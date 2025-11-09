@@ -84,9 +84,10 @@ public final class DrawManager {
 	/**
 	 * Sets the frame to draw the image on.
 	 */
-	public void setFrame(final Frame currentFrame) {
+public void setFrame(final Frame currentFrame) {
 		frame = currentFrame;
         backBuffer = new BackBuffer(frame);
+		fontPack = null;
 	}
 
 	/**
