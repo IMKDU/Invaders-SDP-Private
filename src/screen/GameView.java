@@ -24,7 +24,7 @@ public class GameView {
      */
     /**
      * Draws the elements associated with the screen.
-     * View는 이제 Model의 내부 구조를 모르며, 오직 'Entity 목록'만 받아서 그립니다.
+     * The View is now decoupled from the Model's internal structure and only
      */
     public void draw(Screen screen) {
         drawManager.initDrawing(screen);
