@@ -73,8 +73,6 @@ public class GameModel {
     // === [ADD] Independent scores for two players ===
     private int scoreP1 = 0;
     private int scoreP2 = 0;
-    /** current level parameter */
-    public Level currentlevel;
     /** Player lives left. */
     private int livesP1;
     private int livesP2;
@@ -128,7 +126,6 @@ public class GameModel {
 
         this.currentLevel = level;
         this.bonusLife = bonusLife;
-        this.currentlevel = level;
         this.maxLives = maxLives;
         this.level = gameState.getLevel();
         this.score = gameState.getScore();
@@ -255,10 +252,21 @@ public class GameModel {
         }
     }
 
+    public void updateGameWorld() {
+        // Phase 1: Update state/position of ALL entities
+        this.updateAllEntities();
+
+        // Phase 2: Process interactions and collisions
+        this.processAllCollisions();
+
+        // Phase 3: Clean up destroyed or off-screen entities
+        this.cleanupAllEntities();
+    }
+
     /**
      * Updates all non-player-controlled game logic.
      */
-    public void updateGameWorld() {
+    public void updateAllEntities() {
         switch (this.currentPhase) {
             case wave:
                 if (!DropItem.isTimeFreezeActive()) {
@@ -280,7 +288,7 @@ public class GameModel {
                 else if (this.omegaBoss != null){
                     this.omegaBoss.update();
                     if (this.omegaBoss.isDestroyed()) {
-                        if ("omegaAndFinal".equals(this.currentlevel.getBossId())) {
+                        if ("omegaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.omegaBoss = null;
                             this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, this.width, this.height);
                             this.logger.info("Final Boss has spawned!");
@@ -305,11 +313,25 @@ public class GameModel {
         // special enemy update
         this.enemyShipSpecialFormation.update();
 
-        cleanItems();
+        for (Bullet bullet : this.bullets) {
+            bullet.update();
+        }
+
+        for (DropItem dropItem : this.dropItems) {
+            dropItem.update();
+        }
+    }
+
+    //
+    private void processAllCollisions() {
         manageBulletShipCollisions();
         manageShipEnemyCollisions();
         manageItemCollisions();
+    }
+
+    private void cleanupAllEntities() {
         cleanBullets();
+        cleanItems();
     }
 
 
@@ -319,7 +341,6 @@ public class GameModel {
     private void cleanBullets() {
         Set<Bullet> recyclable = new HashSet<Bullet>();
         for (Bullet bullet : this.bullets) {
-            bullet.update();
             if (bullet.getPositionY() < GameScreen.SEPARATION_LINE_HEIGHT
                     || bullet.getPositionY() > this.height)
                 recyclable.add(bullet);
@@ -335,7 +356,6 @@ public class GameModel {
     private void cleanItems() {
         Set<DropItem> recyclable = new HashSet<DropItem>();
         for (DropItem dropItem : this.dropItems) {
-            dropItem.update();
             if (dropItem.getPositionY() < GameScreen.SEPARATION_LINE_HEIGHT
                     || dropItem.getPositionY() > this.height)
                 recyclable.add(dropItem);
@@ -745,7 +765,7 @@ public class GameModel {
     }
 
     private void bossReveal() {
-        String bossName = this.currentlevel.getBossId();
+        String bossName = this.currentLevel.getBossId();
 
         if (bossName == null || bossName.isEmpty()) {
             this.logger.info("No boss for this level. Proceeding to finish.");
@@ -870,12 +890,12 @@ public class GameModel {
 
     public void processLevelCompletion() {
         if (this.livesP1 > 0 || (this.shipP2 != null && this.livesP2 > 0)) { // Check for win condition
-            if (this.currentlevel.getCompletionBonus() != null) {
-                this.coin += this.currentlevel.getCompletionBonus().getCurrency();
-                this.logger.info("Awarded " + this.currentlevel.getCompletionBonus().getCurrency() + " coins for level completion.");
+            if (this.currentLevel.getCompletionBonus() != null) {
+                this.coin += this.currentLevel.getCompletionBonus().getCurrency();
+                this.logger.info("Awarded " + this.currentLevel.getCompletionBonus().getCurrency() + " coins for level completion.");
             }
 
-            String achievement = this.currentlevel.getAchievementTrigger();
+            String achievement = this.currentLevel.getAchievementTrigger();
             if (achievement != null && !achievement.isEmpty()) {
                 AchievementManager.getInstance().unlockAchievement(achievement);
                 this.logger.info("Unlocked achievement: " + achievement);
@@ -884,8 +904,8 @@ public class GameModel {
     }
 
     public int calculateFinalScore() {
-        this.score += LIFE_SCORE * (this.livesP1 - 1);
-        this.score += LIFE_SCORE * (this.livesP2 - 1);
+        this.score += LIFE_SCORE * Math.max(0, this.livesP1 - 1);
+        this.score += LIFE_SCORE * Math.max(0, this.livesP2 - 1);
         return this.score;
     }
 
