@@ -42,7 +42,8 @@ public class FormationBuilder {
         boolean useQueue = (spriteQueue != null && spriteQueue.size() == cells);
         int qIndex = 0;
 
-        for (List<EnemyShip> column : enemyShips) {
+        for (int j = 0; j < nShipsWide; j++) {
+            List<EnemyShip> column = enemyShips.get(j);
             for (int i = 0; i < nShipsHigh; i++) {
                 SpriteType chosen;
                 if (useQueue) {
@@ -58,7 +59,7 @@ public class FormationBuilder {
                 }
 
                 column.add(new EnemyShip(
-                        (SEPARATION_DISTANCE * enemyShips.indexOf(column)) + INIT_POS_X,
+                        (SEPARATION_DISTANCE * j) + INIT_POS_X,
                         (SEPARATION_DISTANCE * i) + INIT_POS_Y,
                         chosen));
                 // shipCount is now managed by the Model, not the builder.

@@ -293,36 +293,35 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
      * Cleans empty columns, adjusts the width and height of the formation.
      */
     private void cleanUp() {
-        Set<Integer> emptyColumns = new HashSet<Integer>();
+        // Iterate backwards to safely remove elements from the list.
+        for (int i = this.enemyShips.size() - 1; i >= 0; i--) {
+            if (this.enemyShips.get(i).isEmpty()) {
+                this.enemyShips.remove(i);
+                logger.info("Removed column " + i);
+            }
+        }
+
+        if (this.enemyShips.isEmpty()) {
+            this.width = 0;
+            this.height = 0;
+            return;
+        }
+
         int maxColumn = 0;
         int minPositionY = Integer.MAX_VALUE;
-        for (List<EnemyShip> column : this.enemyShips) {
-            if (!column.isEmpty()) {
-                // Height of this column
-                int columnSize = column.get(column.size() - 1).positionY
-                        - this.positionY + this.shipHeight;
-                maxColumn = Math.max(maxColumn, columnSize);
-                minPositionY = Math.min(minPositionY, column.get(0)
-                        .getPositionY());
-            } else {
-                // Empty column, we remove it.
-                emptyColumns.add(this.enemyShips.indexOf(column));
-            }
-        }
-        for (int index : emptyColumns) {
-            this.enemyShips.remove(index);
-            logger.info("Removed column " + index);
-        }
-
-        int leftMostPoint = 0;
-        int rightMostPoint = 0;
+        int leftMostPoint = Integer.MAX_VALUE;
+        int rightMostPoint = Integer.MIN_VALUE;
 
         for (List<EnemyShip> column : this.enemyShips) {
-            if (!column.isEmpty()) {
-                if (leftMostPoint == 0)
-                    leftMostPoint = column.get(0).getPositionX();
-                rightMostPoint = column.get(0).getPositionX();
-            }
+            // Height of this column
+            int columnSize = column.get(column.size() - 1).getPositionY()
+                    - this.positionY + this.shipHeight;
+            maxColumn = Math.max(maxColumn, columnSize);
+            minPositionY = Math.min(minPositionY, column.get(0).getPositionY());
+
+            int columnX = column.get(0).getPositionX();
+            leftMostPoint = Math.min(leftMostPoint, columnX);
+            rightMostPoint = Math.max(rightMostPoint, columnX);
         }
 
         this.width = rightMostPoint - leftMostPoint + this.shipWidth;
@@ -358,42 +357,34 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
      * Ship to be destroyed.
      */
     public final void destroy(final EnemyShip destroyedShip) {
-        for (List<EnemyShip> column : this.enemyShips)
-            for (int i = 0; i < column.size(); i++)
-                if (column.get(i).equals(destroyedShip)) {
-                    column.get(i).destroy();
-                    this.logger.info("Destroyed ship in ("
-                            + this.enemyShips.indexOf(column) + "," + i + ")");
+        for (int i = 0; i < this.enemyShips.size(); i++) {
+            List<EnemyShip> column = this.enemyShips.get(i);
+            int shipIndexInColumn = column.indexOf(destroyedShip);
+
+            if (shipIndexInColumn != -1) {
+                if (!column.get(shipIndexInColumn).isDestroyed()) {
+                    column.get(shipIndexInColumn).destroy();
+                    this.logger.info("Destroyed ship in (" + i + "," + shipIndexInColumn + ")");
+                    this.shipCount--;
+
+                    // Updates the list of ships that can shoot the player.
+                    if (this.shooters.contains(destroyedShip)) {
+                        int destroyedShooterIndex = this.shooters.indexOf(destroyedShip);
+                        EnemyShip nextShooter = getNextShooter(column);
+
+                        if (nextShooter != null) {
+                            this.shooters.set(destroyedShooterIndex, nextShooter);
+                        } else {
+                            this.shooters.remove(destroyedShooterIndex);
+                            this.logger.info("Shooters list reduced to "
+                                    + this.shooters.size() + " members.");
+                        }
+                    }
                 }
-
-        // Updates the list of ships that can shoot the player.
-        if (this.shooters.contains(destroyedShip)) {
-            int destroyedShipIndex = this.shooters.indexOf(destroyedShip);
-            int destroyedShipColumnIndex = -1;
-
-            for (List<EnemyShip> column : this.enemyShips)
-                if (column.contains(destroyedShip)) {
-                    destroyedShipColumnIndex = this.enemyShips.indexOf(column);
-                    break;
-                }
-
-            if (destroyedShipColumnIndex != -1) {
-                EnemyShip nextShooter = getNextShooter(this.enemyShips
-                        .get(destroyedShipColumnIndex));
-
-                if (nextShooter != null)
-                    this.shooters.set(destroyedShipIndex, nextShooter);
-                else {
-                    this.shooters.remove(destroyedShipIndex);
-                    this.logger.info("Shooters list reduced to "
-                            + this.shooters.size() + " members.");
-                }
+                return;
             }
         }
-
-        this.shipCount--;
     }
-
     /**
      * Gets the ship on a given column that will be in charge of shooting.
      *
