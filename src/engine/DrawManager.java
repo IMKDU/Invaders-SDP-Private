@@ -165,8 +165,8 @@ public void setFrame(final Frame currentFrame) {
         return entityRenderer;
     }
 
-    public HUDRenderer getHUDRenderer() {return  hudRenderer;}
+    public HUDRenderer getHUDRenderer() { return hudRenderer; }
 
-    public UIRenderer  getUIRenderer() {return uiRenderer;}
+    public UIRenderer getUIRenderer() { return uiRenderer; }
 
 }
