@@ -50,7 +50,7 @@ public final class SpriteAtlas {
     }
 
     public Map<DrawManager.SpriteType, boolean[][]> getSpriteMap() {
-        return spriteMap;
+        return java.util.Collections.unmodifiableMap(spriteMap);
     }
 
 }
