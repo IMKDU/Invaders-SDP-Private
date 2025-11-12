@@ -149,7 +149,7 @@ public class GameModel {
         this.bossBullets = new HashSet<>();
         enemyShipFormationModel = new EnemyShipFormationModel(this.currentLevel);
         enemyShipFormationModel.attach(this.screen);
-        this.enemyShipFormationModel.applyEnemyColorByLevel(this.currentLevel);
+        this.enemyShipFormationModel.applyEnemyColor(this.currentLevel.getColorForLevel());
         this.ship = new Ship(this.width / 2 - 100, GameScreen.ITEMS_SEPARATION_LINE_HEIGHT - 20,Color.green);
         this.ship.setPlayerId(1);   //=== [ADD] Player 1 ===
 
