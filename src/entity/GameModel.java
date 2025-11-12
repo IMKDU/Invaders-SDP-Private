@@ -64,6 +64,8 @@ public class GameModel {
     private Cooldown screenFinishedCooldown;
     /** OmegaBoss */
     private MidBoss omegaBoss;
+    private DeltaBoss deltaBoss;
+    private List<EnemyShip> deltaBossChilds;
     /** Set of all bullets fired by on-screen ships. */
     private Set<Bullet> bullets;
     /** Set of all dropItems dropped by on screen ships. */
@@ -176,6 +178,8 @@ public class GameModel {
         this.elapsedTime = 0;
         this.finalBoss = null;
         this.omegaBoss = null;
+        this.deltaBoss = null;
+        this.deltaBossChilds = null;
         this.currentPhase = StagePhase.wave;
     }
 
@@ -285,6 +289,13 @@ public class GameModel {
                             this.levelFinished = true;
                             this.screenFinishedCooldown.reset();
                         }
+                    }
+                }
+                else if (this.deltaBoss != null){
+                    this.deltaBoss.update();
+                    if (this.deltaBoss.isDestroyed()) {
+                        this.levelFinished = true;
+                        this.screenFinishedCooldown.reset();
                     }
                 }
                 else{
@@ -460,7 +471,33 @@ public class GameModel {
                     }
                     recyclable.add(bullet);
                 }
-
+                if (this.deltaBoss != null && !this.deltaBoss.isDestroyed()) {
+                    if(checkCollision(bullet, this.deltaBoss)) {
+                        this.deltaBoss.takeDamage(2);
+                        if(this.deltaBoss.getHealPoint() <= 0) {
+                            this.shipsDestroyed++;
+                            int pts = this.deltaBoss.getPointValue();
+                            addPointsFor(bullet, pts);
+                            this.coin += (pts / 10);
+                            this.deltaBoss.destroy();
+                            AchievementManager.getInstance().unlockAchievement("Boss Slayer");
+                            this.bossExplosionCooldown.reset();
+                        }
+                        recyclable.add(bullet);
+                    }
+                    for(EnemyShip ship : deltaBossChilds){
+                        if(ship != null
+                                && !ship.isDestroyed()
+                                && checkCollision(bullet, ship)) {
+                            int pts = ship.getPointValue();
+                            addPointsFor(bullet, pts);
+                            this.coin += (pts / 10);
+                            this.shipsDestroyed++;
+                            ship.destroy();
+                            recyclable.add(bullet);
+                        }
+                    }
+                }
                 /** when final boss collide with bullet */
                 if(this.finalBoss != null && !this.finalBoss.isDestroyed() && checkCollision(bullet,this.finalBoss)){
                     this.finalBoss.takeDamage(1);
@@ -524,6 +561,28 @@ public class GameModel {
                 return;
             }
 
+            if (this.deltaBoss != null && !this.deltaBoss.isDestroyed()) {
+                if (checkCollision(this.ship, this.deltaBoss)) {
+                    this.ship.destroy();
+                    this.livesP1--;
+                    showHealthPopup("-1 Life (Boss Collision!)");
+                    this.logger.info("Ship collided with delta boss! " + this.livesP1
+                        + " lives remaining.");
+                }
+                for(EnemyShip ship : deltaBossChilds){
+                    if(ship != null
+                            && !ship.isDestroyed()
+                            && checkCollision(this.ship, ship)){
+                        this.ship.destroy();
+                        this.livesP1--;
+                        showHealthPopup("-1 Life (Collision!)");
+                        this.logger.info("Ship collided with enemy! " + this.livesP1
+                            + " lives remaining.");
+                        return;
+                    }
+                }
+            }
+
             // Check collision with final boss
             if (this.finalBoss != null && !this.finalBoss.isDestroyed()
                     && checkCollision(this.ship, this.finalBoss)) {
@@ -577,6 +636,27 @@ public class GameModel {
                 return;
             }
 
+            if (this.deltaBoss != null && !this.deltaBoss.isDestroyed()) {
+                if (checkCollision(this.shipP2, this.deltaBoss)) {
+                    this.shipP2.destroy();
+                    this.livesP2--;
+                    showHealthPopup("-1 Life (Boss Collision!)");
+                    this.logger.info("Ship collided with delta boss! " + this.livesP2
+                            + " lives remaining.");
+                }
+                for(EnemyShip ship : deltaBossChilds){
+                    if(ship != null
+                            && !ship.isDestroyed()
+                            && checkCollision(this.shipP2, ship)){
+                        this.shipP2.destroy();
+                        this.livesP2--;
+                        showHealthPopup("-1 Life (Collision!)");
+                        this.logger.info("Ship collided with enemy! " + this.livesP2
+                                + " lives remaining.");
+                        return;
+                    }
+                }
+            }
             // Check collision with final boss
             if (this.finalBoss != null && !this.finalBoss.isDestroyed()
                     && checkCollision(this.shipP2, this.finalBoss)) {
