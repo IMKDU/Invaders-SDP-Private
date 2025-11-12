@@ -2,8 +2,6 @@ package entity;
 
 import java.util.logging.Logger;
 import engine.Core;
-import screen.GameScreen;
-import screen.Screen;
 
 /**
  * Implements a diagonal movement pattern for the formation,
@@ -44,16 +42,22 @@ public class EnemyShipFormationMovement implements IMovementStrategy {
     /** Counter for the remaining duration of the slowdown effect. */
     private int slowDownCount;
     private EnemyShipFormationModel model;
+    /** The maximum Y-coordinate (bottom boundary) the formation is allowed to move to. */
+    private int formationBottomLimit;
+    /** The total width of the playable area, used for calculating the right boundary. */
+    private int formationScreenWidth;
     /**
      * Initializes the movement logic.
      * @param model The parent formation model this strategy will control.
      */
-    public EnemyShipFormationMovement(EnemyShipFormationModel model) {
+    public EnemyShipFormationMovement(EnemyShipFormationModel model, int bottomLimit, int screenWidth) {
         this.model = model;
         this.logger = Core.getLogger();
         this.currentDirection = Direction.DOWN_RIGHT;
         this.isSlowedDown = false;
         this.slowDownCount = 0;
+        this.formationBottomLimit = bottomLimit;
+        this.formationScreenWidth = screenWidth;
     }
 
     /**
@@ -69,10 +73,9 @@ public class EnemyShipFormationMovement implements IMovementStrategy {
         int positionY = model.getPositionY();
         int width = model.getWidth();
         int height = model.getHeight();
-        Screen screen = model.getScreen();
 
-        boolean isAtBottom = positionY + height > GameScreen.ITEMS_SEPARATION_LINE_HEIGHT;
-        boolean isAtRightSide = positionX + width >= screen.getWidth() - SIDE_MARGIN;
+        boolean isAtBottom = positionY + height > formationBottomLimit;
+        boolean isAtRightSide = positionX + width >= formationScreenWidth - SIDE_MARGIN;
         boolean isAtLeftSide = positionX <= SIDE_MARGIN;
         boolean isAtTop = positionY <= INIT_POS_Y;
 

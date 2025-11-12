@@ -13,7 +13,7 @@ import engine.level.Level;
 
 /**
  * Groups enemy ships into a formation.
- * (MODEL - Contains data and coordinates logic via helpers)
+ * (MODEL - Contains data and coordinates logic using components)
  */
 public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 
@@ -72,7 +72,7 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
      *
      * @param level The level data (for speed, shooting, etc.).
      */
-    public EnemyShipFormationModel(final Level level) {
+    public EnemyShipFormationModel(final Level level,int bottomLimit, int screenWidth) {
         this.logger = Core.getLogger();
         this.movementInterval = 0;
         this.levelObj = level;
@@ -84,7 +84,7 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
                 level.getFormationHeight()
         );
 
-        this.movementStrategy = new EnemyShipFormationMovement(this);
+        this.movementStrategy = new EnemyShipFormationMovement(this,bottomLimit,screenWidth);
         this.shootingManager = new FormationShootingManager(level, this.enemyShips);
 
         this.nShipsWide = level.getFormationWidth();
@@ -121,16 +121,6 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
      */
     public final List<List<EnemyShip>> getEnemyShips() {
         return this.enemyShips;
-    }
-
-    /**
-     * Associates the formation to a given screen.
-     *
-     * @param newScreen
-     * Screen to attach.
-     */
-    public final void attach(final Screen newScreen) {
-        this.screen = newScreen;
     }
 
     /**
