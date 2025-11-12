@@ -12,6 +12,7 @@
       "enemyTypes": [
         { "type": "enemyA", "count": 20 }
       ],
+      "bossId": "deltaBoss",
       "completionBonus": { "currency": 10 }
     },
     {
