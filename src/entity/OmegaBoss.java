@@ -1,8 +1,6 @@
 package entity;
 
 import engine.DrawManager;
-import screen.GameScreen;
-
 import java.awt.*;
 
 /**
