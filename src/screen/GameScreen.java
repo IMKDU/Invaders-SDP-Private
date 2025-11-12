@@ -20,10 +20,6 @@ public class GameScreen extends Screen {
     /** Height of the items separation line (above items). */
     public static final int ITEMS_SEPARATION_LINE_HEIGHT = 400;
 
-    public static int getItemsSeparationLineHeight() {
-        return ITEMS_SEPARATION_LINE_HEIGHT;
-    }
-
     /** Current level data. */
     private final Level currentLevel;
     private final boolean bonusLife;
@@ -35,7 +31,21 @@ public class GameScreen extends Screen {
     private GameView view;     // View
 
     /**
-     * Constructor - establishes the properties of the screen.
+     * Constructor, establishes the properties of the screen.
+     *
+     * @param gameState
+     * Current game state.	 * @param level
+     * Current level settings.
+     * @param bonusLife
+     * Checks if a bonus life is awarded this level.
+     * @param maxLives
+     * Maximum number of lives.
+     * @param width
+     * Screen width.
+     * @param height
+     * Screen height.
+     * @param fps
+     * Frames per second, frame rate at which the game is run.
      */
     public GameScreen(final GameState gameState,
                       final Level level, final boolean bonusLife, final int maxLives,
@@ -89,7 +99,7 @@ public class GameScreen extends Screen {
     protected final void update() {
         super.update();
 
-        // 1️⃣ Input Handling
+        // Input Handling
         if (this.inputDelay.checkFinished() && !this.model.isLevelFinished()) {
 
             if (!this.model.isTimerRunning()) {
@@ -128,16 +138,16 @@ public class GameScreen extends Screen {
             this.model.updateGameWorld();
         }
 
-        // 2️⃣ Timer
+        // Timer
         if (this.model.isTimerRunning()) {
             this.model.updateElapsedTime();
         }
 
-        // 3️⃣ Create DTO and render via View
+        // Create DTO and render via View
         HUDInfoDTO hudInfo = createHUDInfoDTO();
         this.view.render(hudInfo);
 
-        // 4️⃣ Game Over / Level Finish check
+        // Game Over / Level Finish check
         if (this.model.isGameOver() && !this.model.isLevelFinished()) {
             this.model.setGameOver();
         }

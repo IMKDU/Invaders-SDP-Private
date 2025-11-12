@@ -57,7 +57,7 @@ public final class ShopRenderer {
             boolean isLevelSelection = (i == dto.getSelectedItem() && dto.getSelectionMode() == 1);
             int currentLevel = dto.getCurrentLevels()[i];
 
-            drawShopItem(g, dto.getScreenWidth(), dto.getItemNames()[i], dto.getItemDescriptions()[i], dto.getItemPrices()[i],
+            drawShopItem(dto.getScreenWidth(), dto.getItemNames()[i], dto.getItemDescriptions()[i], dto.getItemPrices()[i],
                     dto.getMaxLevels()[i], currentLevel, currentY,
                     isSelected, dto.getCoinBalance(), isLevelSelection, dto.getSelectedLevel());
 
@@ -75,7 +75,6 @@ public final class ShopRenderer {
      * Draws a single shop item with level indicators.
      */
     private void drawShopItem(
-            Graphics g,
             final int screenWidth,
             String itemName,
             String description,
@@ -88,6 +87,7 @@ public final class ShopRenderer {
             boolean isLevelSelection,
             int selectedLevel
     ) {
+        Graphics g = backBuffer.getGraphics();
         g.setFont(fontPack.getRegular());
         FontMetrics metrics = g.getFontMetrics();
 
