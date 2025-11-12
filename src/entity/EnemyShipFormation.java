@@ -266,7 +266,7 @@ public class EnemyShipFormation implements Iterable<EnemyShip> {
 	public final void draw() {
 		for (List<EnemyShip> column : this.enemyShips)
 			for (EnemyShip enemyShip : column)
-				drawManager.drawEntity(enemyShip, enemyShip.getPositionX(),
+				drawManager.getEntityRenderer().drawEntity(enemyShip, enemyShip.getPositionX(),
 						enemyShip.getPositionY());
 	}
 
@@ -297,7 +297,7 @@ public class EnemyShipFormation implements Iterable<EnemyShip> {
             updateSlowdown();
 
 			boolean isAtBottom = positionY
-					+ this.height > GameScreen.getItemsSeparationLineHeight();
+					+ this.height > GameScreen.ITEMS_SEPARATION_LINE_HEIGHT;
 			boolean isAtRightSide = positionX
 					+ this.width >= screen.getWidth() - SIDE_MARGIN;
 			boolean isAtLeftSide = positionX <= SIDE_MARGIN;
