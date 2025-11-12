@@ -41,7 +41,7 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.OmegaBossDeath, new boolean[16][16]);
             fileManager.loadSprite(spriteMap);
         } catch (IOException e) {
-            System.out.println("[SpriteAtlas] Failed to load sprites: " + e.getMessage());
+            Core.getLogger().warning("[SpriteAtlas] Failed to load sprites: " + e.getMessage());
         }
     }
 
@@ -50,7 +50,7 @@ public final class SpriteAtlas {
     }
 
     public Map<DrawManager.SpriteType, boolean[][]> getSpriteMap() {
-        return spriteMap;
+        return java.util.Collections.unmodifiableMap(spriteMap);
     }
 
 }

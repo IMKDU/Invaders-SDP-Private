@@ -84,9 +84,10 @@ public final class DrawManager {
 	/**
 	 * Sets the frame to draw the image on.
 	 */
-	public void setFrame(final Frame currentFrame) {
+public void setFrame(final Frame currentFrame) {
 		frame = currentFrame;
         backBuffer = new BackBuffer(frame);
+		fontPack = null;
 	}
 
 	/**
@@ -164,8 +165,8 @@ public final class DrawManager {
         return entityRenderer;
     }
 
-    public HUDRenderer getHUDRenderer() {return  hudRenderer;}
+    public HUDRenderer getHUDRenderer() { return hudRenderer; }
 
-    public UIRenderer  getUIRenderer() {return uiRenderer;}
+    public UIRenderer getUIRenderer() { return uiRenderer; }
 
 }

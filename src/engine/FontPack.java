@@ -8,13 +8,13 @@ import java.io.IOException;
 import engine.FileManager;
 
 public final class FontPack {
-    public final Font fontRegular;
-    public final Font fontBig;
-    public final Font fontSmall;
+    private final Font fontRegular;
+    private final Font fontBig;
+    private final Font fontSmall;
 
-    public final FontMetrics regularMetrics;
-    public final FontMetrics bigMetrics;
-    public final FontMetrics smallMetrics;
+    private final FontMetrics regularMetrics;
+    private final FontMetrics bigMetrics;
+    private final FontMetrics smallMetrics;
 
     public FontPack(Graphics graphics, FileManager fm) {
         try {
