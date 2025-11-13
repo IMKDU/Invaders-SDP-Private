@@ -4,7 +4,7 @@ import java.awt.Color;
 import engine.DrawManager.SpriteType;
 import java.util.Random;
 
-public class DropItem extends Entity {
+public class DropItem extends Entity implements Collidable {
     public enum ItemType {
         Explode(2),
         Slow(10),
@@ -187,5 +187,18 @@ public class DropItem extends Entity {
         else {
             return null;
         }
+    }
+    /**
+     * Handles collision behavior for dropped items.
+     * When a ship touches the item, the item is collected.
+     */
+    @Override
+    public void onCollision(Collidable other, GameModel game) {
+        if (!(other instanceof Ship)) return;
+
+        Ship ship = (Ship) other;
+        if (game.isLevelFinished()) return;
+
+        game.handleItemCollected(ship, this);
     }
 }

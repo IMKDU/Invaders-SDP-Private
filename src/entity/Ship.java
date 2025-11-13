@@ -14,7 +14,7 @@ import engine.DrawManager.SpriteType;
  * @author <a href="mailto:RobertoIA1987@gmail.com">Roberto Izquierdo Amo</a>
  * 
  */
-public class Ship extends Entity {
+public class Ship extends Entity implements Collidable {
 
 	/** Time between shots. */
 	private static final int SHOOTING_INTERVAL = 750;
@@ -144,7 +144,6 @@ public class Ship extends Entity {
 	public final void update() {
         if (this.isInvincible && this.shieldCooldown.checkFinished()) {
             this.isInvincible = false;
-            this.setColor(Color.GREEN);
         }
 
         if (!this.destructionCooldown.checkFinished())
@@ -201,6 +200,43 @@ public class Ship extends Entity {
         this.isInvincible = true;
         this.shieldCooldown.setMilliseconds(duration);
         this.shieldCooldown.reset();
-        this.setColor(Color.BLUE);
+    }
+    @Override
+    public void onCollision(Collidable other, GameModel game) {
+
+        // 0) Ignore collisions if level is finished
+        if (game.isLevelFinished()) return;
+
+        // 1) Hit by enemy bullet
+        if (other instanceof Bullet) {
+            Bullet bullet = (Bullet) other;
+
+            // Enemy bullet (speed > 0)
+            if (bullet.getSpeed() > 0) {
+                game.handleEnemyBulletHitPlayer(bullet, this);
+            }
+            return;
+        }
+        // 2) Hit by boss bullet
+        if (other instanceof BossBullet) {
+            game.handleBossBulletHitPlayer((BossBullet) other, this);
+            return;
+        }
+        // 3) Collision with normal enemy ship
+        if (other instanceof EnemyShip) {
+            game.handlePlayerCrash(this, (EnemyShip) other);
+            return;
+        }
+        // 4) Collision with FinalBoss
+        if (other instanceof FinalBoss) {
+            game.handlePlayerCrash(this, (FinalBoss) other);
+            return;
+        }
+
+        // 5) Collision with OmegaBoss
+        if (other instanceof OmegaBoss) {
+            game.handlePlayerCrash(this, (OmegaBoss) other);
+            return;
+        }
     }
 }

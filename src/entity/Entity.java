@@ -10,7 +10,7 @@ import engine.DrawManager.SpriteType;
  * @author <a href="mailto:RobertoIA1987@gmail.com">Roberto Izquierdo Amo</a>
  * 
  */
-public class Entity {
+public class Entity implements Collidable{
 
 	/** Position in the x-axis of the upper left corner of the entity. */
 	protected int positionX;
@@ -131,4 +131,16 @@ public class Entity {
 	public final int getHeight() {
 		return this.height;
 	}
+
+    @Override
+    public Entity asEntity() {
+        return this;
+    }
+    /**
+     * Default collision handler for all entities.
+     * Specific entities override this to implement their own collision logic.
+     */
+    @Override
+    public void onCollision(Collidable other, GameModel gameModel) {
+    }
 }

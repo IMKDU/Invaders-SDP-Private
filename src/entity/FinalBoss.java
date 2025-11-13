@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-public class FinalBoss extends Entity implements BossEntity{
+public class FinalBoss extends Entity implements BossEntity, Collidable{
 
     private int healPoint;
     private int maxHp;
@@ -83,9 +83,6 @@ public class FinalBoss extends Entity implements BossEntity{
         this.healPoint -= damage;
         SoundManager.stop("sfx/pikachu.wav");
         SoundManager.play("sfx/pikachu.wav");
-        if(this.healPoint <= 0){
-            this.destroy();
-        }
     }
 
     @Override
@@ -205,5 +202,27 @@ public class FinalBoss extends Entity implements BossEntity{
     @Override
     public void draw(DrawManager drawManager) {
         drawManager.getEntityRenderer().drawEntity(this, this.positionX, this.positionY);
+    }
+
+    /**
+     * Overrides collision handling for FinalBoss.
+     * Defines how the boss reacts to player bullets and ship collisions.
+     */
+    @Override
+    public void onCollision(Collidable other, GameModel game) {
+
+        if (other instanceof Bullet) {
+            Bullet bullet = (Bullet) other;
+
+            if (bullet.getSpeed() < 0) {
+                game.handlePlayerBulletHitFinalBoss(bullet, this);
+            }
+            return;
+        }
+
+        if (other instanceof Ship) {
+            Ship ship = (Ship) other;
+            game.playerTakeDamage(ship, 1);
+        }
     }
 }

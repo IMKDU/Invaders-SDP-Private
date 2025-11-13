@@ -5,7 +5,7 @@ import engine.DrawManager;
 import java.awt.*;
 
 
-public class BossBullet extends Entity{
+public class BossBullet extends Entity implements Collidable{
     /** amount of horizontal change*/
     private int dx;
     /** amount of vertical change*/
@@ -49,10 +49,14 @@ public class BossBullet extends Entity{
         return positionX < 0 || positionX > screenWidth ||
                 positionY < 0 || positionY > screenHeight;
     }
-
-
-
-
-
-
+    /**
+     * Handles collision behavior for boss bullets.
+     * Boss bullets damage the player when they collide.
+     */
+    @Override
+    public void onCollision(Collidable other, GameModel game) {
+        if (other instanceof Ship) {
+            game.handleBossBulletHitPlayer(this, (Ship) other);
+        }
+    }
 }
