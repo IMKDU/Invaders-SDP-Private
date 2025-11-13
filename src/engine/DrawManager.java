@@ -38,8 +38,8 @@ public final class DrawManager {
     private HUDRenderer hudRenderer;
     private ShopRenderer shopRenderer;
     private UIRenderer uiRenderer;
-    private int scaleX;
-    private int scaleY;
+    private double scaleX;
+    private double scaleY;
 
 	/** Sprite types mapped to their images. */
 	private static Map<SpriteType, boolean[][]> spriteMap;
@@ -145,8 +145,8 @@ public void setFrame(final Frame currentFrame) {
 		}
 	}
     public void setScale(double scaleX, double scaleY){
-        this.scaleX = (int) scaleX;
-        this.scaleY = (int) scaleY;
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
     }
 
     public void drawShootingStars(final List<ShootingStar> shootingStars, final float angle) {    }

@@ -15,10 +15,10 @@ public final class EntityRenderer {
 
     private final Map<SpriteType, boolean[][]> spriteMap;
     private final BackBuffer backBuffer;
-    private final int scaleX;
-    private final int scaleY;
+    private final double scaleX;
+    private final double scaleY;
 
-    public EntityRenderer(Map<SpriteType, boolean[][]> spriteMap, BackBuffer backBuffer, int scaleX, int scaleY) {
+    public EntityRenderer(Map<SpriteType, boolean[][]> spriteMap, BackBuffer backBuffer, double scaleX, double scaleY) {
         this.spriteMap = spriteMap;
         this.backBuffer = backBuffer;
         this.scaleX = scaleX;
@@ -42,7 +42,7 @@ public final class EntityRenderer {
                     // 스케일 적용된 픽셀 크기
                     int pixelWidth = (int) Math.max(1, 2 * this.scaleX);
                     int pixelHeight = (int) Math.max(1, 2 * this.scaleY);
-                    g.drawRect(scaledX, scaledY, 1, 1);
+                    g.fillRect(scaledX, scaledY, pixelWidth, pixelHeight);
                 }
             }
         }
