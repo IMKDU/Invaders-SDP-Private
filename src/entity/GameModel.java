@@ -117,6 +117,7 @@ public class GameModel {
     /** Milliseconds until the screen accepts user input. */
     private Cooldown inputDelay;
 
+    /** variables for Boss BlackHole Pattern */
     private BossPattern bossPattern;
     private boolean blackHoleActive = false;
     private int blackHoleCX;

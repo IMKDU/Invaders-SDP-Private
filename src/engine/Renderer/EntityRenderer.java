@@ -17,6 +17,9 @@ public final class EntityRenderer {
     private final Map<SpriteType, boolean[][]> spriteMap;
     private final BackBuffer backBuffer;
 
+    /** BlackHole Color */
+    private static final Color BLACK_HOLE_COLOR = new Color(200, 0, 255);
+
     public EntityRenderer(Map<SpriteType, boolean[][]> spriteMap, BackBuffer backBuffer) {
         this.spriteMap = spriteMap;
         this.backBuffer = backBuffer;
@@ -44,7 +47,7 @@ public final class EntityRenderer {
             int y = cy - radius/2;
 
             Graphics g = backBuffer.getGraphics();
-            g.setColor(new Color (200, 0, 255));
+            g.setColor(BLACK_HOLE_COLOR);
             g.drawOval(x, y, radius, radius);
         }
     }
