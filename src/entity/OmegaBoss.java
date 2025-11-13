@@ -39,9 +39,9 @@ public class OmegaBoss extends MidBoss {
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
 	 *
-	 * @param widthBoundary		The lowermost X-coordinate for the boss's movement. The boss cannot move over this value.
-	 * @param bottomBoundary    The lowermost Y-coordinate for the boss's movement. The boss cannot move below this value.
-	 * @param color     Color of the boss entity.
+ 	 * @param color             Color of the boss entity.
+ 	 * @param widthBoundary		The rightmost X-coordinate for the boss's movement. The boss cannot move over this value.
+ 	 * @param bottomBoundary    The lowermost Y-coordinate for the boss's movement. The boss cannot move below this value.
 	 */
 	public OmegaBoss(Color color, int widthBoundary, int bottomBoundary) {
 		super(INIT_POS_X, INIT_POS_Y, OMEGA_WIDTH, OMEGA_HEIGHT, OMEGA_HEALTH, OMEGA_POINT_VALUE, color);
