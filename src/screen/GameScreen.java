@@ -16,9 +16,9 @@ import entity.GameModel;
 public class GameScreen extends Screen {
 
     /** Height of the interface separation line. */
-    public static final int SEPARATION_LINE_HEIGHT = 45;
+    public static int SEPARATION_LINE_HEIGHT;
     /** Height of the items separation line (above items). */
-    public static final int ITEMS_SEPARATION_LINE_HEIGHT = 400;
+    public static int ITEMS_SEPARATION_LINE_HEIGHT;
 
     /** Current level data. */
     private final Level currentLevel;
@@ -55,8 +55,9 @@ public class GameScreen extends Screen {
         this.bonusLife = bonusLife;
         this.maxLives = maxLives;
         this.gameState = gameState;
+        SEPARATION_LINE_HEIGHT = (int) (height * 0.08);
+        ITEMS_SEPARATION_LINE_HEIGHT = (int) (height * 0.9);
     }
-
     /**
      * Initializes the Model and View.
      */

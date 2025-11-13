@@ -2,6 +2,7 @@ package engine;
 
 import audio.SoundManager;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
@@ -31,9 +32,9 @@ import screen.*;
 public final class Core {
 
 	/** Width of current screen. */
-	private static final int WIDTH = 700;
+	private static int WIDTH;
 	/** Height of current screen. */
-	private static final int HEIGHT = 800;
+	private static int HEIGHT;
 	/** Max fps of current screen. */
 	private static final int FPS = 60;
 
@@ -81,6 +82,15 @@ public final class Core {
 			// TODO handle exception
 			e.printStackTrace();
 		}
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        WIDTH = (int) (screenSize.getWidth() * 0.8);
+        HEIGHT = (int) (screenSize.getHeight() * 0.9);
+
+        //screen 사이즈 비율
+        double scaleX = (double) WIDTH / 1228.0;
+        double scaleY = (double) HEIGHT / 777.0;
+
+        DrawManager.getInstance().setScale(scaleX, scaleY);
 
 		frame = new Frame(WIDTH, HEIGHT);
 		DrawManager.getInstance().setFrame(frame);
@@ -88,12 +98,12 @@ public final class Core {
 		int height = frame.getHeight();
 
 		levelManager = new LevelManager();
-		GameState gameState = new GameState(1, 0, MAX_LIVES, MAX_LIVES, 0, 0,0);
+		GameState gameState = new GameState(4, 0, MAX_LIVES, MAX_LIVES, 0, 0,0);
 
 
         int returnCode = 1;
 		do {
-            gameState = new GameState(1, 0, MAX_LIVES,MAX_LIVES, 0, 0,gameState.getCoin());
+            gameState = new GameState(4, 0, MAX_LIVES,MAX_LIVES, 0, 0,gameState.getCoin());
 			switch (returnCode) {
                 case 1:
                     // Main menu.

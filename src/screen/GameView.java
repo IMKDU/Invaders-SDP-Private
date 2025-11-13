@@ -36,17 +36,17 @@ public class GameView {
         }
 
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25);
-        drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 40);
+        drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50);
         drawManager.getHUDRenderer().drawCoin(dto.getWidth(), dto.getHeight(), dto.getCoin());
-        drawManager.getHUDRenderer().drawLivesP1(dto.getLivesP1());
-        drawManager.getHUDRenderer().drawLivesP2(dto.getLivesP2());
+        drawManager.getHUDRenderer().drawLivesP1(dto.getWidth(),dto.getHeight(),dto.getLivesP1());
+        drawManager.getHUDRenderer().drawLivesP2(dto.getWidth(),dto.getHeight(),dto.getLivesP2());
         drawManager.getHUDRenderer().drawTime(dto.getHeight(), dto.getElapsedTimeMillis());
-        drawManager.getHUDRenderer().drawItemsHUD(dto.getWidth());
+        drawManager.getHUDRenderer().drawItemsHUD(dto.getWidth(), dto.getHeight());
         drawManager.getHUDRenderer().drawLevel(dto.getHeight(), dto.getLevelName());
 
         /** draw Line */
-        drawManager.getUIRenderer().drawHorizontalLine(dto.getHeight(), GameScreen.SEPARATION_LINE_HEIGHT - 1);
-        drawManager.getUIRenderer().drawHorizontalLine(dto.getHeight(), GameScreen.ITEMS_SEPARATION_LINE_HEIGHT);
+        drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), GameScreen.SEPARATION_LINE_HEIGHT - 1);
+        drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), GameScreen.ITEMS_SEPARATION_LINE_HEIGHT);
 
         /** achievement popup */
         if (dto.getAchievementText() != null && !model.getAchievementPopupCooldown().checkFinished()) {
@@ -71,8 +71,8 @@ public class GameView {
                     model.isBonusLife()
             );
 
-            drawManager.getUIRenderer().drawHorizontalLine(dto.getHeight(), dto.getHeight() / 2 - dto.getHeight() / 12);
-            drawManager.getUIRenderer().drawHorizontalLine(dto.getHeight(), dto.getHeight() / 2 + dto.getHeight() / 12);
+            drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), dto.getHeight() / 2 - dto.getHeight() / 12);
+            drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), dto.getHeight() / 2 + dto.getHeight() / 12);
         }
 
         /** frame complete */

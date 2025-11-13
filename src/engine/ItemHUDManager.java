@@ -1,7 +1,6 @@
 package engine;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,12 +27,10 @@ public class ItemHUDManager {
 
     /** Spacing between squares */
     private static final int SQUARE_SPACING = 3;
-
     /** Y position for fixed shop items (bottom row) */
-    private static final int FIXED_ITEMS_Y = 450;
-
+    private static int FIXED_ITEMS_Y;
     /** Y position for dynamic dropped items (top row) */
-    private static final int DYNAMIC_ITEMS_Y = 420;
+    private static int DYNAMIC_ITEMS_Y;
 
     /** X position to start drawing items (right side) */
     private int startX;
@@ -78,7 +75,12 @@ public class ItemHUDManager {
         if (instance == null) {
             instance = new ItemHUDManager();
         }
+
         return instance;
+    }
+    public void setHUDPositions(int screenHeight) {
+        DYNAMIC_ITEMS_Y = (int) (screenHeight * 0.9 + 10);
+        FIXED_ITEMS_Y = DYNAMIC_ITEMS_Y + 30;
     }
 
     /**
@@ -180,11 +182,10 @@ public class ItemHUDManager {
         Color bgColor = isActive ? Color.GREEN : Color.DARK_GRAY;
         graphics.setColor(bgColor);
         graphics.fillRect(x, y, ITEM_SQUARE_SIZE, ITEM_SQUARE_SIZE);
-
+        graphics.setFont(new Font("Arial", Font.PLAIN, 12));
         // Draw border
         graphics.setColor(Color.WHITE);
         graphics.drawRect(x, y, ITEM_SQUARE_SIZE, ITEM_SQUARE_SIZE);
-
         // Draw item icon/letter
         graphics.setColor(Color.WHITE);
         String itemLetter = getShopItemLetter(itemType);

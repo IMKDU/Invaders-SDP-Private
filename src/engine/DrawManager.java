@@ -38,6 +38,8 @@ public final class DrawManager {
     private HUDRenderer hudRenderer;
     private ShopRenderer shopRenderer;
     private UIRenderer uiRenderer;
+    private int scaleX;
+    private int scaleY;
 
 	/** Sprite types mapped to their images. */
 	private static Map<SpriteType, boolean[][]> spriteMap;
@@ -91,7 +93,7 @@ public void setFrame(final Frame currentFrame) {
         backBuffer.initDraw(screenWidth, screenHeight);
         if(fontPack == null){
             fontPack = new FontPack(backBuffer.getGraphics(), fileManager);
-            entityRenderer = new EntityRenderer(spriteAtlas.getSpriteMap(),backBuffer);
+            entityRenderer = new EntityRenderer(spriteAtlas.getSpriteMap(),backBuffer, this.scaleX, this.scaleY);
             hudRenderer = new HUDRenderer(backBuffer, fontPack, entityRenderer);
             shopRenderer = new ShopRenderer(backBuffer,fontPack);
             uiRenderer = new UIRenderer(backBuffer,fontPack);
@@ -142,6 +144,10 @@ public void setFrame(final Frame currentFrame) {
 			g.drawRect(screenX, screenY, 1, 1);
 		}
 	}
+    public void setScale(double scaleX, double scaleY){
+        this.scaleX = (int) scaleX;
+        this.scaleY = (int) scaleY;
+    }
 
     public void drawShootingStars(final List<ShootingStar> shootingStars, final float angle) {    }
 

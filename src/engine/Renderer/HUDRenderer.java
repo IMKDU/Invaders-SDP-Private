@@ -63,12 +63,11 @@ public final class HUDRenderer {
     }
 
     /** Draw number of remaining lives for Player 1. */
-    public void drawLivesP1(final int lives) {
+    public void drawLivesP1(final int screenWidth, final int screenHeight,final int lives) {
         Graphics g = backBuffer.getGraphics();
         g.setFont(fontPack.getRegular());
         g.setColor(Color.WHITE);
-        g.drawString("P1:", 15, 25);
-
+        g.drawString("P1:", 10, 25);
         Ship dummyShip = new Ship(0, 0, Color.GREEN);
         for (int i = 0; i < lives; i++) {
             entityRenderer.drawEntity(dummyShip, 40 + 35 * i, 10);
@@ -76,22 +75,22 @@ public final class HUDRenderer {
     }
 
     /** Draw number of remaining lives for Player 2. */
-    public void drawLivesP2(final int lives) {
+    public void drawLivesP2(final int screenWidth, final int screenHeight, final int lives) {
         Graphics g = backBuffer.getGraphics();
         g.setFont(fontPack.getRegular());
         g.setColor(Color.WHITE);
-        g.drawString("P2:", 15, 40);
-
+        g.drawString("P2:", 10, 55);
         Ship dummyShip = new Ship(0, 0, Color.PINK);
         for (int i = 0; i < lives; i++) {
-            entityRenderer.drawEntity(dummyShip, 40 + 35 * i, 30);
+            entityRenderer.drawEntity(dummyShip, 40 + 35 * i, 40);
         }
     }
 
     /** Draw all item icons on HUD. */
-    public void drawItemsHUD(final int screenWidth) {
+    public void drawItemsHUD(final int screenWidth, final int screeHeight) {
         Graphics g = backBuffer.getGraphics();
         ItemHUDManager hud = ItemHUDManager.getInstance();
+        hud.setHUDPositions(screeHeight);
         hud.initialize(screenWidth);
         hud.drawItems(g);
     }
