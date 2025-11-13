@@ -818,8 +818,6 @@ public class GameModel {
                 blackHoleCX = this.finalBoss.getPositionX() + this.finalBoss.getWidth() / 2;
                 blackHoleCY = this.finalBoss.getPositionY() + this.finalBoss.getHeight() + 50;
                 blackHoleRadius = 400;
-
-                bossPattern.blackHolePattern(ships, blackHoleCX, blackHoleCY, blackHoleRadius);
             }
 
             /** BlackHole duration */
