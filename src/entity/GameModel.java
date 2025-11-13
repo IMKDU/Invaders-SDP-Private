@@ -818,7 +818,7 @@ public class GameModel {
                 blackHoleCY = this.finalBoss.getPositionY() + this.finalBoss.getHeight() + 50;
                 blackHoleRadius = 400;
 
-                bossPattern.BlackHolePattern(ships, blackHoleCX, blackHoleCY, blackHoleRadius);
+                bossPattern.blackHolePattern(ships, blackHoleCX, blackHoleCY, blackHoleRadius);
             }
 
             /** BlackHole duration */
@@ -826,7 +826,7 @@ public class GameModel {
                 if(blackHoleCooldown.checkFinished()){
                     blackHoleActive = false;
                 }
-                bossPattern.BlackHolePattern(ships, blackHoleCX, blackHoleCY, blackHoleRadius);
+                bossPattern.blackHolePattern(ships, blackHoleCX, blackHoleCY, blackHoleRadius);
             }
 
             /** called the boss shoot logic */

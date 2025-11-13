@@ -7,7 +7,7 @@ public class BossPattern {
     private final double pullConstant = 0.005;
 
     /** Pull attack pattern */
-    public void BlackHolePattern(List<Ship> ships, final int cx, final int cy, final int radius) {
+    public void blackHolePattern(List<Ship> ships, final int cx, final int cy, final int radius) {
         for(Ship ship : ships){
             double sx = ship.positionX;
             double sy = ship.positionY;
