@@ -54,11 +54,13 @@ public final class HUDRenderer {
         Graphics g = backBuffer.getGraphics();
         g.setFont(fontPack.getRegular());
         g.setColor(Color.WHITE);
+        FontMetrics fm = g.getFontMetrics();
+        int fontHeight = fm.getHeight();
 
         String coinString = String.format("%03d$", coin);
         int textWidth = fontPack.getRegularMetrics().stringWidth(coinString);
         int x = screenWidth / 2 - textWidth / 2;
-        int y = screenHeight - 50;
+        int y = screenHeight - fontHeight;
 
         g.drawString(coinString, x, y);
     }
