@@ -358,8 +358,6 @@ public class GameModel {
                 }
             }
         }
-
-        cleanupAllEntities();
     }
 
 
@@ -412,7 +410,7 @@ public class GameModel {
      * When an enemy bullet hits the player, apply damage and remove the bullet.
      */
     public void handleEnemyBulletHitPlayer(Bullet b, Ship ship) {
-            if (!bullets.contains(b)) return;  // 이미 처리됨
+            if (!bullets.contains(b)) return;
         playerTakeDamage(ship, 1);
         bullets.remove(b);
     }
@@ -430,8 +428,11 @@ public class GameModel {
 
         if (boss.getHealPoint() <= 0) {
             boss.destroy();
-            score += 500;
-            coin += 100;
+
+            int pts = boss.getPointValue();
+            addPointsFor(bullet, pts);
+            this.coin += pts / 10;
+            AchievementManager.getInstance().unlockAchievement("Boss Slayer");
         }
     }
 
@@ -510,7 +511,11 @@ public class GameModel {
 
             if (Math.random() > drop.getDropChance()) continue;
 
-            DropItem.ItemType type = DropItem.ItemType.valueOf(drop.getItemId());
+            DropItem.ItemType type = DropItem.fromString(drop.getItemId());
+            if (type == null) {
+                logger.warning("Invalid itemId in level config: " + drop.getItemId());
+                continue;
+            }
 
             DropItem item = new DropItem(
                     enemy.getPositionX(),
