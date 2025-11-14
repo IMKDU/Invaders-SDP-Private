@@ -62,11 +62,11 @@ public class TestModel {
 				if (!isLeftBorder) player.moveLeft();
 				break;
 			case "UP":
-				boolean isUpBorder = player.getPositionY() - player.getSpeed() < height;
+				boolean isUpBorder = player.getPositionY() - player.getSpeed() < this.height;
 				if (!isUpBorder) player.moveUp();
 				break;
 			case "DOWN":
-				boolean isDownBorder = player.getPositionY() + player.getHeight() + player.getSpeed() > height;
+				boolean isDownBorder = player.getPositionY() + player.getHeight() + player.getSpeed() > this.height;
 				if (!isDownBorder) player.moveDown();
 				break;
 		}
