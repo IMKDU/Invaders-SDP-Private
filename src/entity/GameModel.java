@@ -367,7 +367,6 @@ public class GameModel {
     public void handlePlayerBulletHitEnemy(Bullet bullet, EnemyShip enemy) {
 
         if (!bullets.contains(bullet)) return;
-
         if (enemy.isDestroyed()) return;
 
         int pts = enemy.getPointValue();
@@ -377,8 +376,17 @@ public class GameModel {
         AchievementManager.getInstance().onEnemyDefeated();
 
         attemptItemDrop(enemy);
-        enemyShipFormation.destroy(enemy);
 
+        String type = enemy.getEnemyType();
+        if ("enemySpecial".equals(type)) {
+            if (enemyShipSpecialFormation != null) {
+                enemyShipSpecialFormation.destroy(enemy);
+            }
+        } else {
+            if (enemyShipFormation != null) {
+                enemyShipFormation.destroy(enemy);
+            }
+        }
         if (!bullet.penetration()) {
             bullets.remove(bullet);
         }
@@ -449,7 +457,22 @@ public class GameModel {
      */
     public void handlePlayerCrash(Ship ship, Entity enemy) {
 
-        if (enemy instanceof EnemyShip && ((EnemyShip) enemy).isDestroyed()) return;
+        if (enemy instanceof EnemyShip) {
+            EnemyShip e = (EnemyShip) enemy;
+            if (!e.isDestroyed()) {
+                String type = e.getEnemyType();
+
+                if ("enemySpecial".equals(type)) {
+                    if (enemyShipSpecialFormation != null) {
+                        enemyShipSpecialFormation.destroy(e);
+                    }
+                } else {
+                    if (enemyShipFormation != null) {
+                        enemyShipFormation.destroy(e);
+                    }
+                }
+            }
+        }
         playerTakeDamage(ship, 1);
     }
 
