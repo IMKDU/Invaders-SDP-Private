@@ -45,7 +45,7 @@ public class GameModel {
     /** Current difficulty level number. */
     private int level;
     /** Formation of enemy ships. */
-    private EnemyShipFormation enemyShipFormation;
+    private EnemyShipFormationModel enemyShipFormationModel;
     /** Formation of special enemy ships. */
     private EnemyShipSpecialFormation enemyShipSpecialFormation;
     /** Player's ship. */
@@ -114,16 +114,18 @@ public class GameModel {
     private Logger logger;
     private int width;
     private int height;
+    private int bottomHeight;
     private Screen screen; // Needed for attach()
 
     /** Milliseconds until the screen accepts user input. */
     private Cooldown inputDelay;
 
 
-    public GameModel(GameState gameState, Level level, boolean bonusLife, int maxLives, int width, int height, Screen screen) {
+    public GameModel(GameState gameState, Level level, boolean bonusLife, int maxLives, int width, int height,int ITEMS_SEPARATION_LINE_HEIGHT, Screen screen) {
         this.logger = Core.getLogger();
         this.width = width;
         this.height = height;
+        this.bottomHeight = ITEMS_SEPARATION_LINE_HEIGHT;
         this.screen = screen; // Store screen context
 
         this.currentLevel = level;
@@ -149,9 +151,8 @@ public class GameModel {
     public final void initialize() {
         /** Initialize the bullet Boss fired */
         this.bossBullets = new HashSet<>();
-        enemyShipFormation = new EnemyShipFormation(this.currentLevel);
-        enemyShipFormation.attach(this.screen);
-        this.enemyShipFormation.applyEnemyColorByLevel(this.currentLevel);
+        enemyShipFormationModel = new EnemyShipFormationModel(this.currentLevel, bottomHeight, width);
+        this.enemyShipFormationModel.applyEnemyColor(this.currentLevel.getColorForLevel());
         this.ship = new Ship(this.width / 2 - 100, GameScreen.ITEMS_SEPARATION_LINE_HEIGHT - 20,Color.green);
         this.ship.setPlayerId(1);   //=== [ADD] Player 1 ===
 
@@ -252,11 +253,6 @@ public class GameModel {
 
         // Phase 3: Clean up destroyed or off-screen entities
         this.cleanupAllEntities();
-
-        if (this.currentPhase == StagePhase.wave &&
-                this.enemyShipFormation.isEmpty()) {
-            this.currentPhase = StagePhase.boss_wave;
-        }
     }
 
     /**
@@ -266,17 +262,18 @@ public class GameModel {
         switch (this.currentPhase) {
             case wave:
                 if (!DropItem.isTimeFreezeActive()) {
-                    this.enemyShipFormation.update();
-                    this.enemyShipFormation.shoot(this.bullets);
+                    this.enemyShipFormationModel.update();
+                    this.enemyShipFormationModel.shoot(this.bullets);
                 }
-                if (this.enemyShipFormation.isEmpty() && this.enemyShipSpecialFormation.isEmpty()) {
+                if (this.enemyShipFormationModel.isEmpty()
+                        && this.enemyShipSpecialFormation.isEmpty()) {
                     this.currentPhase = StagePhase.boss_wave;
                 }
                 break;
             case boss_wave:
                 if (this.finalBoss == null && this.omegaBoss == null){
                     bossReveal();
-                    this.enemyShipFormation.clear();
+                    this.enemyShipFormationModel.clear();
                 }
                 if(this.finalBoss != null){
                     finalbossManage();
@@ -329,7 +326,7 @@ public class GameModel {
         if (ship != null) collidables.add(ship);
         if (shipP2 != null) collidables.add(shipP2);
 
-        for (EnemyShip e : enemyShipFormation) {
+        for (EnemyShip e : enemyShipFormationModel) {
             if (e != null && !e.isDestroyed()) collidables.add(e);
         }
 
@@ -383,8 +380,8 @@ public class GameModel {
                 enemyShipSpecialFormation.destroy(enemy);
             }
         } else {
-            if (enemyShipFormation != null) {
-                enemyShipFormation.destroy(enemy);
+            if (enemyShipFormationModel != null) {
+                enemyShipFormationModel.destroy(enemy);
             }
         }
         if (!bullet.penetration()) {
@@ -467,8 +464,8 @@ public class GameModel {
                         enemyShipSpecialFormation.destroy(e);
                     }
                 } else {
-                    if (enemyShipFormation != null) {
-                        enemyShipFormation.destroy(e);
+                    if (enemyShipFormationModel != null) {
+                        enemyShipFormationModel.destroy(e);
                     }
                 }
             }
@@ -503,12 +500,12 @@ public class GameModel {
         }
 
         if (item.getItemType() == DropItem.ItemType.Explode) {
-            int destroyed = enemyShipFormation.destroyAll();
+            int destroyed = enemyShipFormationModel.destroyAll();
             addPointsFor(null, destroyed * 5);
         }
 
         if (item.getItemType() == DropItem.ItemType.Slow) {
-            enemyShipFormation.activateSlowdown();
+            enemyShipFormationModel.activateSlowdown();
         }
 
         dropItems.remove(item);
@@ -558,7 +555,7 @@ public class GameModel {
      * Pushes all enemy ships upward (used by Push-type item).
      */
     public void pushEnemiesBack() {
-        for (EnemyShip enemy : enemyShipFormation) {
+        for (EnemyShip enemy : enemyShipFormationModel) {
             if (enemy != null && !enemy.isDestroyed()) {
                 enemy.move(0, -20);
             }
@@ -699,8 +696,7 @@ public class GameModel {
                 break;
             case "omegaBoss":
             case "omegaAndFinal":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, GameScreen.ITEMS_SEPARATION_LINE_HEIGHT);
-                omegaBoss.attach(this.screen);
+                this.omegaBoss = new OmegaBoss(Color.ORANGE, width, GameScreen.ITEMS_SEPARATION_LINE_HEIGHT);
                 this.logger.info("Omega Boss has spawned!");
                 break;
             default:
@@ -845,7 +841,7 @@ public class GameModel {
     public EnemyShipSpecialFormation getEnemyShipSpecialFormation() { return enemyShipSpecialFormation; }
     public FinalBoss getFinalBoss() { return finalBoss; }
     public Set<BossBullet> getBossBullets() { return bossBullets; }
-    public EnemyShipFormation getEnemyShipFormation() { return enemyShipFormation; }
+    public EnemyShipFormationModel getEnemyShipFormationModel() { return enemyShipFormationModel; }
     public MidBoss getOmegaBoss() { return omegaBoss; }
     public Set<Bullet> getBullets() { return bullets; }
     public Set<DropItem> getDropItems() { return dropItems; }
@@ -882,8 +878,8 @@ public class GameModel {
         }
 
         // 3. added enemyship
-        if (getEnemyShipFormation() != null) {
-            for (EnemyShip enemy : getEnemyShipFormation()) {
+        if (getEnemyShipFormationModel() != null) {
+            for (EnemyShip enemy : getEnemyShipFormationModel()) {
                 renderList.add(enemy);
             }
         }
