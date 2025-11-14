@@ -42,13 +42,9 @@ public final class HUDRenderer {
         long seconds = milliseconds / 1000;
         long minutes = seconds / 60;
         seconds %= 60;
-        // 글자 높이 가져오기
         FontMetrics fm = g.getFontMetrics();
         int fontHeight = fm.getHeight();
-
-        // 화면 가장 아래에서 글자 높이만큼 위로 올리기
-        int y = screenHeight - fontHeight;
-
+        int y = screenHeight + 2 * fontHeight;
         String timeString = String.format("Time: %02d:%02d", minutes, seconds);
         g.drawString(timeString, 10, y);
     }
