@@ -66,7 +66,7 @@ public final class HUDRenderer {
     }
 
     /** Draw number of remaining lives for Player 1. */
-    public void drawLivesP1(final int screenWidth, final int screenHeight,final int lives) {
+    public void drawLivesP1(final int lives) {
         Graphics g = backBuffer.getGraphics();
         g.setFont(fontPack.getRegular());
         g.setColor(Color.WHITE);
@@ -78,7 +78,7 @@ public final class HUDRenderer {
     }
 
     /** Draw number of remaining lives for Player 2. */
-    public void drawLivesP2(final int screenWidth, final int screenHeight, final int lives) {
+    public void drawLivesP2(final int lives) {
         Graphics g = backBuffer.getGraphics();
         g.setFont(fontPack.getRegular());
         g.setColor(Color.WHITE);
@@ -90,10 +90,10 @@ public final class HUDRenderer {
     }
 
     /** Draw all item icons on HUD. */
-    public void drawItemsHUD(final int screenWidth, final int screeHeight) {
+    public void drawItemsHUD(final int screenWidth, final int screenHeight) {
         Graphics g = backBuffer.getGraphics();
         ItemHUDManager hud = ItemHUDManager.getInstance();
-        hud.setHUDPositions(screeHeight);
+        hud.setHUDPositions(screenHeight);
         hud.initialize(screenWidth);
         hud.drawItems(g);
     }

@@ -39,8 +39,8 @@ public class GameView {
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25);
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50);
         drawManager.getHUDRenderer().drawCoin(dto.getWidth(), dto.getHeight(), dto.getCoin());
-        drawManager.getHUDRenderer().drawLivesP1(dto.getWidth(),dto.getHeight(),dto.getLivesP1());
-        drawManager.getHUDRenderer().drawLivesP2(dto.getWidth(),dto.getHeight(),dto.getLivesP2());
+        drawManager.getHUDRenderer().drawLivesP1(dto.getLivesP1());
+        drawManager.getHUDRenderer().drawLivesP2(dto.getLivesP2());
         drawManager.getHUDRenderer().drawTime(GameConstant.ITEMS_SEPARATION_LINE_HEIGHT, dto.getElapsedTimeMillis());
         drawManager.getHUDRenderer().drawItemsHUD(dto.getWidth(), dto.getHeight());
         drawManager.getHUDRenderer().drawLevel(GameConstant.ITEMS_SEPARATION_LINE_HEIGHT, dto.getLevelName());
