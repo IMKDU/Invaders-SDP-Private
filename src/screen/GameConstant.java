@@ -13,12 +13,7 @@ import entity.GameModel;
  * - Updates the GameModel (Model)
  * - Passes data to GameView (View) via HUDInfoDTO
  */
-public class GameScreen extends Screen {
-
-    /** Height of the interface separation line. */
-    public static int SEPARATION_LINE_HEIGHT;
-    /** Height of the items separation line (above items). */
-    public static int ITEMS_SEPARATION_LINE_HEIGHT;
+public class GameConstant extends Screen {
 
     /** Current level data. */
     private final Level currentLevel;
@@ -47,16 +42,14 @@ public class GameScreen extends Screen {
      * @param fps
      * Frames per second, frame rate at which the game is run.
      */
-    public GameScreen(final GameState gameState,
-                      final Level level, final boolean bonusLife, final int maxLives,
-                      final int width, final int height, final int fps) {
+    public GameConstant(final GameState gameState,
+                        final Level level, final boolean bonusLife, final int maxLives,
+                        final int width, final int height, final int fps) {
         super(width, height, fps);
         this.currentLevel = level;
         this.bonusLife = bonusLife;
         this.maxLives = maxLives;
         this.gameState = gameState;
-        SEPARATION_LINE_HEIGHT = (int) (height * 0.08);
-        ITEMS_SEPARATION_LINE_HEIGHT = (int) (height * 0.9);
     }
     /**
      * Initializes the Model and View.
@@ -69,7 +62,7 @@ public class GameScreen extends Screen {
         this.model = new GameModel(
                 this.gameState, this.currentLevel,
                 this.bonusLife, this.maxLives,
-                this.width, this.height, ITEMS_SEPARATION_LINE_HEIGHT,this
+                this.width, this.height
         );
         this.view = new GameView(this.model,this.drawManager);
 

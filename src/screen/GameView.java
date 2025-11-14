@@ -3,6 +3,7 @@ package screen;
 import engine.DrawManager;
 import engine.DTO.HUDInfoDTO;
 import entity.GameModel;
+import entity.GameConstant;
 
 /**
  * GameView
@@ -40,13 +41,13 @@ public class GameView {
         drawManager.getHUDRenderer().drawCoin(dto.getWidth(), dto.getHeight(), dto.getCoin());
         drawManager.getHUDRenderer().drawLivesP1(dto.getWidth(),dto.getHeight(),dto.getLivesP1());
         drawManager.getHUDRenderer().drawLivesP2(dto.getWidth(),dto.getHeight(),dto.getLivesP2());
-        drawManager.getHUDRenderer().drawTime(GameScreen.ITEMS_SEPARATION_LINE_HEIGHT, dto.getElapsedTimeMillis());
+        drawManager.getHUDRenderer().drawTime(GameConstant.ITEMS_SEPARATION_LINE_HEIGHT, dto.getElapsedTimeMillis());
         drawManager.getHUDRenderer().drawItemsHUD(dto.getWidth(), dto.getHeight());
-        drawManager.getHUDRenderer().drawLevel(GameScreen.ITEMS_SEPARATION_LINE_HEIGHT, dto.getLevelName());
+        drawManager.getHUDRenderer().drawLevel(GameConstant.ITEMS_SEPARATION_LINE_HEIGHT, dto.getLevelName());
 
         /** draw Line */
-        drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), GameScreen.SEPARATION_LINE_HEIGHT - 1);
-        drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), GameScreen.ITEMS_SEPARATION_LINE_HEIGHT);
+        drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), GameConstant.STAT_SEPARATION_LINE_HEIGHT - 1);
+        drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), GameConstant.ITEMS_SEPARATION_LINE_HEIGHT);
 
         /** achievement popup */
         if (dto.getAchievementText() != null && !model.getAchievementPopupCooldown().checkFinished()) {
