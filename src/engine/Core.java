@@ -9,7 +9,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import screen.GameConstant;
+import screen.GameScreen;
 import screen.HighScoreScreen;
 import screen.ScoreScreen;
 import screen.Screen;
@@ -136,7 +136,7 @@ public final class Core {
 						SoundManager.playLoop("sfx/level" + gameState.getLevel() + ".wav");
 
                         // Start a new level
-                        currentScreen = new GameConstant(
+                        currentScreen = new GameScreen(
                                 gameState,
                                 currentLevel,
                                 bonusLife,
@@ -150,7 +150,7 @@ public final class Core {
                                 + " game screen at " + FPS + " fps.");
                         frame.setScreen(currentScreen);
                         LOGGER.info("Closing game screen.");
-                        gameState = ((GameConstant) currentScreen).getGameState();
+                        gameState = ((GameScreen) currentScreen).getGameState();
                         if (gameState.getLivesRemaining() > 0 || gameState.getLivesRemainingP2() > 0) {
 							SoundManager.stopAll();
 							SoundManager.play("sfx/levelup.wav");

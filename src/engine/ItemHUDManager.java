@@ -6,7 +6,6 @@ import java.util.List;
 
 import entity.ShopItem;
 import entity.DropItem;
-import screen.Screen;
 
 /**
  * Manages the display of items in the HUD.
@@ -28,9 +27,9 @@ public class ItemHUDManager {
     /** Spacing between squares */
     private static final int SQUARE_SPACING = 3;
     /** Y position for fixed shop items (bottom row) */
-    private static int FIXED_ITEMS_Y;
+    private static int fixedItemsY;
     /** Y position for dynamic dropped items (top row) */
-    private static int DYNAMIC_ITEMS_Y;
+    private static int dynamicItemsY;
 
     /** X position to start drawing items (right side) */
     private int startX;
@@ -79,8 +78,8 @@ public class ItemHUDManager {
         return instance;
     }
     public void setHUDPositions(int screenHeight) {
-        DYNAMIC_ITEMS_Y = (int) (screenHeight * 0.9 + 10);
-        FIXED_ITEMS_Y = DYNAMIC_ITEMS_Y + 30;
+        dynamicItemsY = (int) (screenHeight * 0.9 + 10);
+        fixedItemsY = dynamicItemsY + 30;
     }
 
     /**
@@ -134,7 +133,7 @@ public class ItemHUDManager {
      */
     private void drawFixedShopItems(Graphics graphics) {
         int x = startX;
-        int y = FIXED_ITEMS_Y;
+        int y = fixedItemsY;
 
         // Shop items in order: MultiShot, RapidFire, Penetration, BulletSpeed, ShipSpeed
         ShopItemType[] shopItems = {
@@ -156,7 +155,7 @@ public class ItemHUDManager {
      */
     private void drawDynamicDroppedItems(Graphics graphics) {
         int x = startX;
-        int y = DYNAMIC_ITEMS_Y;
+        int y = dynamicItemsY;
 
         // Draw up to 6 dynamic items
         for (int i = 0; i < MAX_DYNAMIC_ITEMS; i++) {

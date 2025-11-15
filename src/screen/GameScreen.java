@@ -13,7 +13,7 @@ import entity.GameModel;
  * - Updates the GameModel (Model)
  * - Passes data to GameView (View) via HUDInfoDTO
  */
-public class GameConstant extends Screen {
+public class GameScreen extends Screen {
 
     /** Current level data. */
     private final Level currentLevel;
@@ -42,7 +42,7 @@ public class GameConstant extends Screen {
      * @param fps
      * Frames per second, frame rate at which the game is run.
      */
-    public GameConstant(final GameState gameState,
+    public GameScreen(final GameState gameState,
                         final Level level, final boolean bonusLife, final int maxLives,
                         final int width, final int height, final int fps) {
         super(width, height, fps);
