@@ -6,140 +6,140 @@ import engine.DrawManager.SpriteType;
 
 /**
  * Implements a bullet that moves vertically up or down.
- * 
+ *
  * @author <a href="mailto:RobertoIA1987@gmail.com">Roberto Izquierdo Amo</a>
- * 
+ *
  */
 public class Bullet extends Entity implements Collidable {
-    // === [ADD] Owner flag: 1 = P1, 2 = P2, null for legacy compatibility ===
-    private Integer ownerId;
+	// === [ADD] Owner flag: 1 = P1, 2 = P2, null for legacy compatibility ===
+	private Integer ownerId;
 
-    public Integer getOwnerId() {
-        return ownerId;
-    }
+	public Integer getOwnerId() {
+		return ownerId;
+	}
 
-    public void setOwnerId(Integer ownerId) {
-        this.ownerId = ownerId;
-    }
-
-
-    /**
-     * Speed of the bullet, positive or negative depending on direction -
-     * positive is down.
-     */
-    private int speed;
-
-    /**
-     * number of Penetrations
-     */
-    private int penetrationCount;
-    /**
-     * Number of possible penetrations
-     */
-    private int maxPenetration;
+	public void setOwnerId(Integer ownerId) {
+		this.ownerId = ownerId;
+	}
 
 
-    /**
-     * Constructor, establishes the bullet's properties.
-     *
-     * @param positionX Initial position of the bullet in the X axis.
-     * @param positionY Initial position of the bullet in the Y axis.
-     * @param speed     Speed of the bullet, positive or negative depending on
-     *                  direction - positive is down.
-     */
-    public Bullet(final int positionX, final int positionY, final int speed) {
-        super(positionX, positionY, 3 * 2, 5 * 2, Color.WHITE);
+	/**
+	 * Speed of the bullet, positive or negative depending on direction -
+	 * positive is down.
+	 */
+	private int speed;
 
-        this.speed = speed;
-        this.penetrationCount = 0;
-        this.maxPenetration = ShopItem.getPenetrationCount();
+	/**
+	 * number of Penetrations
+	 */
+	private int penetrationCount;
+	/**
+	 * Number of possible penetrations
+	 */
+	private int maxPenetration;
 
-        setSprite();
-    }
 
-    /**
-     * Sets correct sprite for the bullet, based on speed.
-     */
-    public final void setSprite() {
-        if (speed < 0)
-            this.spriteType = SpriteType.Bullet;
-        else
-            this.spriteType = SpriteType.EnemyBullet;
-    }
+	/**
+	 * Constructor, establishes the bullet's properties.
+	 *
+	 * @param positionX Initial position of the bullet in the X axis.
+	 * @param positionY Initial position of the bullet in the Y axis.
+	 * @param speed     Speed of the bullet, positive or negative depending on
+	 *                  direction - positive is down.
+	 */
+	public Bullet(final int positionX, final int positionY, final int speed) {
+		super(positionX, positionY, 3 * 2, 5 * 2, Color.WHITE);
 
-    /**
-     * Updates the bullet's position.
-     */
-    public final void update() {
-        this.positionY += this.speed;
-    }
+		this.speed = speed;
+		this.penetrationCount = 0;
+		this.maxPenetration = ShopItem.getPenetrationCount();
 
-    /**
-     * Setter of the speed of the bullet.
-     *
-     * @param speed New speed of the bullet.
-     */
-    public final void setSpeed(final int speed) {
-        this.speed = speed;
-    }
+		setSprite();
+	}
 
-    /**
-     * Getter for the speed of the bullet.
-     *
-     * @return Speed of the bullet.
-     */
-    public final int getSpeed() {
-        return this.speed;
-    }
+	/**
+	 * Sets correct sprite for the bullet, based on speed.
+	 */
+	public final void setSprite() {
+		if (speed < 0)
+			this.spriteType = SpriteType.Bullet;
+		else
+			this.spriteType = SpriteType.EnemyBullet;
+	}
 
-    /**
-     * getter Bullet persistence status
-     *
-     * @return If true the bullet persists, If false it is deleted.
-     */
-    public final boolean penetration() {
-        this.penetrationCount++;
+	/**
+	 * Updates the bullet's position.
+	 */
+	public final void update() {
+		this.positionY += this.speed;
+	}
 
-        return this.penetrationCount <= this.maxPenetration;
-    }
+	/**
+	 * Setter of the speed of the bullet.
+	 *
+	 * @param speed New speed of the bullet.
+	 */
+	public final void setSpeed(final int speed) {
+		this.speed = speed;
+	}
 
-    /**
-     * Check for penetration possibility
-     *
-     * @return True, Penetrable
-     */
-    public final boolean canPenetration() {
-        return this.penetrationCount < this.maxPenetration;
-    }
+	/**
+	 * Getter for the speed of the bullet.
+	 *
+	 * @return Speed of the bullet.
+	 */
+	public final int getSpeed() {
+		return this.speed;
+	}
 
-    /**
-     * reset penetration setting
-     */
-    public final void resetPenetration() {
-        this.penetrationCount = 0;
-        this.maxPenetration = ShopItem.getPenetrationCount();
-    }
+	/**
+	 * getter Bullet persistence status
+	 *
+	 * @return If true the bullet persists, If false it is deleted.
+	 */
+	public final boolean penetration() {
+		this.penetrationCount++;
 
-    /**
-     * Handles collision behavior for bullets.
-     * Enemy bullets damage the player, and player bullets damage enemies/bosses.
-     */
-    @Override
-    public void onCollision(Collidable other, GameModel game) {
-        Entity o = other.asEntity();
+		return this.penetrationCount <= this.maxPenetration;
+	}
 
-        if (this.speed > 0 && o instanceof Ship) {
-            // Enemy bullet → Player
-            game.handleEnemyBulletHitPlayer(this, (Ship) o);
+	/**
+	 * Check for penetration possibility
+	 *
+	 * @return True, Penetrable
+	 */
+	public final boolean canPenetration() {
+		return this.penetrationCount < this.maxPenetration;
+	}
 
-        } else if (this.speed < 0) {
-            // Player bullet → Enemy/Boss
-            if (o instanceof EnemyShip) {
-                game.handlePlayerBulletHitEnemy(this, (EnemyShip) o);
+	/**
+	 * reset penetration setting
+	 */
+	public final void resetPenetration() {
+		this.penetrationCount = 0;
+		this.maxPenetration = ShopItem.getPenetrationCount();
+	}
 
-            } else if (o instanceof BossEntity) {
-                game.handlePlayerBulletHitBoss(this, (BossEntity) o);
-            }
-        }
-    }
+	/**
+	 * Handles collision behavior for bullets.
+	 * Enemy bullets damage the player, and player bullets damage enemies/bosses.
+	 */
+	@Override
+	public void onCollision(Collidable other, GameModel game) {
+		Entity o = other.asEntity();
+
+		if (this.speed > 0 && o instanceof Ship) {
+			// Enemy bullet → Player
+			game.handleEnemyBulletHitPlayer(this, (Ship) o);
+
+		} else if (this.speed < 0) {
+			// Player bullet → Enemy/Boss
+			if (o instanceof EnemyShip) {
+				game.handlePlayerBulletHitEnemy(this, (EnemyShip) o);
+
+			} else if (o instanceof BossEntity) {
+				game.handlePlayerBulletHitBoss(this, (BossEntity) o);
+			}
+		}
+	}
 }
