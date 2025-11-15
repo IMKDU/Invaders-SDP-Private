@@ -4,16 +4,35 @@ import engine.DrawManager;
 
 import java.awt.*;
 
-
+/**
+ * Represents a specialized mob or child ship spawned by a MidBoss,
+ * inheriting base characteristics from MidBoss.
+ */
 public class MidBossMob extends MidBoss {
-    private static int WIDTH = 24;
-    private static int HEIGHT= 16;
+    /** The width of the child mob entity. */
+    private static final int WIDTH = 24;
+    /** The height of the child mob entity. */
+    private static final int HEIGHT= 16;
+    /** Flag to determine horizontal movement direction. True for right, false for left. */
     private boolean directionRight = true;
-
+    /**
+     * Constructs a new MidBossMob entity.
+     * @param INIT_POS_X Initial X position.
+     * @param INIT_POS_Y Initial Y position.
+     * @param healthPoint Initial health points.
+     * @param pointValue Score value granted upon destruction.
+     * @param color The drawing color of the entity.
+     */
     public MidBossMob(int INIT_POS_X, int INIT_POS_Y, int healthPoint, int pointValue, Color color) {
         super(INIT_POS_X, INIT_POS_Y, WIDTH, HEIGHT, healthPoint, pointValue, color);
         this.spriteType = DrawManager.SpriteType.EnemyShipB1;
     }
+
+    /**
+     * Moves the entity by the specified distances in the X and Y axes.
+     * @param distanceX Distance to move along the X-axis.
+     * @param distanceY Distance to move along the Y-axis.
+     */
     @Override
     public void move(int distanceX, int distanceY) {
         this.positionX += distanceX;
@@ -22,6 +41,7 @@ public class MidBossMob extends MidBoss {
 
     @Override
     public void update() {
+        // NOTE: Movement logic is typically delegated to the movement strategy in this design.
     }
     /**
      * Reduces health and destroys the entity if it drops to zero or below.
@@ -38,7 +58,10 @@ public class MidBossMob extends MidBoss {
         this.spriteType = DrawManager.SpriteType.Explosion;
         this.logger.info("Child Destroyed");
     }
-
+    /**
+     * Draws the entity on the screen using the DrawManager.
+     * @param drawManager The DrawManager instance responsible for rendering.
+     */
     @Override
     public void draw(DrawManager drawManager) {drawManager.getEntityRenderer().drawEntity(this,this.positionX,this.positionY);}
 
