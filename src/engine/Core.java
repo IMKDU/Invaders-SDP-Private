@@ -21,10 +21,7 @@ import entity.GameConstant;
  * 
  */
 public final class Core {
-    /** Width of current screen. */
-    public static int FRAME_WIDTH_TOTAL;
-    /** Height of current screen. */
-    public static int FRAME_HEIGHT_TOTAL;
+
 	/** Width of current screen. (excepting white space) */
 	public static int FRAME_WIDTH;
 	/** Height of current screen. (excepting white space) */
@@ -78,7 +75,8 @@ public final class Core {
 			// TODO handle exception
 			e.printStackTrace();
 		}
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int FRAME_HEIGHT_TOTAL, FRAME_WIDTH_TOTAL;
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         FRAME_WIDTH_TOTAL = (int) (screenSize.getWidth() * 0.8);
         FRAME_HEIGHT_TOTAL = (int) (screenSize.getHeight() * 0.9);
 

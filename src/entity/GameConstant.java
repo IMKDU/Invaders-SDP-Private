@@ -1,8 +1,7 @@
 package entity;
 
-import engine.Core;
 
-public class GameConstant {
+public final class GameConstant {
 
     /** Height of the interface separation line. */
     public static int STAT_SEPARATION_LINE_HEIGHT;
@@ -11,10 +10,18 @@ public class GameConstant {
     public static int SCREEN_WIDTH;
     public static int SCREEN_HEIGHT;
 
+    private GameConstant() {}
+    private static boolean initialized = false;
+
     public static void initialize(int screenWidth, int screenHeight) {
+        if (initialized) {
+            throw new IllegalStateException("GameConstant has already been initialized.");
+        }
         STAT_SEPARATION_LINE_HEIGHT = (int) (screenHeight * 0.08);
         ITEMS_SEPARATION_LINE_HEIGHT = (int) (screenHeight * 0.9);
         SCREEN_WIDTH = screenWidth;
         SCREEN_HEIGHT = screenHeight;
+
+        initialized = true;
     }
 }
