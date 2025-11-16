@@ -125,6 +125,7 @@ public class GameModel {
     private int blackHoleRadius;
     private Cooldown blackHoleCooldown;
     private int lastHp;
+    private static final int BLACK_HOLE_DURATION_MS = 7000;
 
 
     public GameModel(GameState gameState, Level level, boolean bonusLife, int maxLives, int width, int height, Screen screen) {
@@ -188,7 +189,7 @@ public class GameModel {
         this.currentPhase = StagePhase.wave;
 
         bossPattern = new BossPattern();
-        blackHoleCooldown = Core.getCooldown(7000);
+        blackHoleCooldown = Core.getCooldown(BLACK_HOLE_DURATION_MS);
         lastHp = Integer.MAX_VALUE;
     }
 
