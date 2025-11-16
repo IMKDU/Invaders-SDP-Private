@@ -18,14 +18,14 @@ public class MidBossMob extends MidBoss {
     private boolean directionRight = true;
     /**
      * Constructs a new MidBossMob entity.
-     * @param INIT_POS_X Initial X position.
-     * @param INIT_POS_Y Initial Y position.
+     * @param initPosX Initial X position.
+     * @param initPosY Initial Y position.
      * @param healthPoint Initial health points.
      * @param pointValue Score value granted upon destruction.
      * @param color The drawing color of the entity.
      */
-    public MidBossMob(int INIT_POS_X, int INIT_POS_Y, int healthPoint, int pointValue, Color color) {
-        super(INIT_POS_X, INIT_POS_Y, WIDTH, HEIGHT, healthPoint, pointValue, color);
+    public MidBossMob(int initPosX, int initPosY, int healthPoint, int pointValue, Color color) {
+        super(initPosX, initPosY, WIDTH, HEIGHT, healthPoint, pointValue, color);
         this.spriteType = DrawManager.SpriteType.EnemyShipB1;
     }
 
