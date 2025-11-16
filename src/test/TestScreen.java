@@ -15,10 +15,9 @@ public class TestScreen extends Screen {
 	 *
 	 * @param width  Screen width.
 	 * @param height Screen height.
-	 * @param fps    Frames per second, frame rate at which the game is run.
 	 */
-	public TestScreen(int width, int height, int fps) {
-		super(width, height, fps);
+	public TestScreen(int width, int height) {
+		super(width, height, GameConstant.FPS);
 	}
 
 	public final void initialize(){
