@@ -9,7 +9,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import entity.ShopItem;
 import engine.level.LevelManager;
 import screen.*;
 import test.TestScreen;
@@ -274,17 +273,6 @@ public final class Core {
 	 */
 	public static FileManager getFileManager() {
 		return FileManager.getInstance();
-	}
-
-	/**
-	 * Controls creation of new cooldowns.
-	 * 
-	 * @param milliseconds
-	 *            Duration of the cooldown.
-	 * @return A new cooldown.
-	 */
-	public static Cooldown getCooldown(final int milliseconds) {
-		return new Cooldown(milliseconds);
 	}
 
 	/**

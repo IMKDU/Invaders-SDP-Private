@@ -1,6 +1,6 @@
 package test;
 
-import engine.Core;
+import engine.Cooldown;
 import engine.DTO.HUDInfoDTO;
 import entity.GameModel;
 import screen.Screen;
@@ -26,7 +26,7 @@ public class TestScreen extends Screen {
 		this.model = new TestModel(this.width, ITEMS_SEPARATION_LINE_HEIGHT);
 		this.view = new TestView(this.model, this.drawManager, this.width, this.height);
 
-		this.inputDelay = Core.getCooldown(GameModel.INPUT_DELAY);
+		this.inputDelay = new Cooldown(GameModel.INPUT_DELAY);
 		this.inputDelay.reset();
 	}
 

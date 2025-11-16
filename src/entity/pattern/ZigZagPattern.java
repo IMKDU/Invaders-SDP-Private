@@ -1,6 +1,6 @@
 package entity.pattern;
 
-import engine.Core;
+import engine.Cooldown;
 import entity.HasBounds;
 
 public class ZigZagPattern extends PinnedBossPattern {
@@ -8,7 +8,7 @@ public class ZigZagPattern extends PinnedBossPattern {
 	public ZigZagPattern(HasBounds boss, int screenWidth, int screenHeight) {
 		super(boss, screenWidth, screenHeight);
 		int shootCooldownMilli = 2000;
-		shootCooldown = Core.getCooldown(shootCooldownMilli);
+		shootCooldown = new Cooldown(shootCooldownMilli);
 	}
 
 	@Override

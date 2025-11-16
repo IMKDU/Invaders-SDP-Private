@@ -1,7 +1,6 @@
 package entity.pattern;
 
 import engine.Cooldown;
-import engine.Core;
 import entity.Bullet;
 import entity.HasBounds;
 import entity.LaserBullet;
@@ -35,7 +34,7 @@ public class TimeGapAttackPattern extends BossPattern {
 	@Override
 	public void attack() {
 		if(this.shootCooldown==null){
-			this.shootCooldown = Core.getCooldown(shootCooldownMilli);
+			this.shootCooldown = new Cooldown(shootCooldownMilli);
 			shootCooldown.reset();
 		}
 		if(!isUpdated){

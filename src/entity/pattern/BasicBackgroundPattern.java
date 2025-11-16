@@ -1,7 +1,6 @@
 package entity.pattern;
 
 import engine.Cooldown;
-import engine.Core;
 import entity.BossBullet;
 
 import java.awt.*;
@@ -16,7 +15,7 @@ public class BasicBackgroundPattern extends BossPattern {
 		super(new Point(0,0));
 		this.screenWidth = screenWidth;
 		int shootCooldownMilli = 400;
-		this.shootCooldown = Core.getCooldown(shootCooldownMilli);
+		this.shootCooldown = new Cooldown(shootCooldownMilli);
 	}
 
 	@Override

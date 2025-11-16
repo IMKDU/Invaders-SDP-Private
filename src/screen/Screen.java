@@ -65,7 +65,7 @@ public class Screen {
 		this.drawManager = Core.getDrawManager();
 		this.inputManager = Core.getInputManager();
 		this.logger = Core.getLogger();
-		this.inputDelay = Core.getCooldown(INPUT_DELAY);
+		this.inputDelay = new Cooldown(INPUT_DELAY);
 		this.inputDelay.reset();
 		this.returnCode = 0;
 	}

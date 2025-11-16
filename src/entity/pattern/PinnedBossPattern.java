@@ -30,7 +30,7 @@ public class PinnedBossPattern extends BossPattern {
 		this.screenWidth=screenWidth;
 		this.screenHeight=screenHeight;
 		int shootCooldownMilli = 5000;
-		this.shootCooldown= Core.getCooldown(shootCooldownMilli);
+		this.shootCooldown= new Cooldown(shootCooldownMilli);
 		backGroundPattern = new BasicBackgroundPattern(screenWidth);
 	}
 

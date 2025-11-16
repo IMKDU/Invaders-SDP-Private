@@ -20,7 +20,6 @@ public abstract class BossPattern implements IBossPattern {
 		this.bullets = new HashSet<Bullet>();
 	}
 
-	public Cooldown getShootCoolDown(Cooldown cooldown) { return cooldown; }
 	public void setCooldown(Cooldown cooldown) { this.shootCooldown=cooldown; }
 	public Point getBossPosition() { return this.bossPosition; }
 	public Set<Bullet> getBullets(){

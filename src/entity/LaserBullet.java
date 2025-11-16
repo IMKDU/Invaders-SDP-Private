@@ -1,8 +1,6 @@
 package entity;
 
 import engine.Cooldown;
-import engine.Core;
-
 import java.awt.*;
 
 public class LaserBullet extends Bullet {
@@ -23,13 +21,13 @@ public class LaserBullet extends Bullet {
 	@Override
 	public void update(){
 		if(this.chargeCooldown==null){
-			this.chargeCooldown = Core.getCooldown(chargeCooldownMilli);
+			this.chargeCooldown = new Cooldown(chargeCooldownMilli);
 			chargeCooldown.reset();
 		}
 		if(this.chargeCooldown.checkFinished()){
 			color = Color.red;
 			if(this.remainCooldown==null){
-				this.remainCooldown = Core.getCooldown(remainCooldownMilli);
+				this.remainCooldown = new Cooldown(remainCooldownMilli);
 				remainCooldown.reset();
 			}
 		}

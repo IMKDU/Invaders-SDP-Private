@@ -1,19 +1,17 @@
 package entity.pattern;
 
-import engine.Core;
+import engine.Cooldown;
 import entity.BossBullet;
 import entity.HasBounds;
 
 import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
 
 public class ZigZagAngryPattern extends ZigZagPattern {
 
 	public ZigZagAngryPattern(HasBounds boss, int screenWidth, int screenHeight) {
 		super(boss, screenWidth, screenHeight);
 		int shootCooldownMilli = 300;
-		shootCooldown = Core.getCooldown(shootCooldownMilli);
+		shootCooldown = new Cooldown(shootCooldownMilli);
 	}
 
 	@Override

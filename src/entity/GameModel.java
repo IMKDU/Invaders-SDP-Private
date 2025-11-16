@@ -1,16 +1,14 @@
 package entity;
 
-import java.awt.Color;
-import java.util.*;
-import java.util.logging.Logger;
-
-import engine.Cooldown;
-import engine.Core;
-import engine.GameState;
-import engine.GameTimer;
-import engine.AchievementManager;
-import engine.ItemHUDManager;
+import engine.*;
 import engine.level.Level;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Implements the Model for the game screen.
@@ -151,16 +149,15 @@ public class GameModel {
 
         enemyShipSpecialFormation = new EnemyShipSpecialFormation(this.currentLevel,
                 Core.getVariableCooldown(BONUS_SHIP_INTERVAL, BONUS_SHIP_VARIANCE),
-                Core.getCooldown(BONUS_SHIP_EXPLOSION));
-        this.bossExplosionCooldown = Core
-                .getCooldown(BOSS_EXPLOSION);
-        this.screenFinishedCooldown = Core.getCooldown(SCREEN_CHANGE_INTERVAL);
+                new Cooldown(BONUS_SHIP_EXPLOSION));
+        this.bossExplosionCooldown = new Cooldown(BOSS_EXPLOSION);
+        this.screenFinishedCooldown = new Cooldown(SCREEN_CHANGE_INTERVAL);
         this.bullets = new HashSet<Bullet>();
         this.dropItems = new HashSet<DropItem>();
 
         // Special input delay / countdown.
         this.gameStartTime = System.currentTimeMillis();
-        this.inputDelay = Core.getCooldown(INPUT_DELAY);
+        this.inputDelay = new Cooldown(INPUT_DELAY);
         this.inputDelay.reset();
 
 
@@ -701,7 +698,7 @@ public class GameModel {
      */
     public void showAchievement(String message) {
         this.achievementText = message;
-        this.achievementPopupCooldown = Core.getCooldown(2500); // Show for 2.5 seconds
+        this.achievementPopupCooldown = new Cooldown(2500); // Show for 2.5 seconds
         this.achievementPopupCooldown.reset();
     }
 
@@ -714,7 +711,7 @@ public class GameModel {
 
     public void showHealthPopup(String message) {
         this.healthPopupText = message;
-        this.healthPopupCooldown = Core.getCooldown(500);
+        this.healthPopupCooldown = new Cooldown(500);
         this.healthPopupCooldown.reset();
     }
 
