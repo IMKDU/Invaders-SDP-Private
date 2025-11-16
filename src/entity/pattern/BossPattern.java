@@ -2,6 +2,7 @@ package entity.pattern;
 
 import engine.Cooldown;
 import entity.Bullet;
+import entity.HasBounds;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -30,4 +31,6 @@ public abstract class BossPattern implements IBossPattern {
 		this.bullets = new HashSet<Bullet>();
 		return returnBullets;
 	}
+
+	public void setTarget(HasBounds target) { /* Default: do nothing */ }
 }

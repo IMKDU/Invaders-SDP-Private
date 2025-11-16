@@ -150,6 +150,8 @@ public class FinalBoss extends Entity implements BossEntity{
 
 	public void setTarget(HasBounds target){
 		this.playerPosition = target;
-		if(bossPattern instanceof TimeGapAttackPattern){ ((TimeGapAttackPattern) bossPattern).setTarget(target); }
+		if(bossPattern != null){
+			bossPattern.setTarget(target);
+		}
 	}
 }
