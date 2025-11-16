@@ -13,23 +13,29 @@ public class MidBossMobMovement {
     /** The vertical boundary the child ships cannot cross. */
     private int bottomHeight;
     /** Reference to the list of active child ships. */
-    private List<MidBossMob> ChildShips;
+    private List<MidBossMob> childShips;
     /** Base movement speed of the child ships. */
     private int speed;
     /** Frame counter used for generating oscillating and orbital movement. */
     private int frameCount = 0;
     /** The width of the boss, used for center calculation. */
-    private int MidBossWidth;
+    private int midBossWidth;
     /** The height of the boss, used for center calculation. */
-    private int MidBossHeight;
+    private int midBossHeight;
     /** Radius of the orbit movement when in Pattern 2 or low HP state. */
     private static final double ORBIT_RADIUS = 50.0;
     /** Speed multiplier for the orbit angle per frame. */
     private static final double ORBIT_SPEED = 0.02;
     /** Frequency for horizontal oscillation when descending. */
     private static final double OSCILLATION_FREQUENCY = 0.1;
+    /** Multiplier to increase the speed of the horizontal sine wave movement. */
+    private static final int OSCILLATION_FREQUENCY_MULTIPLIER = 3;
+    /** Distance required to trigger an acceleration towards the target. */
+    private static final double DISTANCE_THRESHOLD_FOR_SPEED_BOOST = 10.0;
+    /** The highest Y-coordinate (ceiling) the child ships can move up to. */
+    private static final int TOP_MARGIN = 50;
     /** Margin distance from the bottom boundary used for descent stop. */
-    private static final int Bottom_Margin = 50;
+    private static final int BOTTOM_MARGIN = 50;
     /**
      * Initializes the movement strategy parameters.
      * @param ITEMS_SEPARATION_LINE_HEIGHT The lower boundary of the play area.
@@ -41,8 +47,8 @@ public class MidBossMobMovement {
     public MidBossMobMovement(int ITEMS_SEPARATION_LINE_HEIGHT , int screenWidth, int bossWidth, int bossHeight, int childSpeed) {
         this.bottomHeight = ITEMS_SEPARATION_LINE_HEIGHT;
         this.wallWidth = screenWidth;
-        this.MidBossWidth = bossWidth;
-        this.MidBossHeight = bossHeight;
+        this.midBossWidth = bossWidth;
+        this.midBossHeight = bossHeight;
         this.speed = childSpeed;
     }
     /**
@@ -56,7 +62,7 @@ public class MidBossMobMovement {
         double dx = targetX - ship.getPositionX();
         double dy = targetY - ship.getPositionY();
         double distance = Math.sqrt(dx*dx + dy*dy);
-        double speedMultiplier = (distance > 10) ? 10.0 : 1.0;
+        double speedMultiplier = (distance > 10) ? DISTANCE_THRESHOLD_FOR_SPEED_BOOST : 1.0;
         // Calculate movement based on unit vector * speed * multiplier
         int moveX = (int) (dx * this.speed / distance * speedMultiplier);
         int moveY = (int) (dy * this.speed / distance * speedMultiplier);
@@ -66,6 +72,32 @@ public class MidBossMobMovement {
 
         ship.move(moveX, moveY);
 
+    }
+    /**
+     * Executes the circular orbit movement around the boss center for a single child ship.
+     * Handles orbit calculation and clamping to the TOP_MARGIN and bottom boundary.
+     * @param child The child entity to move.
+     * @param childIndex The index of the child in the list, used to offset its orbit angle.
+     * @param bossCenterX The center X position of the main boss.
+     * @param bossCenterY The center Y position of the main boss.
+     * @param initialChildCount The total number of children spawned, used to calculate orbit radius.
+     */
+    private void executeOrbitMovement(MidBossMob child, int childIndex, int bossCenterX, int bossCenterY, int initialChildCount) {
+        double radius = this.ORBIT_RADIUS + (this.ORBIT_RADIUS / initialChildCount);
+        double angle = (this.frameCount * this.ORBIT_SPEED) + (childIndex * 2 * Math.PI / initialChildCount);
+
+        int orbitTargetX = (int) (bossCenterX + Math.cos(angle) * radius);
+        int orbitTargetY = (int) (bossCenterY + Math.sin(angle) * radius);
+
+        int finalTargetX = orbitTargetX - child.getWidth()/ 2;
+        int finalTargetY = orbitTargetY - child.getHeight()/ 2;
+
+        boolean isTopWall = finalTargetY < TOP_MARGIN;
+        boolean isBottomWall = finalTargetY + child.getHeight() > bottomHeight;
+        if(isTopWall){finalTargetY = TOP_MARGIN;}
+        if(isBottomWall){finalTargetY = bottomHeight - child.getHeight();}
+
+        moveToTarget(child, finalTargetX, finalTargetY);
     }
     /**
      * Executes Movement Pattern 1.
@@ -78,13 +110,13 @@ public class MidBossMobMovement {
      */
     public void pattern_1_Movement(int bossX, int bossY, List<MidBossMob> Boss_Delta_Childs, int initialChildCount){
         this.frameCount++;
-        this.ChildShips = Boss_Delta_Childs;
-        int bossCenterX = bossX + this.MidBossWidth /2;
-        int bossCenterY = bossY + this.MidBossHeight/2;
+        this.childShips = Boss_Delta_Childs;
+        int bossCenterX = bossX + this.midBossWidth /2;
+        int bossCenterY = bossY + this.midBossHeight /2;
 
 
-        for(int childIndex = 0; childIndex < ChildShips.size(); childIndex++){
-            MidBossMob child = ChildShips.get(childIndex);
+        for(int childIndex = 0; childIndex < childShips.size(); childIndex++){
+            MidBossMob child = childShips.get(childIndex);
             if(child.getHealPoint() > child.getMaxHp()*0.5){
                 if(child.getDirectionRight()){
                     boolean isRightWall = child.getPositionX() + child.getWidth() + this.speed > this.wallWidth;
@@ -96,20 +128,7 @@ public class MidBossMobMovement {
                     else { child.move(-this.speed,0); }
                 }
             }else {
-                double radius = this.ORBIT_RADIUS + (this.ORBIT_RADIUS / initialChildCount);
-                double angle = (this.frameCount * this.ORBIT_SPEED) + (childIndex * 2 * Math.PI / initialChildCount);
-
-                int orbitTargetX = (int) (bossCenterX + Math.cos(angle) * radius);
-                int orbitTargetY = (int) (bossCenterY + Math.sin(angle) * radius);
-
-                int finalTargetX = orbitTargetX - child.getWidth()/ 2;
-                int finalTargetY = orbitTargetY - child.getHeight()/ 2;
-
-                boolean isTopWall = finalTargetY < 50;
-                boolean isBottomWall = finalTargetY + child.getHeight() > bottomHeight;
-                if(isTopWall){finalTargetY = 51;}
-                if(isBottomWall){finalTargetY = bottomHeight - child.getHeight();}
-                moveToTarget(child, finalTargetX, finalTargetY);
+                executeOrbitMovement(child, childIndex, bossCenterX, bossCenterY, initialChildCount);
             }
         }
     }
@@ -125,30 +144,17 @@ public class MidBossMobMovement {
      */
     public void pattern_2_Movement(int bossX, int bossY, List<MidBossMob> Boss_Delta_Childs, int initialChildCount){
         this.frameCount++;
-        this.ChildShips = Boss_Delta_Childs;
-        int bossCenterX = bossX + this.MidBossWidth /2;
-        int bossCenterY = bossY + this.MidBossHeight/2;
+        this.childShips = Boss_Delta_Childs;
+        int bossCenterX = bossX + this.midBossWidth /2;
+        int bossCenterY = bossY + this.midBossHeight /2;
 
-        for(int childIndex = 0; childIndex < this.ChildShips.size(); childIndex++){
-            MidBossMob child = this.ChildShips.get(childIndex);
+        for(int childIndex = 0; childIndex < this.childShips.size(); childIndex++){
+            MidBossMob child = this.childShips.get(childIndex);
             if(child.getHealPoint() > child.getMaxHp()*0.5){
-                double radius = this.ORBIT_RADIUS + (this.ORBIT_RADIUS / initialChildCount);
-                double angle = (this.frameCount * this.ORBIT_SPEED) + (childIndex * 2 * Math.PI / initialChildCount);
-
-                int orbitTargetX = (int) (bossCenterX + Math.cos(angle) * radius);
-                int orbitTargetY = (int) (bossCenterY + Math.sin(angle) * radius);
-
-                int finalTargetX = orbitTargetX - child.getWidth()/ 2;
-                int finalTargetY = orbitTargetY - child.getHeight()/ 2;
-
-                boolean isTopWall = finalTargetY < 50;
-                boolean isBottomWall = finalTargetY + child.getHeight() > bottomHeight;
-                if(isTopWall){finalTargetY = 51;}
-                if(isBottomWall){finalTargetY = bottomHeight - child.getHeight();}
-                moveToTarget(child, finalTargetX, finalTargetY);
+                executeOrbitMovement(child, childIndex, bossCenterX, bossCenterY, initialChildCount);
             }else {
-                boolean isBottom = child.getPositionY() + child.getHeight() + this.speed > this.bottomHeight - this.Bottom_Margin;
-                int moveX = (int) (Math.cos(this.frameCount * this.OSCILLATION_FREQUENCY) * (this.speed * 3));
+                boolean isBottom = child.getPositionY() + child.getHeight() + this.speed > this.bottomHeight - this.BOTTOM_MARGIN;
+                int moveX = (int) (Math.cos(this.frameCount * this.OSCILLATION_FREQUENCY) * (this.speed * OSCILLATION_FREQUENCY_MULTIPLIER));
                 if(isBottom){ child.move(moveX,0);}
                 else {
                     int moveY = this.speed;

@@ -15,26 +15,26 @@ public class SpawnMobPattern {
     /** The width of the screen. */
     private final int screenWidth;
     /** Boss spawn child ships */
-    private List<MidBossMob> ChildShips;
+    private List<MidBossMob> childShips;
     /** Current accumulated count of all ships spawned throughout the fight. */
-    private int SPAWN_COUNT = 0;
+    private int spawnCount = 0;
     /** Movement speed of the spawned child ships. */
-    private final int Child_Speed = 1;
+    private final int CHILD_SPEED = 1;
     /** Strategy object managing the movement patterns of the child ships. */
     private MidBossMobMovement movementStrategy;
     /** Current active movement and spawn pattern (1 or 2). */
     private int currentPattern = 1;
     /** The current X position of the boss. */
-    private int BOSS_PositionX;
+    private int bossPositionX;
     /** The current Y position of the boss. */
-    private int BOSS_PositionY;
+    private int bossPositionY;
     /** The width of the boss. */
     private final int BOSS_WIDTH;
     /** The height of the boss. */
     private final int BOSS_HEIGHT;
     /** The maximum health points of the boss. */
     private final int BOSS_MAXHP;
-    private Logger Logger;
+    private Logger logger;
     /** List of ship count increments for each spawn phase (5, 10, 15, 30) */
     private final int[] SPAWN_COUNT_LIST = {
             5,
@@ -51,6 +51,12 @@ public class SpawnMobPattern {
             0.5,
             0.2
     };
+    /** The total vertical distance (in pixels) used to spread newly spawned mobs below the boss. */
+    private final double SPAWN_VERTICAL_SPACING_BASE = 60.0;
+    /** The initial health points assigned to each spawned mob. */
+    private final int MOB_HEALTH_POINT = 4;
+    /** The score value awarded to the player upon destroying the mob. */
+    private final int MOB_POINT_VALUE = 10;
     /** Color palette used to assign distinct colors to spawned children. */
     private Color[] colorPalette = {
             new Color( 0xFF4081),
@@ -77,18 +83,18 @@ public class SpawnMobPattern {
     public SpawnMobPattern(int bottomBoundary, int width, int bossWidth, int bossHeight, int Boss_MaxHP) {
         this.bottomBoundary = bottomBoundary;
         this.screenWidth = width;
-        this.ChildShips = new ArrayList<MidBossMob>();
+        this.childShips = new ArrayList<MidBossMob>();
 
         this.BOSS_WIDTH = bossWidth;
         this.BOSS_HEIGHT = bossHeight;
         this.BOSS_MAXHP = Boss_MaxHP;
-        this.Logger = Core.getLogger();
+        this.logger = Core.getLogger();
         this.movementStrategy = new MidBossMobMovement(
                 this.bottomBoundary,
                 this.screenWidth,
                 this.BOSS_WIDTH,
                 this.BOSS_HEIGHT,
-                this.Child_Speed
+                this.CHILD_SPEED
         );
     }
 
@@ -99,8 +105,8 @@ public class SpawnMobPattern {
      * @param bossHealPoint The current health point of the main boss.
      */
     public void update(int bossPositionX, int bossPositionY,int bossHealPoint) {
-        this.BOSS_PositionX = bossPositionX;
-        this.BOSS_PositionY = bossPositionY;
+        this.bossPositionX = bossPositionX;
+        this.bossPositionY = bossPositionY;
         this.checkPatternSwitch(bossHealPoint);
         this.spawnPattern(bossHealPoint);
         this.childMovePattern();
@@ -111,17 +117,17 @@ public class SpawnMobPattern {
     public void childMovePattern() {
         if(this.currentPattern == 1) {
             this.movementStrategy.pattern_1_Movement(
-                    this.BOSS_PositionX,
-                    this.BOSS_PositionY,
-                    this.ChildShips,
-                    this.SPAWN_COUNT
+                    this.bossPositionX,
+                    this.bossPositionY,
+                    this.childShips,
+                    this.spawnCount
             );
         } else {
             this.movementStrategy.pattern_2_Movement(
-                    this.BOSS_PositionX,
-                    this.BOSS_PositionY,
-                    this.ChildShips,
-                    this.SPAWN_COUNT
+                    this.bossPositionX,
+                    this.bossPositionY,
+                    this.childShips,
+                    this.spawnCount
             );
         }
     }
@@ -133,7 +139,7 @@ public class SpawnMobPattern {
     public void checkPatternSwitch(int bossHealPoint) {
         if(bossHealPoint < this.BOSS_MAXHP * 0.5 && this.currentPattern == 1) {
             this.currentPattern = 2;
-            this.Logger.info("Pattern Change: Switching to Child Movement Pattern 2");
+            this.logger.info("Pattern Change: Switching to Child Movement Pattern 2");
         }
     }
     /**
@@ -143,17 +149,8 @@ public class SpawnMobPattern {
     public void spawnPattern(int bossHealPoint) {
         this.cleanDestroyedChild();
         double HPRatio = (double) bossHealPoint/ this.BOSS_MAXHP;
-        if(this.SPAWN_COUNT_CHECK == 3 && HPRatio < HP_THRESHOLDS[3]) {
-            this.SPAWN_COUNT += this.SPAWN_COUNT_LIST[this.SPAWN_COUNT_CHECK];
-            createChild(this.SPAWN_COUNT_LIST[this.SPAWN_COUNT_CHECK++]);
-        }else if(this.SPAWN_COUNT_CHECK == 2 && HPRatio < HP_THRESHOLDS[2]) {
-            this.SPAWN_COUNT += this.SPAWN_COUNT_LIST[this.SPAWN_COUNT_CHECK];
-            createChild(this.SPAWN_COUNT_LIST[this.SPAWN_COUNT_CHECK++]);
-        }else if(this.SPAWN_COUNT_CHECK == 1 && HPRatio < HP_THRESHOLDS[1]) {
-            this.SPAWN_COUNT += this.SPAWN_COUNT_LIST[this.SPAWN_COUNT_CHECK];
-            createChild(this.SPAWN_COUNT_LIST[this.SPAWN_COUNT_CHECK++]);
-        }else if(this.SPAWN_COUNT_CHECK == 0 && HPRatio < HP_THRESHOLDS[0]) {
-            this.SPAWN_COUNT += this.SPAWN_COUNT_LIST[this.SPAWN_COUNT_CHECK];
+        if(this.SPAWN_COUNT_CHECK < HP_THRESHOLDS.length && HPRatio < HP_THRESHOLDS[this.SPAWN_COUNT_CHECK]) {
+            this.spawnCount += this.SPAWN_COUNT_LIST[this.SPAWN_COUNT_CHECK];
             createChild(this.SPAWN_COUNT_LIST[this.SPAWN_COUNT_CHECK++]);
         }
     }
@@ -162,23 +159,23 @@ public class SpawnMobPattern {
      * @param shipCount The *total* number of children to be created in this wave.
      */
     public void createChild(int shipCount) {
-        this.Logger.info("Create Child");
+        this.logger.info("Create Child");
         for (int count = 0; count < shipCount; count++) {
             MidBossMob ship = new MidBossMob(
-                    this.BOSS_PositionX ,
-                    BOSS_PositionY + (int)(60.0/shipCount * (count+1)),
-                    4,
-                    10,
+                    this.bossPositionX,
+                    bossPositionY + (int)(SPAWN_VERTICAL_SPACING_BASE/shipCount * (count+1)),
+                    MOB_HEALTH_POINT,
+                    MOB_POINT_VALUE,
                     colorPalette[count % colorPalette.length]
             );
-            this.ChildShips.add(ship);
+            this.childShips.add(ship);
         }
     }
     /**
      * Removes all child ships from the list that have been destroyed.
      */
     public void cleanDestroyedChild() {
-        Iterator<MidBossMob> iterator = this.ChildShips.iterator();
+        Iterator<MidBossMob> iterator = this.childShips.iterator();
         while(iterator.hasNext()){
             MidBossMob ship = iterator.next();
             if(ship.isDestroyed()) { iterator.remove(); }
@@ -189,5 +186,5 @@ public class SpawnMobPattern {
      * NOTE: This is the getter method required by the game controller for collision and rendering.
      * @return The list of MidBossMob children.
      */
-    public List<MidBossMob> getChildShips() { return ChildShips; }
+    public List<MidBossMob> getChildShips() { return childShips; }
 }
