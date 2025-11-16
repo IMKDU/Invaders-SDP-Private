@@ -63,7 +63,7 @@ public class GameModel {
     private Cooldown screenFinishedCooldown;
     /** OmegaBoss */
     private OmegaBoss omegaBoss;
-    private List<MidBossMob> MidBossChilds;
+    private List<MidBossMob> midBossChilds;
     /** Set of all bullets fired by on-screen ships. */
     private Set<Bullet> bullets;
     /** Set of all dropItems dropped by on screen ships. */
@@ -173,7 +173,7 @@ public class GameModel {
         this.elapsedTime = 0;
         this.finalBoss = null;
         this.omegaBoss = null;
-        this.MidBossChilds = null;
+        this.midBossChilds = null;
         this.currentPhase = StagePhase.wave;
     }
 
@@ -458,8 +458,8 @@ public class GameModel {
                     }
                     recyclable.add(bullet);
                 }
-                if(this.MidBossChilds != null && !this.MidBossChilds.isEmpty()) {
-                    for(MidBossMob ship : MidBossChilds){
+                if(this.midBossChilds != null && !this.midBossChilds.isEmpty()) {
+                    for(MidBossMob ship : midBossChilds){
                         if(ship != null
                                 && !ship.isDestroyed()
                                 && checkCollision(bullet, ship)) {
@@ -470,7 +470,10 @@ public class GameModel {
                                 this.coin += (pts / 10);
                                 this.shipsDestroyed++;
                                 ship.destroy();
-                                recyclable.add(bullet);
+                            }
+                            recyclable.add(bullet);
+                            if (!bullet.penetration()) {
+                                break;
                             }
                         }
                     }
@@ -538,8 +541,8 @@ public class GameModel {
                 return;
             }
 
-            if(this.MidBossChilds != null && !this.MidBossChilds.isEmpty()){
-                for(MidBossMob ship : MidBossChilds){
+            if(this.midBossChilds != null && !this.midBossChilds.isEmpty()){
+                for(MidBossMob ship : midBossChilds){
                     if(ship != null
                             && !ship.isDestroyed()
                             && checkCollision(this.ship, ship)){
@@ -606,8 +609,8 @@ public class GameModel {
                 return;
             }
 
-            if(this.MidBossChilds != null && !this.MidBossChilds.isEmpty()){
-                for(MidBossMob ship : MidBossChilds){
+            if(this.midBossChilds != null && !this.midBossChilds.isEmpty()){
+                for(MidBossMob ship : midBossChilds){
                     if(ship != null
                             && !ship.isDestroyed()
                             && checkCollision(this.shipP2, ship)){
@@ -959,7 +962,7 @@ public class GameModel {
     public Set<BossBullet> getBossBullets() { return bossBullets; }
     public EnemyShipFormationModel getEnemyShipFormationModel() { return enemyShipFormationModel; }
     public MidBoss getOmegaBoss() { return omegaBoss; }
-    public List<MidBossMob> getMidBossChilds() { return MidBossChilds; }
+    public List<MidBossMob> getMidBossChilds() { return midBossChilds; }
     public Set<Bullet> getBullets() { return bullets; }
     public Set<DropItem> getDropItems() { return dropItems; }
     public int getScoreP1() { return scoreP1; }
