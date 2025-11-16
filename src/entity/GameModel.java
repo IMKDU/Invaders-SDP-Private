@@ -802,7 +802,7 @@ public class GameModel {
             for (Bullet b : bossBullets) {
                 b.update();
                 /** If the bullet goes off the screen */
-                if (b.isOffScreen(width, height) || b instanceof LaserBullet && ((LaserBullet) b).needToRemove()) {
+                if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
                     /** bulletsToRemove carry bullet */
                     bulletsToRemove.add(b);
                 }

@@ -120,4 +120,11 @@ public class Bullet extends Entity {
 		return positionX < 0 || positionX > screenWidth ||
 				positionY < 0 || positionY > screenHeight;
 	}
+
+	/**
+	 * does the bullet has to be removed
+	 */
+	public boolean shouldBeRemoved() {
+		return false;
+	}
 }

@@ -53,7 +53,9 @@ public class LaserBullet extends Bullet {
 	public Point getTargetPosition() {
 		return targetPosition;
 	}
-	public boolean needToRemove() {
+	@Override
+	public boolean shouldBeRemoved() {
 		return needToRemove;
 	}
+
 }
