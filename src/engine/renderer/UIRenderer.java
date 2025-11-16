@@ -45,8 +45,7 @@ public final class UIRenderer {
         textWidth = fm.stringWidth(str);
         x = (screenWidth - textWidth) / 2 + 200;
         y = screenHeight / 3 + 30;
-        g.drawString(str,
-                x, y);
+        g.drawString(str, x, y);
 
         g.setFont(fontPack.getRegular());
         g.setColor(Color.YELLOW);
@@ -56,16 +55,14 @@ public final class UIRenderer {
         textWidth = fm.stringWidth(explain1);
         x = (screenWidth - textWidth) / 2;
         y = screenHeight / 2;
-        g.drawString(explain1,
-                x, y);
+        g.drawString(explain1, x, y);
 
         String explain2 = "Player 2: move: arrow keys / shoot: enter";
         fm = g.getFontMetrics();
         textWidth = fm.stringWidth(explain2);
         x = (screenWidth - textWidth) / 2;
         y = screenHeight / 2 + 30;
-        g.drawString(explain2,
-                x, y);
+        g.drawString(explain2, x, y);
     }
 
     /** Draws main menu options with pulsing selection effect. */
