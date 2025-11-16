@@ -30,7 +30,7 @@ public class BossBullet extends Bullet {
      *            bullet's color
      */
     public BossBullet(int x, int y, int dx, int dy, int width, int height, Color color) {
-        super(x, y, dy, color);
+        super(x, y, 0, color);
 		super.width = width;
 		super.height = height;
         this.dx = dx;
