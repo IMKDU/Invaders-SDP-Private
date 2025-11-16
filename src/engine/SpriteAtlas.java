@@ -9,7 +9,7 @@ import engine.DrawManager.SpriteType;
 
 public final class SpriteAtlas {
 
-    private final Map<SpriteType, Color[][]> spriteMap = new LinkedHashMap<>();
+    private Map<SpriteType, Color[][]> spriteMap = new LinkedHashMap<>();
 
     public SpriteAtlas(FileManager fileManager) {
         try {
@@ -77,6 +77,22 @@ public final class SpriteAtlas {
 
     public Map<DrawManager.SpriteType, Color[][]> getSpriteMap() {
         return java.util.Collections.unmodifiableMap(spriteMap);
+    }
+
+    private Color[][] mirrorSprite(Color[][] original) {
+        if (original == null || original.length == 0) return null;
+        int w = original.length;
+        int h = original[0].length;
+        Color[][] mirrored = new Color[w][h];
+
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                Color c = original[w - 1 - i][j];
+                // 널 값 대비
+                mirrored[i][j] = (c != null) ? c : new Color(0, 0, 0, 0);
+            }
+        }
+        return mirrored;
     }
 
 }

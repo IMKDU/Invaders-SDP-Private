@@ -21,7 +21,7 @@ public class TestModel {
 		this.width = width;
 		this.height = height;
 		this.entity = new OmegaBoss(Color.blue, width, 400);
-		this.player = new Ship(this.width/2, height-20, Color.GREEN);
+		this.player = new Ship(this.width/2, height-20, true);
 	}
 
 	public void update(){
