@@ -14,6 +14,7 @@ import engine.GameTimer;
 import engine.AchievementManager;
 import engine.ItemHUDManager;
 import engine.level.Level;
+import entity.pattern.MidBossMob;
 
 /**
  * Implements the Model for the game screen.
@@ -61,7 +62,7 @@ public class GameModel {
     /** Time from finishing the level to screen change. */
     private Cooldown screenFinishedCooldown;
     /** OmegaBoss */
-    private MidBoss omegaBoss;
+    private OmegaBoss omegaBoss;
     private List<MidBossMob> MidBossChilds;
     /** Set of all bullets fired by on-screen ships. */
     private Set<Bullet> bullets;
