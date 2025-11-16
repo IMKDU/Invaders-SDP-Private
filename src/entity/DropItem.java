@@ -66,11 +66,11 @@ public class DropItem extends Entity implements Collidable {
 	/**
 	 * Speed of the item, positive is down.
 	 */
-	private final int speed;
+	private int speed;
 	/**
 	 * Type of the item.
 	 */
-	private final ItemType itemType;
+	private ItemType itemType;
 
 	public DropItem(final int positionX, final int positionY, final int speed, final ItemType itemType) {
 		super(positionX, positionY, 5 * 2, 5 * 2, Color.WHITE);
