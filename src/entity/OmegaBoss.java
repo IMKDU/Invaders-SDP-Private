@@ -37,6 +37,16 @@ public class OmegaBoss extends MidBoss {
 	private final int widthBoundary;
 	/** Boss cannot move below this boundary. */
 	private final int bottomBoundary;
+
+	private boolean isDashing = false;
+	private boolean isShowingPath = false;
+	private Ship targetShip;
+	private int dashTargetX;
+	private int dashTargetY;
+	private long pathShowStartTime;
+	private static final long PATH_SHOW_DURATION = 2000; // 2초
+	private static final int DASH_SPEED = 5; // 돌진 속도
+
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
 	 *
@@ -44,11 +54,12 @@ public class OmegaBoss extends MidBoss {
  	 * @param widthBoundary		The rightmost X-coordinate for the boss's movement. The boss cannot move over this value.
  	 * @param bottomBoundary    The lowermost Y-coordinate for the boss's movement. The boss cannot move below this value.
 	 */
-	public OmegaBoss(Color color, int widthBoundary, int bottomBoundary) {
+	public OmegaBoss(Color color, int widthBoundary, int bottomBoundary, Ship player) {
 		super(INIT_POS_X, INIT_POS_Y, OMEGA_WIDTH, OMEGA_HEIGHT, OMEGA_HEALTH, OMEGA_POINT_VALUE, color);
 		this.widthBoundary = widthBoundary;
 		this.bottomBoundary = bottomBoundary;
 		this.spriteType= DrawManager.SpriteType.OmegaBoss1;
+		this.targetShip = player;
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		this.logger.info("OMEGA : move using the default pattern");
 	}
@@ -69,11 +80,14 @@ public class OmegaBoss extends MidBoss {
 	 * @see #patternSecond()
 	 */
 	private void movePatterns(){
-		if(this.pattern!=2 && this.healPoint < this.maxHp/2){
+		if(this.pattern!=2 && this.healPoint < this.maxHp/2 && this.healPoint > this.maxHp/3){
 			this.pattern=2;
 			this.color=PATTERN_2_COLOR;
 			this.spriteType = DrawManager.SpriteType.OmegaBoss2;
 			logger.info("OMEGA : move using second pattern");
+		}
+		else if (this.healPoint <= this.maxHp/3){
+			this.pattern=3;
 		}
 
 		switch(pattern){
@@ -83,6 +97,9 @@ public class OmegaBoss extends MidBoss {
 			case 2:
 				this.patternSecond();
 				break;
+			case 3:
+				this.skillDash(targetShip.getPositionX(), targetShip.getPositionY());
+
 		}
 	}
 
@@ -126,6 +143,70 @@ public class OmegaBoss extends MidBoss {
 		} else if (this.positionY + this.height >= bottomBoundary) {
 			this.positionY = bottomBoundary - this.height;
 			this.isDown = false;
+		}
+	}
+
+	/**
+	 * 플레이어를 향해 돌진하는 스킬
+	 * 1. 2초간 돌진 경로 표시
+	 * 2. 2초 후 플레이어 위치로 돌진
+	 */
+	/**
+	 * 플레이어를 향해 돌진하는 스킬
+	 * 1. 2초간 돌진 경로 표시
+	 * 2. 2초 후 플레이어 방향으로 벽까지 돌진
+	 */
+	public void skillDash(int player_dx, int player_dy) {
+		// 이미 스킬 사용 중이면 돌진만 실행
+		if (isDashing) {
+			dashToTarget();
+			return;
+		}
+
+		// 경로 표시 중이면 시간 체크
+		if (isShowingPath) {
+			long elapsedTime = System.currentTimeMillis() - pathShowStartTime;
+
+			if (elapsedTime >= PATH_SHOW_DURATION) {
+				// 2초 지나면 돌진 시작
+				isShowingPath = false;
+				isDashing = true;
+			}
+			return;
+		}
+
+		// 새로운 돌진 스킬 시작
+		// 플레이어 방향 저장 (방향만 저장, 목적지는 벽)
+		int dx = player_dx - this.positionX;
+		int dy = player_dy - this.positionY;
+		double distance = Math.sqrt(dx * dx + dy * dy);
+
+		dashTargetX = (int)(dx / distance);  // 정규화된 방향 X
+		dashTargetY = (int)(dy / distance);  // 정규화된 방향 Y
+
+		// 경로 표시 시작
+		isShowingPath = true;
+		pathShowStartTime = System.currentTimeMillis();
+	}
+
+
+	/**
+	 * 타겟 방향으로 벽까지 돌진
+	 */
+	private void dashToTarget() {
+		// 방향으로 이동
+		this.positionX += dashTargetX * DASH_SPEED;
+		this.positionY += dashTargetY * DASH_SPEED;
+
+		// 벽에 닿으면 돌진 종료
+		if (this.positionX <= 0 || this.positionX >= widthBoundary ||
+				this.positionY <= 0 || this.positionY >= bottomBoundary) {
+			isDashing = false;
+			// 돌진 종료 후 패턴1로 복귀
+			this.pattern = 1;
+			this.color = super.color;
+			this.spriteType = DrawManager.SpriteType.OmegaBoss1;
+			logger.info("OMEGA : Dash completed, hit the wall");
 		}
 	}
 
