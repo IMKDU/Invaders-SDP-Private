@@ -43,7 +43,6 @@ public class SoundManager {
 
     public static void playLoop(String resourcePath) {
         if (muted) return;  // no sound played
-
         try {
             Clip c = CACHE.computeIfAbsent(resourcePath, SoundManager::loadClip);
             if (c == null) return;
@@ -76,6 +75,7 @@ public class SoundManager {
             Clip c = CACHE.get(currentLooping);
             c.start();
             setVolume(c, 0.0f);
+            c.loop(Clip.LOOP_CONTINUOUSLY);
         }
     }
 
