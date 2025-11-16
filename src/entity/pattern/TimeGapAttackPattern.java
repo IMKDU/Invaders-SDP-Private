@@ -71,6 +71,7 @@ public class TimeGapAttackPattern extends BossPattern {
 		if (Math.abs(targetY - bossPosition.y) <= 1) bossPosition.y = targetY;
 	}
 
+	@Override
 	public void setTarget(HasBounds target){
 		this.target = target;
 	}
