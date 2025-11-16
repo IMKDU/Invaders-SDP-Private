@@ -1,12 +1,10 @@
 package entity;
+
 import audio.SoundManager;
-
-
-import java.awt.Color;
-
 import engine.Cooldown;
-import engine.Core;
 import engine.DrawManager.SpriteType;
+
+import java.awt.*;
 
 /**
  * Implements a enemy ship, to be destroyed by the player.
@@ -65,8 +63,8 @@ public class EnemyShip extends Entity {
 		super(positionX, positionY, 12 * 2, 8 * 2, Color.WHITE);
 
 		this.spriteType = spriteType;
-		this.animationCooldown = Core.getCooldown(500);
-        this.explosionCooldown = Core.getCooldown(500);
+		this.animationCooldown = new Cooldown(500);
+        this.explosionCooldown = new Cooldown(500);
 		this.isDestroyed = false;
 
 		switch (this.spriteType) {
@@ -93,14 +91,14 @@ public class EnemyShip extends Entity {
 	 * known starting properties.
 	 */
 	public EnemyShip(Color color, Direction direction, int x_speed) {
-		super(-32, 60, 16 * 2, 7 * 2, color);
+        super(-32, GameConstant.STAT_SEPARATION_LINE_HEIGHT, 16 * 2, 7 * 2, color);
 
 		this.direction = direction;
 		this.X_SPEED = x_speed;
 		this.spriteType = SpriteType.EnemyShipSpecial;
 		this.isDestroyed = false;
 		this.pointValue = BONUS_TYPE_POINTS;
-        this.explosionCooldown = Core.getCooldown(500);
+        this.explosionCooldown = new Cooldown(500);
 	}
 
 	/**
