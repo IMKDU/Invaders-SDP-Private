@@ -60,8 +60,8 @@ public class ItemRenderer {
 		switch (type) {
 			case Explode: return Color.RED;
 			case Slow:    return Color.BLUE;
-			case Stop:    return Color.BLUE;
-			case Push:    return Color.BLUE;
+			case Stop:    return Color.YELLOW;
+			case Push:    return Color.ORANGE;
 			case Shield:  return Color.CYAN;
 			case Heal:    return Color.GREEN;
 		}

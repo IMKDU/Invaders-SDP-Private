@@ -531,7 +531,7 @@ public class GameModel {
 
 		for (ItemDrop drop : drops) {
 
-			if (!enemyType.equals(drop.getEnemyType())) continue;
+			if (!enemyType.equalsIgnoreCase(drop.getEnemyType())) continue;
 
 			if (Math.random() > drop.getDropChance()) continue;
 
