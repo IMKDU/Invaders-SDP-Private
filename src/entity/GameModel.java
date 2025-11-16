@@ -146,10 +146,10 @@ public class GameModel {
 		/** Initialize the bullet Boss fired */
 		this.bossBullets = new HashSet<>();
 		enemyShipFormationModel = new EnemyShipFormationModel(this.currentLevel, width);
-		this.ship = new Ship(this.width / 2 - 100, GameScreen.ITEMS_SEPARATION_LINE_HEIGHT - 20, Color.green);
+		this.ship = new Ship(this.width / 2 - 100, this.bottomHeight - 20, Color.green);
 		this.ship.setPlayerId(1);   //=== [ADD] Player 1 ===
 
-		this.shipP2 = new Ship(this.width / 2 + 100, GameScreen.ITEMS_SEPARATION_LINE_HEIGHT - 20, Color.pink);
+		this.shipP2 = new Ship(this.width / 2 + 100, this.bottomHeight - 20, Color.pink);
 		this.shipP2.setPlayerId(2); // === [ADD] Player2 ===
 		// special enemy initial
 
@@ -500,7 +500,12 @@ public class GameModel {
 
 		if (item.getItemType() == DropItem.ItemType.Explode) {
 			int destroyed = enemyShipFormationModel.destroyAll();
-			addPointsFor(null, destroyed * 5);
+			int pts = destroyed * 5;
+			if (ship.getPlayerId() == 2) {
+				this.scoreP2 += pts;
+			} else {
+				this.scoreP1 += pts;
+			}
 		}
 
 		if (item.getItemType() == DropItem.ItemType.Slow) {
