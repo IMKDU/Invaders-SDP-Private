@@ -49,6 +49,8 @@ public class GameModel {
     private Cooldown enemyShipSpecialCooldown;
     /** team drawing may implement */
     private FinalBoss finalBoss;
+    /** Spawn pattern has Mob */
+    private List<MidBossMob> midBossChilds;
     /** Time until bonus ship explosion disappears. */
     private Cooldown enemyShipSpecialExplosionCooldown;
     /** Time until Boss explosion disappears. */
@@ -57,6 +59,7 @@ public class GameModel {
     private Cooldown screenFinishedCooldown;
     /** OmegaBoss */
     private MidBoss omegaBoss;
+
     /** Set of all bullets fired by on-screen ships. */
     private Set<Bullet> bullets;
     /** Set of all dropItems dropped by on screen ships. */
@@ -165,6 +168,7 @@ public class GameModel {
         this.elapsedTime = 0;
         this.finalBoss = null;
         this.omegaBoss = null;
+        this.midBossChilds = null;
         this.currentPhase = StagePhase.wave;
     }
 
@@ -449,7 +453,26 @@ public class GameModel {
                     }
                     recyclable.add(bullet);
                 }
-
+                if(this.midBossChilds != null && !this.midBossChilds.isEmpty()) {
+                    for(MidBossMob ship : midBossChilds){
+                        if(ship != null
+                                && !ship.isDestroyed()
+                                && checkCollision(bullet, ship)) {
+                            ship.takeDamage(2);
+                            if(ship.getHealPoint() <= 0) {
+                                int pts = ship.getPointValue();
+                                addPointsFor(bullet, pts);
+                                this.coin += (pts / 10);
+                                this.shipsDestroyed++;
+                                ship.destroy();
+                            }
+                            recyclable.add(bullet);
+                            if (!bullet.penetration()) {
+                                break;
+                            }
+                        }
+                    }
+                }
                 /** when final boss collide with bullet */
                 if(this.finalBoss != null && !this.finalBoss.isDestroyed() && checkCollision(bullet,this.finalBoss)){
                     this.finalBoss.takeDamage(1);
@@ -512,7 +535,20 @@ public class GameModel {
                         + " lives remaining.");
                 return;
             }
-
+            if(this.midBossChilds != null && !this.midBossChilds.isEmpty()){
+                for(MidBossMob ship : midBossChilds){
+                    if(ship != null
+                            && !ship.isDestroyed()
+                            && checkCollision(this.ship, ship)){
+                        this.ship.destroy();
+                        this.livesP1--;
+                        showHealthPopup("-1 Life (Collision!)");
+                        this.logger.info("Ship collided with enemy! " + this.livesP1
+                                + " lives remaining.");
+                        return;
+                    }
+                }
+            }
             // Check collision with final boss
             if (this.finalBoss != null && !this.finalBoss.isDestroyed()
                     && checkCollision(this.ship, this.finalBoss)) {
@@ -565,7 +601,20 @@ public class GameModel {
                         + " lives remaining.");
                 return;
             }
-
+            if(this.midBossChilds != null && !this.midBossChilds.isEmpty()){
+                for(MidBossMob ship : midBossChilds){
+                    if(ship != null
+                            && !ship.isDestroyed()
+                            && checkCollision(this.shipP2, ship)){
+                        this.shipP2.destroy();
+                        this.livesP2--;
+                        showHealthPopup("-1 Life (Collision!)");
+                        this.logger.info("Ship collided with enemy! " + this.livesP2
+                                + " lives remaining.");
+                        return;
+                    }
+                }
+            }
             // Check collision with final boss
             if (this.finalBoss != null && !this.finalBoss.isDestroyed()
                     && checkCollision(this.shipP2, this.finalBoss)) {
@@ -906,6 +955,7 @@ public class GameModel {
     public Set<Bullet> getBossBullets() { return bossBullets; }
     public EnemyShipFormationModel getEnemyShipFormationModel() { return enemyShipFormationModel; }
     public MidBoss getOmegaBoss() { return omegaBoss; }
+    public List<MidBossMob> getMidBossChilds() { return midBossChilds; }
     public Set<Bullet> getBullets() { return bullets; }
     public Set<DropItem> getDropItems() { return dropItems; }
     public int getScoreP1() { return scoreP1; }
@@ -946,7 +996,11 @@ public class GameModel {
                 renderList.add(enemy);
             }
         }
-
+        if (getMidBossChilds() != null) {
+            for (MidBossMob child : getMidBossChilds()) {
+                renderList.add(child);
+            }
+        }
         // 4. added boss
         if (getOmegaBoss() != null) {
             renderList.add(getOmegaBoss());

@@ -1,5 +1,7 @@
 package entity.pattern;
 
+import entity.MidBossMob;
+
 import java.util.List;
 
 /**

@@ -6,6 +6,7 @@ import java.util.List;
 import java.awt.*;
 import java.util.logging.Logger;
 import engine.Core;
+import entity.MidBossMob;
 
 public class SpawnMobPattern {
 

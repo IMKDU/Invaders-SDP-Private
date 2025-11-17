@@ -1,7 +1,6 @@
-package entity.pattern;
+package entity;
 
 import engine.DrawManager;
-import entity.MidBoss;
 
 import java.awt.*;
 
