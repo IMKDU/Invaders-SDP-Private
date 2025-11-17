@@ -67,28 +67,29 @@ public final class EntityRenderer {
         }
         return tinted;
     }
-    public void drawShield(int shipPositionX, int shipPositionY, double ratio) {
+    public void drawShield(int shipX,int shipWidth, int shipY, int shipHeight, double ratio) {
         BufferedImage shield = spriteMap.get(SpriteType.Shield);
         if (shield == null) return;
+        int sw = shield.getWidth();
+        int sh = shield.getHeight();
 
-        // 원본 크기
-        int w = shield.getWidth();
-        int h = shield.getHeight();
+        int scaledW = (int) (sw * scale * 2);
+        int scaledH = (int) (sh * scale * 2);
 
-        // 화면 스케일 적용
-        int scaledW = (int) (w * scale * 2);
-        int scaledH = (int) (h * scale * 2);
+        int centerX = shipX + shipWidth / 2;
+        int centerY = shipY + shipHeight / 2;
 
-        // 투명도 계산 (ratio 기반)
+        int drawX = centerX - scaledW / 2;
+        int drawY = centerY - scaledH / 2;
+
         int alpha = (int) (255 * ratio);
-        if (alpha < 30) alpha = 30; // 최소 투명도
-
-        // 쉴드 블렌딩
+        if (alpha < 30) alpha = 30;
         BufferedImage tinted = tintAlpha(shield, alpha);
-        // 쉴드를 약간 배 밖으로 나오게 하고 싶으면 offset 조절
+
         Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
-        g2d.drawImage(tinted, shipPositionX - 4, shipPositionY, scaledW, scaledH, null);
+        g2d.drawImage(tinted, drawX, drawY, scaledW, scaledH, null);
     }
+
     private BufferedImage tintAlpha(BufferedImage src, int alpha) {
         int w = src.getWidth();
         int h = src.getHeight();
