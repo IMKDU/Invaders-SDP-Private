@@ -47,5 +47,26 @@ public final class EntityRenderer {
             }
         }
     }
+    public void drawShield(int shipPositionX, int shipPositionY, double ratio){
+        int alpha = (int) (255 * ratio);
+        if (alpha < 30) alpha = 30;
+        Color[][] image = spriteMap.get(SpriteType.Shield);
+        for (int i = 0; i < image.length; i++) {
+            for (int j = 0; j < image[i].length; j++) {
+                Color baseColor = image[i][j];
+                // 완전 투명 픽셀은 무시
+                if (baseColor.getAlpha() == 0) continue;
+                // 알파값을 ratio 기반으로 새로 계산
+                Color blendedColor = new Color(
+                        baseColor.getRed(),
+                        baseColor.getGreen(),
+                        baseColor.getBlue(),
+                        Math.min(alpha, baseColor.getAlpha())
+                );
+                backBuffer.getGraphics().setColor(blendedColor);
+                backBuffer.getGraphics().drawRect(shipPositionX - 4 + i * 2, shipPositionY + j * 2, 1, 1);
+            }
+        }
+    }
 
 }
