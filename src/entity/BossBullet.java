@@ -9,13 +9,13 @@ public class BossBullet extends Entity implements Collidable {
 	/**
 	 * amount of horizontal change
 	 */
-	private int dx;
+	private final int dx;
 	/**
 	 * amount of vertical change
 	 */
-	private int dy;
-	/** bossBullets carry bullets that the boss will shoot */
+	private final int dy;
 	/**
+	 * bossBullets carry bullets that the boss will shoot
 	 * Constructor, establishes boss bullets.
 	 *
 	 * @param x      current x-coordinate

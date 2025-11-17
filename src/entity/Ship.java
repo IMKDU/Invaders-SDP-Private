@@ -235,11 +235,5 @@ public class Ship extends Entity implements Collidable {
 			game.handlePlayerCrash(this, other.asEntity());
 			return;
 		}
-
-		// 3. Player ship collects drop item
-		if (other instanceof DropItem) {
-			game.handleItemCollected(this, (DropItem) other);
-			return;
-		}
 	}
 }

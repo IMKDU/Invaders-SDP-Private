@@ -114,13 +114,25 @@ public class EnemyShip extends Entity implements Collidable {
 		}
 	}
 
+	public enum SpecialType {
+		RED,
+		BLUE
+	}
+
+	public SpecialType getSpecialType() {
+		return this.specialType;
+	}
+
+	private SpecialType specialType; // 추가
+
 	/**
 	 * Constructor, establishes the ship's properties for a special ship, with
 	 * known starting properties.
 	 */
-	public EnemyShip(Color color, Direction direction, int x_speed) {
-		super(-32, 60, 16 * 2, 7 * 2, color);
+	public EnemyShip(SpecialType type, Direction direction, int x_speed) {
+        super(-32, GameConstant.STAT_SEPARATION_LINE_HEIGHT, 16 * 2, 7 * 2, Color.white);
 
+		this.specialType = type;
 		this.direction = direction;
 		this.X_SPEED = x_speed;
 		this.spriteType = SpriteType.EnemyShipSpecial;

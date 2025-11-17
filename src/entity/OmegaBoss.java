@@ -108,6 +108,11 @@ public class OmegaBoss extends MidBoss {
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		this.logger.info("OMEGA : move using the default pattern");
 	}
+	// ✅ 호환용 생성자 (GameModel 없는 기존 코드/테스트용)
+	public OmegaBoss(Color color, int widthBoundary, int bottomBoundary) {
+		this(color, widthBoundary, bottomBoundary, null);
+		// GameModel이 없으면 스윕 패턴은 자동으로 스킵되도록 (performSweep에서 null 체크됨)
+	}
 
 	/**
 	 * move simple
@@ -313,9 +318,9 @@ public class OmegaBoss extends MidBoss {
 	}
 
 	/**
-	 * Updates the boss logic for this frame.
-	 * Triggers the mid-skill at 50% HP, runs the skill while active,
-	 * and otherwise follows regular movement patterns.
+	 * Updates the entity's state for the current game frame.
+	 * This method is called on every tick of the game loop and is responsible for
+	 * executing the boss's movement patterns.
 	 */
 	@Override
 	public void update() {

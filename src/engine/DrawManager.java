@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import engine.renderer.ItemRenderer;
 import engine.renderer.EntityRenderer;
 import engine.renderer.HUDRenderer;
 import engine.renderer.ShopRenderer;
 import engine.renderer.UIRenderer;
+import entity.DropItem;
 import screen.TitleScreen.Star;
 import screen.TitleScreen.ShootingStar;
 
@@ -38,9 +40,15 @@ public final class DrawManager {
     private HUDRenderer hudRenderer;
     private ShopRenderer shopRenderer;
     private UIRenderer uiRenderer;
+	private ItemRenderer itemRenderer;
+	private double scale;
 
 	/** Sprite types mapped to their images. */
 	private static Map<SpriteType, boolean[][]> spriteMap;
+
+	public void draw(DropItem item) {
+		itemRenderer.render(item);
+	}
 
 	/** Sprite types. */
 	public static enum SpriteType {
@@ -91,8 +99,9 @@ public void setFrame(final Frame currentFrame) {
         backBuffer.initDraw(screenWidth, screenHeight);
         if(fontPack == null){
             fontPack = new FontPack(backBuffer.getGraphics(), fileManager);
-            entityRenderer = new EntityRenderer(spriteAtlas.getSpriteMap(),backBuffer);
-            hudRenderer = new HUDRenderer(backBuffer, fontPack, entityRenderer);
+            entityRenderer = new EntityRenderer(spriteAtlas.getSpriteMap(),backBuffer,this.scale);
+			itemRenderer = new ItemRenderer(backBuffer, spriteAtlas.getSpriteMap(), this.scale);
+			hudRenderer = new HUDRenderer(backBuffer, fontPack, entityRenderer);
             shopRenderer = new ShopRenderer(backBuffer,fontPack);
             uiRenderer = new UIRenderer(backBuffer,fontPack);
         }
@@ -142,6 +151,9 @@ public void setFrame(final Frame currentFrame) {
 			g.drawRect(screenX, screenY, 1, 1);
 		}
 	}
+    public void setScale(double scaleX, double scaleY){
+        this.scale = Math.min(scaleX, scaleY);
+    }
 
     public void drawShootingStars(final List<ShootingStar> shootingStars, final float angle) {    }
 

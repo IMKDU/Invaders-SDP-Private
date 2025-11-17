@@ -2,8 +2,6 @@ package entity;
 
 import java.awt.Color;
 
-import engine.DrawManager.SpriteType;
-
 import java.util.Random;
 
 public class DropItem extends Entity implements Collidable {
@@ -76,37 +74,6 @@ public class DropItem extends Entity implements Collidable {
 		super(positionX, positionY, 5 * 2, 5 * 2, Color.WHITE);
 		this.speed = speed;
 		this.itemType = itemType;
-		this.color = Color.WHITE;
-		setSprite();
-	}
-
-	public final void setSprite() {
-		switch (this.itemType) {
-			case Explode:
-				this.color = Color.RED;
-				this.spriteType = SpriteType.Item_Explode;
-				break;
-			case Slow:
-				this.color = Color.BLUE;
-				this.spriteType = SpriteType.Item_Slow;
-				break;
-			case Stop:
-				this.color = Color.BLUE;
-				this.spriteType = SpriteType.Item_Stop;
-				break;
-			case Push:
-				this.color = Color.BLUE;
-				this.spriteType = SpriteType.Item_Push;
-				break;
-			case Shield:
-				this.color = Color.CYAN;
-				this.spriteType = SpriteType.Item_Shield;
-				break;
-			case Heal:
-				this.color = Color.GREEN;
-				this.spriteType = SpriteType.Item_Heal;
-				break;
-		}
 	}
 
 	private static long freezeEndTime = 0;
@@ -185,7 +152,6 @@ public class DropItem extends Entity implements Collidable {
 
 	public final void setItemType(final ItemType itemType) {
 		this.itemType = itemType;
-		this.setSprite();
 	}
 
 	public static ItemType getRandomItemType(final double proba) {
@@ -193,6 +159,13 @@ public class DropItem extends Entity implements Collidable {
 			return ItemType.selectItemType();
 		} else {
 			return null;
+		}
+	}
+
+	@Override
+	public void onCollision(Collidable other, GameModel game) {
+		if (other instanceof Ship) {
+			game.handleItemCollected((Ship) other, this);
 		}
 	}
 }
