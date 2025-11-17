@@ -67,6 +67,7 @@ public class Ship extends Entity {
 
 	}
 
+
 	/**
 	 * Moves the ship speed uni ts right, or until the right screen border is
 	 * reached.

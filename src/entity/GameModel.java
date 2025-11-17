@@ -148,7 +148,7 @@ public class GameModel {
         this.ship = new Ship(this.width / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 13 / 15,true);
         this.ship.setPlayerId(1);   //=== [ADD] Player 1 ===
 
-        this.shipP2 = new Ship(this.width * 3 / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 19 / 20,false);
+        this.shipP2 = new Ship(this.width * 3 / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 13 / 15,false);
         this.shipP2.setPlayerId(2); // === [ADD] Player2 ===
         // special enemy initial
 
