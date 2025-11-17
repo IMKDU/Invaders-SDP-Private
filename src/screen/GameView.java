@@ -3,15 +3,16 @@ package screen;
 import engine.DrawManager;
 import engine.DTO.HUDInfoDTO;
 import entity.GameModel;
+import entity.LaserBullet;
 import entity.GameConstant;
 
 /**
  * GameView
  * ----------
- * - View Layer (V in MVC)
- * - Does not depend on the Controller(GameScreen) or Screen objects
- * - Receives HUD data from HUDInfoDTO and
- * draws entity lists directly received from the Model.
+ * - View layer (the V in MVC)
+ * - Does not depend on the Controller (GameScreen) or any Screen objects
+ * - Receives HUD data from HUDInfoDTO
+ *   and directly gets the list of entities to render from the Model
  */
 public class GameView {
 
