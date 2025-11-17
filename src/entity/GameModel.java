@@ -1,15 +1,16 @@
 package entity;
 
-import java.awt.Color;
-import java.util.List;
+import engine.*;
+import engine.level.Level;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import engine.*;
 import engine.level.ItemDrop;
-import engine.level.Level;
 import screen.GameScreen;
 import screen.Screen;
 
@@ -62,6 +63,7 @@ public class GameModel {
     private MidBoss omegaBoss;
     /** Set of all bullets fired by on-screen ships. */
     private Set<Bullet> bullets;
+
     /** Set of all dropItems dropped by on screen ships. */
     private Set<DropItem> dropItems;
     /** Current score. */
@@ -88,7 +90,7 @@ public class GameModel {
     private int coin;
 
     /** bossBullets carry bullets which Boss fires */
-    private Set<BossBullet> bossBullets;
+    private Set<Bullet> bossBullets;
     /** Is the bullet on the screen erased */
     private boolean is_cleared = false;
     /** Timer to track elapsed time. */
@@ -162,16 +164,15 @@ public class GameModel {
 
 		enemyShipSpecialFormation = new EnemyShipSpecialFormation(specialSettings,
 				Core.getVariableCooldown(BONUS_SHIP_INTERVAL, BONUS_SHIP_VARIANCE),
-				Core.getCooldown(BONUS_SHIP_EXPLOSION));
-		this.bossExplosionCooldown = Core
-				.getCooldown(BOSS_EXPLOSION);
-		this.screenFinishedCooldown = Core.getCooldown(SCREEN_CHANGE_INTERVAL);
+				new Cooldown(BONUS_SHIP_EXPLOSION));
+		this.bossExplosionCooldown = new Cooldown(BOSS_EXPLOSION);
+		this.screenFinishedCooldown = new Cooldown(SCREEN_CHANGE_INTERVAL);
 		this.bullets = new HashSet<Bullet>();
 		this.dropItems = new HashSet<DropItem>();
 
         // Special input delay / countdown.
         this.gameStartTime = System.currentTimeMillis();
-        this.inputDelay = Core.getCooldown(INPUT_DELAY);
+        this.inputDelay = new Cooldown(INPUT_DELAY);
         this.inputDelay.reset();
 
 
@@ -282,7 +283,7 @@ public class GameModel {
                     if (this.omegaBoss.isDestroyed()) {
                         if ("omegaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.omegaBoss = null;
-                            this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, this.width, this.height);
+                            this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, (HasBounds) ship, this.width, this.height);
                             this.logger.info("Final Boss has spawned!");
                         } else {
                             this.levelFinished = true;
@@ -308,7 +309,8 @@ public class GameModel {
         for (Bullet bullet : this.bullets) {
             bullet.update();
         }
-		for (BossBullet b : this.bossBullets) {
+
+		for (Bullet b : this.bossBullets) {
 			b.update();
 		}
         for (DropItem dropItem : this.dropItems) {
@@ -642,7 +644,7 @@ public class GameModel {
      */
     public void showAchievement(String message) {
         this.achievementText = message;
-        this.achievementPopupCooldown = Core.getCooldown(2500); // Show for 2.5 seconds
+        this.achievementPopupCooldown = new Cooldown(2500); // Show for 2.5 seconds
         this.achievementPopupCooldown.reset();
     }
 
@@ -655,7 +657,7 @@ public class GameModel {
 
     public void showHealthPopup(String message) {
         this.healthPopupText = message;
-        this.healthPopupCooldown = Core.getCooldown(500);
+        this.healthPopupCooldown = new Cooldown(500);
         this.healthPopupCooldown.reset();
     }
 
@@ -697,7 +699,7 @@ public class GameModel {
         this.logger.info("Spawning boss: " + bossName);
         switch (bossName) {
             case "finalBoss":
-                this.finalBoss = new FinalBoss(this.width / 2 - 50, 80, this.width, this.height);
+                this.finalBoss = new FinalBoss(this.width / 2 - 50, 80, (HasBounds) ship, this.width, this.height);
                 this.logger.info("Final Boss has spawned!");
                 break;
             case "omegaBoss":
@@ -712,61 +714,16 @@ public class GameModel {
     }
 
 
-    public void finalbossManage(){
-        if (this.finalBoss != null && !this.finalBoss.isDestroyed()) {
-            this.finalBoss.update();
-            /** called the boss shoot logic */
-            if (this.finalBoss.getHealPoint() > this.finalBoss.getMaxHp() / 4) {
-                bossBullets.addAll(this.finalBoss.shoot1());
-                bossBullets.addAll(this.finalBoss.shoot2());
-            } else {
-                /** Is the bullet on the screen erased */
-                if (!is_cleared) {
-                    bossBullets.clear();
-                    is_cleared = true;
-                    logger.info("boss is angry");
-                } else {
-                    bossBullets.addAll(this.finalBoss.shoot3());
-                }
-            }
+	public void finalbossManage() {
+		if (this.finalBoss != null && !this.finalBoss.isDestroyed()) {
+			this.finalBoss.update();
+		}
 
-            /** bullets to erase */
-            Set<BossBullet> bulletsToRemove = new HashSet<>();
-
-            for (BossBullet b : bossBullets) {
-                b.update();
-                /** If the bullet goes off the screen */
-                if (b.isOffScreen(width, height)) {
-                    /** bulletsToRemove carry bullet */
-                    bulletsToRemove.add(b);
-                }
-                /** If the bullet collides with ship */
-                else if (this.livesP1 > 0 && this.checkCollision(b, this.ship)) {
-                    if (!this.ship.isDestroyed()) {
-                        this.ship.destroy();
-                        this.livesP1--;
-                        this.logger.info("Hit on player ship, " + this.livesP1 + " lives remaining.");
-                    }
-                    bulletsToRemove.add(b);
-                }
-                else if (this.shipP2 != null && this.livesP2 > 0 && !this.shipP2.isDestroyed() && this.checkCollision(b, this.shipP2)) {
-                    if (!this.shipP2.isDestroyed()) {
-                        this.shipP2.destroy();
-                        this.livesP2--;
-                        this.logger.info("Hit on player ship, " + this.livesP2 + " lives remaining.");
-                    }
-                    bulletsToRemove.add(b);
-                }
-            }
-            /** all bullets are removed */
-            bossBullets.removeAll(bulletsToRemove);
-
-        }
-        if (this.finalBoss != null && this.finalBoss.isDestroyed()) {
-            this.levelFinished = true;
-            this.screenFinishedCooldown.reset();
-        }
-    }
+		if (this.finalBoss != null && this.finalBoss.isDestroyed()) {
+			this.levelFinished = true;
+			this.screenFinishedCooldown.reset();
+		}
+	}
 
     // --- Timer and State Management Methods for Controller ---
 
@@ -846,7 +803,7 @@ public class GameModel {
     public int getLivesP2() { return livesP2; }
     public EnemyShipSpecialFormation getEnemyShipSpecialFormation() { return enemyShipSpecialFormation; }
     public FinalBoss getFinalBoss() { return finalBoss; }
-    public Set<BossBullet> getBossBullets() { return bossBullets; }
+    public Set<Bullet> getBossBullets() { return bossBullets; }
     public EnemyShipFormationModel getEnemyShipFormationModel() { return enemyShipFormationModel; }
     public MidBoss getOmegaBoss() { return omegaBoss; }
     public Set<Bullet> getBullets() { return bullets; }

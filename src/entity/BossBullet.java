@@ -5,7 +5,7 @@ import engine.DrawManager;
 import java.awt.*;
 
 
-public class BossBullet extends Entity implements Collidable {
+public class BossBullet extends Bullet implements Collidable {
 	/**
 	 * amount of horizontal change
 	 */
@@ -27,7 +27,7 @@ public class BossBullet extends Entity implements Collidable {
 	 * @param color  bullet's color
 	 */
 	public BossBullet(int x, int y, int dx, int dy, int width, int height, Color color) {
-		super(x, y, width, height, color);
+		super(x, y, width, color);
 		this.dx = dx;
 		this.dy = dy;
 		this.spriteType = DrawManager.SpriteType.FinalBossBullet; // boss's bullet image = enemyBullet

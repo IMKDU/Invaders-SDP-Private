@@ -9,61 +9,33 @@ import java.awt.*;
  */
 public class OmegaBoss extends MidBoss {
 
-	/**
-	 * Initial position in the x-axis.
-	 */
+	/** Initial position in the x-axis. */
 	private static final int INIT_POS_X = 224;
-	/**
-	 * Initial position in the y-axis.
-	 */
-	private static final int INIT_POS_Y = 50;
-	/**
-	 * Width of Omega
-	 */
+	/** Initial position in the y-axis. */
+	private static final int INIT_POS_Y = 80;
+	/** Width of Omega */
 	private static final int OMEGA_WIDTH = 64;
-	/**
-	 * Height of Omega
-	 */
+	/** Height of Omega */
 	private static final int OMEGA_HEIGHT = 28;
-	/**
-	 * Current Health of Omega
-	 */
+	/** Current Health of Omega */
 	private static final int OMEGA_HEALTH = 45;
-	/**
-	 * Point of Omega when destroyed
-	 */
+	/** Point of Omega when destroyed */
 	private static final int OMEGA_POINT_VALUE = 500;
-	/**
-	 * Speed of x in pattern 1
-	 */
+	/** Speed of x in pattern 1 */
 	private static final int PATTERN_1_X_SPEED = 1;
-	/**
-	 * Speed of x in pattern 2
-	 */
+	/** Speed of x in pattern 2 */
 	private static final int PATTERN_2_X_SPEED = 4;
-	/**
-	 * Speed of y in pattern 2
-	 */
+	/** Speed of y in pattern 2 */
 	private static final int PATTERN_2_Y_SPEED = 3;
-	/**
-	 * Color of pattern 2
-	 */
+	/** Color of pattern 2 */
 	private static final Color PATTERN_2_COLOR = Color.MAGENTA;
-	/**
-	 * Current horizontal movement direction. true for right, false for left.
-	 */
+	/** Current horizontal movement direction. true for right, false for left. */
 	private boolean isRight = true;
-	/**
-	 * Current vertical movement direction. true for down, false for up.
-	 */
+	/** Current vertical movement direction. true for down, false for up. */
 	private boolean isDown = true;
-	/**
-	 * Boss cannot move over this boundary.
-	 */
+	/** Boss cannot move over this boundary. */
 	private final int widthBoundary;
-	/**
-	 * Boss cannot move below this boundary.
-	 */
+	/** Boss cannot move below this boundary. */
 	private final int bottomBoundary;
 	/**
 	 * Check if HP is below 50%
@@ -95,9 +67,9 @@ public class OmegaBoss extends MidBoss {
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
 	 *
-	 * @param color          Color of the boss entity.
-	 * @param widthBoundary  The rightmost X-coordinate for the boss's movement. The boss cannot move over this value.
-	 * @param bottomBoundary The lowermost Y-coordinate for the boss's movement. The boss cannot move below this value.
+ 	 * @param color             Color of the boss entity.
+ 	 * @param widthBoundary		The rightmost X-coordinate for the boss's movement. The boss cannot move over this value.
+ 	 * @param bottomBoundary    The lowermost Y-coordinate for the boss's movement. The boss cannot move below this value.
 	 */
 	public OmegaBoss(Color color, int widthBoundary, int bottomBoundary, GameModel model) {
 		super(INIT_POS_X, INIT_POS_Y, OMEGA_WIDTH, OMEGA_HEIGHT, OMEGA_HEALTH, OMEGA_POINT_VALUE, color);
@@ -114,9 +86,7 @@ public class OmegaBoss extends MidBoss {
 		// GameModel이 없으면 스윕 패턴은 자동으로 스킵되도록 (performSweep에서 null 체크됨)
 	}
 
-	/**
-	 * move simple
-	 */
+	/** move simple */
 	@Override
 	public void move(int distanceX, int distanceY) {
 		this.positionX += distanceX;
@@ -240,12 +210,12 @@ public class OmegaBoss extends MidBoss {
 	 * pattern == 1 → patternFirst()
 	 * pattern == 2 → patternSecond()
 	 */
-	private void movePatterns() {
-		if (this.pattern != 2 && this.healPoint < this.maxHp / 2 && !midSkillActive) {
-			this.pattern = 2;
-			this.color = PATTERN_2_COLOR;
+	private void movePatterns(){
+		if(this.pattern!=2 && this.healPoint < this.maxHp/2){
+			this.pattern=2;
+			this.color=PATTERN_2_COLOR;
 			this.spriteType = DrawManager.SpriteType.OmegaBoss2;
-			logger.info("OMEGA : move using second pattern (fallback)");
+			logger.info("OMEGA : move using second pattern");
 		}
 
 		if (pattern == 1) patternFirst();
@@ -254,10 +224,9 @@ public class OmegaBoss extends MidBoss {
 
 	/**
 	 * The boss's phase first pattern, which makes it move from side to side across the screen.
-	 *
 	 * @see #move(int, int)
 	 */
-	private void patternFirst() {
+	private void patternFirst(){
 		int dx = this.isRight ? PATTERN_1_X_SPEED : -PATTERN_1_X_SPEED;
 		this.move(dx, 0);
 
@@ -271,10 +240,9 @@ public class OmegaBoss extends MidBoss {
 	/**
 	 * The boss's phase Second pattern, which combines horizontal and vertical movement
 	 * Horizontally, it patrols from side to side at a faster speed than in {@link #patternFirst()}.
-	 *
 	 * @see #move(int, int)
 	 */
-	private void patternSecond() {
+	private void patternSecond(){
 		int dx = this.isRight ? PATTERN_2_X_SPEED : -PATTERN_2_X_SPEED;
 		int dy = this.isDown ? PATTERN_2_Y_SPEED : -PATTERN_2_Y_SPEED;
 
@@ -297,9 +265,7 @@ public class OmegaBoss extends MidBoss {
 		}
 	}
 
-	/**
-	 * Marks the entity as destroyed and changes its sprite to an explosion.
-	 */
+	/** Marks the entity as destroyed and changes its sprite to an explosion. */
 	@Override
 	public void destroy() {
 		this.isDestroyed = true;
@@ -343,7 +309,6 @@ public class OmegaBoss extends MidBoss {
 	/**
 	 * Renders the entity at its current position using the provided DrawManager.
 	 */
-	@Override
 	public void draw(DrawManager drawManager) {
 		drawManager.getEntityRenderer().drawEntity(this, this.positionX, this.positionY);
 	}
