@@ -26,11 +26,11 @@ public class EnemyShip extends Entity implements Collidable {
 	/** Cooldown between sprite changes. */
 	private Cooldown animationCooldown;
     /** Cooldown between explosions. */
-    private Cooldown explosionCooldown;
+    private final Cooldown explosionCooldown;
 	/** Checks if the ship has been hit by a bullet. */
 	private boolean isDestroyed;
 	/** Values of the ship, in points, when destroyed. */
-	private int pointValue;
+	private final int pointValue;
 
 	/** Special enemy Direction enum **/
 	public enum Direction {
@@ -51,12 +51,9 @@ public class EnemyShip extends Entity implements Collidable {
 	/**
 	 * Constructor, establishes the ship's properties.
 	 * 
-	 * @param positionX
-	 *            Initial position of the ship in the X axis.
-	 * @param positionY
-	 *            Initial position of the ship in the Y axis.
-	 * @param spriteType
-	 *            Sprite type, image corresponding to the ship.
+	 * @param positionX	Initial position of the ship in the X axis.
+	 * @param positionY	Initial position of the ship in the Y axis.
+	 * @param spriteType Sprite type, image corresponding to the ship.
 	 */
 	public EnemyShip(final int positionX, final int positionY,
 	                 final SpriteType spriteType) {
@@ -125,10 +122,8 @@ public class EnemyShip extends Entity implements Collidable {
 	/**
 	 * Moves the ship the specified distance.
 	 * 
-	 * @param distanceX
-	 *            Distance to move in the X axis.
-	 * @param distanceY
-	 *            Distance to move in the Y axis.
+	 * @param distanceX	Distance to move in the X axis.
+	 * @param distanceY	Distance to move in the Y axis.
 	 */
 	public final void move(final int distanceX, final int distanceY) {
 		this.positionX += distanceX;

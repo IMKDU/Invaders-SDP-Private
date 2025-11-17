@@ -7,8 +7,6 @@ import engine.DrawManager;
 import entity.pattern.*;
 
 import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Logger;
 
 public class FinalBoss extends Entity implements BossEntity{
