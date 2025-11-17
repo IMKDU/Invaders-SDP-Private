@@ -271,15 +271,26 @@ public class GameModel {
                     ApocalypseAttackPattern pattern = this.omegaBoss.getApocalypsePattern();
 
                     // If the pattern component exists and is active
-                    if (pattern.isPatternActive()) {
+                    if (pattern != null && pattern.isPatternActive()) {
 
-                        // Check if the warning cooldown (2 seconds) is finished
-                        if (pattern.isWarningFinished()) {
-                            // If time is up, execute the attack and reset the boss's state
-                            executeApocalypseDamage(pattern.getSafeZoneColumn());
-                            pattern.finishPattern(); // Reset pattern component state
+                        // Check if in Warning state and warning time is finished
+                        if (pattern.isWarningActive() && pattern.isWarningFinished()) {
+                            // Warning time is over, so start attack animation
+                            pattern.beginAttackAnimation();
                         }
-                        // (If 2 seconds haven't passed: do nothing. Boss is paused, View draws the warning)
+                        // Check if in Attacking state (executes every frame)
+                        else if (pattern.isAttacking()) {
+                            // Get the current animation progress (0.0 ~ 1.0)
+                            float progress = pattern.getAttackAnimationProgress();
+
+                            // Pass the progress to execute damage logic every frame
+                            executeApocalypseDamage(pattern.getSafeZoneColumn(), progress);
+
+                            // Check if animation is finished, and if so, end the pattern
+                            if (pattern.isAttackAnimationFinished()) {
+                                pattern.finishPattern(); // Reset pattern component state
+                            }
+                        }
                     }
 
                     else if (this.omegaBoss.isDestroyed()) {
@@ -333,10 +344,13 @@ public class GameModel {
      * Determines the damage for the boss's area-wide attack. (General method)
      * @param safeZoneColumn (0-9) Safe zone column index
      */
-    public void executeApocalypseDamage(int safeZoneColumn) {
+    public void executeApocalypseDamage(int safeZoneColumn, float progress) {
         if (safeZoneColumn < 0 || safeZoneColumn > 9) {
             return;
         }
+
+        // Calculate the current "bottom" Y-coordinate of the attack based on animation progress
+        int currentAttackHeight = (int) (this.height * progress);
 
         int columnWidth = this.width / 10;
 
@@ -346,11 +360,20 @@ public class GameModel {
             int playerLeftX = this.ship.getPositionX();
             int playerRightX = this.ship.getPositionX() + this.ship.getWidth() - 1;
 
+            // Player's Y-coordinate (top)
+            int playerTopY = this.ship.getPositionY();
+
             int leftColumn = playerLeftX / columnWidth;
             int rightColumn = playerRightX / columnWidth;
 
-            // If the player is not in the safe zone, process damage
-            if (leftColumn != safeZoneColumn || rightColumn != safeZoneColumn) {
+            // Is the player in a column that is not the safe zone?
+            boolean isInRedZone = (leftColumn != safeZoneColumn || rightColumn != safeZoneColumn);
+            // Is the "bottom" of the attack animation below the "top" of the player?
+            //    (i.e., has the attack reached the player?)
+            boolean isHitByAnimation = (currentAttackHeight >= playerTopY);
+
+            // If the player is not in the safe zone AND is hit by the animation
+            if (isInRedZone && isHitByAnimation) {
                 this.ship.destroy();
                 this.livesP1--;
                 showHealthPopup("-1 Life (Apocalypse!)");
@@ -361,12 +384,17 @@ public class GameModel {
         // --- Player 2 Check ---
         if (this.shipP2 != null && this.livesP2 > 0 && !this.shipP2.isDestroyed() && !this.shipP2.isInvincible()) {
             int playerLeftX = this.shipP2.getPositionX(); //
-            int playerRightX = this.shipP2.getPositionX() + this.shipP2.getWidth() - 1; //
+            int playerRightX = this.shipP2.getPositionX() + this.shipP2.getWidth() - 1;
+
+            int playerTopY = this.shipP2.getPositionY();
 
             int leftColumn = playerLeftX / columnWidth;
             int rightColumn = playerRightX / columnWidth;
 
-            if (leftColumn != safeZoneColumn || rightColumn != safeZoneColumn) {
+            boolean isInRedZone = (leftColumn != safeZoneColumn || rightColumn != safeZoneColumn);
+            boolean isHitByAnimation = (currentAttackHeight >= playerTopY);
+
+            if (isInRedZone && isHitByAnimation) {
                 this.shipP2.destroy();
                 this.livesP2--;
                 showHealthPopup("-1 Life (Apocalypse!)");

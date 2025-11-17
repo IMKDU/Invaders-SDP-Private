@@ -4,6 +4,7 @@ import engine.DrawManager;
 import engine.DTO.HUDInfoDTO;
 import entity.GameModel;
 import entity.LaserBullet;
+import entity.pattern.ApocalypseAttackPattern;
 import entity.GameConstant;
 
 /**
@@ -34,14 +35,28 @@ public class GameView {
             for (int i = 0; i < model.getEntitiesToRender().size(); i++) {
                 var e = model.getEntitiesToRender().get(i);
 
-                // ==== Draw OmegaBoss Warning ====
+                // Draw OmegaBoss Warning / Attack
                 if (e == model.getOmegaBoss() && model.getOmegaBoss() != null) {
-                    if (model.getOmegaBoss().isApocalypseWarning()) {
-                        drawManager.getUIRenderer().drawApocalypseWarning(
-                                dto.getWidth(),
-                                dto.getHeight(),
-                                model.getOmegaBoss().getSafeZoneColumn()
-                        );
+                    // Get the pattern object.
+                    ApocalypseAttackPattern pattern = model.getOmegaBoss().getApocalypsePattern();
+
+                    if (pattern != null) {
+                        if (pattern.isWarningActive()) {
+                            // State 1: Warning
+                            drawManager.getUIRenderer().drawApocalypseWarning(
+                                    dto.getWidth(),
+                                    dto.getHeight(),
+                                    pattern.getSafeZoneColumn()
+                            );
+                        } else if (pattern.isAttacking()) {
+                            // State 2: Attack Animation
+                            drawManager.getUIRenderer().drawApocalypseAttack(
+                                    dto.getWidth(),
+                                    dto.getHeight(),
+                                    pattern.getSafeZoneColumn(),
+                                    pattern.getAttackAnimationProgress() // Pass the progress
+                            );
+                        }
                     }
                 }
                 drawManager.getEntityRenderer().drawEntity(e, e.getPositionX(), e.getPositionY());

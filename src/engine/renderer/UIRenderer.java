@@ -130,6 +130,32 @@ public final class UIRenderer {
         }
     }
 
+    /**
+     * Draws the boss's area-wide attack *animation*. (View logic)
+     * @param screenWidth Screen width
+     * @param screenHeight Screen height
+     * @param safeZoneColumn Safe zone index (0-9)
+     * @param animationProgress Progress of the attack (0.0 to 1.0)
+     */
+    public void drawApocalypseAttack(final int screenWidth, final int screenHeight, final int safeZoneColumn, final float animationProgress) {
+        Graphics g = backBuffer.getGraphics();
+
+        int columnWidth = screenWidth / 10;
+        // Calculate the current height of the attack based on animation progress.
+        int currentAttackHeight = (int) (screenHeight * animationProgress);
+
+        //Red color with 200/255 (approx. 80%) transparency
+        Color attackColor = new Color(255, 0, 0, 200);
+
+        for (int i = 0; i < 10; i++) {
+            if (i != safeZoneColumn) {
+                g.setColor(attackColor); // Attack zone (red)
+                // Draw a rectangle from the top (0) down to the current attack height.
+                g.fillRect(i * columnWidth, 0, columnWidth, currentAttackHeight);
+            }
+        }
+    }
+
     /** Draws game results on the end screen.*/
     public void drawResults(final int screenWidth, final int screenHeight, final int score, final int livesRemaining,
                             final int shipsDestroyed, final float accuracy, final boolean isNewRecord) {
