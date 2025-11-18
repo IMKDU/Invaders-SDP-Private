@@ -1,8 +1,8 @@
 ## 🚩 What is this PR?
-<!-- PR의 목적을 간단히 설명해주세요 -->
+<!-- Briefly describe the purpose of this PR -->
 
 ## 📢 Changes-Detail
-<!-- 변경사항을 상세히 나열해주세요 -->
+<!-- List the changes in detail -->
 *
 *
 *
@@ -12,9 +12,9 @@
 * To-do:
 
 ## ✅ Checklist
-- [ ] Jira 이슈 키를 포함했습니다
+- [ ] Jira issue key is included
 
-## 📸 스크린샷 또는 비디오
+## 📸 Screenshots or Video
 
 ## ⚙️ Additional Notes
-<!-- 리뷰어가 특별히 확인해야 할 사항 -->
+<!-- Anything the reviewer should pay special attention to -->
