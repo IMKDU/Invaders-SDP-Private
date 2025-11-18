@@ -798,7 +798,7 @@ public class GameModel {
                     bulletsToRemove.add(b);
                 }
                 /** If the bullet collides with ship */
-                else if (this.livesP1 > 0 && this.checkCollision(b, this.ship)) {
+                else if (this.livesP1 > 0 && this.checkCollision(b, this.ship) && !this.ship.isInvincible()) {
                     if (!this.ship.isDestroyed()) {
                         this.ship.destroy();
                         this.livesP1--;
@@ -806,7 +806,7 @@ public class GameModel {
                     }
                     bulletsToRemove.add(b);
                 }
-                else if (this.shipP2 != null && this.livesP2 > 0 && !this.shipP2.isDestroyed() && this.checkCollision(b, this.shipP2)) {
+                else if (this.shipP2 != null && this.livesP2 > 0 && !this.shipP2.isDestroyed() && this.checkCollision(b, this.shipP2) && !this.ship.isInvincible()) {
                     if (!this.shipP2.isDestroyed()) {
                         this.shipP2.destroy();
                         this.livesP2--;

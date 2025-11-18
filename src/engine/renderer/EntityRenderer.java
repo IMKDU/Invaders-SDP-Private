@@ -1,6 +1,7 @@
 package engine.renderer;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
@@ -146,8 +147,24 @@ public final class EntityRenderer {
 		int sy = (int) Math.round(y1 - dy * big);
 		int ex = (int) Math.round(x1 + dx * big);
 		int ey = (int) Math.round(y1 + dy * big);
+        if (entity.getColor() == Color.GREEN){
+            g.drawLine(sx, sy, ex, ey);
+        }
+        else {
+            BufferedImage laserImg = spriteMap.get(SpriteType.Laser);
+            Graphics2D g2 = (Graphics2D) g;
+            double angle = Math.atan2(ey - sy, ex - sx);
+            double length = Math.hypot(ex - sx, ey - sy);
+            double scaleX = length / laserImg.getWidth() * scale;
+            double scaleY = 6.0 * scale; // 굵기 유지
+            AffineTransform at = new AffineTransform();
+            at.translate(sx, sy);
+            at.rotate(angle);
+            at.scale(scaleX, scaleY);
 
-		g.drawLine(sx, sy, ex, ey);
+            g2.drawImage(laserImg, at, null);
+        }
+
 	}
     public void drawLife(final int positionX, final int positionY){
         Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();

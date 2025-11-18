@@ -58,6 +58,7 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.OmegaBossMoving2, new BufferedImage(32,32,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.OmegaBossDeath, new BufferedImage(16,16,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.OmegaBoss100, new BufferedImage(96,81,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Laser, new BufferedImage(5,13,BufferedImage.TYPE_INT_ARGB));
             fileManager.loadSprite(spriteMap);
             //여기서부터는 대칭 스프라이트
             spriteMap.put(SpriteType.OmegaBoss3, mirrorSprite(spriteMap.get(SpriteType.OmegaBoss1)));
