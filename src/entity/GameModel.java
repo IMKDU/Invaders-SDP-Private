@@ -142,7 +142,8 @@ public class GameModel {
         /** Initialize the bullet Boss fired */
         this.bossBullets = new HashSet<>();
         enemyShipFormationModel = new EnemyShipFormationModel(this.currentLevel, width);
-        this.ship = new Ship(this.width / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 19 / 20, Color.green);
+		enemyShipFormationModel.applyEnemyColorByLevel(this.currentLevel);
+		this.ship = new Ship(this.width / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 19 / 20, Color.green);
         this.ship.setPlayerId(1);   //=== [ADD] Player 1 ===
 
         this.shipP2 = new Ship(this.width * 3 / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 19 / 20, Color.pink);
@@ -421,7 +422,7 @@ public class GameModel {
 	public void requestBossHitByPlayerBullet(Bullet bullet, BossEntity boss) {
 
 
-		boss.takeDamage(2);
+		boss.takeDamage(1);
 
 		if (!bullet.penetration()) {
 			bullets.remove(bullet);

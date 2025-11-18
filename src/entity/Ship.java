@@ -160,6 +160,7 @@ public class Ship extends Entity implements Collidable {
 	public final void update() {
 		if (this.isInvincible && this.shieldCooldown.checkFinished()) {
 			this.isInvincible = false;
+			this.setColor(Color.GREEN);
 		}
 
 		if (!this.destructionCooldown.checkFinished())
@@ -215,6 +216,7 @@ public class Ship extends Entity implements Collidable {
 		this.isInvincible = true;
 		this.shieldCooldown.setMilliseconds(duration);
 		this.shieldCooldown.reset();
+		this.setColor(Color.BLUE);
 	}
 
 	@Override

@@ -99,7 +99,7 @@ public class EnemyShip extends Entity implements Collidable {
 	 * known starting properties.
 	 */
 	public EnemyShip(SpecialType type, Direction direction, int x_speed) {
-        super(-32, GameConstant.STAT_SEPARATION_LINE_HEIGHT, 16 * 2, 7 * 2, Color.white);
+        super(-32, GameConstant.STAT_SEPARATION_LINE_HEIGHT, 16 * 2, 7 * 2,  (type == SpecialType.RED) ? Color.RED : Color.BLUE);
 
 		this.specialType = type;
 		this.direction = direction;
