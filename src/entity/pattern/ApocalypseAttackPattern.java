@@ -2,13 +2,16 @@ package entity.pattern;
 
 import engine.Cooldown;
 import engine.Core;
+import entity.HasBounds;
+
+import java.awt.Point;
 import java.util.Random;
 
 /**
  * Manages the state and timing of the boss's area-wide (Apocalypse) attack pattern.
  * This class is part of the Model layer in MVC.
  */
-public class ApocalypseAttackPattern {
+public class ApocalypseAttackPattern extends BossPattern {
     /** 2-second warning cooldown */
     private Cooldown warningCooldown;
     /** attack animation cooldown */
@@ -26,10 +29,34 @@ public class ApocalypseAttackPattern {
     /** Object for random generation */
     private Random random;
 
-    public ApocalypseAttackPattern() {
+    protected HasBounds boss;
+
+    public ApocalypseAttackPattern(HasBounds boss) {
+        // Calls the BossPattern constructor.
+        super(new Point(boss.getPositionX(), boss.getPositionY()));
+        this.boss = boss;
         this.warningCooldown = Core.getVariableCooldown(2000, 0); // 2second
         this.attackAnimationCooldown = Core.getVariableCooldown(ATTACK_ANIMATION_DURATION, 0); // [추가] 1초
         this.random = new Random();
+    }
+
+    // Implementation of BossPattern abstract methods
+    /**
+     * Since GameModel directly checks the state of this pattern,
+     * no specific logic is needed in the attack() method.
+     */
+    @Override
+    public void attack() {
+        // All logic is handled by GameModel polling this object's state
+    }
+
+    /**
+     * The boss does not move during the Apocalypse pattern,
+     * so the move() method is left empty.
+     */
+    @Override
+    public void move() {
+        // Boss does not move during this pattern
     }
 
     /**

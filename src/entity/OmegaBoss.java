@@ -55,7 +55,7 @@ public class OmegaBoss extends MidBoss {
 		this.spriteType= DrawManager.SpriteType.OmegaBoss1;
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		this.logger.info("OMEGA : move using the default pattern");
-        this.apocalypsePattern = new ApocalypseAttackPattern();
+        this.apocalypsePattern = new ApocalypseAttackPattern(this);
 	}
 
 	/** move simple */
@@ -159,19 +159,21 @@ public class OmegaBoss extends MidBoss {
 	 */
 	@Override
 	public void update() {
-        // 1. If the pattern component is active, the boss does not move.
-        if (this.apocalypsePattern.isPatternActive()) {
-            return;
-        }
 
-        // 2. If HP is 50% or less and the apocalypse attack hasn't been used yet, activate it.
-        if (!this.hasUsedApocalypse && this.healPoint <= this.maxHp / 2) {
-            // Call start() to start apocalypse
+        // 1. If Apocalypse pattern hasn't been used, HP is below 50%, and pattern is inactive
+        if (!this.hasUsedApocalypse && this.healPoint <= this.maxHp / 2 && !this.apocalypsePattern.isPatternActive()) {
+            // Start the pattern.
             this.apocalypsePattern.start(1);
             this.hasUsedApocalypse = true;
             this.logger.info("OMEGA : Starting Apocalypse Pattern (delegated to component).");
         }
-        // 3. Only perform normal patterns when not casting the apocalypse attack.
+        // 2. Check if the pattern is active
+        if (this.apocalypsePattern.isPatternActive()) {
+            this.apocalypsePattern.move();
+            this.apocalypsePattern.attack();
+        }
+
+        // 3. If the Apocalypse pattern is inactive, perform normal patterns.
         else {
             this.movePatterns();
         }
