@@ -1,6 +1,7 @@
 package entity;
 
 import engine.DrawManager;
+import screen.HealthBar;
 
 import java.awt.*;
 
@@ -37,6 +38,7 @@ public class OmegaBoss extends MidBoss {
 	private final int widthBoundary;
 	/** Boss cannot move below this boundary. */
 	private final int bottomBoundary;
+    private HealthBar healthBar;
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
 	 *
@@ -51,6 +53,7 @@ public class OmegaBoss extends MidBoss {
 		this.spriteType= DrawManager.SpriteType.OmegaBoss1;
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		this.logger.info("OMEGA : move using the default pattern");
+        this.healthBar = new HealthBar(this.getHealPoint(), this.getPositionX(), this.getPositionY(), this.getWidth(),this.getHeight());
 	}
 
 	/** move simple */
@@ -162,4 +165,8 @@ public class OmegaBoss extends MidBoss {
 	public void draw(DrawManager drawManager) {
 		drawManager.getEntityRenderer().drawEntity(this, this.positionX, this.positionY);
 	}
+    @Override
+    public HealthBar getHealthBar() {
+        return this.healthBar;
+    }
 }

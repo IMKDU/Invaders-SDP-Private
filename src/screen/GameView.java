@@ -35,7 +35,12 @@ public class GameView {
                 drawManager.getEntityRenderer().drawEntity(e, e.getPositionX(), e.getPositionY());
             }
         }
-
+        if (model.getOmegaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBar(model.getOmegaBoss().getHealthBar());
+        }
+        if (model.getFinalBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBar(model.getFinalBoss().getHealthBar());
+        }
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25);
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50);
         drawManager.getHUDRenderer().drawCoin(dto.getWidth(), dto.getHeight(), dto.getCoin());
