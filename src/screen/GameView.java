@@ -2,6 +2,7 @@ package screen;
 
 import engine.DrawManager;
 import engine.DTO.HUDInfoDTO;
+import entity.DropItem;
 import entity.GameModel;
 import entity.LaserBullet;
 import entity.pattern.ApocalypseAttackPattern;
