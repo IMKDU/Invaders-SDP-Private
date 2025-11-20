@@ -36,6 +36,11 @@ public class GameView {
             for (int i = 0; i < model.getEntitiesToRender().size(); i++) {
                 var e = model.getEntitiesToRender().get(i);
 
+                if (e instanceof DropItem) {
+                    drawManager.getItemRenderer().render((DropItem) e);
+                    continue; // 아이템을 그렸으므로 다음 루프로 넘어감
+                }
+
                 // Draw OmegaBoss Warning / Attack
                 if (e == model.getOmegaBoss() && model.getOmegaBoss() != null) {
                     // Get the pattern object.
