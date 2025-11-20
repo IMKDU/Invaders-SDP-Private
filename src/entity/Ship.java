@@ -15,34 +15,20 @@ import java.util.Set;
  */
 public class Ship extends Entity implements Collidable {
 
-	/**
-	 * Time between shots.
-	 */
+	/** Time between shots. */
 	private static final int SHOOTING_INTERVAL = 750;
-	/**
-	 * Speed of the bullets shot by the ship.
-	 */
+	/** Speed of the bullets shot by the ship. */
 	private static final int BULLET_SPEED = -6;
-	/**
-	 * Movement of the ship for each unit of time.
-	 */
+	/** Movement of the ship for each unit of time. */
 	private static final int SPEED = 2;
 
-	/**
-	 * Minimum time between shots.
-	 */
+	/** Minimum time between shots. */
 	private Cooldown shootingCooldown;
-	/**
-	 * Time spent inactive between hits.
-	 */
+	/** Time spent inactive between hits. */
 	private Cooldown destructionCooldown;
-	/**
-	 * Cooldown for the invincibility shield.
-	 */
+	/** Cooldown for the invincibility shield. */
 	private Cooldown shieldCooldown;
-	/**
-	 * Checks if the ship is invincible.
-	 */
+	/** Checks if the ship is invincible. */
 	private boolean isInvincible;
 	// === [ADD] Which player: 1 = P1, 2 = P2 (default 1 for single-player compatibility) ===
 	private int playerId = 1;
@@ -58,8 +44,10 @@ public class Ship extends Entity implements Collidable {
 	/**
 	 * Constructor, establishes the ship's properties.
 	 *
-	 * @param positionX Initial position of the ship in the X axis.
-	 * @param positionY Initial position of the ship in the Y axis.
+	 * @param positionX
+	 *            Initial position of the ship in the X axis.
+	 * @param positionY
+	 *            Initial position of the ship in the Y axis.
 	 */
 	public Ship(final int positionX, final int positionY, final Color color) {
 		super(positionX, positionY, 13 * 2, 8 * 2, color);
@@ -111,7 +99,8 @@ public class Ship extends Entity implements Collidable {
 	/**
 	 * Shoots a bullet upwards.
 	 *
-	 * @param bullets List of bullets on screen, to add the new bullet.
+	 * @param bullets
+	 *            List of bullets on screen, to add the new bullet.
 	 * @return Checks if the bullet was shot correctly.
 	 */
 	public final boolean shoot(final Set<Bullet> bullets) {
@@ -210,7 +199,8 @@ public class Ship extends Entity implements Collidable {
 	/**
 	 * Activates the ship's invincibility shield for a given duration.
 	 *
-	 * @param duration Duration of the invincibility in milliseconds.
+	 * @param duration
+	 *            Duration of the invincibility in milliseconds.
 	 */
 	public final void activateInvincibility(final int duration) {
 		this.isInvincible = true;

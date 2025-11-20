@@ -50,10 +50,13 @@ public class EnemyShip extends Entity implements Collidable {
 
 	/**
 	 * Constructor, establishes the ship's properties.
-	 * 
-	 * @param positionX	Initial position of the ship in the X axis.
-	 * @param positionY	Initial position of the ship in the Y axis.
-	 * @param spriteType Sprite type, image corresponding to the ship.
+	 *
+	 * @param positionX
+	 *            Initial position of the ship in the X axis.
+	 * @param positionY
+	 *            Initial position of the ship in the Y axis.
+	 * @param spriteType
+	 *            Sprite type, image corresponding to the ship.
 	 */
 	public EnemyShip(final int positionX, final int positionY,
 	                 final SpriteType spriteType) {
@@ -121,9 +124,11 @@ public class EnemyShip extends Entity implements Collidable {
 
 	/**
 	 * Moves the ship the specified distance.
-	 * 
-	 * @param distanceX	Distance to move in the X axis.
-	 * @param distanceY	Distance to move in the Y axis.
+	 *
+	 * @param distanceX
+	 *            Distance to move in the X axis.
+	 * @param distanceY
+	 *            Distance to move in the Y axis.
 	 */
 	public final void move(final int distanceX, final int distanceY) {
 		this.positionX += distanceX;

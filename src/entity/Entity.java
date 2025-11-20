@@ -27,12 +27,17 @@ public class Entity implements Collidable, HasBounds {
 
 	/**
 	 * Constructor, establishes the entity's generic properties.
-	 * 
-	 * @param positionX	Initial position of the entity in the X axis.
-	 * @param positionY	Initial position of the entity in the Y axis.
-	 * @param width	Width of the entity.
-	 * @param height	Height of the entity.
-	 * @param color	Color of the entity.
+	 *
+	 * @param positionX
+	 *            Initial position of the entity in the X axis.
+	 * @param positionY
+	 *            Initial position of the entity in the Y axis.
+	 * @param width
+	 *            Width of the entity.
+	 * @param height
+	 *            Height of the entity.
+	 * @param color
+	 *            Color of the entity.
 	 */
 	public Entity(final int positionX, final int positionY, final int width,
 				  final int height, final Color color) {
@@ -45,7 +50,7 @@ public class Entity implements Collidable, HasBounds {
 
 	/**
 	 * Getter for the color of the entity.
-	 * 
+	 *
 	 * @return Color of the entity, used when drawing it.
 	 */
 	public final Color getColor() {
@@ -55,7 +60,8 @@ public class Entity implements Collidable, HasBounds {
 	/**
 	 * Setter for the color of the entity.
 	 *
-	 * @param color	New color of the entity.
+	 * @param color
+	 *            New color of the entity.
 	 */
 	public void setColor(final Color color) {
 		this.color = color;
@@ -63,8 +69,9 @@ public class Entity implements Collidable, HasBounds {
 
 	/**
 	 * Setter for the X axis position of the entity.
-	 * 
-	 * @param positionX	New position of the entity in the X axis.
+	 *
+	 * @param positionX
+	 *            New position of the entity in the X axis.
 	 */
 	public final void setPositionX(final int positionX) {
 		this.positionX = positionX;
@@ -72,8 +79,9 @@ public class Entity implements Collidable, HasBounds {
 
 	/**
 	 * Setter for the Y axis position of the entity.
-	 * 
-	 * @param positionY	New position of the entity in the Y axis.
+	 *
+	 * @param positionY
+	 *            New position of the entity in the Y axis.
 	 */
 	public final void setPositionY(final int positionY) {
 		this.positionY = positionY;

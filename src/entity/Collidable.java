@@ -3,8 +3,9 @@ package entity;
 public interface Collidable {
 
 	/**
-	 * Defines how this object should react when a collision occurs.
-	 * Each entity implements its own collision behavior.
+	 * Defines the action to be taken when this object collides with another.
+	 *
+	 * @param other The {@code Collidable} object this object has collided with.
 	 */
 	void onCollision(Collidable other, GameModel gameModel);
 

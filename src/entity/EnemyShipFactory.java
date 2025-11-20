@@ -12,25 +12,15 @@ import engine.level.Level;
  */
 public class EnemyShipFactory {
 
-	/**
-	 * Proportion of C-type ships.
-	 */
+	/** Proportion of C-type ships. */
 	private static final double PROPORTION_C = 0.2;
-	/**
-	 * Proportion of B-type ships.
-	 */
+	/** Proportion of B-type ships. */
 	private static final double PROPORTION_B = 0.4;
-	/**
-	 * Initial position in the x-axis.
-	 */
+	/** Initial position in the x-axis. */
 	private static final int INIT_POS_X = 20;
-	/**
-	 * Initial position in the y-axis.
-	 */
+	/** Initial position in the y-axis. */
 	private static final int INIT_POS_Y = 100;
-	/**
-	 * Distance between ships.
-	 */
+	/** Distance between ships. */
 	private static final int SEPARATION_DISTANCE = 40;
 
 	/**
@@ -98,16 +88,13 @@ public class EnemyShipFactory {
 			switch (kind) {
 				case "enemya":
 				case "a":
-					countA += cnt;
-					break;
+					countA += cnt; break;
 				case "enemyb":
 				case "b":
-					countB += cnt;
-					break;
+					countB += cnt; break;
 				case "enemyc":
 				case "c":
-					countC += cnt;
-					break;
+					countC += cnt; break;
 				default:
 					countA += cnt;
 			}

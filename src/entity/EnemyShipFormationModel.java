@@ -354,8 +354,12 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
             }
     }
 
+	/**
+	 * Applies a specific color to all ships in the formation.
+	 * @param color The color to apply.
+	 */
 	public void applyEnemyColor(final Color color) {
-		for (java.util.List<EnemyShip> column : this.enemyShips) {
+		for (java.util.List<EnemyShip> column : this.getEnemyShips()) {
 			for (EnemyShip ship : column) {
 				if (ship != null && !ship.isDestroyed()) {
 					ship.setColor(color);
@@ -363,6 +367,7 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 			}
 		}
 	}
+
 	public void applyEnemyColorByLevel(final Level level) {
 		if (level == null) return;
 		final int lv = level.getLevel();

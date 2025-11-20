@@ -13,9 +13,7 @@ import entity.DropItem.ItemType;
  */
 public final class ItemPool {
 
-	/**
-	 * Set of already created items.
-	 */
+	/** Set of already created items. */
 	private static Set<DropItem> pool = new HashSet<DropItem>();
 
 	/**
@@ -29,11 +27,14 @@ public final class ItemPool {
 	 * Returns a item from the pool if one is available, a new one if there
 	 * isn't.
 	 *
-	 * @param positionX Requested position of the item in the X axis.
-	 * @param positionY Requested position of the item in the Y axis.
-	 * @param speed     Requested speed of the item, positive or negative depending
-	 *                  on direction - positive is down.
-	 * @param itemType  * Requested item type.
+	 * @param positionX
+	 *            Requested position of the item in the X axis.
+	 * @param positionY
+	 *            Requested position of the item in the Y axis.
+	 * @param speed
+	 *            Requested speed of the item, positive or negative depending
+	 * @param itemType
+	 *            Requested item type.
 	 * @return Requested item.
 	 */
 	public static DropItem getItem(final int positionX,
@@ -56,7 +57,8 @@ public final class ItemPool {
 	/**
 	 * Adds one or more items to the list of available ones.
 	 *
-	 * @param dropItem items to recycle.
+	 * @param dropItem
+	 *            items to recycle.
 	 */
 	public static void recycle(final Set<DropItem> dropItem) {
 		pool.addAll(dropItem);
