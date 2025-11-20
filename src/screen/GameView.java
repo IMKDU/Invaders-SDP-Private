@@ -38,7 +38,7 @@ public class GameView {
 
                 if (e instanceof DropItem) {
                     drawManager.getItemRenderer().render((DropItem) e);
-                    continue; // 아이템을 그렸으므로 다음 루프로 넘어감
+                    continue;
                 }
 
                 // Draw OmegaBoss Warning / Attack
