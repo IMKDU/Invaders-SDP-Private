@@ -58,7 +58,6 @@ public class OmegaBoss extends MidBoss {
         this.animationCooldown = new Cooldown(200);
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		this.logger.info("OMEGA : move using the default pattern");
-        SoundManager.stop("sfx/OmegaBossAppearance.wav");
         SoundManager.play("sfx/OmegaBossAppearance.wav");
 	}
 
@@ -156,7 +155,6 @@ public class OmegaBoss extends MidBoss {
 	@Override
 	public void takeDamage(int damage) {
 		this.healPoint -= damage;
-        SoundManager.stop("sfx/OmegaBoss_hitting.wav");
         SoundManager.play("sfx/OmegaBoss_hitting.wav");
         ishit =true;
 	}

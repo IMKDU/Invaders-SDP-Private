@@ -128,7 +128,6 @@ public class Ship extends Entity {
 			if (bulletCount == 1) {
 				// Normal shot (when Spread Shot is not purchased)
 				Bullet b = BulletPool.getBullet(centerX, centerY, BULLET_SPEED);
-				SoundManager.stop("sfx/laser.wav");
                 SoundManager.play("sfx/laser.wav");
                 b.setOwnerId(this.playerId);  // === [ADD] Ownership flag: 1 = P1, 2 = P2, null for legacy logic ===
 
@@ -145,7 +144,6 @@ public class Ship extends Entity {
                     bullets.add(b);
 
                     // might consider putting a different sound
-					SoundManager.stop("sfx/laser.wav");
                     SoundManager.play("sfx/laser.wav");
                 }
 			}
@@ -232,7 +230,6 @@ public class Ship extends Entity {
 	 */
 	public final void destroy() {
         if (!this.isInvincible) {
-			SoundManager.stop("sfx/destroy.wav");
             SoundManager.play("sfx/destroy.wav");
             this.destructionCooldown.reset();
         }

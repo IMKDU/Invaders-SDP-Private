@@ -172,12 +172,10 @@ public class EnemyShip extends Entity {
 
             if (isSpecial){
                 this.spriteType = SpriteType.EnemySpecialExplosion;
-                SoundManager.stop("sfx/SpecialEnemyDeath.wav");
                 SoundManager.play("sfx/SpecialEnemyDeath.wav");
             }
             else {
                 this.spriteType = SpriteType.Explosion;
-                SoundManager.stop("sfx/disappearance.wav");
                 SoundManager.play("sfx/disappearance.wav");
             }
 

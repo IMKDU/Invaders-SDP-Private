@@ -2,25 +2,43 @@ package audio;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SoundManager {
     private static final Map<String, Clip> CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, byte[]> AUDIO_CACHE = new HashMap<>();
     private static volatile boolean muted = false;  // global state of sound
     private static volatile String currentLooping = null;
 
     public static void play(String resourcePath) {
         if (muted) return;  // no sound played
         try {
-            Clip c = CACHE.computeIfAbsent(resourcePath, SoundManager::loadClip);
-            if (c == null) return;
-            if (c.isRunning()) c.stop();
-            c.setFramePosition(0);
-            c.start();
+            byte[] audioData = AUDIO_CACHE.computeIfAbsent(resourcePath, SoundManager::loadAudioData);
+            if (audioData == null) return;
+            Clip clip = AudioSystem.getClip();
+            AudioInputStream ais = AudioSystem.getAudioInputStream(
+                    new ByteArrayInputStream(audioData)
+            );
+
+            clip.open(ais);
+            clip.start();
+
         } catch (Exception e) {
             System.err.println("[Sound] Play failed: " + resourcePath + " -> " + e.getMessage());
+        }
+    }
+    private static byte[] loadAudioData(String resourcePath) {
+        String p = resourcePath.startsWith("/") ? resourcePath : "/" + resourcePath;
+        try (InputStream is = SoundManager.class.getResourceAsStream(p);
+             BufferedInputStream bis = new BufferedInputStream(is)) {
+            return bis.readAllBytes();
+        } catch (Exception e) {
+            System.err.println("[Sound] Load failed: " + p);
+            return null;
         }
     }
 
