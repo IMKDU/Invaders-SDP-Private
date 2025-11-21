@@ -4,7 +4,6 @@ import audio.SoundManager;
 import engine.Cooldown;
 import engine.Core;
 import engine.DrawManager;
-
 import java.awt.*;
 
 /**
@@ -218,4 +217,15 @@ public class OmegaBoss extends MidBoss {
         }
 		this.movePatterns();
 	}
+
+	@Override
+	public void onCollision(Collidable other, GameModel model) {
+		other.onCollideWithBoss(this, model);
+	}
+
+	@Override
+	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
+		model.requestBossHitByPlayerBullet(bullet, this);
+	}
+
 }
