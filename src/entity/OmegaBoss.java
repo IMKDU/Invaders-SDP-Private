@@ -4,9 +4,9 @@ import engine.DrawManager;
 import engine.Core;
 import engine.Cooldown;
 import entity.pattern.BossPattern;
-import entity.pattern.mid.DashPattern;
-import entity.pattern.mid.DiagonalPattern;
-import entity.pattern.mid.HorizontalPattern;
+import entity.pattern.DashPattern;
+import entity.pattern.DiagonalPattern;
+import entity.pattern.HorizontalPattern;
 
 import java.awt.*;
 import java.util.logging.Logger;
@@ -180,7 +180,7 @@ public class OmegaBoss extends MidBoss {
 	}
 
 	/**
-	 * Dash 경로 표시 여부 반환 (시각화용)
+	 * Dash 경로 표시 여부 반환 (by watching)
 	 */
 	public boolean isShowingPath() {
 		if (bossPattern instanceof DashPattern) {
@@ -190,7 +190,7 @@ public class OmegaBoss extends MidBoss {
 	}
 
 	/**
-	 * Calculate dash end point (시각화용)
+	 * Calculate dash end point (by watching)
 	 * @return [x, y] array
 	 */
 	public int[] getDashEndPoint() {
@@ -208,7 +208,7 @@ public class OmegaBoss extends MidBoss {
 	}
 
 	/**
-	 * Get current boss phase (FinalBoss와의 일관성 유지)
+	 * Get current boss phase
 	 */
 	public int getBossPhase() {
 		return this.bossPhase;

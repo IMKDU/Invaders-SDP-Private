@@ -1,11 +1,8 @@
-package entity.pattern.mid;
+package entity.pattern;
 
 import engine.Core;
-import engine.DrawManager;
 import entity.GameConstant;
 import entity.HasBounds;
-import entity.Ship;
-import entity.pattern.BossPattern;
 
 import java.awt.*;
 import java.util.logging.Logger;
@@ -13,8 +10,6 @@ import java.util.logging.Logger;
 public class DashPattern extends BossPattern {
 
     protected Logger logger;
-
-    // Dash 관련 필드
     private boolean isDashing = false;
     private boolean isShowingPath = false;
     private HasBounds target;
@@ -22,7 +17,7 @@ public class DashPattern extends BossPattern {
     private double dashDirectionX;
     private double dashDirectionY;
     private long pathShowStartTime;
-    private static final long PATH_SHOW_DURATION = 2000; // 2초
+    private static final long PATH_SHOW_DURATION = 2000; // 2 seconds
     private static final int DASH_SPEED = 10;
     private boolean dashSkillInitialized = false;
 
@@ -32,7 +27,7 @@ public class DashPattern extends BossPattern {
         this.boss = boss;
         this.logger = Core.getLogger();
 
-        // 패턴 시작 시 초기화
+        // Initialize when pattern starts
         if (!dashSkillInitialized) {
             isShowingPath = true;
             pathShowStartTime = System.currentTimeMillis();
@@ -43,33 +38,33 @@ public class DashPattern extends BossPattern {
 
     @Override
     public void move() {
-        // 이미 돌진 중이면 계속 돌진
+        // Continue dashing if already in dash
         if (isDashing) {
             dashToTarget();
             return;
         }
 
-        // 경로 표시 중이면 시간 체크
+        // Check time if showing path
         if (isShowingPath) {
             long elapsedTime = System.currentTimeMillis() - pathShowStartTime;
 
             if (elapsedTime >= PATH_SHOW_DURATION) {
-                // 2초 지나면 돌진 방향 계산
+                // Calculate dash direction after 2 seconds
                 int dx = target.getPositionX() - this.bossPosition.x;
                 int dy = target.getPositionY() - this.bossPosition.y;
                 double distance = Math.sqrt(dx * dx + dy * dy);
 
-                // 거리 체크
+                // Distance check
                 if (distance < 1.0) {
                     logger.warning("OMEGA : Player too close, aborting dash");
                     return;
                 }
 
-                // 정규화된 방향 계산
+                // Calculate normalized direction
                 dashDirectionX = dx / distance;
                 dashDirectionY = dy / distance;
 
-                // 돌진 시작
+                // Start dashing
                 isShowingPath = false;
                 isDashing = true;
                 logger.info("OMEGA : Dashing! Direction=(" + dashDirectionX + ", " + dashDirectionY + ")");
@@ -78,9 +73,8 @@ public class DashPattern extends BossPattern {
     }
 
     /**
-     * Dash 이동 로직
+     * Dash movement logic
      */
-
     private void dashToTarget() {
         // Move precisely using double direction values
         int newX = boss.getPositionX() + (int)(dashDirectionX * DASH_SPEED);
@@ -118,7 +112,7 @@ public class DashPattern extends BossPattern {
 
     @Override
     public void attack() {
-        // DashPattern은 이동 패턴이므로 공격 로직 없음
+        // DashPattern is a movement pattern, so no attack logic
     }
 
     @Override
@@ -126,7 +120,7 @@ public class DashPattern extends BossPattern {
         this.target = target;
     }
 
-    // Getter 메서드들
+    // Getter methods
     public boolean isShowingPath() {
         return isShowingPath;
     }
@@ -140,18 +134,18 @@ public class DashPattern extends BossPattern {
     }
 
     /**
-     * Dash 종료 지점 계산 (시각화용)
+     * Calculate dash end point (for visualization)
      */
     public int[] getDashEndPoint(int bossWidth, int bossHeight) {
         if (isShowingPath) {
-            // 경로 표시 중일 때는 플레이어 위치 반환
+            // Return player position when showing path
             return new int[]{
                     target.getPositionX() + target.getWidth() / 2,
                     target.getPositionY() + target.getHeight() / 2
             };
         }
 
-        // 돌진 중일 때는 벽 위치 계산
+        // Calculate wall position when dashing
         int endX = bossPosition.x;
         int endY = bossPosition.y;
 

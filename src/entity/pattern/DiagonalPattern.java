@@ -1,10 +1,8 @@
-package entity.pattern.mid;
+package entity.pattern;
 
-import engine.DrawManager;
 import entity.Entity;
 import entity.GameConstant;
 import entity.HasBounds;
-import entity.pattern.BossPattern;
 
 import java.awt.*;
 
