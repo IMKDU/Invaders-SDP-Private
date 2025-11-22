@@ -1,7 +1,6 @@
 package engine.renderer;
 
 import engine.BackBuffer;
-import engine.Core;
 import engine.DTO.ShopInfoDTO;
 import engine.FontPack;
 
@@ -69,7 +68,6 @@ public final class ShopRenderer {
         FontMetrics fm = g.getFontMetrics();
         int fontHeight = fm.getHeight();
         int exitY = dto.getScreenHeight() - fontHeight;
-	    Core.getLogger().info(dto.getScreenHeight() +"");
         g.setColor((dto.getSelectedItem() == dto.getTotalItems() && dto.getSelectionMode() == 0) ? Color.GREEN : Color.WHITE);
         String exitText = dto.isBetweenLevels() ? "< Back to Game >" : "< Back to Main Menu >";
         drawCenteredString(dto.getScreenWidth(), exitText, exitY, fontPack.getRegular());

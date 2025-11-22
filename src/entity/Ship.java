@@ -3,25 +3,28 @@ package entity;
 import audio.SoundManager;
 import engine.Cooldown;
 import engine.DrawManager.SpriteType;
+import entity.pattern.ISkill;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.Set;
 
 /**
  * Implements a ship, to be controlled by the player.
- * 
+ *
  * @author <a href="mailto:RobertoIA1987@gmail.com">Roberto Izquierdo Amo</a>
- * 
+ *
  */
-public class Ship extends Entity {
+public class Ship extends Entity implements Collidable {
 
+	// === Constants ===
 	/** Time between shots. */
 	private static final int SHOOTING_INTERVAL = 750;
 	/** Speed of the bullets shot by the ship. */
 	private static final int BULLET_SPEED = -6;
 	/** Movement of the ship for each unit of time. */
 	private static final int SPEED = 2;
-	
+
 	/** Minimum time between shots. */
 	private Cooldown shootingCooldown;
 	/** Time spent inactive between hits. */
@@ -30,14 +33,21 @@ public class Ship extends Entity {
 	private Cooldown shieldCooldown;
 	/** Checks if the ship is invincible. */
 	private boolean isInvincible;
-    // === [ADD] Which player: 1 = P1, 2 = P2 (default 1 for single-player compatibility) ===
-    private int playerId = 1;
-    public void setPlayerId(int pid) { this.playerId = pid; }
-    public int getPlayerId() { return this.playerId; }
+
+    // === Which player: 1 = P1, 2 = P2 (default 1 for single-player compatibility) ===
+	private int playerId = 1;
+
+	// === Variable for Skil ===
+	public enum SkillType {
+		ORIGIN,
+		CHARGE,
+		DASH
+	}
+	private HashMap<SkillType, ISkill> skills;
 
 	/**
 	 * Constructor, establishes the ship's properties.
-	 * 
+	 *
 	 * @param positionX
 	 *            Initial position of the ship in the X axis.
 	 * @param positionY
@@ -52,89 +62,8 @@ public class Ship extends Entity {
 		this.shieldCooldown = new Cooldown(0);
 		this.isInvincible = false;
 
-	}
-
-	/**
-	 * Moves the ship speed uni ts right, or until the right screen border is
-	 * reached.
-	 */
-	public final void moveRight() {
-		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
-		this.positionX += SPEED*(1+shipspeed/10);
-	}
-
-	/**
-	 * Moves the ship speed units left, or until the left screen border is
-	 * reached.
-	 */
-	public final void moveLeft() {
-		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
-		this.positionX -= SPEED*(1+shipspeed/10);
-	}
-
-    /**
-     * Moves the ship speed units up, or until the SEPARATION_LINE_HEIGHT is
-     * reached.
-     */
-    public final void moveUp() {
-		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
-		this.positionY -= SPEED*(1+shipspeed/10);
-    }
-
-    /**
-     * Moves the ship speed units down, or until the down screen border is
-     * reached.
-     */
-    public final void moveDown() {
-		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
-		this.positionY += SPEED*(1+shipspeed/10);
-    }
-
-	/**
-	 * Shoots a bullet upwards.
-	 * 
-	 * @param bullets
-	 *            List of bullets on screen, to add the new bullet.
-	 * @return Checks if the bullet was shot correctly.
-	 */
-	public final boolean shoot(final Set<Bullet> bullets) {
-		if (this.shootingCooldown.checkFinished()) {
-			this.shootingCooldown.reset();
-
-			// Get Spread Shot information from the DropItem class
-			int bulletCount = ShopItem.getMultiShotBulletCount();
-			int spacing = ShopItem.getMultiShotSpacing();
-
-			int centerX = positionX + this.width / 2;
-			int centerY = positionY;
-
-			if (bulletCount == 1) {
-				// Normal shot (when Spread Shot is not purchased)
-				Bullet b = BulletPool.getBullet(centerX, centerY, BULLET_SPEED);
-				SoundManager.stop("sfx/laser.wav");
-                SoundManager.play("sfx/laser.wav");
-                b.setOwnerId(this.playerId);  // === [ADD] Ownership flag: 1 = P1, 2 = P2, null for legacy logic ===
-
-                bullets.add(b);
-			} else {
-				// Fire Spread Shot
-				int startOffset = -(bulletCount / 2) * spacing;
-
-				for (int i = 0; i < bulletCount; i++) {
-					int offsetX = startOffset + (i * spacing);
-                    Bullet b = BulletPool.getBullet(centerX + offsetX, centerY, BULLET_SPEED);
-                    b.setOwnerId(this.playerId);   // Ownership flag
-
-                    bullets.add(b);
-
-                    // might consider putting a different sound
-					SoundManager.stop("sfx/laser.wav");
-                    SoundManager.play("sfx/laser.wav");
-                }
-			}
-			return true;
-		}
-		return false;
+		this.skills = new HashMap<SkillType, ISkill>();
+		registerSkills();
 	}
 
 	/**
@@ -164,8 +93,85 @@ public class Ship extends Entity {
     }
 
 	/**
+	 * Shoots a bullet upwards.
+	 *
+	 * @param bullets
+	 *            List of bullets on screen, to add the new bullet.
+	 * @return Checks if the bullet was shot correctly.
+	 */
+	public final boolean shoot(final Set<Bullet> bullets) {
+		if (this.shootingCooldown.checkFinished()) {
+			this.shootingCooldown.reset();
+
+			// Get Spread Shot information from the DropItem class
+			int bulletCount = ShopItem.getMultiShotBulletCount();
+			int spacing = ShopItem.getMultiShotSpacing();
+
+			int centerX = positionX + this.width / 2;
+			int centerY = positionY;
+
+			if (bulletCount == 1) {
+				// Normal shot (when Spread Shot is not purchased)
+				Bullet b = BulletPool.getBullet(centerX, centerY, BULLET_SPEED);
+				SoundManager.stop("sfx/laser.wav");
+				SoundManager.play("sfx/laser.wav");
+				b.setOwnerId(this.playerId);  // === [ADD] Ownership flag: 1 = P1, 2 = P2, null for legacy logic ===
+
+				bullets.add(b);
+			} else {
+				// Fire Spread Shot
+				int startOffset = -(bulletCount / 2) * spacing;
+
+				for (int i = 0; i < bulletCount; i++) {
+					int offsetX = startOffset + (i * spacing);
+					Bullet b = BulletPool.getBullet(centerX + offsetX, centerY, BULLET_SPEED);
+					b.setOwnerId(this.playerId);   // Ownership flag
+
+					bullets.add(b);
+
+					// might consider putting a different sound
+					SoundManager.stop("sfx/laser.wav");
+					SoundManager.play("sfx/laser.wav");
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Register user skills into skill map.
+	 */
+	private void registerSkills() {
+
+	}
+
+	/**
+	 * Called in GameScreen.java to use skills for each situation.
+	 */
+	public void useSkill(final SkillType skillType) {
+		ISkill skill = skills.get(skillType);
+		if (skill != null) {
+			skill.use(this);
+		}
+	}
+
+	/**
+	 * Activates the ship's invincibility shield for a given duration.
+	 *
+	 * @param duration
+	 *            Duration of the invincibility in milliseconds.
+	 */
+	public final void activateInvincibility(final int duration) {
+		this.isInvincible = true;
+		this.shieldCooldown.setMilliseconds(duration);
+		this.shieldCooldown.reset();
+		this.setColor(Color.BLUE);
+	}
+
+	/**
 	 * Checks if the ship is destroyed.
-	 * 
+	 *
 	 * @return True if the ship is currently destroyed.
 	 */
 	public final boolean isDestroyed() {
@@ -174,32 +180,95 @@ public class Ship extends Entity {
 
 	/**
 	 * Getter for the ship's speed.
-	 * 
+	 *
 	 * @return Speed of the ship.
 	 */
 	public final int getSpeed() {
 		return SPEED;
 	}
 
-    /**
-     * Getter for the ship's invincibility state.
-     *
-     * @return True if the ship is currently invincible.
-     */
-    public final boolean isInvincible() {
-        return this.isInvincible;
-    }
+	/**
+	 * Getter for the ship's invincibility state.
+	 *
+	 * @return True if the ship is currently invincible.
+	 */
+	public final boolean isInvincible() {
+		return this.isInvincible || this.isDestroyed();
+	}
 
-    /**
-     * Activates the ship's invincibility shield for a given duration.
-     *
-     * @param duration
-     *            Duration of the invincibility in milliseconds.
-     */
-    public final void activateInvincibility(final int duration) {
-        this.isInvincible = true;
-        this.shieldCooldown.setMilliseconds(duration);
-        this.shieldCooldown.reset();
-        this.setColor(Color.BLUE);
-    }
+	/**
+	 * Moves the ship speed uni ts right, or until the right screen border is
+	 * reached.
+	 */
+	public final void moveRight() {
+		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+		this.positionX += SPEED*(1+shipspeed/10);
+	}
+
+	/**
+	 * Moves the ship speed units left, or until the left screen border is
+	 * reached.
+	 */
+	public final void moveLeft() {
+		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+		this.positionX -= SPEED*(1+shipspeed/10);
+	}
+
+	/**
+	 * Moves the ship speed units up, or until the SEPARATION_LINE_HEIGHT is
+	 * reached.
+	 */
+	public final void moveUp() {
+		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+		this.positionY -= SPEED*(1+shipspeed/10);
+	}
+
+	/**
+	 * Moves the ship speed units down, or until the down screen border is
+	 * reached.
+	 */
+	public final void moveDown() {
+		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+		this.positionY += SPEED*(1+shipspeed/10);
+	}
+
+	public void setPlayerId(int pid) { this.playerId = pid; }
+	public int getPlayerId() { return this.playerId; }
+
+	@Override
+	public void onCollision(Collidable other, GameModel model) {
+		if (model.isLevelFinished()) return;
+		other.onCollideWithShip(this, model);
+	}
+
+	@Override
+	public void onHitByEnemyBullet(Bullet bullet, GameModel model) {
+		if (!this.isInvincible()) {
+			model.requestShipDamage(this, 1);
+		}
+		model.requestRemoveBullet(bullet);
+	}
+
+	@Override
+	public void onHitByBossBullet(BossBullet b, GameModel model) {
+		if (!this.isInvincible()) {
+			model.requestShipDamage(this, 1);
+		}
+		model.requestRemoveBossBullet(b);
+	}
+
+	@Override
+	public void onCollideWithEnemyShip(EnemyShip enemy, GameModel model) {
+		model.requestPlayerCrash(this, enemy);
+	}
+
+	@Override
+	public void onCollideWithBoss(BossEntity boss, GameModel model) {
+		model.requestPlayerCrash(this, (Entity) boss);
+	}
+
+	@Override
+	public void onCollideWithDropItem(DropItem item, GameModel model) {
+		model.requestApplyItem(this, item);
+	}
 }

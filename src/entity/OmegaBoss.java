@@ -189,6 +189,16 @@ public class OmegaBoss extends MidBoss {
 		return false;
 	}
 
+	@Override
+	public void onCollision(Collidable other, GameModel model) {
+		other.onCollideWithBoss(this, model);
+	}
+
+	@Override
+	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
+		model.requestBossHitByPlayerBullet(bullet, this);
+	}
+
 	/**
 	 * Calculate dash end point (by watching)
 	 * @return [x, y] array
