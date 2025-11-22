@@ -16,11 +16,8 @@ public class TestModel {
 	private Ship player;
 	private final int width;
 	private final int height;
-
-	// 총알 관리 (Ship.shoot()가 자동으로 여기에 추가함)
 	private Set<Bullet> bullets;
 
-	// 상단 경계
 	private static final int TOP_BOUNDARY = 0;
 
 	public TestModel(int width, int height) {
@@ -28,23 +25,18 @@ public class TestModel {
 		this.height = height;
 		this.player = new Ship(this.width/2, height-20, Color.GREEN);
 		this.entity = new OmegaBoss(Color.blue, player);
-		// 총알 Set 초기화
 		this.bullets = new HashSet<>();
 	}
 
 	public void update(){
 		updateEntity();
 
-		// 총알 업데이트 (Bullet 클래스가 알아서 위치 이동)
 		for (Bullet bullet : bullets) {
 			bullet.update();
 		}
 
-		// 화면 밖 총알 제거
-		// 3. 충돌 처리 (GameModel 로직 재활용)
 		checkBulletCollisions();
 
-		// 4. 화면 밖 총알 제거
 		cleanBullets();
 	}
 
@@ -83,30 +75,19 @@ public class TestModel {
 				if (!isLeftBorder) player.moveLeft();
 				break;
 			case "UP":
-				// ⭐ 수정: 상단 경계 - 플레이어 상단이 TOP_BOUNDARY를 넘지 않도록
 				boolean isUpBorder = player.getPositionY() - player.getSpeed() < TOP_BOUNDARY;
 				if (!isUpBorder) player.moveUp();
 				break;
 
 			case "DOWN":
-				// ⭐ 수정: 하단 경계 - 플레이어 하단이 화면 하단을 넘지 않도록
 				boolean isDownBorder = player.getPositionY() + player.getHeight() + player.getSpeed() > this.height - 1;
 				if (!isDownBorder) player.moveDown();
 				break;
 		}
 	}
-	/**
-	 * 플레이어 발사 처리
-	 * Ship 클래스의 shoot() 메서드를 그대로 활용
-	 */
+
 	public void playerFire(){
 		if (!playerAvailable() || player.isDestroyed()) return;
-
-		// Ship.shoot()가 알아서:
-		// 1. 쿨다운 체크
-		// 2. Bullet 생성
-		// 3. bullets Set에 추가
-		// 4. 사운드 재생
 		player.shoot(bullets);
 	}
 

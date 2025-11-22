@@ -179,9 +179,6 @@ public class OmegaBoss extends MidBoss {
 		this.healPoint -= damage;
 	}
 
-	/**
-	 * Dash 경로 표시 여부 반환 (by watching)
-	 */
 	public boolean isShowingPath() {
 		if (bossPattern instanceof DashPattern) {
 			return ((DashPattern) bossPattern).isShowingPath();

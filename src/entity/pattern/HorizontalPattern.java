@@ -1,6 +1,6 @@
 package entity.pattern;
 
-import entity.Entity;
+import engine.Core;
 import entity.GameConstant;
 import entity.HasBounds;
 
@@ -12,18 +12,18 @@ import java.awt.*;
  */
 public class HorizontalPattern extends BossPattern {
 
-    private Entity boss;
+    private HasBounds bossBound;
     private final int speed;
     private boolean isRight;
 
     /**
      * Constructor for horizontal pattern
-     * @param boss The boss entity
+     * @param bossBound The boss entity
      * @param speed Movement speed
      */
-    public HorizontalPattern(Entity boss, int speed) {
-        super(new Point(boss.getPositionX(), boss.getPositionY()));
-        this.boss = boss;
+    public HorizontalPattern(HasBounds bossBound, int speed) {
+        super(new Point(bossBound.getPositionX(), bossBound.getPositionY()));
+        this.bossBound = bossBound;
         this.speed = speed;
         this.isRight = true;
     }
@@ -32,18 +32,17 @@ public class HorizontalPattern extends BossPattern {
     public void move() {
         int dx = isRight ? speed : -speed;
 
-        int newX = boss.getPositionX() + dx;
+        int newX = bossBound.getPositionX() + dx;
 
         // Check boundaries and reverse direction
         if (newX <= 0) {
             newX = 0;
             isRight = true;
-        } else if (newX + boss.getWidth() >= GameConstant.SCREEN_WIDTH) {
-            newX = GameConstant.SCREEN_WIDTH - boss.getWidth();
+        } else if (newX + bossBound.getWidth() >= GameConstant.SCREEN_WIDTH) {
+            newX = GameConstant.SCREEN_WIDTH - bossBound.getWidth();
             isRight = false;
         }
-
-        boss.setPositionX(newX);
+        this.bossPosition.x = newX;
     }
 
     @Override
@@ -53,7 +52,7 @@ public class HorizontalPattern extends BossPattern {
 
     @Override
     public Point getBossPosition() {
-        return new Point(boss.getPositionX(), boss.getPositionY());
+        return new Point(this.bossPosition.x, this.bossPosition.y);
     }
 
     @Override
