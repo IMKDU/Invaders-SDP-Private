@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 import engine.*;
 import engine.level.ItemDrop;
+import entity.pattern.BackgroundExplosionPattern;
 import entity.pattern.BlackHolePattern;
 
 /**
@@ -60,7 +61,7 @@ public class GameModel {
     /** Time from finishing the level to screen change. */
     private Cooldown screenFinishedCooldown;
     /** OmegaBoss */
-    private MidBoss omegaBoss;
+    private OmegaBoss omegaBoss;
     /** Set of all bullets fired by on-screen ships. */
     private Set<Bullet> bullets;
     /** Set of all dropItems dropped by on screen ships. */
@@ -122,6 +123,7 @@ public class GameModel {
     private Cooldown blackHoleCooldown;
     private int lastHp;
     private static final int BLACK_HOLE_DURATION_MS = 7000;
+    private Explosion explosionEntity = null;
 
 
     public GameModel(GameState gameState, Level level, boolean bonusLife, int maxLives, int width, int height) {
@@ -294,6 +296,7 @@ public class GameModel {
                 }
                 else if (this.omegaBoss != null){
                     this.omegaBoss.update();
+                    explosionEntity = this.omegaBoss.getExplosionPattern().getboom();
                     if (this.omegaBoss.isDestroyed()) {
                         if ("omegaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.omegaBoss = null;
@@ -355,7 +358,7 @@ public class GameModel {
 
 		if (finalBoss != null && !finalBoss.isDestroyed()) entities.add(finalBoss);
 		if (omegaBoss != null && !omegaBoss.isDestroyed()) entities.add(omegaBoss);
-
+        if (explosionEntity != null) entities.add(explosionEntity);
 		entities.addAll(bullets);
 		entities.addAll(bossBullets);
 		entities.addAll(dropItems);
@@ -878,6 +881,8 @@ public class GameModel {
     public int getBlackHoleCX() { return blackHoleCX; }
     public int getBlackHoleCY() { return blackHoleCY; }
     public int getBlackHoleRadius() { return blackHoleRadius; }
+    public Explosion getExplosionEntity() { return explosionEntity; }
+    public double getWarningExplosion() { return explosionEntity.getWarningProgress(); }
 
     public List<Entity> getEntitiesToRender() {
         List<Entity> renderList = new ArrayList<>();
@@ -911,7 +916,6 @@ public class GameModel {
         if (getFinalBoss() != null && !getFinalBoss().isDestroyed()) {
             renderList.add(getFinalBoss());
         }
-
         // 5. added items and bullets
         if (getBullets() != null) {
             renderList.addAll(getBullets());

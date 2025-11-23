@@ -3,10 +3,7 @@ package entity;
 import engine.DrawManager;
 import engine.Core;
 import engine.Cooldown;
-import entity.pattern.BossPattern;
-import entity.pattern.DashPattern;
-import entity.pattern.DiagonalPattern;
-import entity.pattern.HorizontalPattern;
+import entity.pattern.*;
 
 import java.awt.*;
 import java.util.logging.Logger;
@@ -39,6 +36,7 @@ public class OmegaBoss extends MidBoss {
 	/** Dash cooldown duration in milliseconds (5 seconds) */
 	private static final int DASH_COOLDOWN_MS = 5000;
 
+	private BackgroundExplosionPattern explosionPattern;
 	/** Boss pattern instance for delegating movement logic */
 	private BossPattern bossPattern;
 	/** Player reference for pattern targeting */
@@ -64,7 +62,7 @@ public class OmegaBoss extends MidBoss {
 		this.spriteType = DrawManager.SpriteType.OmegaBoss1;
 		this.logger = Core.getLogger();
 		this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
-
+		this.explosionPattern = new BackgroundExplosionPattern();
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		choosePattern();
 	}
@@ -77,7 +75,7 @@ public class OmegaBoss extends MidBoss {
 	@Override
 	public void update() {
 		choosePattern();
-
+		this.explosionPattern.update();
 		if (bossPattern != null) {
 			bossPattern.move();
 			bossPattern.attack();
@@ -228,6 +226,7 @@ public class OmegaBoss extends MidBoss {
 		return isInDashCooldown;
 	}
 
+	public BackgroundExplosionPattern getExplosionPattern() { return explosionPattern;}
 	/**
 	 * Update target ship for pattern
 	 */

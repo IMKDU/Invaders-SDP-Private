@@ -5,10 +5,12 @@ import java.awt.Color;
 import java.awt.*;
 import java.util.Map;
 
+import audio.SoundManager;
 import engine.BackBuffer;
 import engine.Core;
 import entity.Entity;
 import engine.DrawManager.SpriteType;
+import entity.HasBounds;
 import entity.LaserBullet;
 import entity.OmegaBoss;
 import entity.pattern.BossPattern;
@@ -230,4 +232,23 @@ public final class EntityRenderer {
         g.drawOval(x, y, radius * 2, radius * 2);
 
     }
+	public void drawExplosion(boolean isBoom, HasBounds boom, double time) {
+		Graphics g = backBuffer.getGraphics();
+		if (!isBoom) {
+
+			g.setColor(Color.red);
+			g.drawOval(boom.getPositionX(),boom.getPositionY(),boom.getWidth(),boom.getHeight());
+			int currentWidth = (int) (boom.getWidth() * time);
+			int currentHeight = (int) (boom.getHeight() * time);
+			int offsetX = (boom.getWidth() - currentWidth) / 2;
+			int offsetY = (boom.getHeight() - currentHeight) / 2;
+			g.setColor(Color.RED);
+			g.fillOval(boom.getPositionX() + offsetX, boom.getPositionY() + offsetY, currentWidth, currentHeight);
+		}
+		else {
+			g.setColor(Color.ORANGE);
+			g.fillOval(boom.getPositionX() - 10, boom.getPositionY() - 10, boom.getWidth() + 20, boom.getHeight() + 20);
+		}
+	}
+
 }

@@ -72,7 +72,13 @@ public class GameView {
                     model.getBlackHoleRadius()
             );
         }
-
+        if(model.getExplosionEntity() != null){
+            drawManager.getEntityRenderer().drawExplosion(
+                    model.getExplosionEntity().isBoom(),
+                    model.getExplosionEntity(),
+                    model.getWarningExplosion()
+            );
+        }
         /** countdown */
         if (!model.isInputDelayFinished()) {
             int countdown = (int) ((GameModel.INPUT_DELAY
