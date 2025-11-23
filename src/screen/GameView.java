@@ -73,7 +73,6 @@ public class GameView {
             );
         }
 
-
         /** countdown */
         if (!model.isInputDelayFinished()) {
             int countdown = (int) ((GameModel.INPUT_DELAY
