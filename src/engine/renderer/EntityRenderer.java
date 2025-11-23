@@ -265,9 +265,12 @@ public final class EntityRenderer {
         }
 
 	}
-    public void drawLife(final int positionX, final int positionY){
+    public void drawLife(final int positionX, final int positionY, final int playerId){
         Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
         BufferedImage image = spriteMap.get(SpriteType.Life);
+        if (playerId == 2){
+            image = this.tint(image, new Color(20, 74, 246, 180));
+        }
         int scaledW = (int) (image.getWidth() * scale * 2);
         int scaledH = (int) (image.getHeight() * scale * 2);
         g2d.drawImage(image, positionX, positionY, scaledW, scaledH, null);
@@ -313,4 +316,24 @@ public final class EntityRenderer {
 		g2d.drawLine(endX, endY, x1, y1);
 		g2d.drawLine(endX, endY, x2, y2);
 	}
+
+    public BufferedImage tint(BufferedImage src, Color newColor) {
+        int width = src.getWidth();
+        int height = src.getHeight();
+
+        BufferedImage tinted = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int rgba = src.getRGB(x, y);
+                int alpha = (rgba >> 24) & 0xff;
+
+                if (alpha == 0) continue; // 투명 픽셀은 건너뜀
+
+                tinted.setRGB(x, y, newColor.getRGB());
+            }
+        }
+
+        return tinted;
+    }
 }

@@ -86,7 +86,7 @@ public final class FileManager {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.warning("Failed to load sprite " + file.getName() + ": " + e.getMessage());
             }
         }
     }

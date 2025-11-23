@@ -132,66 +132,36 @@ public class Ship extends Entity implements Collidable {
             this.isInvincible = false;//테스트용
         }
         if (!this.destructionCooldown.checkFinished()) {
-            if (!this.isP1Ship) {
-                double ratio = this.destructionCooldown.getRemaining() / (double) this.destructionCooldown.getTotal();
-                // 전체 쿨다운 시간 1000ms 기준, 3단계로 나누기
-                if (ratio > 0.6) {
-                    this.spriteType = SpriteType.ShipP2Explosion1;
-                } else if (ratio > 0.3) {
-                    this.spriteType = SpriteType.ShipP2Explosion2;
-                } else {
-                    this.spriteType = SpriteType.ShipP2Explosion3;
-                }
-            }
-            else{
-                double ratio = this.destructionCooldown.getRemaining() / (double) this.destructionCooldown.getTotal();
-                // 전체 쿨다운 시간 1000ms 기준, 3단계로 나누기
-                if (ratio > 0.6) {
-                    this.spriteType = SpriteType.ShipP1Explosion1;
-                } else if (ratio > 0.3) {
-                    this.spriteType = SpriteType.ShipP1Explosion2;
-                } else {
-                    this.spriteType = SpriteType.ShipP1Explosion3;
-                }
-            }
-        }
+            double ratio = this.destructionCooldown.getRemaining() / (double) this.destructionCooldown.getTotal();
+            SpriteType explosion1 = this.isP1Ship ? SpriteType.ShipP1Explosion1 : SpriteType.ShipP2Explosion1;
+            SpriteType explosion2 = this.isP1Ship ? SpriteType.ShipP1Explosion2 : SpriteType.ShipP2Explosion2;
+            SpriteType explosion3 = this.isP1Ship ? SpriteType.ShipP1Explosion3 : SpriteType.ShipP2Explosion3;
 
-        else {
-            if (this.isP1Ship){
-                if (this.isMove){
-                    this.spriteType = SpriteType.ShipP1Move;
-                    if (!movingSoundPlaying) {
-                        SoundManager.playLoop("sfx/ShipMoving.wav");
-                        movingSoundPlaying = true;
-                    }
-                    this.isMove = false;
-                }
-                else{
-                    this.spriteType = SpriteType.ShipP1;
-                    if (movingSoundPlaying) {
-                        SoundManager.stop("sfx/ShipMoving.wav");
-                        movingSoundPlaying = false;
-                    }
-                }
+            if (ratio > 0.6) {
+                this.spriteType = explosion1;
+            } else if (ratio > 0.3) {
+                this.spriteType = explosion2;
+            } else {
+                this.spriteType = explosion3;
             }
-            else {
-                if (this.isMove){
-                    this.spriteType = SpriteType.ShipP2Move;
-                    if (!movingSoundPlaying) {
-                        SoundManager.playLoop("sfx/ShipMoving.wav");
-                        movingSoundPlaying = true;
-                    }
-                    this.isMove = false;
-                }
-                else {
-                    this.spriteType = SpriteType.ShipP2;
-                    if (movingSoundPlaying) {
-                        SoundManager.stop("sfx/ShipMoving.wav");
-                        movingSoundPlaying = false;
-                    }
-                }
-            }
+        } else {
+            SpriteType moveSprite = this.isP1Ship ? SpriteType.ShipP1Move : SpriteType.ShipP2Move;
+            SpriteType idleSprite = this.isP1Ship ? SpriteType.ShipP1 : SpriteType.ShipP2;
 
+            if (this.isMove) {
+                this.spriteType = moveSprite;
+                if (!movingSoundPlaying) {
+                    SoundManager.playLoop("sfx/ShipMoving.wav");
+                    movingSoundPlaying = true;
+                }
+                this.isMove = false;
+            } else {
+                this.spriteType = idleSprite;
+                if (movingSoundPlaying) {
+                    SoundManager.stop("sfx/ShipMoving.wav");
+                    movingSoundPlaying = false;
+                }
+            }
         }
     }
     /**
