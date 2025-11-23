@@ -1,7 +1,6 @@
 package engine.renderer;
 
 import engine.BackBuffer;
-import engine.Core;
 import engine.DTO.ShopInfoDTO;
 import engine.FontPack;
 

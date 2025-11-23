@@ -18,58 +18,34 @@ public class EnemyShipFormationMovement implements IMovementStrategy {
 		DOWN_RIGHT, DOWN_LEFT, UP_RIGHT, UP_LEFT
 	}
 
-	/**
-	 * Current movement direction.
-	 */
+	/** Current movement direction. */
 	private Direction currentDirection;
-	/**
-	 * Application logger.
-	 */
+	/** Application logger. */
 	private Logger logger;
 
-	/**
-	 * Initial vertical position to check for top boundary.
-	 */
+	/** Initial vertical position to check for top boundary. */
 	private static final int INIT_POS_Y = 100;
-	/**
-	 * Base vertical speed.
-	 */
+	/** Base vertical speed. */
 	private static final int Y_SPEED = 4;
-	/**
-	 * Margin from the screen edges.
-	 */
+	/** Margin from the screen edges. */
 	private static final int SIDE_MARGIN = 20;
 
-	/**
-	 * Default horizontal speed.
-	 */
+	/** Default horizontal speed. */
 	private static final int ORIGINAL_X_SPEED = 8;
-	/**
-	 * Horizontal speed when slowed.
-	 */
+	/** Horizontal speed when slowed. */
 	private static final int SLOWED_X_SPEED = 4;
-	/**
-	 * Duration of the slowdown effect in movement cycles.
-	 */
+	/** Duration of the slowdown effect in movement cycles. */
 	private static final int SLOWDOWN_DURATION = 18;
 
 
-	/**
-	 * Flag indicating if the slowdown effect is active.
-	 */
+	/** Flag indicating if the slowdown effect is active. */
 	private boolean isSlowedDown;
-	/**
-	 * Counter for the remaining duration of the slowdown effect.
-	 */
+	/** Counter for the remaining duration of the slowdown effect. */
 	private int slowDownCount;
 	private EnemyShipFormationModel model;
-	/**
-	 * The maximum Y-coordinate (bottom boundary) the formation is allowed to move to.
-	 */
+	/** The maximum Y-coordinate (bottom boundary) the formation is allowed to move to. */
 	private int formationBottomLimit;
-	/**
-	 * The total width of the playable area, used for calculating the right boundary.
-	 */
+	/** The total width of the playable area, used for calculating the right boundary. */
 	private int formationScreenWidth;
 
 	/**

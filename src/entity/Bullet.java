@@ -10,9 +10,9 @@ import engine.DrawManager.SpriteType;
  * @author <a href="mailto:RobertoIA1987@gmail.com">Roberto Izquierdo Amo</a>
  * 
  */
-public class Bullet extends Entity {
-    // === [ADD] Owner flag: 1 = P1, 2 = P2, null for legacy compatibility ===
-    private Integer ownerId;
+public class Bullet extends Entity implements Collidable {
+	// === [ADD] Owner flag: 1 = P1, 2 = P2, null for legacy compatibility ===
+	private Integer ownerId;
 
     public Integer getOwnerId() { return ownerId; }
     public void setOwnerId(Integer ownerId) { this.ownerId = ownerId; }
@@ -89,6 +89,7 @@ public class Bullet extends Entity {
 
 	/**
 	 * getter Bullet persistence status
+	 *
 	 * @return If true the bullet persists, If false it is deleted.
 	 */
 	public final boolean penetration() {
@@ -98,10 +99,11 @@ public class Bullet extends Entity {
 	}
 
 	/**
-	 *Check for penetration possibility
+	 * Check for penetration possibility
+	 *
 	 * @return True, Penetrable
 	 */
-	public final boolean canPenetration(){
+	public final boolean canPenetration() {
 		return this.penetrationCount < this.maxPenetration;
 	}
 
@@ -113,28 +115,6 @@ public class Bullet extends Entity {
 		this.maxPenetration = ShopItem.getPenetrationCount();
 	}
 
-	/**
-	 * Handles collision behavior for bullets.
-	 * Enemy bullets damage the player, and player bullets damage enemies/bosses.
-	 */
-	@Override
-	public void onCollision(Collidable other, GameModel game) {
-		Entity o = other.asEntity();
-
-		if (this.speed > 0 && o instanceof Ship) {
-			// Enemy bullet → Player
-			game.handleEnemyBulletHitPlayer(this, (Ship) o);
-
-		} else if (this.speed < 0) {
-			// Player bullet → Enemy/Boss
-			if (o instanceof EnemyShip) {
-				game.handlePlayerBulletHitEnemy(this, (EnemyShip) o);
-
-			} else if (o instanceof BossEntity) {
-				game.handlePlayerBulletHitBoss(this, (BossEntity) o);
-			}
-		}
-	}
 	/**
 	 * does the bullet go off the screen
 	 */
@@ -148,5 +128,20 @@ public class Bullet extends Entity {
 	 */
 	public boolean shouldBeRemoved() {
 		return false;
+	}
+
+
+	@Override
+	public void onCollision(Collidable other, GameModel model) {
+
+		if (this.speed < 0) {
+			other.onHitByPlayerBullet(this, model);
+			return;
+		}
+
+		if (this.speed > 0) {
+			other.onHitByEnemyBullet(this, model);
+			return;
+		}
 	}
 }

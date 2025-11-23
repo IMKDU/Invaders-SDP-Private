@@ -1,12 +1,7 @@
 package entity;
 
 import audio.SoundManager;
-
-
-import java.awt.Color;
-
 import engine.Cooldown;
-import engine.Core;
 import engine.DrawManager.SpriteType;
 
 import java.awt.*;
@@ -19,9 +14,7 @@ import java.awt.*;
  */
 public class EnemyShip extends Entity implements Collidable {
 
-	/**
-	 * Point value of a type A enemy.
-	 */
+	/** Point value of a type A enemy. */
 	private static final int A_TYPE_POINTS = 10;
 	/** Point value of a type B enemy. */
 	private static final int B_TYPE_POINTS = 20;
@@ -33,11 +26,11 @@ public class EnemyShip extends Entity implements Collidable {
 	/** Cooldown between sprite changes. */
 	private Cooldown animationCooldown;
     /** Cooldown between explosions. */
-    private Cooldown explosionCooldown;
+    private final Cooldown explosionCooldown;
 	/** Checks if the ship has been hit by a bullet. */
 	private boolean isDestroyed;
 	/** Values of the ship, in points, when destroyed. */
-	private int pointValue;
+	private final int pointValue;
 
 	/** Special enemy Direction enum **/
 	public enum Direction {
@@ -47,7 +40,7 @@ public class EnemyShip extends Entity implements Collidable {
 		LEFT,
 		/** Movement to the bottom of the screen. */
 		DOWN
-	};
+	}
 
 	/** Special enemy Direction variable **/
 	private Direction direction;
@@ -57,7 +50,7 @@ public class EnemyShip extends Entity implements Collidable {
 
 	/**
 	 * Constructor, establishes the ship's properties.
-	 * 
+	 *
 	 * @param positionX
 	 *            Initial position of the ship in the X axis.
 	 * @param positionY
@@ -66,30 +59,30 @@ public class EnemyShip extends Entity implements Collidable {
 	 *            Sprite type, image corresponding to the ship.
 	 */
 	public EnemyShip(final int positionX, final int positionY,
-			final SpriteType spriteType) {
+	                 final SpriteType spriteType) {
 		super(positionX, positionY, 12 * 2, 8 * 2, Color.WHITE);
 
 		this.spriteType = spriteType;
 		this.animationCooldown = new Cooldown(500);
-		this.explosionCooldown = new Cooldown(500);
+        this.explosionCooldown = new Cooldown(500);
 		this.isDestroyed = false;
 
 		switch (this.spriteType) {
-		case EnemyShipA1:
-		case EnemyShipA2:
-			this.pointValue = A_TYPE_POINTS;
-			break;
-		case EnemyShipB1:
-		case EnemyShipB2:
-			this.pointValue = B_TYPE_POINTS;
-			break;
-		case EnemyShipC1:
-		case EnemyShipC2:
-			this.pointValue = C_TYPE_POINTS;
-			break;
-		default:
-			this.pointValue = 0;
-			break;
+			case EnemyShipA1:
+			case EnemyShipA2:
+				this.pointValue = A_TYPE_POINTS;
+				break;
+			case EnemyShipB1:
+			case EnemyShipB2:
+				this.pointValue = B_TYPE_POINTS;
+				break;
+			case EnemyShipC1:
+			case EnemyShipC2:
+				this.pointValue = C_TYPE_POINTS;
+				break;
+			default:
+				this.pointValue = 0;
+				break;
 		}
 	}
 
@@ -102,14 +95,14 @@ public class EnemyShip extends Entity implements Collidable {
 		return this.specialType;
 	}
 
-	private SpecialType specialType; // 추가
+	private SpecialType specialType;
 
 	/**
 	 * Constructor, establishes the ship's properties for a special ship, with
 	 * known starting properties.
 	 */
 	public EnemyShip(SpecialType type, Direction direction, int x_speed) {
-        super(-32, GameConstant.STAT_SEPARATION_LINE_HEIGHT, 16 * 2, 7 * 2, Color.white);
+        super(-32, GameConstant.STAT_SEPARATION_LINE_HEIGHT, 16 * 2, 7 * 2,  (type == SpecialType.RED) ? Color.RED : Color.BLUE);
 
 		this.specialType = type;
 		this.direction = direction;
@@ -131,7 +124,7 @@ public class EnemyShip extends Entity implements Collidable {
 
 	/**
 	 * Moves the ship the specified distance.
-	 * 
+	 *
 	 * @param distanceX
 	 *            Distance to move in the X axis.
 	 * @param distanceY
@@ -150,26 +143,26 @@ public class EnemyShip extends Entity implements Collidable {
 			this.animationCooldown.reset();
 
 			switch (this.spriteType) {
-			case EnemyShipA1:
-				this.spriteType = SpriteType.EnemyShipA2;
-				break;
-			case EnemyShipA2:
-				this.spriteType = SpriteType.EnemyShipA1;
-				break;
-			case EnemyShipB1:
-				this.spriteType = SpriteType.EnemyShipB2;
-				break;
-			case EnemyShipB2:
-				this.spriteType = SpriteType.EnemyShipB1;
-				break;
-			case EnemyShipC1:
-				this.spriteType = SpriteType.EnemyShipC2;
-				break;
-			case EnemyShipC2:
-				this.spriteType = SpriteType.EnemyShipC1;
-				break;
-			default:
-				break;
+				case EnemyShipA1:
+					this.spriteType = SpriteType.EnemyShipA2;
+					break;
+				case EnemyShipA2:
+					this.spriteType = SpriteType.EnemyShipA1;
+					break;
+				case EnemyShipB1:
+					this.spriteType = SpriteType.EnemyShipB2;
+					break;
+				case EnemyShipB2:
+					this.spriteType = SpriteType.EnemyShipB1;
+					break;
+				case EnemyShipC1:
+					this.spriteType = SpriteType.EnemyShipC2;
+					break;
+				case EnemyShipC2:
+					this.spriteType = SpriteType.EnemyShipC1;
+					break;
+				default:
+					break;
 			}
 		}
 	}
@@ -214,6 +207,7 @@ public class EnemyShip extends Entity implements Collidable {
 
     /**
      * Check if the explosion effect is finished.
+     *
      * @return True if the explosion is finished.
      */
     public final boolean isExplosionFinished() {
@@ -237,5 +231,31 @@ public class EnemyShip extends Entity implements Collidable {
 			default:
 				return null;
 		}
+	}
+
+	@Override
+	public void onCollision(Collidable other, GameModel model) {
+		other.onCollideWithEnemyShip(this, model);
+	}
+
+	@Override
+	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
+
+		if (this.isDestroyed()) return;
+
+		model.requestEnemyHitByPlayerBullet(bullet, this);
+	}
+
+	@Override
+	public void onHitByEnemyBullet(Bullet bullet, GameModel model) {
+	}
+
+	@Override
+	public void onHitByBossBullet(BossBullet bullet, GameModel model) {
+	}
+
+	@Override
+	public void onCollideWithShip(Ship ship, GameModel model) {
+		model.requestPlayerCrash(ship, this);
 	}
 }

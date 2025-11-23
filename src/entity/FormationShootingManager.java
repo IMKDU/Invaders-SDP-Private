@@ -18,26 +18,16 @@ import engine.level.Level;
  */
 public class FormationShootingManager {
 
-	/**
-	 * Speed of the bullets shot.
-	 */
+	/** Speed of the bullets shot. */
 	private static final int BULLET_SPEED = 4;
-	/**
-	 * Proportion of differences between shooting times.
-	 */
+	/** Proportion of differences between shooting times. */
 	private static final double SHOOTING_VARIANCE = .2;
 
-	/**
-	 * Application logger.
-	 */
+	/** Application logger. */
 	private Logger logger;
-	/**
-	 * List of ships that are currently able to shoot.
-	 */
+	/** List of ships that are currently able to shoot. */
 	private List<EnemyShip> shooters;
-	/**
-	 * The cooldown timer between shots.
-	 */
+	/** The cooldown timer between shots. */
 	private Cooldown shootingCooldown;
 
 	/**

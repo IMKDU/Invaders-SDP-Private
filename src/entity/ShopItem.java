@@ -3,9 +3,7 @@ package entity;
 /**
  * Manages the in-game item (enhancement) system.
  * This is a temporary implementation focusing on functionality.
- * <p>
  * Currently implemented: MultiShot, Rapid Fire, Penetration
- * <p>
  * Example usage:
  * DropItem.setMultiShotLevel(2);  // Purchase level 2 in the shop
  */
@@ -13,24 +11,16 @@ public class ShopItem {
 
 	// ==================== MultiShot DropItem ====================
 
-	/**
-	 * MultiShot level (0 = not purchased, 1-3 = enhancement levels)
-	 */
+	/** MultiShot level (0 = not purchased, 1-3 = enhancement levels) */
 	private static int multiShotLevel = 0;
 
-	/**
-	 * Maximum MultiShot level
-	 */
+	/** Maximum MultiShot level */
 	private static final int MAX_MULTI_SHOT_LEVEL = 3;
 
-	/**
-	 * Number of bullets fired per level
-	 */
+	/** Number of bullets fired per level */
 	private static final int[] MULTI_SHOT_BULLETS = {1, 2, 3, 4};
 
-	/**
-	 * Spacing between bullets per level (in pixels)
-	 */
+	/** Spacing between bullets per level (in pixels) */
 	private static final int[] MULTI_SHOT_SPACING = {0, 10, 8, 5};
 
 
@@ -42,72 +32,48 @@ public class ShopItem {
 	}
 	//==================== Rapid Fire DropItem =======================
 
-	/**
-	 * Rapid Fire lever (0 = not purchased, 1~5 = enhancement levels)
-	 */
+	/** Rapid Fire lever (0 = not purchased, 1~5 = enhancement levels)*/
 	private static int rapidFireLevel = 0;
 
-	/**
-	 * maximum Rapid Fire level
-	 */
+	/** maximum Rapid Fire level */
 	private static final int MAX_RAPID_FIRE_LEVEL = 5;
 
-	/**
-	 * Base Shooting Interval
-	 */
+	/** Base Shooting Interval */
 	private static final int BASE_SHOOTING_INTERVAL = 750;
 
-	/**
-	 * Rapid Fire Reduction Per Level (%)
-	 */
+	/** Rapid Fire Reduction Per Level (%)*/
 	private static final int[] RAPID_FIRE_REDUCTION = {0, 5, 10, 15, 20, 30};
 
 
 	//===================== penetration DropItem =====================
 
-	/**
-	 * penetration level (0 = not purchased, 1~2 = enhancement levels)
-	 */
+	/** penetration level (0 = not purchased, 1~2 = enhancement levels) */
 	private static int penetrationLevel = 0;
 
-	/**
-	 * maximum penetration level
-	 */
+	/** maximum penetration level */
 	private static final int MAX_PENETRATION_LEVEL = 2;
 
-	/**
-	 * penetration count
-	 */
+	/** penetration count */
 	private static final int[] PENETRATION_COUNT = {0, 1, 2};
 
 	//===================== ShipSpeed DropItem =====================
 
 	private static final int MAX_SHIP_SPEED_LEVEL = 5;
 
-	/**
-	 * Ship speed per level
-	 */
+	/** Ship speed per level */
 	private static final int[] SHIP_SPEED = {0, 5, 10, 15, 20, 25};
 
-	/**
-	 * Ship Speed Increase Per Level (%)
-	 */
+	/** Ship Speed Increase Per Level (%)*/
 	private static int SHIPSPEEDLEVEL = 0;
 	// ==================== Bullet Speed DropItem ====================
 
-	/**
-	 * Bullet Speed level (0 = not purchased, 1-3 = enhancement levels)
-	 */
+	/** Bullet Speed level (0 = not purchased, 1-3 = enhancement levels) */
 	private static int bulletSpeedLevel = 0;
 
-	/**
-	 * Maximum Bullet Speed level
-	 */
+	/** Maximum Bullet Speed level */
 	private static final int MAX_BULLET_SPEED_LEVEL = 3;
 
-	/**
-	 * Bullet speed value per level
-	 */
+	/** Bullet speed value per level */
 	private static final int[] BULLET_SPEED_VALUES = {-6, -8, -10, -12};
 
 	/**

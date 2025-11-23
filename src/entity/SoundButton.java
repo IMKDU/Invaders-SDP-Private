@@ -10,20 +10,18 @@ import engine.DrawManager.SpriteType;
  */
 public class SoundButton extends Entity {
 
-	/**
-	 * State of all Sound on/off
-	 */
+	/** State of all Sound on/off */
 	private static boolean isSoundOn = true;
-	/**
-	 * Variables to store the number of times the button has been pressed (Using Easter egg)
-	 */
+	/** Variables to store the number of times the button has been pressed (Using Easter egg)*/
 	private int turnOnSound = 0;
 
 	/**
 	 * Constructor, establishes the button's properties.
 	 *
-	 * @param positionX Initial position of the button in the X axis.
-	 * @param positionY Initial position of the button in the Y axis.
+	 * @param positionX
+	 *            Initial position of the button in the X axis.
+	 * @param positionY
+	 *            Initial position of the button in the Y axis.
 	 */
 
 	public SoundButton(final int positionX, final int positionY) {

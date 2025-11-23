@@ -30,22 +30,17 @@ public class GameView {
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
 
-		/** Entity Rendering */
-		if (model.getEntitiesToRender() != null) {
-			for (var e : model.getEntitiesToRender()) {
+        /** Entity Rendering */
+        if (model.getEntitiesToRender() != null) {
+            for (var e : model.getEntitiesToRender()) {
+	            if (e instanceof DropItem) {
+		            drawManager.getItemRenderer().render((DropItem) e);
+		            continue;
+	            }
+				drawManager.getEntityRenderer().drawEntity(e);
+            }
 
-				if (e instanceof DropItem) {
-					drawManager.draw((DropItem) e);
-					continue;
-				}
-
-				drawManager.getEntityRenderer().drawEntity(
-						e,
-						e.getPositionX(),
-						e.getPositionY()
-				);
-			}
-		}
+        }
 
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25);
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50);

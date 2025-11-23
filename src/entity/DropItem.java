@@ -61,13 +61,9 @@ public class DropItem extends Entity implements Collidable {
 		return null;
 	}
 
-	/**
-	 * Speed of the item, positive is down.
-	 */
+	/** Speed of the item, positive is down. */
 	private int speed;
-	/**
-	 * Type of the item.
-	 */
+	/** Type of the item. */
 	private ItemType itemType;
 
 	public DropItem(final int positionX, final int positionY, final int speed, final ItemType itemType) {
@@ -100,7 +96,8 @@ public class DropItem extends Entity implements Collidable {
 	/**
 	 * Freeze DropItem : all enemy ship never move except special enemy.
 	 *
-	 * @param durationMillis Freeze duration Time
+	 * @param durationMillis
+	 *                  Freeze duration Time
 	 */
 	public static void applyTimeFreezeItem(int durationMillis) {
 		// current Time + duration Time = End Time
@@ -157,15 +154,14 @@ public class DropItem extends Entity implements Collidable {
 	public static ItemType getRandomItemType(final double proba) {
 		if (Math.random() < proba) {
 			return ItemType.selectItemType();
-		} else {
+		}
+		else {
 			return null;
 		}
 	}
 
 	@Override
-	public void onCollision(Collidable other, GameModel game) {
-		if (other instanceof Ship) {
-			game.handleItemCollected((Ship) other, this);
-		}
+	public void onCollision(Collidable other, GameModel model) {
+		other.onCollideWithDropItem(this, model);
 	}
 }
