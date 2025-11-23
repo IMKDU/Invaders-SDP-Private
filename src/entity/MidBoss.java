@@ -21,6 +21,8 @@ public abstract class MidBoss extends Entity implements BossEntity {
 	protected int pattern = 1;
 	protected Logger logger;
 
+    protected ApocalypseAttackPattern apocalypsePattern;
+
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
 	 *
@@ -53,7 +55,6 @@ public abstract class MidBoss extends Entity implements BossEntity {
 	@Override
 	public boolean isDestroyed() { return this.isDestroyed; }
 
-    // --- [Added] Base methods for Apocalypse Pattern ---
     // Bosses that don't use this pattern (e.g., ZetaBoss) will inherit this default implementation.
 
     /**
@@ -61,7 +62,7 @@ public abstract class MidBoss extends Entity implements BossEntity {
      * @return Always returns false for bosses without this pattern.
      */
     public boolean isApocalypseWarning() {
-        return false;
+        return this.apocalypsePattern != null && this.apocalypsePattern.isWarningActive();
     }
 
     /**
@@ -69,7 +70,7 @@ public abstract class MidBoss extends Entity implements BossEntity {
      * @return Returns -1 for bosses without this pattern.
      */
     public int getSafeZoneColumn() {
-        return -1;
+        return this.apocalypsePattern != null ? this.apocalypsePattern.getSafeZoneColumn() : -1;
     }
 
     /**
@@ -77,7 +78,7 @@ public abstract class MidBoss extends Entity implements BossEntity {
      * @return Returns null for bosses without this pattern.
      */
     public ApocalypseAttackPattern getApocalypsePattern() {
-        return null;
+        return this.apocalypsePattern;
     }
 
 	@Override

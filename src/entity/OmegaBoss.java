@@ -38,7 +38,6 @@ public class OmegaBoss extends MidBoss {
 	/** Color of pattern 2 */
 	private static final Color PATTERN_2_COLOR = Color.MAGENTA;
 
-    private ApocalypseAttackPattern apocalypsePattern;
     private boolean hasUsedApocalypse = false;
 
 	/** Dash cooldown duration in milliseconds (5 seconds) */
@@ -209,22 +208,6 @@ public class OmegaBoss extends MidBoss {
 	public void takeDamage(int damage) {
 		this.healPoint -= damage;
 	}
-
-
-    @Override
-    public boolean isApocalypseWarning() {
-        return this.apocalypsePattern.isWarningActive();
-    }
-
-    @Override
-    public int getSafeZoneColumn() {
-        return this.apocalypsePattern.getSafeZoneColumn();
-    }
-
-    @Override
-    public ApocalypseAttackPattern getApocalypsePattern() {
-        return this.apocalypsePattern;
-    }
 
     public boolean isShowingPath() {
         if (bossPattern instanceof DashPattern) {
