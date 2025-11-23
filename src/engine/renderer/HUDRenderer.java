@@ -11,11 +11,19 @@ import java.awt.*;
  * Handles all on-screen HUD rendering such as scores, coins, and timers.
  * Acts as a sub-view in the MVC structure.
  */
+
+
 public final class HUDRenderer {
 
     private final BackBuffer backBuffer;
     private final FontPack fontPack;
     private final EntityRenderer entityRenderer;
+
+	// Teleport cooldown UI constants
+	private static final int P1_COOLDOWN_X = 170;
+	private static final int P2_COOLDOWN_X_OFFSET = 200;
+	private static final int COOLDOWN_Y_OFFSET = 50;
+	private static final int TELEPORT_GAUGE_RADIUS = 26;
 
     public HUDRenderer(BackBuffer backBuffer, FontPack fontPack, EntityRenderer entityRenderer) {
         this.backBuffer = backBuffer;
@@ -148,7 +156,7 @@ public final class HUDRenderer {
 	/** Draw circular cooldown gauge */
 	private void drawTeleportCooldown(Graphics2D g, int x, int y, double ratio, Color readyColor) {
 
-		int r = 26;
+		int r = TELEPORT_GAUGE_RADIUS;
 		g.setColor(Color.DARK_GRAY);
 		g.fillOval(x, y, r, r);
 
@@ -170,7 +178,8 @@ public final class HUDRenderer {
 
 		Graphics2D g = (Graphics2D) backBuffer.getGraphics();
 
-		drawTeleportCooldown(g, 170, screenHeight - 50, cooldownP1, Color.GREEN);
-		drawTeleportCooldown(g, screenWidth - 200, screenHeight - 50, cooldownP2, Color.PINK);
+		drawTeleportCooldown(g, P1_COOLDOWN_X, screenHeight - COOLDOWN_Y_OFFSET, cooldownP1, Color.GREEN);
+		drawTeleportCooldown(g, screenWidth - P2_COOLDOWN_X_OFFSET, screenHeight - COOLDOWN_Y_OFFSET, cooldownP2, Color.PINK);
+
 	}
 }

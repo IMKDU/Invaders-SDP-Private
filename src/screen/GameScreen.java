@@ -125,22 +125,22 @@ public class GameScreen extends Screen {
 
 			// Player 2 Input
 			if (model.getShipP2() != null && model.getLivesP2() > 0 && !model.getShipP2().isDestroyed()) {
-				boolean Slash = inputManager.isP2SlashDown();
+				boolean isSlashDown = inputManager.isP2SlashDown();
 
 				if (inputManager.isP2KeyDown(KeyEvent.VK_RIGHT)) {
-					model.playerMoveOrTeleport(2, "RIGHT", Slash);
+					model.playerMoveOrTeleport(2, "RIGHT", isSlashDown);
 				}
 
 				if (inputManager.isP2KeyDown(KeyEvent.VK_LEFT)) {
-					model.playerMoveOrTeleport(2, "LEFT", Slash);
+					model.playerMoveOrTeleport(2, "LEFT", isSlashDown);
 				}
 
 				if (inputManager.isP2KeyDown(KeyEvent.VK_UP)) {
-					model.playerMoveOrTeleport(2, "UP", Slash);
+					model.playerMoveOrTeleport(2, "UP", isSlashDown);
 				}
 
 				if (inputManager.isP2KeyDown(KeyEvent.VK_DOWN)) {
-					model.playerMoveOrTeleport(2, "DOWN", Slash);
+					model.playerMoveOrTeleport(2, "DOWN", isSlashDown);
 				}
 				if (inputManager.isP2KeyDown(java.awt.event.KeyEvent.VK_ENTER))
 					model.playerFire(2);
@@ -175,7 +175,17 @@ public class GameScreen extends Screen {
      */
 	private HUDInfoDTO createHUDInfoDTO() {
 
-		HUDInfoDTO dto = new HUDInfoDTO(
+		float teleportCooldownP1 =
+				(model.getShip() != null)
+						? model.getShip().getTeleportCooldownProgress()
+						: 1f;
+
+		float teleportCooldownP2 =
+				(model.getShipP2() != null)
+						? model.getShipP2().getTeleportCooldownProgress()
+						: 1f;
+
+		return new HUDInfoDTO(
 				getWidth(),
 				getHeight(),
 				model.getScoreP1(),
@@ -187,21 +197,12 @@ public class GameScreen extends Screen {
 				model.getElapsedTime(),
 				model.getCurrentLevel().getLevelName(),
 				model.getAchievementText(),
-				model.getHealthPopupText()
+				model.getHealthPopupText(),
+				teleportCooldownP1,
+				teleportCooldownP2
 		);
-
-		dto.teleportCooldownP1 =
-				(model.getShip() != null)
-						? model.getShip().getTeleportCooldownProgress()
-						: 1f;
-
-		dto.teleportCooldownP2 =
-				(model.getShipP2() != null)
-						? model.getShipP2().getTeleportCooldownProgress()
-						: 1f;
-
-		return dto;
 	}
+
 
     /**
      * Returns the game state for other systems.

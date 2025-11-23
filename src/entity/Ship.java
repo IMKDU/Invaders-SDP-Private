@@ -30,6 +30,8 @@ public class Ship extends Entity implements Collidable {
 	private Cooldown shieldCooldown;
 	/** Checks if the ship is invincible. */
 	private boolean isInvincible;
+	private static final int TELEPORT_COOLDOWN_MS = 5000;
+
 	// === [ADD] Which player: 1 = P1, 2 = P2 (default 1 for single-player compatibility) ===
 	private int playerId = 1;
 
@@ -132,7 +134,7 @@ public class Ship extends Entity implements Collidable {
 		return Math.max(0f, Math.min(1f, ratio));
 	}
 
-	private Cooldown teleportCooldown = new Cooldown(5000);
+	private Cooldown teleportCooldown = new Cooldown(TELEPORT_COOLDOWN_MS);
 	private static final int TELEPORT_DISTANCE = 100;
 
 	public boolean canTeleport() {

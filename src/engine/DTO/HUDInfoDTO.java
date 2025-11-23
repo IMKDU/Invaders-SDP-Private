@@ -38,7 +38,10 @@ public final class HUDInfoDTO {
             long elapsedTimeMillis,
             String levelName,
             String achievementText,
-            String healthPopupText) {
+            String healthPopupText,
+			float teleportCooldownP1,
+			float teleportCooldownP2
+	) {
 
         this.width = width;
         this.height = height;
@@ -51,10 +54,17 @@ public final class HUDInfoDTO {
         this.elapsedTimeMillis = elapsedTimeMillis;
         this.levelName = levelName;
         this.achievementText = achievementText;
-        this.healthPopupText = healthPopupText;
-		this.teleportCooldownP1 = 1f;
-		this.teleportCooldownP2 = 1f;
+		this.healthPopupText = healthPopupText;
+		this.teleportCooldownP1 = teleportCooldownP1;
+		this.teleportCooldownP2 = teleportCooldownP2;
     }
+	public float getTeleportCooldownP1() {
+		return teleportCooldownP1;
+	}
+
+	public float getTeleportCooldownP2() {
+		return teleportCooldownP2;
+	}
 
     public int getWidth() {
         return width;
