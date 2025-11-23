@@ -8,7 +8,7 @@ import entity.HasBounds;
 import java.awt.*;
 import java.util.Set;
 
-public class PinnedBossPattern extends BossPattern{
+public class PinnedBossPattern extends BossPattern {
 
 	protected Cooldown shootCooldown;
 	protected HasBounds boss;
