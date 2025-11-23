@@ -3,7 +3,11 @@ package entity;
 import engine.DrawManager;
 import engine.Core;
 import engine.Cooldown;
-import entity.pattern.*;
+import entity.pattern.BossPattern;
+import entity.pattern.DashPattern;
+import entity.pattern.DiagonalPattern;
+import entity.pattern.HorizontalPattern;
+import entity.pattern.BackgroundExplosionPattern;
 
 import java.awt.*;
 import java.util.logging.Logger;
