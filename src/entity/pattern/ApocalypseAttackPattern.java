@@ -29,14 +29,16 @@ public class ApocalypseAttackPattern extends BossPattern {
     /** Object for random generation */
     private Random random;
 
+    public static final int TOTAL_COLUMNS = 10;
+
     protected HasBounds boss;
 
     public ApocalypseAttackPattern(HasBounds boss) {
         // Calls the BossPattern constructor.
         super(new Point(boss.getPositionX(), boss.getPositionY()));
         this.boss = boss;
-        this.warningCooldown = Core.getVariableCooldown(2000, 0); // 2second
-        this.attackAnimationCooldown = Core.getVariableCooldown(ATTACK_ANIMATION_DURATION, 0); // [추가] 1초
+        this.warningCooldown = Core.getVariableCooldown(2000, 0); // 2 second
+        this.attackAnimationCooldown = Core.getVariableCooldown(ATTACK_ANIMATION_DURATION, 0); // 1 second
         this.random = new Random();
     }
 

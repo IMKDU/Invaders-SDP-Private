@@ -285,7 +285,7 @@ public class GameModel {
                         executeApocalypseDamage(pattern.getSafeZoneColumn(), progress);
                     }
 
-                    else if (this.omegaBoss.isDestroyed()) {
+                    if (this.omegaBoss.isDestroyed()) {
                         if ("omegaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.omegaBoss = null;
                             this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, ship, this.width, this.height);

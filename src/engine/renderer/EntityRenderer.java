@@ -103,15 +103,16 @@ public final class EntityRenderer {
         Graphics g = backBuffer.getGraphics();
         int screenWidth = GameConstant.SCREEN_WIDTH;
         int screenHeight = GameConstant.SCREEN_HEIGHT;
-        int columnWidth = screenWidth / 10;
         int safeZoneColumn = pattern.getSafeZoneColumn();
+        int totalColumns = ApocalypseAttackPattern.TOTAL_COLUMNS;
+        int columnWidth = screenWidth / totalColumns;
 
         if (pattern.isWarningActive()) {
             // Draw warning screen (Red translucent)
             Color attackColor = new Color(255, 0, 0, 100);
             Color safeColor = new Color(255, 255, 255, 100);
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < totalColumns; i++) {
                 if (i == safeZoneColumn) {
                     g.setColor(safeColor);
                 } else {
@@ -127,7 +128,7 @@ public final class EntityRenderer {
             Color attackColor = new Color(255, 0, 0, 200);
 
             g.setColor(attackColor);
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < totalColumns; i++) {
                 if (i != safeZoneColumn) {
                     g.fillRect(i * columnWidth, 0, columnWidth, currentAttackHeight);
                 }
