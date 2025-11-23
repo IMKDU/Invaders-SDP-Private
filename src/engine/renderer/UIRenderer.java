@@ -103,13 +103,6 @@ public final class UIRenderer {
         }
     }
 
-    /**
-     * Draws the boss's area-wide attack warning. (View logic)
-     * @param screenWidth Screen width
-     * @param screenHeight Screen height
-     * @param safeZoneColumn Safe zone index (0-9)
-     */
-
     /** Draws game results on the end screen.*/
     public void drawResults(final int screenWidth, final int screenHeight, final int score, final int livesRemaining,
                             final int shipsDestroyed, final float accuracy, final boolean isNewRecord) {
