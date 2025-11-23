@@ -1,12 +1,16 @@
 package engine.renderer;
 
+import java.awt.Graphics;
+import java.awt.Color;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
 import engine.BackBuffer;
+import engine.Cooldown;
 import engine.Core;
+import engine.DrawManager;
 import entity.Entity;
 import engine.DrawManager.SpriteType;
 import entity.LaserBullet;
@@ -23,6 +27,8 @@ public final class EntityRenderer {
     private final Map<SpriteType, BufferedImage> spriteMap;
     private final BackBuffer backBuffer;
     private final double scale;
+    private final Cooldown blackholeAnimationCooldown = new Cooldown(100);
+    private SpriteType blackHoleType = SpriteType.BlackHole1;
 
     public EntityRenderer(Map<SpriteType, BufferedImage> spriteMap, BackBuffer backBuffer, double scale) {
         this.spriteMap = spriteMap;
@@ -335,5 +341,35 @@ public final class EntityRenderer {
         }
 
         return tinted;
+    }
+
+    /** Draw circle for pull_attack pattern */
+    public void drawBlackHole(final int cx, final int cy, final int size) {
+        Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
+
+        // 쿨다운 애니메이션 (필드로 선언해야 제대로 동작)
+        if (this.blackholeAnimationCooldown.checkFinished()) {
+            this.blackholeAnimationCooldown.reset();
+            blackHoleType = (blackHoleType == SpriteType.BlackHole1)
+                    ? SpriteType.BlackHole2
+                    : SpriteType.BlackHole1;
+        }
+
+        BufferedImage img = spriteMap.get(blackHoleType);
+
+        int drawX = cx - size / 2;
+        int drawY = cy - size / 2;
+
+        // 현재 클리핑 영역 저장
+        Shape oldClip = g2d.getClip();
+
+        // 원형 클리핑 생성
+        g2d.setClip(new java.awt.geom.Ellipse2D.Float(drawX, drawY, size, size));
+
+        // 이미지 그리기
+        g2d.drawImage(img, drawX, drawY, size, size, null);
+
+        // 클리핑 복원
+        g2d.setClip(oldClip);
     }
 }

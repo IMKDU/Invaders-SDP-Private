@@ -29,6 +29,13 @@ public class GameView {
 
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
+        if(model.isBlackHoleActive()){
+            drawManager.getEntityRenderer().drawBlackHole(
+                    model.getBlackHoleCX(),
+                    model.getBlackHoleCY(),
+                    model.getBlackHoleRadius()
+            );
+        }
         if (dto.getShipP1().isInvincible()) {
             drawManager.getEntityRenderer().drawShield(dto.getShipP1().getPositionX(), dto.getShipP1().getWidth(), dto.getShipP1().getPositionY(),dto.getShipP1().getHeight(), dto.getShipP1().getInvincibilityRatio());
         }
@@ -69,6 +76,7 @@ public class GameView {
         if (dto.getHealthPopupText() != null && !model.getHealthPopupCooldown().checkFinished()) {
             drawManager.getHUDRenderer().drawHealthPopup(dto.getWidth(), dto.getHealthPopupText());
         }
+
 
         /** countdown */
         if (!model.isInputDelayFinished()) {
