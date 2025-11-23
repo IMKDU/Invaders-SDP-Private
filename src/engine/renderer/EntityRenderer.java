@@ -221,14 +221,13 @@ public final class EntityRenderer {
 	}
 
     /** Draw circle for pull_attack pattern */
-    public void drawBlackHole(final int cx, final int cy, final int radius, final boolean isBlackHoleActive){
-        if(isBlackHoleActive){
-            int x = cx - radius;
-            int y = cy - radius;
+    public void drawBlackHole(final int cx, final int cy, final int radius){
+        int x = cx - radius;
+        int y = cy - radius;
 
-            Graphics g = backBuffer.getGraphics();
-            g.setColor(BLACK_HOLE_COLOR);
-            g.drawOval(x, y, radius * 2, radius * 2);
-        }
+        Graphics g = backBuffer.getGraphics();
+        g.setColor(BLACK_HOLE_COLOR);
+        g.drawOval(x, y, radius * 2, radius * 2);
+
     }
 }

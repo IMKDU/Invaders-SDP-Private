@@ -65,12 +65,14 @@ public class GameView {
             drawManager.getHUDRenderer().drawHealthPopup(dto.getWidth(), dto.getHealthPopupText());
         }
 
-        drawManager.getEntityRenderer().drawBlackHole(
-                model.getBlackHoleCX(),
-                model.getBlackHoleCY(),
-                model.getBlackHoleRadius(),
-                model.isBlackHoleActive()
-        );
+        if(model.isBlackHoleActive()){
+            drawManager.getEntityRenderer().drawBlackHole(
+                    model.getBlackHoleCX(),
+                    model.getBlackHoleCY(),
+                    model.getBlackHoleRadius()
+            );
+        }
+
 
         /** countdown */
         if (!model.isInputDelayFinished()) {
