@@ -419,11 +419,16 @@ public class GameModel {
 		ship.destroy();
 
 		if (ship.getPlayerId() == 1) {
-			livesP1 = Math.max(0, livesP1 - amount);  // ★ 여기!!
+			livesP1 = Math.max(0, livesP1 - amount);
 		} else {
-			livesP2 = Math.max(0, livesP2 - amount);  // ★ 여기!!
+			livesP2 = Math.max(0, livesP2 - amount);
 		}
 
+        if ((ship.getPlayerId() == 1 && livesP1 == 0) ||
+                (ship.getPlayerId() == 2 && livesP2 == 0)) {
+
+            ships.remove(ship);
+        }
 		if (this.isGameOver()) {
 			this.setGameOver();
 		}
