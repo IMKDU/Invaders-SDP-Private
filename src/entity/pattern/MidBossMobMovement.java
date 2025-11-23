@@ -33,7 +33,7 @@ public class MidBossMobMovement {
     /** Multiplier to increase the speed of the horizontal sine wave movement. */
     private static final int OSCILLATION_FREQUENCY_MULTIPLIER = 3;
     /** Distance required to trigger an acceleration towards the target. */
-    private static final double DISTANCE_THRESHOLD_FOR_SPEED_BOOST = 10.0;
+    private static final double DISTANCE_THRESHOLD_FOR_SPEED_BOOST = 15.0;
     /** The highest Y-coordinate (ceiling) the child ships can move up to. */
     private static final int TOP_MARGIN = 80;
     /** Margin distance from the bottom boundary used for descent stop. */

@@ -61,7 +61,7 @@ public class GameModel {
     /** Time from finishing the level to screen change. */
     private Cooldown screenFinishedCooldown;
     /** OmegaBoss */
-    private MidBoss omegaBoss;
+    private OmegaBoss omegaBoss;
 
     /** Set of all bullets fired by on-screen ships. */
     private Set<Bullet> bullets;
@@ -279,6 +279,7 @@ public class GameModel {
                 }
                 else if (this.omegaBoss != null){
                     this.omegaBoss.update();
+                    this.midBossChilds = this.omegaBoss.getSpawnMobs();
                     if (this.omegaBoss.isDestroyed()) {
                         if ("omegaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.omegaBoss = null;
@@ -335,7 +336,9 @@ public class GameModel {
 
 		if (finalBoss != null && !finalBoss.isDestroyed()) entities.add(finalBoss);
 		if (omegaBoss != null && !omegaBoss.isDestroyed()) entities.add(omegaBoss);
-
+        if (midBossChilds != null){
+            for(MidBossMob mb : midBossChilds){ entities.add(mb); }
+        }
 		entities.addAll(bullets);
 		entities.addAll(bossBullets);
 		entities.addAll(dropItems);

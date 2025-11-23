@@ -7,8 +7,10 @@ import entity.pattern.BossPattern;
 import entity.pattern.DashPattern;
 import entity.pattern.DiagonalPattern;
 import entity.pattern.HorizontalPattern;
+import entity.pattern.SpawnMobPattern;
 
 import java.awt.*;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -52,6 +54,8 @@ public class OmegaBoss extends MidBoss {
 	/** Flag to track if currently in dash cooldown */
 	private boolean isInDashCooldown = false;
 
+	private SpawnMobPattern spawnPattern;
+
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
 	 *
@@ -64,7 +68,7 @@ public class OmegaBoss extends MidBoss {
 		this.spriteType = DrawManager.SpriteType.OmegaBoss1;
 		this.logger = Core.getLogger();
 		this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
-
+		this.spawnPattern = new SpawnMobPattern(this,this.getHealPoint());
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		choosePattern();
 	}
@@ -81,7 +85,7 @@ public class OmegaBoss extends MidBoss {
 		if (bossPattern != null) {
 			bossPattern.move();
 			bossPattern.attack();
-
+			spawnPattern.update(this,this.getHealPoint());
 			// Update position from pattern
 			this.positionX = bossPattern.getBossPosition().x;
 			this.positionY = bossPattern.getBossPosition().y;
@@ -153,7 +157,6 @@ public class OmegaBoss extends MidBoss {
 		dashCooldown.reset();
 		logger.info("OMEGA : Dash cooldown started (5 seconds)");
 	}
-
 	/** move simple */
 	@Override
 	public void move(int distanceX, int distanceY) {
@@ -237,4 +240,6 @@ public class OmegaBoss extends MidBoss {
 			bossPattern.setTarget(target);
 		}
 	}
+
+	public List<MidBossMob> getSpawnMobs() { return this.spawnPattern.getChildShips();}
 }

@@ -6,15 +6,14 @@ import java.util.List;
 import java.awt.*;
 import java.util.logging.Logger;
 import engine.Core;
+import entity.GameConstant;
+import entity.HasBounds;
 import entity.MidBossMob;
 
-public class SpawnMobPattern {
+public class SpawnMobPattern extends BossPattern {
 
 
-    /** Mob cannot move below this boundary. */
-    private final int bottomBoundary;
-    /** The width of the screen. */
-    private final int screenWidth;
+    private HasBounds boss;
     /** Boss spawn child ships */
     private List<MidBossMob> childShips;
     /** Current accumulated count of all ships spawned throughout the fight. */
@@ -75,24 +74,19 @@ public class SpawnMobPattern {
     };
     /**
      * Initializes the SpawnMobPattern component.
-     * @param bottomBoundary The lowest point mobs can move to.
-     * @param width The width of the screen/play area.
-     * @param bossWidth The width of the boss.
-     * @param bossHeight The height of the boss.
      * @param Boss_MaxHP The maximum health of the boss.
      */
-    public SpawnMobPattern(int bottomBoundary, int width, int bossWidth, int bossHeight, int Boss_MaxHP) {
-        this.bottomBoundary = bottomBoundary;
-        this.screenWidth = width;
+    public SpawnMobPattern(HasBounds boss,int Boss_MaxHP) {
+        super(new Point(boss.getPositionX(), boss.getPositionY()));
         this.childShips = new ArrayList<MidBossMob>();
 
-        this.BOSS_WIDTH = bossWidth;
-        this.BOSS_HEIGHT = bossHeight;
+        this.BOSS_WIDTH = boss.getWidth();
+        this.BOSS_HEIGHT = boss.getHeight();
         this.BOSS_MAXHP = Boss_MaxHP;
         this.logger = Core.getLogger();
         this.movementStrategy = new MidBossMobMovement(
-                this.bottomBoundary,
-                this.screenWidth,
+                GameConstant.ITEMS_SEPARATION_LINE_HEIGHT,
+                GameConstant.SCREEN_WIDTH,
                 this.BOSS_WIDTH,
                 this.BOSS_HEIGHT,
                 this.CHILD_SPEED
@@ -101,13 +95,11 @@ public class SpawnMobPattern {
 
     /**
      * Updates the pattern status, checks for spawning, and updates child ship movement.
-     * @param bossPositionX Initial X position of the boss (used for mob spawning).
-     * @param bossPositionY Initial Y position of the boss (used for mob spawning).
      * @param bossHealPoint The current health point of the main boss.
      */
-    public void update(int bossPositionX, int bossPositionY,int bossHealPoint) {
-        this.bossPositionX = bossPositionX;
-        this.bossPositionY = bossPositionY;
+    public void update(HasBounds boss,int bossHealPoint) {
+        this.bossPositionX = boss.getPositionX();
+        this.bossPositionY = boss.getPositionY();
         this.checkPatternSwitch(bossHealPoint);
         this.spawnPattern(bossHealPoint);
         this.childMovePattern();
@@ -182,6 +174,11 @@ public class SpawnMobPattern {
             if(ship.isDestroyed()) { iterator.remove(); }
         }
     }
+    @Override
+    public void attack(){}
+
+    @Override
+    public void move(){}
     /**
      * Returns the list of currently active child ships.
      * NOTE: This is the getter method required by the game controller for collision and rendering.
