@@ -3,8 +3,10 @@ package entity;
 import audio.SoundManager;
 import engine.Cooldown;
 import engine.DrawManager.SpriteType;
+import entity.pattern.ISkill;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.Set;
 
 /**
@@ -15,6 +17,7 @@ import java.util.Set;
  */
 public class Ship extends Entity implements Collidable {
 
+	// === Constants ===
 	/** Time between shots. */
 	private static final int SHOOTING_INTERVAL = 750;
 	/** Speed of the bullets shot by the ship. */
@@ -36,6 +39,13 @@ public class Ship extends Entity implements Collidable {
     private boolean isMove;
     private boolean movingSoundPlaying = false;
 
+	// === Variable for Skil ===
+	public enum SkillType {
+		ORIGIN,
+		CHARGE,
+		DASH
+	}
+	private HashMap<SkillType, ISkill> skills;
 
     public void setPlayerId(int pid) { this.playerId = pid; }
     public int getPlayerId() { return this.playerId; }
@@ -64,48 +74,10 @@ public class Ship extends Entity implements Collidable {
 		this.shieldCooldown = new Cooldown(0);
 		this.isInvincible = false;
 
+		this.skills = new HashMap<SkillType, ISkill>();
+		registerSkills();
 	}
 
-
-	/**
-	 * Moves the ship speed uni ts right, or until the right screen border is
-	 * reached.
-	 */
-	public final void moveRight() {
-		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
-		this.positionX += SPEED*(1+shipspeed/10);
-        this.isMove = true;
-	}
-
-	/**
-	 * Moves the ship speed units left, or until the left screen border is
-	 * reached.
-	 */
-	public final void moveLeft() {
-		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
-		this.positionX -= SPEED*(1+shipspeed/10);
-        this.isMove = true;
-	}
-
-	/**
-	 * Moves the ship speed units up, or until the SEPARATION_LINE_HEIGHT is
-	 * reached.
-	 */
-	public final void moveUp() {
-		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
-		this.positionY -= SPEED*(1+shipspeed/10);
-        this.isMove = true;
-    }
-
-	/**
-	 * Moves the ship speed units down, or until the down screen border is
-	 * reached.
-	 */
-	public final void moveDown() {
-		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
-		this.positionY += SPEED*(1+shipspeed/10);
-        this.isMove = true;
-    }
 
 	/**
 	 * Shoots a bullet upwards.
@@ -153,14 +125,12 @@ public class Ship extends Entity implements Collidable {
 	}
 
 	/**
-	 * Updates status of the ship.
+	 * Register user skills into skill map.
 	 */
     public final void update() {
         if (this.isInvincible && this.shieldCooldown.checkFinished()) {
             this.isInvincible = false;//테스트용
         }
-
-
         if (!this.destructionCooldown.checkFinished()) {
             if (!this.isP1Ship) {
                 double ratio = this.destructionCooldown.getRemaining() / (double) this.destructionCooldown.getTotal();
@@ -224,11 +194,34 @@ public class Ship extends Entity implements Collidable {
 
         }
     }
+    /**
+     * Register user skills into skill map.
+     */
+    private void registerSkills() {
 
+    }
 	/**
-	 * Switches the ship to its destroyed state.
+	 * Called in GameScreen.java to use skills for each situation.
 	 */
-	public final void destroy() {
+	public void useSkill(final SkillType skillType) {
+		ISkill skill = skills.get(skillType);
+		if (skill != null) {
+			skill.use(this);
+		}
+	}
+
+    /**
+     * Activates the ship's invincibility shield for a given duration.
+     *
+     * @param duration
+     *            Duration of the invincibility in milliseconds.
+     */
+    public final void activateInvincibility(final int duration) {
+        this.isInvincible = true;
+        this.shieldCooldown.setMilliseconds(duration);
+        this.shieldCooldown.reset();
+    }
+    public final void destroy() {
         if (!this.isInvincible) {
             SoundManager.play("sfx/destroy.wav");
             this.destructionCooldown.reset();
@@ -262,22 +255,51 @@ public class Ship extends Entity implements Collidable {
 		return this.isInvincible || this.isDestroyed();
 	}
 
-    /**
-     * Activates the ship's invincibility shield for a given duration.
-     *
-     * @param duration
-     *            Duration of the invincibility in milliseconds.
-     */
-    public final void activateInvincibility(final int duration) {
-        this.isInvincible = true;
-        this.shieldCooldown.setMilliseconds(duration);
-        this.shieldCooldown.reset();
-    }
+
     public float getInvincibilityRatio() {
         if (!isInvincible || shieldCooldown.getTotal() == 0) return 0f;
         float ratio = (float) shieldCooldown.getRemaining() / shieldCooldown.getTotal();
         return ratio;
     }
+	/**
+	 * Moves the ship speed uni ts right, or until the right screen border is
+	 * reached.
+	 */
+	public final void moveRight() {
+		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+		this.positionX += SPEED*(1+shipspeed/10);
+        this.isMove = true;
+	}
+
+	/**
+	 * Moves the ship speed units left, or until the left screen border is
+	 * reached.
+	 */
+	public final void moveLeft() {
+		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+		this.positionX -= SPEED*(1+shipspeed/10);
+        this.isMove = true;
+	}
+
+	/**
+	 * Moves the ship speed units up, or until the SEPARATION_LINE_HEIGHT is
+	 * reached.
+	 */
+	public final void moveUp() {
+		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+		this.positionY -= SPEED*(1+shipspeed/10);
+        this.isMove = true;
+	}
+
+	/**
+	 * Moves the ship speed units down, or until the down screen border is
+	 * reached.
+	 */
+	public final void moveDown() {
+		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+		this.positionY += SPEED*(1+shipspeed/10);
+        this.isMove = true;
+	}
 
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
