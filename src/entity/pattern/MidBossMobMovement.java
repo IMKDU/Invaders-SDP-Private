@@ -1,5 +1,6 @@
 package entity.pattern;
 
+import entity.GameConstant;
 import entity.MidBossMob;
 
 import java.util.List;
@@ -12,6 +13,8 @@ public class MidBossMobMovement {
 
     /** The width of the screen, used for wall collision checks. */
     private int wallWidth;
+    /** The vertical boundary the child ships cannot cross. */
+    private int topHeight;
     /** The vertical boundary the child ships cannot cross. */
     private int bottomHeight;
     /** Reference to the list of active child ships. */
@@ -35,20 +38,19 @@ public class MidBossMobMovement {
     /** Distance required to trigger an acceleration towards the target. */
     private static final double DISTANCE_THRESHOLD_FOR_SPEED_BOOST = 15.0;
     /** The highest Y-coordinate (ceiling) the child ships can move up to. */
-    private static final int TOP_MARGIN = 80;
+    private static final int TOP_MARGIN = 5;
     /** Margin distance from the bottom boundary used for descent stop. */
     private static final int BOTTOM_MARGIN = 50;
     /**
      * Initializes the movement strategy parameters.
-     * @param ITEMS_SEPARATION_LINE_HEIGHT The lower boundary of the play area.
-     * @param screenWidth The total screen width.
      * @param bossWidth The width of the main boss.
      * @param bossHeight The height of the main boss.
      * @param childSpeed The base speed for child movement.
      */
-    public MidBossMobMovement(int ITEMS_SEPARATION_LINE_HEIGHT , int screenWidth, int bossWidth, int bossHeight, int childSpeed) {
-        this.bottomHeight = ITEMS_SEPARATION_LINE_HEIGHT;
-        this.wallWidth = screenWidth;
+    public MidBossMobMovement(int bossWidth, int bossHeight, int childSpeed) {
+        this.wallWidth = GameConstant.SCREEN_WIDTH;
+        this.bottomHeight = GameConstant.ITEMS_SEPARATION_LINE_HEIGHT;
+        this.topHeight = GameConstant.STAT_SEPARATION_LINE_HEIGHT;
         this.midBossWidth = bossWidth;
         this.midBossHeight = bossHeight;
         this.speed = childSpeed;
@@ -94,12 +96,12 @@ public class MidBossMobMovement {
         int finalTargetX = orbitTargetX - child.getWidth()/ 2;
         int finalTargetY = orbitTargetY - child.getHeight()/ 2;
 
-        boolean isTopWall = finalTargetY < TOP_MARGIN;
+        boolean isTopWall = finalTargetY < this.topHeight;
         boolean isBottomWall = finalTargetY + child.getHeight() > bottomHeight;
         boolean isRightWall = finalTargetX + child.getWidth() > this.wallWidth;
         boolean isLeftWall = finalTargetX < 0;
 
-        if(isTopWall){finalTargetY = TOP_MARGIN;}
+        if(isTopWall){finalTargetY = this.topHeight + TOP_MARGIN;}
         if(isBottomWall){finalTargetY = bottomHeight - child.getHeight();}
         if(isRightWall){finalTargetX = this.wallWidth - child.getWidth();}
         if(isLeftWall){finalTargetX = 0;}

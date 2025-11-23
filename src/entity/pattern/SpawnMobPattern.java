@@ -85,8 +85,6 @@ public class SpawnMobPattern extends BossPattern {
         this.BOSS_MAXHP = Boss_MaxHP;
         this.logger = Core.getLogger();
         this.movementStrategy = new MidBossMobMovement(
-                GameConstant.ITEMS_SEPARATION_LINE_HEIGHT,
-                GameConstant.SCREEN_WIDTH,
                 this.BOSS_WIDTH,
                 this.BOSS_HEIGHT,
                 this.CHILD_SPEED
