@@ -280,27 +280,9 @@ public class GameModel {
                     // GameModel gets the pattern component
                     ApocalypseAttackPattern pattern = this.omegaBoss.getApocalypsePattern();
 
-                    // If the pattern component exists and is active
-                    if (pattern != null && pattern.isPatternActive()) {
-
-                        // Check if in Warning state and warning time is finished
-                        if (pattern.isWarningActive() && pattern.isWarningFinished()) {
-                            // Warning time is over, so start attack animation
-                            pattern.beginAttackAnimation();
-                        }
-                        // Check if in Attacking state (executes every frame)
-                        else if (pattern.isAttacking()) {
-                            // Get the current animation progress (0.0 ~ 1.0)
-                            float progress = pattern.getAttackAnimationProgress();
-
-                            // Pass the progress to execute damage logic every frame
-                            executeApocalypseDamage(pattern.getSafeZoneColumn(), progress);
-
-                            // Check if animation is finished, and if so, end the pattern
-                            if (pattern.isAttackAnimationFinished()) {
-                                pattern.finishPattern(); // Reset pattern component state
-                            }
-                        }
+                    if (pattern != null && pattern.isAttacking()) {
+                        float progress = pattern.getAttackAnimationProgress();
+                        executeApocalypseDamage(pattern.getSafeZoneColumn(), progress);
                     }
 
                     else if (this.omegaBoss.isDestroyed()) {

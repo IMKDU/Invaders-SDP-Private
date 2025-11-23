@@ -47,7 +47,20 @@ public class ApocalypseAttackPattern extends BossPattern {
      */
     @Override
     public void attack() {
-        // All logic is handled by GameModel polling this object's state
+        // 1. Warning State
+        if (isWarning) {
+            // Check if warning time is finished
+            if (warningCooldown.checkFinished()) {
+                beginAttackAnimation(); // Transition to attack state
+            }
+        }
+        // 2. Attack State
+        else if (isAttacking) {
+            // Check if attack animation time is finished
+            if (attackAnimationCooldown.checkFinished()) {
+                finishPattern(); // Finish pattern
+            }
+        }
     }
 
     /**
@@ -64,6 +77,9 @@ public class ApocalypseAttackPattern extends BossPattern {
      */
     public void start(int safeZoneCount) {
         if (isPatternActive) return; // Prevent duplicate execution if already active
+
+        this.bossPosition.x = boss.getPositionX();
+        this.bossPosition.y = boss.getPositionY();
 
         this.isWarning = true;
         this.isPatternActive = true;

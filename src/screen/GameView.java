@@ -40,32 +40,7 @@ public class GameView {
                     drawManager.getItemRenderer().render((DropItem) e);
                     continue;
                 }
-
-                // Draw OmegaBoss Warning / Attack
-                if (e == model.getOmegaBoss() && model.getOmegaBoss() != null) {
-                    // Get the pattern object.
-                    ApocalypseAttackPattern pattern = model.getOmegaBoss().getApocalypsePattern();
-
-                    if (pattern != null) {
-                        if (pattern.isWarningActive()) {
-                            // State 1: Warning
-                            drawManager.getUIRenderer().drawApocalypseWarning(
-                                    dto.getWidth(),
-                                    dto.getHeight(),
-                                    pattern.getSafeZoneColumn()
-                            );
-                        } else if (pattern.isAttacking()) {
-                            // State 2: Attack Animation
-                            drawManager.getUIRenderer().drawApocalypseAttack(
-                                    dto.getWidth(),
-                                    dto.getHeight(),
-                                    pattern.getSafeZoneColumn(),
-                                    pattern.getAttackAnimationProgress() // Pass the progress
-                            );
-                        }
-                    }
-                }
-                drawManager.getEntityRenderer().drawEntity(e, e.getPositionX(), e.getPositionY());
+                drawManager.getEntityRenderer().drawEntity(e);
             }
         }
 

@@ -83,35 +83,15 @@ public class OmegaBoss extends MidBoss {
 	 */
 	@Override
     public void update() {
-        // 1. [HEAD Logic] Apocalypse Pattern Check (Highest Priority)
-        // If Apocalypse hasn't been used, HP is below 50%, and pattern is currently inactive, Start it.
-        if (!this.hasUsedApocalypse && this.healPoint <= this.maxHp / 2 && !this.apocalypsePattern.isPatternActive()) {
-            this.apocalypsePattern.start(1);
-            this.hasUsedApocalypse = true;
-            this.logger.info("OMEGA : Starting Apocalypse Pattern (delegated to component).");
-        }
+        choosePattern();
 
-        // 2. [HEAD Logic] Execute Apocalypse if active
-        if (this.apocalypsePattern.isPatternActive()) {
-            this.apocalypsePattern.move();
-            this.apocalypsePattern.attack();
-
-            // Sync position just in case pattern moves boss (though Apocalypse usually doesn't)
-            this.positionX = apocalypsePattern.getBossPosition().x;
-            this.positionY = apocalypsePattern.getBossPosition().y;
-        }
-        // 3. [Master Logic] If Apocalypse is NOT active, perform normal Phase patterns
-        else {
-            choosePattern();
-
-            if (bossPattern != null) {
-                bossPattern.move();
-                bossPattern.attack();
+        if (bossPattern != null) {
+            bossPattern.move();
+            bossPattern.attack();
 
                 // Update position from pattern
-                this.positionX = bossPattern.getBossPosition().x;
-                this.positionY = bossPattern.getBossPosition().y;
-            }
+            this.positionX = bossPattern.getBossPosition().x;
+            this.positionY = bossPattern.getBossPosition().y;
         }
     }
 
@@ -122,26 +102,50 @@ public class OmegaBoss extends MidBoss {
 	 * Pattern 3: Dash attack with cooldown (HP <= 33%)
 	 */
 	private void choosePattern() {
-		if (this.healPoint > this.maxHp / 2 && this.bossPhase == 1) {
-			++this.bossPhase;
-			bossPattern = new HorizontalPattern(this, PATTERN_1_X_SPEED);
-			logger.info("OMEGA : move using horizontal pattern");
-		}
-		else if (this.healPoint <= this.maxHp / 2 && this.healPoint > this.maxHp / 3 && this.bossPhase == 2) {
-			++this.bossPhase;
-			bossPattern = new DiagonalPattern(this, PATTERN_2_X_SPEED, PATTERN_2_Y_SPEED, PATTERN_2_COLOR);
-			logger.info("OMEGA : move using diagonal pattern");
-		}
-		else if (this.healPoint <= this.maxHp / 3 && this.bossPhase == 3) {
-			++this.bossPhase;
-			// Start with dash pattern
-			startDashPattern();
-		}
 
-		// Phase 3: Handle dash cooldown cycle
-		if (this.bossPhase >= 4) {
-			handleDashCycle();
-		}
+        // Do not execute the normal pattern logic below while the Apocalypse Pattern is active
+        if (this.apocalypsePattern.isPatternActive()) {
+            return;
+        }
+        // Trigger if HP is 50% or less, hasn't been used yet, and is not currently the Apocalypse Pattern
+        if (!this.hasUsedApocalypse && this.healPoint <= this.maxHp / 2) {
+            if (this.bossPattern != this.apocalypsePattern) {
+                this.bossPattern = this.apocalypsePattern; // Switch pattern
+                this.apocalypsePattern.start(1); // Trigger start
+                this.hasUsedApocalypse = true;
+                logger.info("OMEGA : Apocalypse Pattern Activated!");
+                return;
+            }
+        }
+
+        // Execute normal pattern logic if Apocalypse Pattern is finished or inactive
+        // (When Apocalypse ends, isPatternActive() becomes false and execution reaches here)
+
+        // Pattern 1: Horizontal (HP > 50%)
+        if (this.healPoint > this.maxHp / 2) {
+            if (this.bossPhase < 2) {
+                this.bossPhase = 2;
+                bossPattern = new HorizontalPattern(this, PATTERN_1_X_SPEED);
+                logger.info("OMEGA : move using horizontal pattern");
+            }
+        }
+        // Pattern 2: Diagonal (33% < HP <= 50%)
+        else if (this.healPoint > this.maxHp / 3) {
+            // Return to diagonal pattern immediately after Apocalypse
+            if (this.bossPhase < 3 || this.bossPattern == this.apocalypsePattern) {
+                this.bossPhase = 3;
+                bossPattern = new DiagonalPattern(this, PATTERN_2_X_SPEED, PATTERN_2_Y_SPEED, PATTERN_2_COLOR);
+                logger.info("OMEGA : move using diagonal pattern");
+            }
+        }
+        // Pattern 3: Dash (HP <= 33%)
+        else {
+            if (this.bossPhase < 4) {
+                this.bossPhase = 4;
+                startDashPattern();
+            }
+            handleDashCycle();
+        }
 	}
 
 	/**
@@ -206,10 +210,6 @@ public class OmegaBoss extends MidBoss {
 		this.healPoint -= damage;
 	}
 
-	/** Renders the entity at its current position using the provided DrawManager. */
-	public void draw(DrawManager drawManager) {
-		drawManager.getEntityRenderer().drawEntity(this, this.positionX, this.positionY);
-	}
 
     @Override
     public boolean isApocalypseWarning() {

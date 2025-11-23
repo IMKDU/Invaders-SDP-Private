@@ -4,11 +4,12 @@ import java.awt.*;
 import java.util.Map;
 
 import engine.BackBuffer;
-import engine.Core;
 import entity.Entity;
 import engine.DrawManager.SpriteType;
+import entity.GameConstant;
 import entity.LaserBullet;
 import entity.OmegaBoss;
+import entity.pattern.ApocalypseAttackPattern;
 import entity.pattern.BossPattern;
 import entity.pattern.DashPattern;
 
@@ -81,6 +82,10 @@ public final class EntityRenderer {
 		if (pattern instanceof DashPattern) {
 			drawDashPatternVisual(boss, (DashPattern) pattern);
 		}
+
+        else if (pattern instanceof ApocalypseAttackPattern) {
+            drawApocalypseVisual((ApocalypseAttackPattern) pattern);
+        }
 		// Add more pattern types here as needed
 		// else if (pattern instanceof ex1Pattern) {
 		//     drawLaserPatternVisual(boss, (ex1Pattern) pattern);
@@ -89,6 +94,46 @@ public final class EntityRenderer {
 		//     drawCirclePatternVisual(boss, (ex2Pattern) pattern);
 		// }
 	}
+
+    /**
+     * [Added] Apocalypse Pattern Visualization Method
+     * (Ported logic from existing GameView/UIRenderer)
+     */
+    private void drawApocalypseVisual(ApocalypseAttackPattern pattern) {
+        Graphics g = backBuffer.getGraphics();
+        int screenWidth = GameConstant.SCREEN_WIDTH;
+        int screenHeight = GameConstant.SCREEN_HEIGHT;
+        int columnWidth = screenWidth / 10;
+        int safeZoneColumn = pattern.getSafeZoneColumn();
+
+        if (pattern.isWarningActive()) {
+            // Draw warning screen (Red translucent)
+            Color attackColor = new Color(255, 0, 0, 100);
+            Color safeColor = new Color(255, 255, 255, 100);
+
+            for (int i = 0; i < 10; i++) {
+                if (i == safeZoneColumn) {
+                    g.setColor(safeColor);
+                } else {
+                    g.setColor(attackColor);
+                }
+                g.fillRect(i * columnWidth, 0, columnWidth, screenHeight);
+            }
+        }
+        else if (pattern.isAttacking()) {
+            // Draw attack animation (Dark red)
+            float progress = pattern.getAttackAnimationProgress();
+            int currentAttackHeight = (int) (screenHeight * progress);
+            Color attackColor = new Color(255, 0, 0, 200);
+
+            g.setColor(attackColor);
+            for (int i = 0; i < 10; i++) {
+                if (i != safeZoneColumn) {
+                    g.fillRect(i * columnWidth, 0, columnWidth, currentAttackHeight);
+                }
+            }
+        }
+    }
 
 	/**
 	 * Draws visualization for DashPattern.
