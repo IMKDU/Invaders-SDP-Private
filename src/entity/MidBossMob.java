@@ -21,10 +21,9 @@ public class MidBossMob extends MidBoss {
      * @param initPosY Initial Y position.
      * @param healthPoint Initial health points.
      * @param pointValue Score value granted upon destruction.
-     * @param color The drawing color of the entity.
      */
-    public MidBossMob(int initPosX, int initPosY, int healthPoint, int pointValue, Color color) {
-        super(initPosX, initPosY, WIDTH, HEIGHT, healthPoint, pointValue, color);
+    public MidBossMob(int initPosX, int initPosY, int healthPoint, int pointValue) {
+        super(initPosX, initPosY, WIDTH, HEIGHT, healthPoint, pointValue, Color.cyan);
         this.spriteType = DrawManager.SpriteType.EnemyShipB1;
     }
 

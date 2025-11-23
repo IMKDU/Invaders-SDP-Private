@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.awt.*;
 import java.util.logging.Logger;
-import engine.Core;
 import entity.GameConstant;
 import entity.HasBounds;
 import entity.MidBossMob;
@@ -57,21 +56,6 @@ public class SpawnMobPattern extends BossPattern {
     private final int MOB_HEALTH_POINT = 4;
     /** The score value awarded to the player upon destroying the mob. */
     private final int MOB_POINT_VALUE = 10;
-    /** Color palette used to assign distinct colors to spawned children. */
-    private Color[] colorPalette = {
-            new Color( 0xFF4081),
-            new Color( 0xFCDD8A),
-            new Color( 0xFF5722),
-            new Color( 0x8BC34A),
-            new Color( 0x9C27B0),
-            new Color( 0x6A89FF),
-            new Color( 0x6756C9),
-            new Color( 0xF2606F),
-            new Color( 0xF5A5A5),
-            new Color( 0x6F5E77),
-            new Color( 0x32A9B3),
-            new Color( 0x8303EE)
-    };
     /**
      * Initializes the SpawnMobPattern component.
      * @param Boss_MaxHP The maximum health of the boss.
@@ -83,7 +67,7 @@ public class SpawnMobPattern extends BossPattern {
         this.BOSS_WIDTH = boss.getWidth();
         this.BOSS_HEIGHT = boss.getHeight();
         this.BOSS_MAXHP = Boss_MaxHP;
-        this.logger = Core.getLogger();
+        this.logger = engine.Core.getLogger();
         this.movementStrategy = new MidBossMobMovement(
                 this.BOSS_WIDTH,
                 this.BOSS_HEIGHT,
@@ -156,8 +140,7 @@ public class SpawnMobPattern extends BossPattern {
                     this.bossPositionX,
                     bossPositionY + (int)(SPAWN_VERTICAL_SPACING_BASE/shipCount * (count+1)),
                     MOB_HEALTH_POINT,
-                    MOB_POINT_VALUE,
-                    colorPalette[count % colorPalette.length]
+                    MOB_POINT_VALUE
             );
             this.childShips.add(ship);
         }
