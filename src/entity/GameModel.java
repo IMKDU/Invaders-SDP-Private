@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 import engine.*;
 import engine.level.ItemDrop;
+import entity.pattern.BlackHolePattern;
 
 /**
  * Implements the Model for the game screen.
@@ -115,6 +116,16 @@ public class GameModel {
     /** Milliseconds until the screen accepts user input. */
     private Cooldown inputDelay;
 
+    private List<Ship> ships;
+    /** variables for Boss BlackHole Pattern */
+    private boolean blackHoleActive = false;
+    private int blackHoleCX;
+    private int blackHoleCY;
+    private int blackHoleRadius;
+    private Cooldown blackHoleCooldown;
+    private int lastHp;
+    private static final int BLACK_HOLE_DURATION_MS = 7000;
+
 
     public GameModel(GameState gameState, Level level, boolean bonusLife, int maxLives, int width, int height) {
         this.logger = Core.getLogger();
@@ -180,6 +191,14 @@ public class GameModel {
         this.omegaBoss = null;
         this.midBossChilds = null;
         this.currentPhase = StagePhase.wave;
+
+//        bossPattern = new BossPattern();
+//        blackHoleCooldown = Core.getCooldown(BLACK_HOLE_DURATION_MS);
+//        lastHp = Integer.MAX_VALUE;
+        /** ships list for boss argument */
+        this.ships = new ArrayList<>();
+        if (this.ship != null) ships.add(this.ship);
+        if (this.shipP2 != null) ships.add(this.shipP2);
     }
 
     /**
@@ -283,7 +302,7 @@ public class GameModel {
                     if (this.omegaBoss.isDestroyed()) {
                         if ("omegaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.omegaBoss = null;
-                            this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, ship, this.width, this.height);
+                            this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, ships, this.width, this.height);
                             this.logger.info("Final Boss has spawned!");
                         } else {
                             this.levelFinished = true;
@@ -407,11 +426,16 @@ public class GameModel {
 		ship.destroy();
 
 		if (ship.getPlayerId() == 1) {
-			livesP1 = Math.max(0, livesP1 - amount);  // ★ 여기!!
+			livesP1 = Math.max(0, livesP1 - amount);
 		} else {
-			livesP2 = Math.max(0, livesP2 - amount);  // ★ 여기!!
+			livesP2 = Math.max(0, livesP2 - amount);
 		}
 
+        if ((ship.getPlayerId() == 1 && livesP1 == 0) ||
+                (ship.getPlayerId() == 2 && livesP2 == 0)) {
+
+            ships.remove(ship);
+        }
 		if (this.isGameOver()) {
 			this.setGameOver();
 		}
@@ -687,7 +711,7 @@ public class GameModel {
         this.logger.info("Spawning boss: " + bossName);
         switch (bossName) {
             case "finalBoss":
-                this.finalBoss = new FinalBoss(this.width / 2 - 50, 80, ship, this.width, this.height);
+                this.finalBoss = new FinalBoss(this.width / 2 - 50, 80,  ships, this.width, this.height);
                 this.logger.info("Final Boss has spawned!");
                 break;
             case "omegaBoss":
@@ -705,16 +729,18 @@ public class GameModel {
 
     public void finalbossManage(){
         if (this.finalBoss != null && !this.finalBoss.isDestroyed()) {
-			if(livesP1>0 && livesP2>0){
-				this.finalBoss.setTarget(Math.random() < 0.5 ? ship : shipP2);
-			}
-			else if(livesP2 > 0){
-				this.finalBoss.setTarget(shipP2);
-			}
-			else if(livesP1 > 0){
-				this.finalBoss.setTarget(ship);
-			}
             this.finalBoss.update();
+            BlackHolePattern bh = finalBoss.getCurrentBlackHole();
+
+            if (bh != null && bh.isActive()) {
+                blackHoleActive = true;
+                blackHoleCX = bh.getCenterX();
+                blackHoleCY = bh.getCenterY();
+                blackHoleRadius = bh.getRadius();
+            } else {
+                blackHoleActive = false;
+            }
+
 			if(this.finalBoss.getBossPhase() == 3 && !this.is_cleared){
 				bossBullets.clear();
 				is_cleared = true;
@@ -855,6 +881,11 @@ public class GameModel {
     public boolean isBonusLife() { return bonusLife; }
     public boolean isLevelFinished() { return levelFinished; }
     public Cooldown getScreenFinishedCooldown() { return screenFinishedCooldown; }
+
+    public boolean isBlackHoleActive() { return blackHoleActive; }
+    public int getBlackHoleCX() { return blackHoleCX; }
+    public int getBlackHoleCY() { return blackHoleCY; }
+    public int getBlackHoleRadius() { return blackHoleRadius; }
 
     public List<Entity> getEntitiesToRender() {
         List<Entity> renderList = new ArrayList<>();
