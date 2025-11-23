@@ -33,13 +33,14 @@ public class SpreadShotPattern extends BossPattern {
 
 		if (movingToCenter) {
 			moveToCenter();
-		} else {
-			performSpreadShot();
 		}
 	}
 
 	@Override
 	public void attack() {
+		if (movingToCenter) return;
+
+		performSpreadShot();
 	}
 
 	@Override

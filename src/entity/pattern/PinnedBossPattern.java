@@ -8,7 +8,7 @@ import entity.HasBounds;
 import java.awt.*;
 import java.util.Set;
 
-public class PinnedBossPattern extends BossPattern implements HasBounds{
+public class PinnedBossPattern extends BossPattern{
 
 	protected Cooldown shootCooldown;
 	protected HasBounds boss;
@@ -55,25 +55,5 @@ public class PinnedBossPattern extends BossPattern implements HasBounds{
 	public Set<Bullet> getBullets(){
 		this.bullets.addAll(backGroundPattern.getBullets());
 		return bullets;
-	}
-
-	@Override
-	public int getPositionX() {
-		return 0;
-	}
-
-	@Override
-	public int getPositionY() {
-		return 0;
-	}
-
-	@Override
-	public int getWidth() {
-		return 0;
-	}
-
-	@Override
-	public int getHeight() {
-		return 0;
 	}
 }
