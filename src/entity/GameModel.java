@@ -881,6 +881,7 @@ public class GameModel {
     public int getBlackHoleCX() { return blackHoleCX; }
     public int getBlackHoleCY() { return blackHoleCY; }
     public int getBlackHoleRadius() { return blackHoleRadius; }
+    public boolean isExplosionBoom() { return explosionEntity.isBoom(); }
     public Explosion getExplosionEntity() { return explosionEntity; }
     public double getWarningExplosion() { return explosionEntity.getWarningProgress(); }
 

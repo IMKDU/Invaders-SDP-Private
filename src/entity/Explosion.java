@@ -1,7 +1,6 @@
 package entity;
 
 import audio.SoundManager;
-import engine.Core;
 
 import java.awt.*;
 
@@ -39,7 +38,19 @@ public class Explosion extends Entity {
             return;
         }
         if( other instanceof Ship){
-            gameModel.requestShipDamage((Ship) other,1);
+            double radius = this.width / 2;
+            double centerX = this.getPositionX() + radius;
+            double centerY = this.getPositionY() + radius;
+            double rectX = ((Ship) other).getPositionX();
+            double rectY = ((Ship) other).getPositionY();
+            double rectWidth = ((Ship) other).getWidth();
+            double rectHeight = ((Ship) other).getHeight();
+            double closestX = Math.max(rectX, Math.min(centerX, rectX + rectWidth));
+            double closestY = Math.max(rectY, Math.min(centerY, rectY + rectHeight));
+            double distanceX = closestX - this.getPositionX();
+            double distanceY = closestY - this.getPositionY();
+            double distanceSquared = distanceX * distanceX + distanceY * distanceY;
+            if( distanceSquared < radius * radius ){ gameModel.requestShipDamage((Ship) other,1);}
         }
     }
     public boolean isDestroyed() {

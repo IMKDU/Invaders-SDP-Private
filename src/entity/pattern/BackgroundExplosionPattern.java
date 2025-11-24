@@ -22,6 +22,7 @@ public class BackgroundExplosionPattern extends BossPattern {
         }else if (explosionEntity != null) {
             if(explosionEntity.isDestroyed()){
                 explosionEntity = null;
+                this.cooldown.reset();
                 return;
             }
             explosionEntity.update();

@@ -74,7 +74,7 @@ public class GameView {
         }
         if(model.getExplosionEntity() != null){
             drawManager.getEntityRenderer().drawExplosion(
-                    model.getExplosionEntity().isBoom(),
+                    model.isExplosionBoom(),
                     model.getExplosionEntity(),
                     model.getWarningExplosion()
             );
