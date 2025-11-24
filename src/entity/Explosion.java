@@ -1,6 +1,7 @@
 package entity;
 
 import audio.SoundManager;
+import engine.Core;
 
 import java.awt.*;
 
@@ -47,9 +48,10 @@ public class Explosion extends Entity {
             double rectHeight = ((Ship) other).getHeight();
             double closestX = Math.max(rectX, Math.min(centerX, rectX + rectWidth));
             double closestY = Math.max(rectY, Math.min(centerY, rectY + rectHeight));
-            double distanceX = closestX - this.getPositionX();
-            double distanceY = closestY - this.getPositionY();
+            double distanceX = closestX - centerX;
+            double distanceY = closestY - centerY;
             double distanceSquared = distanceX * distanceX + distanceY * distanceY;
+            Core.getLogger().info("distanceSquared: " + distanceSquared + " radius * radius" + radius * radius);
             if( distanceSquared < radius * radius ){ gameModel.requestShipDamage((Ship) other,1);}
         }
     }
