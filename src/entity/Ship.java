@@ -45,10 +45,6 @@ public class Ship extends Entity implements Collidable {
 	}
 	private HashMap<SkillType, ISkill> skills;
 
-	// === Charging Skill Instance ===
-	/** ChargingSkill instance that handles all charging logic */
-	private entity.pattern.ChargingSkill chargingSkill;
-
 	/**
 	 * Constructor, establishes the ship's properties.
 	 *
@@ -84,9 +80,10 @@ public class Ship extends Entity implements Collidable {
         else
             this.spriteType = SpriteType.Ship;
 
-        // Update charging skill state
-        if (this.chargingSkill != null) {
-            this.chargingSkill.update();
+        // Update charging skill state through ISkill interface
+        ISkill chargingSkill = skills.get(SkillType.CHARGE);
+        if (chargingSkill instanceof entity.pattern.ChargingSkill) {
+            ((entity.pattern.ChargingSkill) chargingSkill).update();
         }
 	}
 
@@ -152,8 +149,7 @@ public class Ship extends Entity implements Collidable {
 	 * Register user skills into skill map.
 	 */
 	private void registerSkills() {
-		this.chargingSkill = new entity.pattern.ChargingSkill();
-		skills.put(SkillType.CHARGE, this.chargingSkill);
+		skills.put(SkillType.CHARGE, new entity.pattern.ChargingSkill());
 	}
 
 	/**
@@ -245,15 +241,28 @@ public class Ship extends Entity implements Collidable {
 	public void setPlayerId(int pid) { this.playerId = pid; }
 	public int getPlayerId() { return this.playerId; }
 
-	// === Charging Skill Methods (Delegation to ChargingSkill) ===
+	// === Charging Skill Methods (Access via ISkill interface) ===
+
+	/**
+	 * Gets the ChargingSkill instance from the skills map.
+	 * @return ChargingSkill instance or null if not found
+	 */
+	private entity.pattern.ChargingSkill getChargingSkill() {
+		ISkill skill = skills.get(SkillType.CHARGE);
+		if (skill instanceof entity.pattern.ChargingSkill) {
+			return (entity.pattern.ChargingSkill) skill;
+		}
+		return null;
+	}
 
 	/**
 	 * Starts charging the skill if not on cooldown.
 	 * Should be called when the player presses and holds the C key.
 	 */
 	public void startCharging() {
-		if (this.chargingSkill != null) {
-			this.chargingSkill.startCharging();
+		entity.pattern.ChargingSkill chargingSkill = getChargingSkill();
+		if (chargingSkill != null) {
+			chargingSkill.startCharging();
 		}
 	}
 
@@ -262,8 +271,9 @@ public class Ship extends Entity implements Collidable {
 	 * Should be called when the player releases the C key before fully charged.
 	 */
 	public void stopCharging() {
-		if (this.chargingSkill != null) {
-			this.chargingSkill.stopCharging();
+		entity.pattern.ChargingSkill chargingSkill = getChargingSkill();
+		if (chargingSkill != null) {
+			chargingSkill.stopCharging();
 		}
 	}
 
@@ -272,8 +282,9 @@ public class Ship extends Entity implements Collidable {
 	 * @return Charge progress percentage
 	 */
 	public double getChargeProgress() {
-		if (this.chargingSkill != null) {
-			return this.chargingSkill.getChargeProgress();
+		entity.pattern.ChargingSkill chargingSkill = getChargingSkill();
+		if (chargingSkill != null) {
+			return chargingSkill.getChargeProgress();
 		}
 		return 0.0;
 	}
@@ -283,8 +294,9 @@ public class Ship extends Entity implements Collidable {
 	 * @return Cooldown progress percentage (0.0 = ready, 1.0 = just used)
 	 */
 	public double getCooldownProgress() {
-		if (this.chargingSkill != null) {
-			return this.chargingSkill.getCooldownProgress();
+		entity.pattern.ChargingSkill chargingSkill = getChargingSkill();
+		if (chargingSkill != null) {
+			return chargingSkill.getCooldownProgress();
 		}
 		return 0.0;
 	}
@@ -294,8 +306,9 @@ public class Ship extends Entity implements Collidable {
 	 * @return True if charging
 	 */
 	public boolean isCharging() {
-		if (this.chargingSkill != null) {
-			return this.chargingSkill.isCharging();
+		entity.pattern.ChargingSkill chargingSkill = getChargingSkill();
+		if (chargingSkill != null) {
+			return chargingSkill.isCharging();
 		}
 		return false;
 	}
@@ -305,8 +318,9 @@ public class Ship extends Entity implements Collidable {
 	 * @return True if laser is active
 	 */
 	public boolean isLaserActive() {
-		if (this.chargingSkill != null) {
-			return this.chargingSkill.isLaserActive();
+		entity.pattern.ChargingSkill chargingSkill = getChargingSkill();
+		if (chargingSkill != null) {
+			return chargingSkill.isLaserActive();
 		}
 		return false;
 	}
@@ -316,8 +330,9 @@ public class Ship extends Entity implements Collidable {
 	 * @return True if skill is ready
 	 */
 	public boolean isChargingSkillReady() {
-		if (this.chargingSkill != null) {
-			return this.chargingSkill.isChargingSkillReady();
+		entity.pattern.ChargingSkill chargingSkill = getChargingSkill();
+		if (chargingSkill != null) {
+			return chargingSkill.isChargingSkillReady();
 		}
 		return false;
 	}
