@@ -14,7 +14,7 @@ public class GuidedMissilePattern extends BossPattern {
     private HasBounds boss;
     private List<Ship> players;
     // 20 second cooldown (20000ms)
-    private static final int MISSILE_INTERVAL = 20000;
+    private static final int MISSILE_INTERVAL = 15000; //15 seconds
 
     public GuidedMissilePattern(HasBounds boss, List<Ship> players) {
         super(new Point(boss.getPositionX(), boss.getPositionY()));
@@ -36,8 +36,8 @@ public class GuidedMissilePattern extends BossPattern {
                 // X-coordinate: Random value between 0 and screen width
                 int startX = (int) (Math.random() * GameConstant.SCREEN_WIDTH);
 
-                // Y-coordinate: Top of the screen (set slightly above to come down)
-                int startY = -20;
+                // Y-coordinate: Top of the screen
+                int startY = 0;
 
                 GuidedBullet missile = new GuidedBullet(startX, startY, target);
                 this.bullets.add(missile);

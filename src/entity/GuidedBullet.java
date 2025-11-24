@@ -28,6 +28,14 @@ public class GuidedBullet extends BossBullet {
         this.spriteType = DrawManager.SpriteType.EnemyBullet; // Use enemy bullet sprite (or change to desired shape)
     }
 
+    public Ship getTarget() {
+        return this.target;
+    }
+
+    public void setTarget(Ship target) {
+        this.target = target;
+    }
+
     @Override
     public void update() {
         if (target != null && !target.isDestroyed()) {

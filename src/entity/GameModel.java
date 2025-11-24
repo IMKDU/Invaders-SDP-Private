@@ -644,6 +644,19 @@ public class GameModel {
                 (ship.getPlayerId() == 2 && livesP2 == 0)) {
 
             ships.remove(ship);
+
+            if (this.bossBullets != null) {
+                for (Bullet b : this.bossBullets) {
+                    // 이 총알이 유도탄인지 확인
+                    if (b instanceof GuidedBullet) {
+                        GuidedBullet gb = (GuidedBullet) b;
+                        // 유도탄의 타겟이 방금 죽은 ship이었다면
+                        if (gb.getTarget() == ship) {
+                            gb.setTarget(null); // 타겟 해제 -> update()에서 직진하게 됨
+                        }
+                    }
+                }
+            }
         }
 		if (this.isGameOver()) {
 			this.setGameOver();
