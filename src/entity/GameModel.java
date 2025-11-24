@@ -299,6 +299,7 @@ public class GameModel {
                     this.omegaBoss.update();
 
 					if (this.omegaBoss instanceof OmegaBoss omega) {
+                        midBossChilds = ((OmegaBoss)omegaBoss).getSpawnMobs();
 						bossBullets.addAll(omega.getBossPattern().getBullets());
 					}
 					Set<Bullet> removeList = new HashSet<>();
