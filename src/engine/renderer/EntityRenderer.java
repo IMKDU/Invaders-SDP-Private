@@ -338,6 +338,7 @@ public final class EntityRenderer {
 		for (int i = 0; i < particleCount; i++) {
 			// Use time and index to create pseudo-random but consistent positions
 			long seed = time / 100 + i * 137; // 137 is a prime number for better distribution
+            if (beamHeight <= 0) return;
 			int particleY = beamY + (int)((seed % beamHeight));
 			int particleX = centerX + (int)((seed * 17 % (beamWidth * 2)) - beamWidth);
 			int particleSize = 2 + (int)(seed % 3);
