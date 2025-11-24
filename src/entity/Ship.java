@@ -154,7 +154,7 @@ public class Ship extends Entity implements Collidable {
 	}
 
 	/**
-	 * Register user skills into skill map.
+	 * Register xuser skills into skill map.
 	 */
 	private void registerSkills() {
 		this.chargingSkill = new ChargingSkill();

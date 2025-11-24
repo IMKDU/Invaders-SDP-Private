@@ -24,6 +24,9 @@ public final class EntityRenderer {
 	private final BackBuffer backBuffer;
 	private final double scale;
     private static final Color BLACK_HOLE_COLOR = new Color(200, 0, 255);
+	private static final double RED_YELLOW_THRESHOLD = 1.0 / 3.0;
+	private static final double YELLOW_GREEN_THRESHOLD = 2.0 / 3.0;
+
 	public EntityRenderer(Map<SpriteType, boolean[][]> spriteMap, BackBuffer backBuffer, double scale) {
 		this.spriteMap = spriteMap;
 		this.backBuffer = backBuffer;
@@ -252,17 +255,20 @@ public final class EntityRenderer {
 
 		// Draw filled portion with color gradient based on progress
 		Color chargeColor;
-		if (progress < 0.33) {
-			// Red to Yellow (0-33%)
-			int green = Math.min(255, (int)(255 * progress * 3));
+		if (progress < RED_YELLOW_THRESHOLD) {
+			// Red to Yellow
+			double phaseProgress = progress / RED_YELLOW_THRESHOLD;
+			int green = (int)(255 * phaseProgress);
 			chargeColor = new Color(255, green, 0, 200);
-		} else if (progress < 0.66) {
-			// Yellow to Green (33-66%)
-			int red = Math.max(0, (int)(255 * (1 - (progress - 0.33) * 3)));
+		} else if (progress < YELLOW_GREEN_THRESHOLD) {
+			// Yellow to Green
+			double phaseProgress = (progress - RED_YELLOW_THRESHOLD) / RED_YELLOW_THRESHOLD;
+			int red = (int)(255 * (1 - phaseProgress));
 			chargeColor = new Color(red, 255, 0, 200);
 		} else {
-			// Green to Cyan (66-100%)
-			int blue = Math.min(255, (int)(255 * (progress - 0.66) / 0.34));
+			// Green to Cyan
+			double phaseProgress = (progress - YELLOW_GREEN_THRESHOLD) / RED_YELLOW_THRESHOLD;
+			int blue = (int)(255 * phaseProgress);
 			chargeColor = new Color(0, 255, blue, 200);
 		}
 

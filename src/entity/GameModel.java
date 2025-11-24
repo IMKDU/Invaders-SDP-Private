@@ -430,7 +430,7 @@ public class GameModel {
                 // Deal damage to boss (laser deals 1 damage per frame it's active)
                 finalBoss.takeDamage(1);
                 if (finalBoss.isDestroyed()) {
-                    handleBossDestruction(playerNum);
+                    handleAnyBossDestruction(finalBoss, playerNum);
                 }
             }
         }
@@ -441,7 +441,7 @@ public class GameModel {
                 // Deal damage to omega boss (laser deals 1 damage per frame it's active)
                 omegaBoss.takeDamage(1);
                 if (omegaBoss.isDestroyed()) {
-                    handleOmegaBossDestruction(playerNum);
+                    handleAnyBossDestruction(omegaBoss, playerNum);
                 }
             }
         }
@@ -503,23 +503,8 @@ public class GameModel {
     /**
      * Handles boss destruction and score award.
      */
-    private void handleBossDestruction(int playerNum) {
-        int bossPoints = finalBoss.getPointValue();
-        if (playerNum == 2) {
-            this.scoreP2 += bossPoints;
-        } else {
-            this.scoreP1 += bossPoints;
-        }
-        this.score += bossPoints;
-        coin += bossPoints / 10;
-        bossExplosionCooldown.reset();
-    }
-
-    /**
-     * Handles omega boss destruction and score award.
-     */
-    private void handleOmegaBossDestruction(int playerNum) {
-        int bossPoints = omegaBoss.getPointValue();
+    private void handleAnyBossDestruction(BossEntity boss, int playerNum) {
+        int bossPoints = boss.getPointValue();
         if (playerNum == 2) {
             this.scoreP2 += bossPoints;
         } else {
