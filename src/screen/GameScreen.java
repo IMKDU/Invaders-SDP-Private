@@ -6,6 +6,7 @@ import engine.GameState;
 import engine.level.Level;
 import entity.GameConstant;
 import entity.GameModel;
+import entity.Ship;
 
 /**
  * Implements the game screen, where the action happens.
@@ -164,29 +165,21 @@ public class GameScreen extends Screen {
      * Manages charging skill activation and cancellation.
      */
     private void handlePlayerSkillInput() {
-        // Player 1 Charging Skill (C key)
         if (model.getShip() != null && model.getLivesP1() > 0 && !model.getShip().isDestroyed()) {
-            if (inputManager.isP1KeyDown(java.awt.event.KeyEvent.VK_C)) {
-                // Start charging when C key is held down
-                model.getShip().startCharging();
-            } else {
-                // Stop charging when C key is released (before fully charged)
-                if (model.getShip().isCharging()) {
-                    model.getShip().stopCharging();
-                }
-            }
+            handleSinglePlayerSkillInput(model.getShip(), inputManager.isP1KeyDown(java.awt.event.KeyEvent.VK_C));
         }
 
-        // Player 2 Charging Skill (Right Ctrl key)
         if (model.getShipP2() != null && model.getLivesP2() > 0 && !model.getShipP2().isDestroyed()) {
-            if (inputManager.isP2KeyDown(java.awt.event.KeyEvent.VK_CONTROL)) {
-                // Start charging when Ctrl key is held down
-                model.getShipP2().startCharging();
-            } else {
-                // Stop charging when Ctrl key is released (before fully charged)
-                if (model.getShipP2().isCharging()) {
-                    model.getShipP2().stopCharging();
-                }
+            handleSinglePlayerSkillInput(model.getShipP2(), inputManager.isP2KeyDown(java.awt.event.KeyEvent.VK_CONTROL));
+        }
+    }
+
+    private void handleSinglePlayerSkillInput(Ship ship, boolean isKeyPressed) {
+        if (isKeyPressed) {
+            ship.startCharging();
+        } else {
+            if (ship.isCharging()) {
+                ship.stopCharging();
             }
         }
     }
