@@ -147,9 +147,17 @@ public class Ship extends Entity implements Collidable {
 
 	/**
 	 * Register user skills into skill map.
+	 * After registration, initialize each skill by calling its use() method.
 	 */
 	private void registerSkills() {
 		skills.put(SkillType.CHARGE, new entity.pattern.ChargingSkill());
+
+		// Initialize each skill through ISkill interface
+		for (ISkill skill : skills.values()) {
+			if (skill != null) {
+				skill.use(this);
+			}
+		}
 	}
 
 	/**

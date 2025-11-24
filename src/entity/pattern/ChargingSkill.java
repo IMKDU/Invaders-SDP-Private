@@ -8,6 +8,8 @@ import entity.Ship;
  * - Hold C key for 5 seconds to fully charge
  * - When fully charged, fires a straight laser beam the width of the ship
  * - Laser lasts for 1.5 seconds
+ *
+ * This skill is initialized via the ISkill.use() method which sets the ship reference.
  */
 public class ChargingSkill implements ISkill {
 
@@ -19,6 +21,10 @@ public class ChargingSkill implements ISkill {
 
     /** Cooldown duration after using the skill (in milliseconds) */
     private static final long COOLDOWN_DURATION = 0;
+
+    // === Ship Reference ===
+    /** Reference to the ship that owns this skill */
+    private Ship ship;
 
     // === Charging Skill State ===
     /** Indicates if the ship is currently charging the skill */
@@ -32,10 +38,15 @@ public class ChargingSkill implements ISkill {
     /** Last time the charging skill was used (for cooldown tracking) */
     private long lastChargingSkillUse = 0;
 
+    /**
+     * Initializes the skill with the ship reference.
+     * This is called through the ISkill interface when the skill is registered.
+     *
+     * @param ship The ship that owns this skill
+     */
     @Override
     public void use(Ship ship) {
-        // This method can be used for alternative activation
-        // Currently, charging is triggered by startCharging() in input handling
+        this.ship = ship;
     }
 
     /**
@@ -166,5 +177,13 @@ public class ChargingSkill implements ISkill {
     public boolean isChargingSkillReady() {
         long currentTime = System.currentTimeMillis();
         return (currentTime - lastChargingSkillUse) >= COOLDOWN_DURATION;
+    }
+
+    /**
+     * Gets the ship reference (for future extensions if needed).
+     * @return The ship that owns this skill
+     */
+    public Ship getShip() {
+        return ship;
     }
 }
