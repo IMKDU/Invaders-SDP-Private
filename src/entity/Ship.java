@@ -8,7 +8,7 @@ import entity.pattern.ISkill;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Set;
-import entity.pattern.skills.ChargingSkill;
+import entity.skills.ChargingSkill;
 
 /**
  * Implements a ship, to be controlled by the player.
@@ -47,22 +47,9 @@ public class Ship extends Entity implements Collidable {
 	private HashMap<SkillType, ISkill> skills;
 
 	// === Charging Skill State ===
-	/** Indicates if the ship is currently charging the skill */
-	private boolean isCharging = false;
-	/** Time when charging started (in milliseconds) */
-	private long chargeStartTime = 0;
-	/** Indicates if the laser beam is currently active */
-	private boolean isLaserActive = false;
-	/** Time when the laser was fired (in milliseconds) */
-	private long laserStartTime = 0;
-	/** Last time the charging skill was used (for cooldown tracking) */
-	private long lastChargingSkillUse = 0;
-	/** Duration required to fully charge the skill (in milliseconds) */
-	private static final long CHARGE_DURATION = 5000;
-	/** Duration of the laser beam after firing (in milliseconds) */
-	private static final long LASER_DURATION = 1500;
-	/** Cooldown duration after using the skill (in milliseconds) */
-	private static final long COOLDOWN_DURATION = 0;
+	// === Charging Skill Instance ===
+	/** ChargingSkill instance that handles all charging logic */
+	private ChargingSkill chargingSkill;
 
 	/**
 	 * Constructor, establishes the ship's properties.
@@ -100,24 +87,8 @@ public class Ship extends Entity implements Collidable {
             this.spriteType = SpriteType.Ship;
 
 		// Update charging skill state
-		updateChargingSkill();
-	}
-
-	/**
-	 * Updates the charging skill state, handling charge completion and laser duration.
-	 */
-	private void updateChargingSkill() {
-		long currentTime = System.currentTimeMillis();
-
-		// Check if charging is complete (5 seconds)
-		if (isCharging && (currentTime - chargeStartTime) >= CHARGE_DURATION) {
-			// Automatically fire the laser when fully charged
-			fireLaser();
-		}
-
-		// Check if laser duration has expired (1.5 seconds)
-		if (isLaserActive && (currentTime - laserStartTime) >= LASER_DURATION) {
-			isLaserActive = false;
+		if (this.chargingSkill != null) {
+			this.chargingSkill.update();
 		}
 	}
 
@@ -186,7 +157,8 @@ public class Ship extends Entity implements Collidable {
 	 * Register user skills into skill map.
 	 */
 	private void registerSkills() {
-		skills.put(SkillType.CHARGE, new ChargingSkill());
+		this.chargingSkill = new ChargingSkill();
+		skills.put(SkillType.CHARGE, this.chargingSkill);
 	}
 
 	/**
@@ -279,28 +251,15 @@ public class Ship extends Entity implements Collidable {
 	public int getPlayerId() { return this.playerId; }
 
 
-	// === Charging Skill Methods ===
+// === Charging Skill Methods (Delegation to ChargingSkill) ===
+
 	/**
 	 * Starts charging the skill if not on cooldown.
 	 * Should be called when the player presses and holds the C key.
 	 */
 	public void startCharging() {
-		long currentTime = System.currentTimeMillis();
-
-		// Check if skill is on cooldown
-		if (currentTime - lastChargingSkillUse < COOLDOWN_DURATION) {
-			return; // Still on cooldown, can't charge
-		}
-
-		// Don't allow charging if laser is already active
-		if (isLaserActive) {
-			return;
-		}
-
-		// Start charging
-		if (!isCharging) {
-			isCharging = true;
-			chargeStartTime = currentTime;
+		if (this.chargingSkill != null) {
+			this.chargingSkill.startCharging();
 		}
 	}
 
@@ -309,30 +268,9 @@ public class Ship extends Entity implements Collidable {
 	 * Should be called when the player releases the C key before fully charged.
 	 */
 	public void stopCharging() {
-		if (isCharging) {
-			isCharging = false;
-			chargeStartTime = 0;
+		if (this.chargingSkill != null) {
+			this.chargingSkill.stopCharging();
 		}
-	}
-
-	/**
-	 * Fires the laser beam when fully charged.
-	 * Called automatically when charge duration is complete.
-	 */
-	private void fireLaser() {
-		if (!isCharging) {
-			return;
-		}
-
-		// Stop charging and activate laser
-		isCharging = false;
-		isLaserActive = true;
-		laserStartTime = System.currentTimeMillis();
-		lastChargingSkillUse = laserStartTime;
-
-		// Play sound effect (optional)
-		SoundManager.stop("sfx/laser.wav");
-		SoundManager.play("sfx/laser.wav");
 	}
 
 	/**
@@ -340,24 +278,21 @@ public class Ship extends Entity implements Collidable {
 	 * @return Charge progress percentage
 	 */
 	public double getChargeProgress() {
-		if (!isCharging) {
-			return 0.0;
+		if (this.chargingSkill != null) {
+			return this.chargingSkill.getChargeProgress();
 		}
-
-		long currentTime = System.currentTimeMillis();
-		long elapsedTime = currentTime - chargeStartTime;
-		double progress = (double) elapsedTime / CHARGE_DURATION;
-
-		return Math.min(progress, 1.0);
+		return 0.0;
 	}
-
 
 	/**
 	 * Checks if the ship is currently charging the skill.
 	 * @return True if charging
 	 */
 	public boolean isCharging() {
-		return isCharging;
+		if (this.chargingSkill != null) {
+			return this.chargingSkill.isCharging();
+		}
+		return false;
 	}
 
 	/**
@@ -365,7 +300,10 @@ public class Ship extends Entity implements Collidable {
 	 * @return True if laser is active
 	 */
 	public boolean isLaserActive() {
-		return isLaserActive;
+		if (this.chargingSkill != null) {
+			return this.chargingSkill.isLaserActive();
+		}
+		return false;
 	}
 
 	/**
@@ -373,24 +311,22 @@ public class Ship extends Entity implements Collidable {
 	 * @return True if skill is ready
 	 */
 	public boolean isChargingSkillReady() {
-		long currentTime = System.currentTimeMillis();
-		return (currentTime - lastChargingSkillUse) >= COOLDOWN_DURATION;
+		if (this.chargingSkill != null) {
+			return this.chargingSkill.isChargingSkillReady();
+		}
+		return false;
 	}
+
 
 	/**
 	 * Gets the current cooldown progress as a percentage (0.0 to 1.0).
 	 * @return Cooldown progress percentage (0.0 = ready, 1.0 = just used)
 	 */
 	public double getCooldownProgress() {
-		long currentTime = System.currentTimeMillis();
-		long timeSinceUse = currentTime - lastChargingSkillUse;
-
-		if (timeSinceUse >= COOLDOWN_DURATION) {
-			return 0.0; // Skill is ready
+		if (this.chargingSkill != null) {
+			return this.chargingSkill.getCooldownProgress();
 		}
-
-		double remaining = 1.0 - ((double) timeSinceUse / COOLDOWN_DURATION);
-		return remaining;
+		return 0.0;
 	}
 
 	@Override
