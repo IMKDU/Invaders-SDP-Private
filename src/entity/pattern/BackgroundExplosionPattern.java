@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class BackgroundExplosionPattern extends BossPattern {
 
-    protected Cooldown cooldown;
+    private Cooldown cooldown;
     private Explosion explosionEntity = null;
     private final int MARGIN = 150;
     private final int MARGIN_2 = 200;
@@ -26,16 +26,15 @@ public class BackgroundExplosionPattern extends BossPattern {
      * or updates the existing explosion until it is destroyed.
      */
     public void update() {
-        if (cooldown.checkFinished()) {
-            spawnExplosion();
-            cooldown.reset();
-        }else if (explosionEntity != null) {
-            if(explosionEntity.isDestroyed()){
+        if (explosionEntity != null) {
+            explosionEntity.update();
+            if (explosionEntity.isDestroyed()) {
                 explosionEntity = null;
                 this.cooldown.reset();
-                return;
             }
-            explosionEntity.update();
+        } else if (cooldown.checkFinished()) {
+            spawnExplosion();
+            cooldown.reset();
         }
     }
 
@@ -66,7 +65,7 @@ public class BackgroundExplosionPattern extends BossPattern {
      * Returns the currently active explosion entity.
      * @return The active Explosion object, or null if none exists.
      */
-    public Explosion getboom(){
+    public Explosion getBoom(){
         return explosionEntity;
     }
 }

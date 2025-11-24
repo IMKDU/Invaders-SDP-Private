@@ -5,14 +5,9 @@ import java.awt.Color;
 import java.awt.*;
 import java.util.Map;
 
-import audio.SoundManager;
 import engine.BackBuffer;
-import engine.Core;
-import entity.Entity;
+import entity.*;
 import engine.DrawManager.SpriteType;
-import entity.HasBounds;
-import entity.LaserBullet;
-import entity.OmegaBoss;
 import entity.pattern.BossPattern;
 import entity.pattern.DashPattern;
 
@@ -26,7 +21,8 @@ public final class EntityRenderer {
 	private final BackBuffer backBuffer;
 	private final double scale;
     private static final Color BLACK_HOLE_COLOR = new Color(200, 0, 255);
-	public EntityRenderer(Map<SpriteType, boolean[][]> spriteMap, BackBuffer backBuffer, double scale) {
+	private final int EXPLOSION_SIZE_CHANGE = 10;
+    public EntityRenderer(Map<SpriteType, boolean[][]> spriteMap, BackBuffer backBuffer, double scale) {
 		this.spriteMap = spriteMap;
 		this.backBuffer = backBuffer;
 		this.scale = scale;
@@ -246,12 +242,14 @@ public final class EntityRenderer {
 			int currentHeight = (int) (boom.getHeight() * time);
 			int offsetX = (boom.getWidth() - currentWidth) / 2;
 			int offsetY = (boom.getHeight() - currentHeight) / 2;
-			g.setColor(Color.RED);
 			g.fillOval(boom.getPositionX() + offsetX, boom.getPositionY() + offsetY, currentWidth, currentHeight);
 		}
 		else {
 			g.setColor(Color.ORANGE);
-			g.fillOval(boom.getPositionX() - 10, boom.getPositionY() - 10, boom.getWidth() + 20, boom.getHeight() + 20);
+            g.fillOval(boom.getPositionX() - EXPLOSION_SIZE_CHANGE,
+					boom.getPositionY() - EXPLOSION_SIZE_CHANGE,
+					boom.getWidth() + EXPLOSION_SIZE_CHANGE * 2,
+					boom.getHeight() + EXPLOSION_SIZE_CHANGE * 2);
 		}
 	}
 

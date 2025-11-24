@@ -10,12 +10,13 @@ public class Explosion extends Entity {
     private final int explodeTime = 30;
     private boolean isDestroyed = false;
     private boolean isBoom = false;
+    private static final int DIAMETER = 150;
 
     /**
      * Initializes the explosion at the specified coordinates.
      * */
     public Explosion(int x, int y) {
-        super(x, y, 150, 150, Color.RED);
+        super(x, y, DIAMETER, DIAMETER, Color.RED);
     }
 
     /**
@@ -28,7 +29,6 @@ public class Explosion extends Entity {
         }
         else if (timer > warningTime + explodeTime) {
             isBoom = false;
-            SoundManager.stop("sfx/impact.wav");
             SoundManager.play("sfx/impact.wav");
             this.destroy();
         }
@@ -49,20 +49,20 @@ public class Explosion extends Entity {
         if(!this.isBoom){
             return;
         }
-        if( other instanceof Ship){
-            double radius = this.width / 2;
+        if( other instanceof Ship ship){
+            double radius = this.width / 2.0;
             double centerX = this.getPositionX() + radius;
             double centerY = this.getPositionY() + radius;
-            double rectX = ((Ship) other).getPositionX();
-            double rectY = ((Ship) other).getPositionY();
-            double rectWidth = ((Ship) other).getWidth();
-            double rectHeight = ((Ship) other).getHeight();
+            double rectX = ship.getPositionX();
+            double rectY = ship.getPositionY();
+            double rectWidth = ship.getWidth();
+            double rectHeight = ship.getHeight();
             double closestX = Math.max(rectX, Math.min(centerX, rectX + rectWidth));
             double closestY = Math.max(rectY, Math.min(centerY, rectY + rectHeight));
             double distanceX = closestX - centerX;
             double distanceY = closestY - centerY;
             double distanceSquared = distanceX * distanceX + distanceY * distanceY;
-            if( distanceSquared < radius * radius ){ gameModel.requestShipDamage((Ship) other,1);}
+            if( distanceSquared < radius * radius ){ gameModel.requestShipDamage(ship,1);}
         }
     }
 
