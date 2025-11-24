@@ -39,7 +39,7 @@ public class FinalBoss extends Entity implements BossEntity, Collidable{
 
     public FinalBoss(int positionX, int positionY, List<Ship> ships, int screenWidth, int screenHeight){
 
-        super(positionX, positionY, 50 * 2,40 * 2, Color.RED);
+        super(positionX, positionY, 150 * 2,143 * 2, Color.RED);
         this.healPoint = 80;
         this.maxHp = healPoint;
         this.pointValue = 1000;
