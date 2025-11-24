@@ -379,14 +379,12 @@ public class GameModel {
 	 * Handles damage and rewards when a player bullet hits a normal enemy.
 	 */
 	public void requestEnemyHitByPlayerBullet(Bullet bullet, EnemyShip enemy) {
-
 		if (!bullets.contains(bullet)) return;
 		if (enemy.isDestroyed()) return;
 
 		int pts = enemy.getPointValue();
 		addPointsFor(bullet, pts);
 		coin += pts / 10;
-
 		AchievementManager.getInstance().onEnemyDefeated();
 
 		attemptItemDrop(enemy);

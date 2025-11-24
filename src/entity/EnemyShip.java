@@ -242,6 +242,7 @@ public class EnemyShip extends Entity implements Collidable {
 			case EnemyShipC2:
 				return "enemyC";
 			case EnemyShipSpecial:
+            case EnemyShipSpecialLeft:
 				return "enemySpecial";
 			default:
 				return null;
