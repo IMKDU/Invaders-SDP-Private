@@ -54,14 +54,9 @@ public class OmegaBoss extends MidBoss {
 	private Cooldown dashCooldown;
 	/** Flag to track if currently in dash cooldown */
 	private boolean isInDashCooldown = false;
-
-	/** Current horizontal movement direction. true for right, false for left. */
-	private boolean isRight = true;
-	/** Current vertical movement direction. true for down, false for up. */
-	private boolean isDown = true;
-
-    private boolean isMove = false;
     private boolean ishit = false;
+    private boolean isMove = false;
+    private boolean isDash = false;
     private Cooldown animationCooldown;
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
@@ -74,7 +69,7 @@ public class OmegaBoss extends MidBoss {
 		this.targetShip = player;
 		this.logger = Core.getLogger();
 		this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
-        this.spriteType= DrawManager.SpriteType.OmegaBoss4;
+        this.spriteType= DrawManager.SpriteType.OmegaBoss1;
         this.animationCooldown = new Cooldown(200);
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		this.logger.info("OMEGA : move using the default pattern");
@@ -91,51 +86,22 @@ public class OmegaBoss extends MidBoss {
 	public void update() {
         if (this.animationCooldown.checkFinished()) {
             this.animationCooldown.reset();
-            if (this.isMove) {
-                if (isRight) {
-                    // 오른쪽 이동 중이면 3↔4 프레임 토글
-                    if (this.spriteType == DrawManager.SpriteType.OmegaBossMoving3)
-                        this.spriteType = DrawManager.SpriteType.OmegaBossMoving4;
-                    else
-                        this.spriteType = DrawManager.SpriteType.OmegaBossMoving3;
-
-                } else {
-                    // 왼쪽 이동 중이면 1↔2 프레임 토글
-                    if (this.spriteType == DrawManager.SpriteType.OmegaBossMoving1)
-                        this.spriteType = DrawManager.SpriteType.OmegaBossMoving2;
-                    else
-                        this.spriteType = DrawManager.SpriteType.OmegaBossMoving1;
-
+            if (this.bossPhase == 2){
+                if (this.spriteType == DrawManager.SpriteType.OmegaBoss1){
+                    this.spriteType = DrawManager.SpriteType.OmegaBoss2;
+                }
+                else {
+                    this.spriteType = DrawManager.SpriteType.OmegaBoss1;
                 }
             }
-            else {
-                if (isRight) {
-                    // 오른쪽 이동 중이면 3↔4 프레임 토글
-                    if (ishit){
-                        this.spriteType = DrawManager.SpriteType.OmegaBossHitting1;
-                        ishit = false;
-                    }
-                    else {
-                        if (this.spriteType == DrawManager.SpriteType.OmegaBoss3)
-                            this.spriteType = DrawManager.SpriteType.OmegaBoss4;
-                        else
-                            this.spriteType = DrawManager.SpriteType.OmegaBoss3;
-                    }
-                } else {
-                    if (ishit){
-                        this.spriteType = DrawManager.SpriteType.OmegaBossHitting;
-                        ishit = false;
-                    }
-                    // 왼쪽 이동 중이면 1↔2 프레임 토글
-                    else {
-                        if (this.spriteType == DrawManager.SpriteType.OmegaBoss1)
-                            this.spriteType = DrawManager.SpriteType.OmegaBoss2;
-                        else
-                            this.spriteType = DrawManager.SpriteType.OmegaBoss1;
-                    }
+            else if (this.bossPhase == 3) {
+                if (this.spriteType == DrawManager.SpriteType.OmegaBossMoving1){
+                    this.spriteType = DrawManager.SpriteType.OmegaBossMoving2;
+                }
+                else {
+                    this.spriteType = DrawManager.SpriteType.OmegaBossMoving1;
                 }
             }
-
 
 
         }

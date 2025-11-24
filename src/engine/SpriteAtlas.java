@@ -50,8 +50,8 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.FinalBoss2, new BufferedImage(50,40,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.FinalBossBullet,new BufferedImage(3,5,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.FinalBossDeath, new BufferedImage(50,40,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.OmegaBoss1, new BufferedImage(43,41,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.OmegaBoss2, new BufferedImage(43,41,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.OmegaBoss1, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.OmegaBoss2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.OmegaBossHitting, new BufferedImage(43,41,BufferedImage.TYPE_INT_ARGB));
 
             spriteMap.put(SpriteType.OmegaBossMoving1, new BufferedImage(32,32,BufferedImage.TYPE_INT_ARGB));
@@ -63,10 +63,6 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.BlackHole2, new BufferedImage(1024,1024,BufferedImage.TYPE_INT_ARGB));
             fileManager.loadSprite(spriteMap);
             //여기서부터는 대칭 스프라이트
-            spriteMap.put(SpriteType.OmegaBoss3, mirrorSprite(spriteMap.get(SpriteType.OmegaBoss1)));
-            spriteMap.put(SpriteType.OmegaBoss4, mirrorSprite(spriteMap.get(SpriteType.OmegaBoss2)));
-            spriteMap.put(SpriteType.OmegaBossMoving3, mirrorSprite(spriteMap.get(SpriteType.OmegaBossMoving1)));
-            spriteMap.put(SpriteType.OmegaBossMoving4, mirrorSprite(spriteMap.get(SpriteType.OmegaBossMoving2)));
             spriteMap.put(SpriteType.OmegaBoss101, mirrorSprite(spriteMap.get(SpriteType.OmegaBoss100)));
             spriteMap.put(SpriteType.EnemyShipSpecialLeft, mirrorSprite(spriteMap.get(SpriteType.EnemyShipSpecial)));
             spriteMap.put(SpriteType.OmegaBossHitting1, mirrorSprite(spriteMap.get(SpriteType.OmegaBossHitting)));
