@@ -254,13 +254,16 @@ public final class EntityRenderer {
 		Color chargeColor;
 		if (progress < 0.33) {
 			// Red to Yellow (0-33%)
-			chargeColor = new Color(255, (int)(255 * progress * 3), 0, 200);
+			int green = Math.min(255, (int)(255 * progress * 3));
+			chargeColor = new Color(255, green, 0, 200);
 		} else if (progress < 0.66) {
 			// Yellow to Green (33-66%)
-			chargeColor = new Color((int)(255 * (1 - (progress - 0.33) * 3)), 255, 0, 200);
+			int red = Math.max(0, (int)(255 * (1 - (progress - 0.33) * 3)));
+			chargeColor = new Color(red, 255, 0, 200);
 		} else {
 			// Green to Cyan (66-100%)
-			chargeColor = new Color(0, 255, (int)(255 * (progress - 0.66) * 3), 200);
+			int blue = Math.min(255, (int)(255 * (progress - 0.66) / 0.34));
+			chargeColor = new Color(0, 255, blue, 200);
 		}
 
 		g2d.setColor(chargeColor);
