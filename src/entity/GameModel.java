@@ -298,7 +298,7 @@ public class GameModel {
                     this.omegaBoss.update();
 
 					if (this.omegaBoss instanceof OmegaBoss omega) {
-                        this.explosionEntity = ((OmegaBoss)omegaBoss).getExplosionPattern().explosionEntity;
+                        this.explosionEntity = ((OmegaBoss)omegaBoss).getExplosionPattern().getboom();
 						bossBullets.addAll(omega.getBossPattern().getBullets());
 					}
 					Set<Bullet> removeList = new HashSet<>();

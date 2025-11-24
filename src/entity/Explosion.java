@@ -1,7 +1,6 @@
 package entity;
 
 import audio.SoundManager;
-import engine.Core;
 
 import java.awt.*;
 
@@ -12,10 +11,16 @@ public class Explosion extends Entity {
     private boolean isDestroyed = false;
     private boolean isBoom = false;
 
+    /**
+     * Initializes the explosion at the specified coordinates.
+     * */
     public Explosion(int x, int y) {
         super(x, y, 150, 150, Color.RED);
     }
 
+    /**
+     * Updates the timer and manages the explosion's lifecycle (Warning -> Boom -> Destroy).
+     * */
     public void update() {
         timer++;
         if (timer > warningTime && timer <= warningTime + explodeTime) {
@@ -29,10 +34,16 @@ public class Explosion extends Entity {
         }
     }
 
+    /**
+     * Marks the entity to be removed from the game.
+     * */
     public final void destroy() {
         isDestroyed = true;
     }
 
+    /**
+     * Checks for collision with the Ship using Circle-AABB logic and applies damage.
+     * */
     @Override
     public void onCollision(Collidable other, GameModel gameModel){
         if(!this.isBoom){
@@ -51,18 +62,28 @@ public class Explosion extends Entity {
             double distanceX = closestX - centerX;
             double distanceY = closestY - centerY;
             double distanceSquared = distanceX * distanceX + distanceY * distanceY;
-            Core.getLogger().info("distanceSquared: " + distanceSquared + " radius * radius" + radius * radius);
             if( distanceSquared < radius * radius ){ gameModel.requestShipDamage((Ship) other,1);}
         }
     }
+
+    /**
+     * Returns whether the entity is destroyed.
+     * */
     public boolean isDestroyed() {
         return isDestroyed;
     }
+
+    /**
+     * Calculates the progress of the warning phase (0.0 to 1.0) for animation.
+     * */
     public double getWarningProgress(){
         double progress = (double) timer / (double) warningTime;
         if (progress > 1) return 1.0;
         return progress;
     }
 
+    /**
+     * Returns true if the explosion is currently active and dealing damage.
+     * */
     public boolean isBoom() { return isBoom; }
 }

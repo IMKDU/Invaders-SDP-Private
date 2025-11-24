@@ -8,17 +8,27 @@ import java.awt.*;
 public class BackgroundExplosionPattern extends BossPattern {
 
     protected Cooldown cooldown;
-    public Explosion explosionEntity = null;
+    private Explosion explosionEntity = null;
+    private final int MARGIN = 150;
+    private final int MARGIN_2 = 200;
+
+    /**
+     * Initializes the background explosion pattern and sets the spawn cooldown.
+     * */
     public BackgroundExplosionPattern() {
         super(new Point(0,0));
         this.cooldown = new Cooldown(3000);
         this.cooldown.reset();
     }
 
+    /**
+     * Manages the pattern's lifecycle: spawns a new explosion if the cooldown is ready,
+     * or updates the existing explosion until it is destroyed.
+     */
     public void update() {
         if (cooldown.checkFinished()) {
             spawnExplosion();
-            cooldown.reset(); // 쿨타임 초기화
+            cooldown.reset();
         }else if (explosionEntity != null) {
             if(explosionEntity.isDestroyed()){
                 explosionEntity = null;
@@ -29,20 +39,33 @@ public class BackgroundExplosionPattern extends BossPattern {
         }
     }
 
+    /**
+     * Spawns a new explosion entity at a random position within the valid game area.
+     * */
     private void spawnExplosion() {
-        int randomX = (int) (Math.random() * (GameConstant.SCREEN_WIDTH - 150));
-        int randomY = GameConstant.STAT_SEPARATION_LINE_HEIGHT + (int) (Math.random() * (GameConstant.ITEMS_SEPARATION_LINE_HEIGHT - GameConstant.STAT_SEPARATION_LINE_HEIGHT - 200));
+        int randomX = (int) (Math.random() * (GameConstant.SCREEN_WIDTH - MARGIN));
+        int randomY = GameConstant.STAT_SEPARATION_LINE_HEIGHT + (int) (Math.random() * (GameConstant.ITEMS_SEPARATION_LINE_HEIGHT - GameConstant.STAT_SEPARATION_LINE_HEIGHT - MARGIN_2));
         explosionEntity = new Explosion(randomX, randomY);
     }
 
+    /**
+     * Executes the attack logic (unused in this pattern).
+     */
     @Override
     public void attack() {
     }
 
+    /**
+     * Handles movement logic (unused in this pattern).
+     */
     @Override
     public void move() {
     }
 
+    /**
+     * Returns the currently active explosion entity.
+     * @return The active Explosion object, or null if none exists.
+     */
     public Explosion getboom(){
         return explosionEntity;
     }

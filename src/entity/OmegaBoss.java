@@ -240,6 +240,7 @@ public class OmegaBoss extends MidBoss {
 		return isInDashCooldown;
 	}
 
+	/** get Explosion Pattern */
 	public BackgroundExplosionPattern getExplosionPattern() { return explosionPattern;}
 	/**
 	 * Update target ship for pattern

@@ -232,6 +232,10 @@ public final class EntityRenderer {
         g.drawOval(x, y, radius * 2, radius * 2);
 
     }
+
+	/**
+	 * Renders the explosion visual, displaying either an expanding warning circle or the final blast.
+	 * */
 	public void drawExplosion(boolean isBoom, HasBounds boom, double time) {
 		Graphics g = backBuffer.getGraphics();
 		if (!isBoom) {
