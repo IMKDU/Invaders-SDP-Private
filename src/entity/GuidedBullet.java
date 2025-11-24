@@ -24,7 +24,7 @@ public class GuidedBullet extends BossBullet {
         this.target = target;
         this.preciseX = x;
         this.preciseY = y;
-        this.speedValue = 3.0; // 유도탄 속도 조절
+        this.speedValue = 3.0; // Speed of guided missile
         this.spriteType = DrawManager.SpriteType.EnemyBullet; // Use enemy bullet sprite (or change to desired shape)
     }
 
