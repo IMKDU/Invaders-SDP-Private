@@ -19,8 +19,8 @@ public class ZigZagAngryPattern extends ZigZagPattern {
 		if (this.shootCooldown.checkFinished()) {
 			this.shootCooldown.reset();
 //            if (!(this.getPositionX() == 0 || this.getPositionX() == 400)){
-			BossBullet bullet1 = new BossBullet(boss.getPositionX() + boss.getWidth() / 2 - 3 + 70, boss.getPositionY(), 0, 5,6,10, Color.blue);
-			BossBullet bullet2 = new BossBullet(boss.getPositionX() + boss.getWidth() / 2 - 3 - 70, boss.getPositionY(), 0, 5,6,10,Color.blue);
+			BossBullet bullet1 = new BossBullet(boss.getPositionX() + boss.getWidth() / 2 - 3 + 70, boss.getPositionY(), 0, 5,6,10, "FinalBoss");
+			BossBullet bullet2 = new BossBullet(boss.getPositionX() + boss.getWidth() / 2 - 3 - 70, boss.getPositionY(), 0, 5,6,10, "FinalBoss");
 			bullets.add(bullet1);
 			bullets.add(bullet2);
 //            }

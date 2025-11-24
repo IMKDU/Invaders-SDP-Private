@@ -6,10 +6,7 @@ import engine.Core;
 import engine.DrawManager;
 import engine.Core;
 import engine.Cooldown;
-import entity.pattern.BossPattern;
-import entity.pattern.DashPattern;
-import entity.pattern.DiagonalPattern;
-import entity.pattern.HorizontalPattern;
+import entity.pattern.*;
 
 import java.awt.*;
 import java.util.logging.Logger;
@@ -87,7 +84,7 @@ public class OmegaBoss extends MidBoss {
 	public void update() {
         if (this.animationCooldown.checkFinished()) {
             this.animationCooldown.reset();
-            if (this.bossPhase == 2){
+            if (this.bossPhase == 2 || this.bossPhase == 3){
                 if (this.ishit){
                     this.spriteType = DrawManager.SpriteType.OmegaBossHitting;
                     this.ishit = false;
@@ -101,7 +98,7 @@ public class OmegaBoss extends MidBoss {
                     }
                 }
             }
-            else if (this.bossPhase == 3) {
+            else if (this.bossPhase == 4) {
                 if (this.spriteType == DrawManager.SpriteType.OmegaBossMoving1){
                     this.spriteType = DrawManager.SpriteType.OmegaBossMoving2;
                 }
@@ -165,23 +162,37 @@ public class OmegaBoss extends MidBoss {
 			bossPattern = new HorizontalPattern(this, PATTERN_1_X_SPEED);
 			logger.info("OMEGA : move using horizontal pattern");
 		}
+		// PHASE 2 → SpreadShotPattern
 		else if (this.healPoint <= this.maxHp / 2 && this.healPoint > this.maxHp / 3 && this.bossPhase == 2) {
             this.setWidth(77 * 2);
             this.setHeight(89 * 2);
-			++this.bossPhase;
-			bossPattern = new DiagonalPattern(this, PATTERN_2_X_SPEED, PATTERN_2_Y_SPEED, PATTERN_2_COLOR);
-			logger.info("OMEGA : move using diagonal pattern");
+            bossPattern = new SpreadShotPattern(this, targetShip);
+			logger.info("OMEGA : Using SPREAD SHOT pattern");
+			this.bossPhase = 3;
+			return;
 		}
-		else if (this.healPoint <= this.maxHp / 3 && this.bossPhase == 3) {
+
+		else if (this.healPoint <= this.maxHp / 2 && this.healPoint > this.maxHp / 3 && this.bossPhase == 3) {
+
+			if (bossPattern instanceof SpreadShotPattern &&
+					((SpreadShotPattern) bossPattern).isFinished()) {
+
+				bossPattern = new DiagonalPattern(this, PATTERN_2_X_SPEED, PATTERN_2_Y_SPEED, PATTERN_2_COLOR);
+				logger.info("OMEGA : SpreadShot finished → DIAGONAL pattern");
+
+				++this.bossPhase;  // → 4
+			}
+		}
+		else if (this.healPoint <= this.maxHp / 3 && this.bossPhase == 4) {
             this.setWidth(70 * 2);
             this.setHeight(51 * 2);
-			++this.bossPhase;
+            ++this.bossPhase;
 			// Start with dash pattern
 			startDashPattern();
 		}
 
 		// Phase 3: Handle dash cooldown cycle
-		if (this.bossPhase >= 4) {
+		if (this.bossPhase >= 5) {
 			handleDashCycle();
 		}
 	}

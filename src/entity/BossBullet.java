@@ -26,16 +26,22 @@ public class BossBullet extends Bullet implements Collidable {
      *            bullet's width
      * @param height
      *            bullet's height
-     * @param color
-     *            bullet's color
+     * @param type
+     *            bullet's sprite type
      */
-    public BossBullet(int x, int y, int dx, int dy, int width, int height, Color color) {
-        super(x, y, 0, color);
+    public BossBullet(int x, int y, int dx, int dy, int width, int height, String type) {
+        super(x, y, 0, Color.GREEN);
 		super.width = width;
 		super.height = height;
         this.dx = dx;
         this.dy = dy;
-        this.spriteType = DrawManager.SpriteType.FinalBossBullet;
+        if (type.equals("FinalBoss")){
+            this.spriteType = DrawManager.SpriteType.FinalBossBullet;
+        }
+        else if (type.equals("OmegaBoss")){
+            this.spriteType = DrawManager.SpriteType.OmegaBossBullet;
+        }
+
     }
     /**
      * move a bullet
