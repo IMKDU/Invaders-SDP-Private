@@ -298,11 +298,22 @@ public class GameModel {
                 }
                 if (this.omegaBoss != null){
                     this.omegaBoss.update();
+                    if (this.omegaBoss instanceof OmegaBoss omega) {
+                        bossBullets.addAll(omega.getBossPattern().getBullets());
+                    }
+                    Set<Bullet> removeList = new HashSet<>();
+                    for (Bullet b : bossBullets) {
+                        b.update();
+                        if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
+                            removeList.add(b);
+                        }
+                    }
+                    bossBullets.removeAll(removeList);
 
                     if (this.omegaBoss.isDestroyed()) {
                         if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.omegaBoss = null;
-                            this.zetaBoss = new ZetaBoss(Color.MAGENTA, this.ship); // [추가] Zeta 소환
+                            this.zetaBoss = new ZetaBoss(Color.MAGENTA, this.ship);
                             this.logger.info("Zeta Boss has spawned!");
                         } else {
 
@@ -310,11 +321,10 @@ public class GameModel {
                     }
                 }
 
-                // [추가] ZetaBoss 로직 추가
+                // ZetaBoss logic added
                 if (this.zetaBoss != null) {
                     this.zetaBoss.update();
 
-                    // ZetaBoss의 아포칼립스 패턴 데미지 처리
                     ApocalypseAttackPattern pattern = this.zetaBoss.getApocalypsePattern();
                     if (pattern != null && pattern.isAttacking()) {
                         float progress = pattern.getAttackAnimationProgress();
@@ -322,7 +332,6 @@ public class GameModel {
                     }
 
                     if (this.zetaBoss.isDestroyed()) {
-                        // 만약 보스 ID가 3연속 전투라면, 제타 사망 후 파이널 보스 소환
                         if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.zetaBoss = null;
                             this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, ships, this.width, this.height); // [추가] Final 소환
@@ -439,7 +448,6 @@ public class GameModel {
 			bullets.remove(bullet);
 		}
 	}
-
 
 	/**
 	 * Applies damage to a player ship.
@@ -561,7 +569,6 @@ public class GameModel {
 
 		dropItems.remove(item);
 	}
-
 
 
 	/**
@@ -1025,9 +1032,9 @@ public class GameModel {
         if (getBullets() != null) {
             renderList.addAll(getBullets());
         }
-        if (getBossBullets() != null && getFinalBoss() != null && !getFinalBoss().isDestroyed()) {
-            renderList.addAll(getBossBullets());
-        }
+		if (getBossBullets() != null && !getBossBullets().isEmpty()) {
+			renderList.addAll(getBossBullets());
+		}
         if (getDropItems() != null) {
             renderList.addAll(getDropItems());
         }
