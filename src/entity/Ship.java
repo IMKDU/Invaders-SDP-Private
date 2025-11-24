@@ -61,7 +61,7 @@ public class Ship extends Entity implements Collidable {
 	/** Duration of the laser beam after firing (in milliseconds) */
 	private static final long LASER_DURATION = 1500;
 	/** Cooldown duration after using the skill (in milliseconds) */
-	private static final long COOLDOWN_DURATION = 10000;
+	private static final long COOLDOWN_DURATION = 0;
 
 	/**
 	 * Constructor, establishes the ship's properties.
