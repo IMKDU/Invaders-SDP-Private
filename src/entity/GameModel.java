@@ -61,7 +61,7 @@ public class GameModel {
     /** Time from finishing the level to screen change. */
     private Cooldown screenFinishedCooldown;
     /** OmegaBoss */
-    private OmegaBoss omegaBoss;
+    private MidBoss omegaBoss;
     /** Set of all bullets fired by on-screen ships. */
     private Set<Bullet> bullets;
     /** Set of all dropItems dropped by on screen ships. */
@@ -296,8 +296,20 @@ public class GameModel {
                 }
                 else if (this.omegaBoss != null){
                     this.omegaBoss.update();
-                    explosionEntity = this.omegaBoss.getExplosionPattern().getboom();
-                    if (this.omegaBoss.isDestroyed()) {
+
+					if (this.omegaBoss instanceof OmegaBoss omega) {
+						bossBullets.addAll(omega.getBossPattern().getBullets());
+					}
+					Set<Bullet> removeList = new HashSet<>();
+					for (Bullet b : bossBullets) {
+						b.update();
+						if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
+							removeList.add(b);
+						}
+					}
+					bossBullets.removeAll(removeList);
+
+					if (this.omegaBoss.isDestroyed()) {
                         if ("omegaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.omegaBoss = null;
                             this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, ships, this.width, this.height);
@@ -409,7 +421,6 @@ public class GameModel {
 			bullets.remove(bullet);
 		}
 	}
-
 
 	/**
 	 * Applies damage to a player ship.
@@ -531,7 +542,6 @@ public class GameModel {
 
 		dropItems.remove(item);
 	}
-
 
 
 	/**
@@ -921,9 +931,9 @@ public class GameModel {
         if (getBullets() != null) {
             renderList.addAll(getBullets());
         }
-        if (getBossBullets() != null && getFinalBoss() != null && !getFinalBoss().isDestroyed()) {
-            renderList.addAll(getBossBullets());
-        }
+		if (getBossBullets() != null && !getBossBullets().isEmpty()) {
+			renderList.addAll(getBossBullets());
+		}
         if (getDropItems() != null) {
             renderList.addAll(getDropItems());
         }
