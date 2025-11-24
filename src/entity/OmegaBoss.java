@@ -107,8 +107,7 @@ public class OmegaBoss extends MidBoss {
         }
         // Pattern 2: Diagonal (33% < HP <= 50%)
         else if (this.healPoint > this.maxHp / 3) {
-            // Return to diagonal pattern immediately after Apocalypse
-            if (this.bossPhase < 3 || this.bossPattern == this.apocalypsePattern) {
+            if (this.bossPhase < 3) {
                 this.bossPhase = 3;
                 bossPattern = new DiagonalPattern(this, PATTERN_2_X_SPEED, PATTERN_2_Y_SPEED, PATTERN_2_COLOR);
                 logger.info("OMEGA : move using diagonal pattern");
