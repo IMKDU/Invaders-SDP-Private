@@ -230,4 +230,123 @@ public final class EntityRenderer {
         g.drawOval(x, y, radius * 2, radius * 2);
 
     }
+
+	/**
+	 * Draws a charging progress bar above the ship.
+	 * @param x X position (ship position)
+	 * @param y Y position (above the ship)
+	 * @param width Bar width (ship width)
+	 * @param progress Charge progress (0.0 to 1.0)
+	 */
+	public void drawChargingBar(int x, int y, int width, double progress) {
+		Graphics g = backBuffer.getGraphics();
+		Graphics2D g2d = (Graphics2D) g;
+
+		int barHeight = 4;
+		int barWidth = width;
+		int filledWidth = (int) (barWidth * progress);
+
+		// Draw background (empty portion)
+		g2d.setColor(new Color(50, 50, 50, 180));
+		g2d.fillRect(x, y, barWidth, barHeight);
+
+		// Draw filled portion with color gradient based on progress
+		Color chargeColor;
+		if (progress < 0.33) {
+			// Red to Yellow (0-33%)
+			int green = Math.min(255, (int)(255 * progress * 3));
+			chargeColor = new Color(255, green, 0, 200);
+		} else if (progress < 0.66) {
+			// Yellow to Green (33-66%)
+			int red = Math.max(0, (int)(255 * (1 - (progress - 0.33) * 3)));
+			chargeColor = new Color(red, 255, 0, 200);
+		} else {
+			// Green to Cyan (66-100%)
+			int blue = Math.min(255, (int)(255 * (progress - 0.66) / 0.34));
+			chargeColor = new Color(0, 255, blue, 200);
+		}
+
+		g2d.setColor(chargeColor);
+		g2d.fillRect(x, y, filledWidth, barHeight);
+
+		// Draw border
+		g2d.setColor(Color.WHITE);
+		g2d.drawRect(x, y, barWidth, barHeight);
+
+		// Draw charging text
+		if (progress >= 1.0) {
+			g2d.setColor(new Color(0, 255, 255));
+			g2d.setFont(new Font("Monospaced", Font.BOLD, 12));
+			String text = "READY!";
+			FontMetrics fm = g2d.getFontMetrics();
+			int textWidth = fm.stringWidth(text);
+			g2d.drawString(text, x + (barWidth - textWidth) / 2, y - 2);
+		}
+	}
+
+	/**
+	 * Draws the charging laser beam from the ship upward.
+	 * @param centerX Center X position of the ship
+	 * @param shipY Y position of the ship
+	 * @param beamWidth Width of the laser beam (ship width)
+	 * @param screenHeight Screen height for extending beam upward
+	 */
+	public void drawChargingLaser(int centerX, int shipY, int beamWidth, int screenHeight) {
+		Graphics g = backBuffer.getGraphics();
+		Graphics2D g2d = (Graphics2D) g;
+
+		// Enable anti-aliasing for smoother laser
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		// Laser beam properties
+		int beamX = centerX - beamWidth / 2;
+		int beamY = 0; // Extend to top of screen
+		int beamHeight = shipY;
+
+		// Draw outer glow (wider, more transparent)
+		g2d.setColor(new Color(0, 255, 255, 30));
+		g2d.fillRect(beamX - beamWidth / 2, beamY, beamWidth * 2, beamHeight);
+
+		// Draw middle layer (medium transparency)
+		g2d.setColor(new Color(0, 255, 255, 80));
+		g2d.fillRect(beamX - beamWidth / 4, beamY, beamWidth + beamWidth / 2, beamHeight);
+
+		// Draw core beam (solid, bright)
+		g2d.setColor(new Color(0, 255, 255, 200));
+		g2d.fillRect(beamX, beamY, beamWidth, beamHeight);
+
+		// Draw center line (pure white for intensity)
+		g2d.setColor(new Color(255, 255, 255, 255));
+		int centerLineWidth = Math.max(2, beamWidth / 4);
+		g2d.fillRect(centerX - centerLineWidth / 2, beamY, centerLineWidth, beamHeight);
+
+		// Draw animated particles/sparkles along the beam
+		drawLaserParticles(g2d, centerX, beamY, beamHeight, beamWidth);
+
+		// Reset rendering hints
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+	}
+
+	/**
+	 * Draws animated particles along the laser beam for visual effect.
+	 */
+	private void drawLaserParticles(Graphics2D g2d, int centerX, int beamY, int beamHeight, int beamWidth) {
+		// Create random-looking particles based on time
+		long time = System.currentTimeMillis();
+		int particleCount = 15;
+
+		for (int i = 0; i < particleCount; i++) {
+			// Use time and index to create pseudo-random but consistent positions
+			long seed = time / 100 + i * 137; // 137 is a prime number for better distribution
+			int particleY = beamY + (int)((seed % beamHeight));
+			int particleX = centerX + (int)((seed * 17 % (beamWidth * 2)) - beamWidth);
+			int particleSize = 2 + (int)(seed % 3);
+
+			// Fade in and out based on position
+			int alpha = (int)(150 * Math.sin((double)particleY / beamHeight * Math.PI));
+			g2d.setColor(new Color(255, 255, 255, Math.max(50, alpha)));
+			g2d.fillOval(particleX, particleY, particleSize, particleSize);
+		}
+	}
+
 }

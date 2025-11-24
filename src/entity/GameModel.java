@@ -266,6 +266,9 @@ public class GameModel {
         // Phase 2: Process interactions and collisions
         this.processAllCollisions();
 
+        // Phase 2.5: Process charging laser collisions
+        this.processChargingLaserCollisions();
+
         // Phase 3: Clean up destroyed or off-screen entities
         this.cleanupAllEntities();
     }
@@ -375,7 +378,160 @@ public class GameModel {
 		entities.clear();
 	}
 
-	/**
+    /**
+     * Processes collisions between charging laser beams and enemies.
+     * The laser beam destroys all enemies in its vertical path.
+     */
+    private void processChargingLaserCollisions() {
+        // Process Player 1's laser
+        if (ship != null && livesP1 > 0 && !ship.isDestroyed() && ship.isLaserActive()) {
+            processLaserCollision(ship, 1);
+        }
+
+        // Process Player 2's laser
+        if (shipP2 != null && livesP2 > 0 && !shipP2.isDestroyed() && shipP2.isLaserActive()) {
+            processLaserCollision(shipP2, 2);
+        }
+    }
+
+    /**
+     * Processes collision for a single ship's laser beam.
+     * @param ship The ship firing the laser
+     * @param playerNum Player number (1 or 2)
+     */
+    private void processLaserCollision(Ship ship, int playerNum) {
+        int laserCenterX = ship.getPositionX() + ship.getWidth() / 2;
+        int laserLeft = laserCenterX - ship.getWidth() / 2;
+        int laserRight = laserCenterX + ship.getWidth() / 2;
+        int laserTop = 0;
+        int laserBottom = ship.getPositionY();
+
+        // Check collision with regular enemies
+        for (EnemyShip enemy : enemyShipFormationModel) {
+            if (enemy != null && !enemy.isDestroyed()) {
+                if (checkLaserEnemyCollision(enemy, laserLeft, laserRight, laserTop, laserBottom)) {
+                    destroyEnemyByLaser(enemy, playerNum);
+                }
+            }
+        }
+
+        // Check collision with special enemies
+        for (EnemyShip enemy : enemyShipSpecialFormation) {
+            if (enemy != null && !enemy.isDestroyed()) {
+                if (checkLaserEnemyCollision(enemy, laserLeft, laserRight, laserTop, laserBottom)) {
+                    destroyEnemyByLaser(enemy, playerNum);
+                }
+            }
+        }
+
+        // Check collision with final boss
+        if (finalBoss != null && !finalBoss.isDestroyed()) {
+            if (checkLaserEntityCollision(finalBoss, laserLeft, laserRight, laserTop, laserBottom)) {
+                // Deal damage to boss (laser deals 1 damage per frame it's active)
+                finalBoss.takeDamage(1);
+                if (finalBoss.isDestroyed()) {
+                    handleBossDestruction(playerNum);
+                }
+            }
+        }
+
+        // Check collision with omega boss
+        if (omegaBoss != null && !omegaBoss.isDestroyed()) {
+            if (checkLaserEntityCollision(omegaBoss, laserLeft, laserRight, laserTop, laserBottom)) {
+                // Deal damage to omega boss (laser deals 1 damage per frame it's active)
+                omegaBoss.takeDamage(1);
+                if (omegaBoss.isDestroyed()) {
+                    handleOmegaBossDestruction(playerNum);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks if an enemy collides with the laser beam area.
+     */
+    private boolean checkLaserEnemyCollision(EnemyShip enemy, int laserLeft, int laserRight, int laserTop, int laserBottom) {
+        return checkLaserEntityCollision(enemy, laserLeft, laserRight, laserTop, laserBottom);
+    }
+
+    /**
+     * Checks if an entity collides with the laser beam area.
+     */
+    private boolean checkLaserEntityCollision(Entity entity, int laserLeft, int laserRight, int laserTop, int laserBottom) {
+        int enemyLeft = entity.getPositionX();
+        int enemyRight = entity.getPositionX() + entity.getWidth();
+        int enemyTop = entity.getPositionY();
+        int enemyBottom = entity.getPositionY() + entity.getHeight();
+
+        // Check if enemy overlaps with laser beam area
+        boolean horizontalOverlap = (enemyRight > laserLeft) && (enemyLeft < laserRight);
+        boolean verticalOverlap = (enemyBottom > laserTop) && (enemyTop < laserBottom);
+
+        return horizontalOverlap && verticalOverlap;
+    }
+
+    /**
+     * Destroys an enemy hit by the laser and awards points.
+     */
+    private void destroyEnemyByLaser(EnemyShip enemy, int playerNum) {
+        int pts = enemy.getPointValue();
+
+        // Award points to the appropriate player
+        if (playerNum == 2) {
+            this.scoreP2 += pts;
+        } else {
+            this.scoreP1 += pts;
+        }
+        this.score += pts;
+        coin += pts / 10;
+
+        AchievementManager.getInstance().onEnemyDefeated();
+
+        attemptItemDrop(enemy);
+
+        String type = enemy.getEnemyType();
+        if ("enemySpecial".equals(type)) {
+            if (enemyShipSpecialFormation != null) {
+                enemyShipSpecialFormation.destroy(enemy);
+            }
+        } else {
+            if (enemyShipFormationModel != null) {
+                enemyShipFormationModel.destroy(enemy);
+            }
+        }
+    }
+
+    /**
+     * Handles boss destruction and score award.
+     */
+    private void handleBossDestruction(int playerNum) {
+        int bossPoints = finalBoss.getPointValue();
+        if (playerNum == 2) {
+            this.scoreP2 += bossPoints;
+        } else {
+            this.scoreP1 += bossPoints;
+        }
+        this.score += bossPoints;
+        coin += bossPoints / 10;
+        bossExplosionCooldown.reset();
+    }
+
+    /**
+     * Handles omega boss destruction and score award.
+     */
+    private void handleOmegaBossDestruction(int playerNum) {
+        int bossPoints = omegaBoss.getPointValue();
+        if (playerNum == 2) {
+            this.scoreP2 += bossPoints;
+        } else {
+            this.scoreP1 += bossPoints;
+        }
+        this.score += bossPoints;
+        coin += bossPoints / 10;
+        bossExplosionCooldown.reset();
+    }
+
+    /**
 	 * Handles damage and rewards when a player bullet hits a normal enemy.
 	 */
 	public void requestEnemyHitByPlayerBullet(Bullet bullet, EnemyShip enemy) {

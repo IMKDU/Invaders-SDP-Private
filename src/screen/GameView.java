@@ -73,6 +73,16 @@ public class GameView {
             );
         }
 
+        /** Charging skill visualization for Player 1 */
+        if (model.getShip() != null) {
+            drawChargingSkill(model.getShip(), dto.getWidth(), dto.getHeight());
+        }
+
+        /** Charging skill visualization for Player 2 */
+        if (model.getShipP2() != null) {
+            drawChargingSkill(model.getShipP2(), dto.getWidth(), dto.getHeight());
+        }
+
         /** countdown */
         if (!model.isInputDelayFinished()) {
             int countdown = (int) ((GameModel.INPUT_DELAY
@@ -93,4 +103,34 @@ public class GameView {
         /** frame complete */
         drawManager.completeDrawing();
     }
+
+    /**
+     * Draws the charging skill UI elements including charge bar and laser beam.
+     * @param ship The ship to draw charging skill for
+     * @param screenWidth Screen width
+     * @param screenHeight Screen height
+     */
+    private void drawChargingSkill(entity.Ship ship, int screenWidth, int screenHeight) {
+        // Draw charging progress bar
+        if (ship.isCharging()) {
+            double progress = ship.getChargeProgress();
+            drawManager.getEntityRenderer().drawChargingBar(
+                    ship.getPositionX(),
+                    ship.getPositionY() - 10,
+                    ship.getWidth(),
+                    progress
+            );
+        }
+
+        // Draw laser beam when active
+        if (ship.isLaserActive()) {
+            drawManager.getEntityRenderer().drawChargingLaser(
+                    ship.getPositionX() + ship.getWidth() / 2,
+                    ship.getPositionY(),
+                    ship.getWidth(),
+                    screenHeight
+            );
+        }
+    }
 }
+
