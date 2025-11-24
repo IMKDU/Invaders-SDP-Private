@@ -409,7 +409,7 @@ public class GameModel {
 		// Check collision with regular enemies
 		for (EnemyShip enemy : enemyShipFormationModel) {
 			if (enemy != null && !enemy.isDestroyed()) {
-				if (checkLaserEnemyCollision(enemy, laserLeft, laserRight, laserTop, laserBottom)) {
+				if (checkLaserEntityCollision(enemy, laserLeft, laserRight, laserTop, laserBottom)) {
 					destroyEnemyByLaser(enemy, playerNum);
 				}
 			}
@@ -418,7 +418,7 @@ public class GameModel {
 		// Check collision with special enemies
 		for (EnemyShip enemy : enemyShipSpecialFormation) {
 			if (enemy != null && !enemy.isDestroyed()) {
-				if (checkLaserEnemyCollision(enemy, laserLeft, laserRight, laserTop, laserBottom)) {
+				if (checkLaserEntityCollision(enemy, laserLeft, laserRight, laserTop, laserBottom)) {
 					destroyEnemyByLaser(enemy, playerNum);
 				}
 			}
@@ -448,24 +448,23 @@ public class GameModel {
 	}
 
 	/**
-	 * Checks if an enemy collides with the laser beam area.
-	 */
-	private boolean checkLaserEnemyCollision(EnemyShip enemy, int laserLeft, int laserRight, int laserTop, int laserBottom) {
-		return checkLaserEntityCollision(enemy, laserLeft, laserRight, laserTop, laserBottom);
-	}
-
-	/**
 	 * Checks if an entity collides with the laser beam area.
+	 * @param bounds The entity to check collision with
+	 * @param laserLeft Left boundary of the laser beam
+	 * @param laserRight Right boundary of the laser beam
+	 * @param laserTop Top boundary of the laser beam
+	 * @param laserBottom Bottom boundary of the laser beam
+	 * @return True if the entity collides with the laser beam area
 	 */
-	private boolean checkLaserEntityCollision(Entity entity, int laserLeft, int laserRight, int laserTop, int laserBottom) {
-		int enemyLeft = entity.getPositionX();
-		int enemyRight = entity.getPositionX() + entity.getWidth();
-		int enemyTop = entity.getPositionY();
-		int enemyBottom = entity.getPositionY() + entity.getHeight();
+	private boolean checkLaserEntityCollision(HasBounds bounds, int laserLeft, int laserRight, int laserTop, int laserBottom) {
+		int entityLeft = bounds.getPositionX();
+		int entityRight = bounds.getPositionX() + bounds.getWidth();
+		int entityTop = bounds.getPositionY();
+		int entityBottom = bounds.getPositionY() + bounds.getHeight();
 
-		// Check if enemy overlaps with laser beam area
-		boolean horizontalOverlap = (enemyRight > laserLeft) && (enemyLeft < laserRight);
-		boolean verticalOverlap = (enemyBottom > laserTop) && (enemyTop < laserBottom);
+		// Check if entity overlaps with laser beam area
+		boolean horizontalOverlap = (entityRight > laserLeft) && (entityLeft < laserRight);
+		boolean verticalOverlap = (entityBottom > laserTop) && (entityTop < laserBottom);
 
 		return horizontalOverlap && verticalOverlap;
 	}
