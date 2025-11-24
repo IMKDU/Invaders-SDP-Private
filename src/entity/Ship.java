@@ -280,7 +280,6 @@ public class Ship extends Entity implements Collidable {
 
 
 	// === Charging Skill Methods ===
-
 	/**
 	 * Starts charging the skill if not on cooldown.
 	 * Should be called when the player presses and holds the C key.
@@ -352,21 +351,6 @@ public class Ship extends Entity implements Collidable {
 		return Math.min(progress, 1.0);
 	}
 
-	/**
-	 * Gets the current cooldown progress as a percentage (0.0 to 1.0).
-	 * @return Cooldown progress percentage (0.0 = ready, 1.0 = just used)
-	 */
-	public double getCooldownProgress() {
-		long currentTime = System.currentTimeMillis();
-		long timeSinceUse = currentTime - lastChargingSkillUse;
-
-		if (timeSinceUse >= COOLDOWN_DURATION) {
-			return 0.0; // Skill is ready
-		}
-
-		double remaining = 1.0 - ((double) timeSinceUse / COOLDOWN_DURATION);
-		return remaining;
-	}
 
 	/**
 	 * Checks if the ship is currently charging the skill.
@@ -391,6 +375,22 @@ public class Ship extends Entity implements Collidable {
 	public boolean isChargingSkillReady() {
 		long currentTime = System.currentTimeMillis();
 		return (currentTime - lastChargingSkillUse) >= COOLDOWN_DURATION;
+	}
+
+	/**
+	 * Gets the current cooldown progress as a percentage (0.0 to 1.0).
+	 * @return Cooldown progress percentage (0.0 = ready, 1.0 = just used)
+	 */
+	public double getCooldownProgress() {
+		long currentTime = System.currentTimeMillis();
+		long timeSinceUse = currentTime - lastChargingSkillUse;
+
+		if (timeSinceUse >= COOLDOWN_DURATION) {
+			return 0.0; // Skill is ready
+		}
+
+		double remaining = 1.0 - ((double) timeSinceUse / COOLDOWN_DURATION);
+		return remaining;
 	}
 
 	@Override
