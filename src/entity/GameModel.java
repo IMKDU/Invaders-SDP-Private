@@ -62,6 +62,8 @@ public class GameModel {
     private Cooldown screenFinishedCooldown;
     /** OmegaBoss */
     private MidBoss omegaBoss;
+    /** ZetaBoss */
+    private MidBoss zetaBoss;
     /** Set of all bullets fired by on-screen ships. */
     private Set<Bullet> bullets;
     /** Set of all dropItems dropped by on screen ships. */
@@ -187,6 +189,7 @@ public class GameModel {
         this.elapsedTime = 0;
         this.finalBoss = null;
         this.omegaBoss = null;
+        this.zetaBoss = null;
         this.currentPhase = StagePhase.wave;
 
 //        bossPattern = new BossPattern();
@@ -286,36 +289,55 @@ public class GameModel {
                 }
                 break;
             case boss_wave:
-                if (this.finalBoss == null && this.omegaBoss == null){
+                if (this.finalBoss == null && this.omegaBoss == null && this.zetaBoss == null){
                     bossReveal();
                     this.enemyShipFormationModel.clear();
                 }
                 if(this.finalBoss != null){
                     finalbossManage();
                 }
-                else if (this.omegaBoss != null){
+                if (this.omegaBoss != null){
                     this.omegaBoss.update();
 
-                    // GameModel gets the pattern component
-                    ApocalypseAttackPattern pattern = this.omegaBoss.getApocalypsePattern();
+                    if (this.omegaBoss.isDestroyed()) {
+                        if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
+                            this.omegaBoss = null;
+                            this.zetaBoss = new ZetaBoss(Color.MAGENTA, this.ship); // [추가] Zeta 소환
+                            this.logger.info("Zeta Boss has spawned!");
+                        } else {
 
+                        }
+                    }
+                }
+
+                // [추가] ZetaBoss 로직 추가
+                if (this.zetaBoss != null) {
+                    this.zetaBoss.update();
+
+                    // ZetaBoss의 아포칼립스 패턴 데미지 처리
+                    ApocalypseAttackPattern pattern = this.zetaBoss.getApocalypsePattern();
                     if (pattern != null && pattern.isAttacking()) {
                         float progress = pattern.getAttackAnimationProgress();
                         executeApocalypseDamage(pattern.getSafeZoneColumn(), progress);
                     }
 
-                    if (this.omegaBoss.isDestroyed()) {
-                        if ("omegaAndFinal".equals(this.currentLevel.getBossId())) {
-                            this.omegaBoss = null;
-                            this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, ships, this.width, this.height);
+                    if (this.zetaBoss.isDestroyed()) {
+                        // 만약 보스 ID가 3연속 전투라면, 제타 사망 후 파이널 보스 소환
+                        if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
+                            this.zetaBoss = null;
+                            this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, ships, this.width, this.height); // [추가] Final 소환
                             this.logger.info("Final Boss has spawned!");
                         } else {
-                            this.levelFinished = true;
-                            this.screenFinishedCooldown.reset();
+
                         }
                     }
                 }
-                else{
+
+                boolean isFinalBossAlive = (this.finalBoss != null && !this.finalBoss.isDestroyed());
+                boolean isOmegaBossAlive = (this.omegaBoss != null && !this.omegaBoss.isDestroyed());
+                boolean isZetaBossAlive = (this.zetaBoss != null && !this.zetaBoss.isDestroyed());
+
+                if (!isFinalBossAlive && !isOmegaBossAlive && !isZetaBossAlive) {
                     if(!this.levelFinished){
                         this.levelFinished = true;
                         this.screenFinishedCooldown.reset();
@@ -365,6 +387,7 @@ public class GameModel {
 
 		if (finalBoss != null && !finalBoss.isDestroyed()) entities.add(finalBoss);
 		if (omegaBoss != null && !omegaBoss.isDestroyed()) entities.add(omegaBoss);
+        if (zetaBoss != null && !zetaBoss.isDestroyed()) entities.add(zetaBoss);
 
 		entities.addAll(bullets);
 		entities.addAll(bossBullets);
@@ -781,9 +804,15 @@ public class GameModel {
                 this.logger.info("Final Boss has spawned!");
                 break;
             case "omegaBoss":
-            case "omegaAndFinal":
                 this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
-
+                this.logger.info("Omega Boss has spawned!");
+                break;
+            case "ZetaBoss":
+                this.zetaBoss = new ZetaBoss(Color.ORANGE, ship);
+                this.logger.info("Zeta Boss has spawned!");
+                break;
+            case "omegaAndZetaAndFinal":
+                this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
                 this.logger.info("Omega Boss has spawned!");
                 break;
             default:
@@ -931,6 +960,7 @@ public class GameModel {
     public Set<Bullet> getBossBullets() { return bossBullets; }
     public EnemyShipFormationModel getEnemyShipFormationModel() { return enemyShipFormationModel; }
     public MidBoss getOmegaBoss() { return omegaBoss; }
+    public MidBoss getZetaBoss() { return zetaBoss; }
     public Set<Bullet> getBullets() { return bullets; }
     public Set<DropItem> getDropItems() { return dropItems; }
     public int getScoreP1() { return scoreP1; }
@@ -981,6 +1011,12 @@ public class GameModel {
         if (getOmegaBoss() != null) {
             renderList.add(getOmegaBoss());
         }
+
+        // [추가] ZetaBoss 렌더링 리스트 추가
+        if (getZetaBoss() != null) {
+            renderList.add(getZetaBoss());
+        }
+
         if (getFinalBoss() != null && !getFinalBoss().isDestroyed()) {
             renderList.add(getFinalBoss());
         }

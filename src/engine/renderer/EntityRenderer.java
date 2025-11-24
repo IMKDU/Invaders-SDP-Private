@@ -11,6 +11,8 @@ import engine.DrawManager.SpriteType;
 import entity.GameConstant;
 import entity.LaserBullet;
 import entity.OmegaBoss;
+import entity.ZetaBoss;
+import entity.MidBoss;
 import entity.pattern.ApocalypseAttackPattern;
 import entity.pattern.BossPattern;
 import entity.pattern.DashPattern;
@@ -58,6 +60,10 @@ public final class EntityRenderer {
 			OmegaBoss omegaBoss = (OmegaBoss) entity;
 			drawOmegaBoss(omegaBoss);
 		}
+        else if (entity instanceof ZetaBoss) {
+           ZetaBoss zetaBoss = (ZetaBoss) entity;
+           drawZetaBoss(zetaBoss);
+        }
 		else {
 			drawEntity(entity, entity.getPositionX(), entity.getPositionY());
 		}
@@ -77,10 +83,21 @@ public final class EntityRenderer {
 		}
 	}
 
+    private void drawZetaBoss(ZetaBoss zetaBoss) {
+        // 1. 보스 본체 그리기
+        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
+
+        // 2. 패턴 이펙트 그리기
+        BossPattern currentPattern = zetaBoss.getBossPattern();
+        if (currentPattern != null) {
+            drawBossPattern(zetaBoss, currentPattern);
+        }
+    }
+
 	/**
 	 * Draws pattern-specific visualizations based on pattern type.
 	 */
-	private void drawBossPattern(OmegaBoss boss, BossPattern pattern) {
+	private void drawBossPattern(MidBoss boss, BossPattern pattern) {
 		if (pattern instanceof DashPattern) {
 			drawDashPatternVisual(boss, (DashPattern) pattern);
 		}
@@ -141,12 +158,19 @@ public final class EntityRenderer {
 	/**
 	 * Draws visualization for DashPattern.
 	 */
-	private void drawDashPatternVisual(OmegaBoss boss, DashPattern dashPattern) {
+	private void drawDashPatternVisual(MidBoss boss, DashPattern dashPattern) {
 		if (!dashPattern.isShowingPath()) {
 			return;
 		}
 
-		int[] targetPoint = boss.getDashEndPoint();
+        int[] targetPoint;
+        if (boss instanceof OmegaBoss) {
+            targetPoint = ((OmegaBoss) boss).getDashEndPoint();
+        } else if (boss instanceof ZetaBoss) {
+            targetPoint = ((ZetaBoss) boss).getDashEndPoint();
+        } else {
+            return;
+        }
 
 		// Calculate boss center point
 		int bossWidth = boss.getWidth();

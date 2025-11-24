@@ -3,7 +3,6 @@ package entity;
 import engine.DrawManager;
 import engine.Core;
 import engine.Cooldown;
-import entity.pattern.ApocalypseAttackPattern;
 import entity.pattern.BossPattern;
 import entity.pattern.DashPattern;
 import entity.pattern.DiagonalPattern;
@@ -38,8 +37,6 @@ public class OmegaBoss extends MidBoss {
 	/** Color of pattern 2 */
 	private static final Color PATTERN_2_COLOR = Color.MAGENTA;
 
-    private boolean hasUsedApocalypse = false;
-
 	/** Dash cooldown duration in milliseconds (5 seconds) */
 	private static final int DASH_COOLDOWN_MS = 5000;
 
@@ -68,7 +65,6 @@ public class OmegaBoss extends MidBoss {
 		this.spriteType = DrawManager.SpriteType.OmegaBoss1;
 		this.logger = Core.getLogger();
 		this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
-        this.apocalypsePattern = new ApocalypseAttackPattern(this);
 
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 
@@ -101,25 +97,6 @@ public class OmegaBoss extends MidBoss {
 	 * Pattern 3: Dash attack with cooldown (HP <= 33%)
 	 */
 	private void choosePattern() {
-
-        // Do not execute the normal pattern logic below while the Apocalypse Pattern is active
-        if (this.apocalypsePattern.isPatternActive()) {
-            return;
-        }
-        // Trigger if HP is 50% or less, hasn't been used yet, and is not currently the Apocalypse Pattern
-        if (!this.hasUsedApocalypse && this.healPoint <= this.maxHp / 2) {
-            if (this.bossPattern != this.apocalypsePattern) {
-                this.bossPattern = this.apocalypsePattern; // Switch pattern
-                this.apocalypsePattern.start(1); // Trigger start
-                this.hasUsedApocalypse = true;
-                logger.info("OMEGA : Apocalypse Pattern Activated!");
-                return;
-            }
-        }
-
-        // Execute normal pattern logic if Apocalypse Pattern is finished or inactive
-        // (When Apocalypse ends, isPatternActive() becomes false and execution reaches here)
-
         // Pattern 1: Horizontal (HP > 50%)
         if (this.healPoint > this.maxHp / 2) {
             if (this.bossPhase < 2) {
