@@ -159,6 +159,13 @@ public class Ship extends Entity implements Collidable {
 	private void registerSkills() {
 		this.chargingSkill = new ChargingSkill();
 		skills.put(SkillType.CHARGE, this.chargingSkill);
+
+		// Initialize each skill through ISkill interface
+		for (ISkill skill : skills.values()) {
+			if (skill != null) {
+				skill.use(this);
+			}
+		}
 	}
 
 	/**

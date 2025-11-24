@@ -23,6 +23,11 @@ public class ChargingSkill implements ISkill {
 
     // === Charging Skill State ===
     /** Indicates if the ship is currently charging the skill */
+
+    // === Ship Reference ===
+    /** Reference to the ship that owns this skill */
+    private Ship ship;
+
     private boolean isCharging = false;
     /** Time when charging started (in milliseconds) */
     private long chargeStartTime = 0;
@@ -35,8 +40,7 @@ public class ChargingSkill implements ISkill {
 
     @Override
     public void use(Ship ship) {
-        // This method can be used for alternative activation
-        // Currently, charging is triggered by startCharging() in input handling
+        this.ship = ship;
     }
 
     /**
@@ -167,5 +171,13 @@ public class ChargingSkill implements ISkill {
     public boolean isChargingSkillReady() {
         long currentTime = System.currentTimeMillis();
         return (currentTime - lastChargingSkillUse) >= COOLDOWN_DURATION;
+    }
+
+    /**
+     * Gets the ship reference (for future extensions if needed).
+     * @return The ship that owns this skill
+     */
+    public Ship getShip() {
+        return ship;
     }
 }
