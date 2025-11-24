@@ -11,6 +11,7 @@ import entity.pattern.*;
 import java.awt.*;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.List;
 
 /**
  * Omega - Middle Boss
@@ -53,6 +54,7 @@ public class OmegaBoss extends MidBoss {
 	private Cooldown dashCooldown;
 	/** Flag to track if currently in dash cooldown */
 	private boolean isInDashCooldown = false;
+
     private boolean ishit = false;
     private boolean isMove = false;
     private boolean isDash = false;
@@ -60,21 +62,30 @@ public class OmegaBoss extends MidBoss {
 
 	private SpawnMobPattern spawnPattern;
 
+    private GuidedMissilePattern guidedMissilePattern;
+
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
 	 *
 	 * @param color             Color of the boss entity.
-	 * @param player           The player ship to target
+	 * @param players          The player ship to target
 	 */
-	public OmegaBoss(Color color, Ship player) {
+	public OmegaBoss(Color color, List<Ship> players) {
 		super(INIT_POS_X, INIT_POS_Y, OMEGA_WIDTH, OMEGA_HEIGHT, OMEGA_HEALTH, OMEGA_POINT_VALUE, color);
-		this.targetShip = player;
+        if (players != null && !players.isEmpty()) {
+            this.targetShip = players.get(0);
+        }
+
+		this.spriteType = DrawManager.SpriteType.OmegaBoss1;
 		this.logger = Core.getLogger();
 		this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
-        this.spriteType= DrawManager.SpriteType.OmegaBoss1;
+
         this.animationCooldown = new Cooldown(200);
-		this.spawnPattern = new SpawnMobPattern(this,this.getHealPoint());
-		this.explosionPattern = new BackgroundExplosionPattern();
+        this.spawnPattern = new SpawnMobPattern(this,this.getHealPoint());
+        this.explosionPattern = new BackgroundExplosionPattern();
+
+        this.guidedMissilePattern = new GuidedMissilePattern(this, players);
+
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		this.logger.info("OMEGA : move using the default pattern");
         SoundManager.play("sfx/OmegaBossAppearance.wav");
@@ -156,8 +167,14 @@ public class OmegaBoss extends MidBoss {
 		if (bossPattern != null) {
 			bossPattern.move();
 			bossPattern.attack();
+
 			spawnPattern.update(this,this.getHealPoint());
 			explosionPattern.attack();
+
+            if (guidedMissilePattern != null) {
+                guidedMissilePattern.attack();
+            }
+
 			// Update position from pattern
 			this.positionX = bossPattern.getBossPosition().x;
 			this.positionY = bossPattern.getBossPosition().y;
@@ -292,43 +309,53 @@ public class OmegaBoss extends MidBoss {
         return false;
     }
 
-    /**
-     * Calculate dash end point (by watching)
-     * @return [x, y] array
-     */
-    public int[] getDashEndPoint() {
-        if (bossPattern instanceof DashPattern) {
-            return ((DashPattern) bossPattern).getDashEndPoint(this.width, this.height);
-        }
-        return new int[]{this.positionX + this.width / 2, this.positionY + this.height / 2};
-    }
-
-    /**
-     * Get current boss pattern
-     */
-    public BossPattern getBossPattern() {
-        return this.bossPattern;
-    }
-
-    /**
-     * Get current boss phase
-     */
-    public int getBossPhase() {
-        return this.bossPhase;
-    }
-
-    /**
-     * Check if boss is in dash cooldown
-     */
-    public boolean isInDashCooldown() {
-        return isInDashCooldown;
-    }
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
 		other.onCollideWithBoss(this, model);
 	}
+
 	/** get Explosion Pattern */
 	public Explosion getBoom() { return explosionPattern.getBoom();}
+
+	/**
+	 * Calculate dash end point (by watching)
+	 * @return [x, y] array
+	 */
+	public int[] getDashEndPoint() {
+		if (bossPattern instanceof DashPattern) {
+			return ((DashPattern) bossPattern).getDashEndPoint(this.width, this.height);
+		}
+		return new int[]{this.positionX + this.width / 2, this.positionY + this.height / 2};
+	}
+
+	/**
+	 * Get current boss pattern
+	 */
+	public BossPattern getBossPattern() {
+		return this.bossPattern;
+	}
+
+    /**
+     * method for getting guided missle pattern
+     */
+    public GuidedMissilePattern getGuidedMissilePattern() {
+        return this.guidedMissilePattern;
+    }
+
+	/**
+	 * Get current boss phase
+	 */
+	public int getBossPhase() {
+		return this.bossPhase;
+	}
+
+	/**
+	 * Check if boss is in dash cooldown
+	 */
+	public boolean isInDashCooldown() {
+		return isInDashCooldown;
+	}
+
 	/**
 	 * Update target ship for pattern
 	 */

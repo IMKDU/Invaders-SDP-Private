@@ -23,8 +23,10 @@ public class TestModel {
 	public TestModel(int width, int height) {
 		this.width = width;
 		this.height = height;
-        this.entity = new OmegaBoss(Color.blue, player);
-        this.player = new Ship(this.width/2, height-20, Color.GREEN,true);
+		this.player = new Ship(this.width/2, height-20, Color.GREEN);
+        List<Ship> players = new ArrayList<>();
+        players.add(player);
+        this.entity = new OmegaBoss(Color.blue, players);
 		this.bullets = new HashSet<>();
 	}
 
@@ -48,7 +50,7 @@ public class TestModel {
 		List<Entity> renderList = new ArrayList<>();
 		renderList.add(entity);
 		renderList.add(player);
-		renderList.addAll(bullets);  // 총알도 포함
+		renderList.addAll(bullets);  // including bullets
 		return renderList;
 	}
 
