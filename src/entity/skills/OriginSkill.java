@@ -6,7 +6,7 @@ import entity.pattern.ISkill;
 
 public class OriginSkill implements ISkill {
 
-    private static final int TOTAL_DAMAGE = 45;
+    private static final int TOTAL_DAMAGE = 80;
     private static final int DURATION_MS = 10000;
     private static final int TICK_MS = 1000;
     private Ship ship;
