@@ -193,6 +193,8 @@ public class OmegaBoss extends MidBoss {
 
 		// Phase 3: Handle dash cooldown cycle
 		if (this.bossPhase >= 5) {
+            this.setWidth(77 * 2);
+            this.setHeight(89 * 2);
 			handleDashCycle();
 		}
 	}
