@@ -158,6 +158,8 @@ public class OmegaBoss extends MidBoss {
 	 */
 	private void choosePattern() {
 		if (this.healPoint > this.maxHp / 2 && this.bossPhase == 1) {
+            this.setWidth(70 * 2);
+            this.setHeight(51 * 2);
 			++this.bossPhase;
 			bossPattern = new HorizontalPattern(this, PATTERN_1_X_SPEED);
 			logger.info("OMEGA : move using horizontal pattern");
