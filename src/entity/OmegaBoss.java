@@ -166,8 +166,6 @@ public class OmegaBoss extends MidBoss {
 		}
 		// PHASE 2 → SpreadShotPattern
 		else if (this.healPoint <= this.maxHp / 2 && this.healPoint > this.maxHp / 3 && this.bossPhase == 2) {
-            this.setWidth(77 * 2);
-            this.setHeight(89 * 2);
             bossPattern = new SpreadShotPattern(this, targetShip);
 			logger.info("OMEGA : Using SPREAD SHOT pattern");
 			this.bossPhase = 3;
@@ -178,7 +176,8 @@ public class OmegaBoss extends MidBoss {
 
 			if (bossPattern instanceof SpreadShotPattern &&
 					((SpreadShotPattern) bossPattern).isFinished()) {
-
+                this.setWidth(77 * 2);
+                this.setHeight(89 * 2);
 				bossPattern = new DiagonalPattern(this, PATTERN_2_X_SPEED, PATTERN_2_Y_SPEED, PATTERN_2_COLOR);
 				logger.info("OMEGA : SpreadShot finished → DIAGONAL pattern");
 
