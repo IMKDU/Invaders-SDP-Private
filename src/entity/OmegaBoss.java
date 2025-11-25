@@ -55,7 +55,7 @@ public class OmegaBoss extends MidBoss {
     private boolean isMove = false;
     private boolean isDash = false;
     private Cooldown animationCooldown;
-    private boolean rightDash;
+
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
 	 *
@@ -85,6 +85,8 @@ public class OmegaBoss extends MidBoss {
         if (this.animationCooldown.checkFinished()) {
             this.animationCooldown.reset();
             if (this.bossPhase == 2 || this.bossPhase == 3){
+                this.setWidth(70 * 2);
+                this.setHeight(51 * 2);
                 if (this.ishit){
                     this.spriteType = DrawManager.SpriteType.OmegaBossHitting;
                     this.ishit = false;
@@ -99,6 +101,8 @@ public class OmegaBoss extends MidBoss {
                 }
             }
             else if (this.bossPhase == 4) {
+                this.setWidth(77 * 2);
+                this.setHeight(89 * 2);
                 if (this.spriteType == DrawManager.SpriteType.OmegaBossMoving1){
                     this.spriteType = DrawManager.SpriteType.OmegaBossMoving2;
                 }
@@ -107,8 +111,10 @@ public class OmegaBoss extends MidBoss {
                 }
             }
             else {
-                if (!isInDashCooldown){
-                    if (rightDash){
+                if (!isInDashCooldown){ //대시 중일 때 dashCooldown.checkFinished()
+                    this.setWidth(70 * 2);
+                    this.setHeight(51 * 2);
+                    if (this.isRight()){
                         if (this.spriteType == DrawManager.SpriteType.OmegaBossDash3) {
                             this.spriteType = DrawManager.SpriteType.OmegaBossDash4;
                         }
@@ -126,6 +132,8 @@ public class OmegaBoss extends MidBoss {
                     }
                 }
                 else {
+                    this.setWidth(77 * 2);
+                    this.setHeight(89 * 2);
                     if (this.spriteType == DrawManager.SpriteType.OmegaBossMoving1) {
                         this.spriteType = DrawManager.SpriteType.OmegaBossMoving2;
                     }
@@ -158,8 +166,6 @@ public class OmegaBoss extends MidBoss {
 	 */
 	private void choosePattern() {
 		if (this.healPoint > this.maxHp / 2 && this.bossPhase == 1) {
-            this.setWidth(70 * 2);
-            this.setHeight(51 * 2);
 			++this.bossPhase;
 			bossPattern = new HorizontalPattern(this, PATTERN_1_X_SPEED);
 			logger.info("OMEGA : move using horizontal pattern");
@@ -176,8 +182,6 @@ public class OmegaBoss extends MidBoss {
 
 			if (bossPattern instanceof SpreadShotPattern &&
 					((SpreadShotPattern) bossPattern).isFinished()) {
-                this.setWidth(77 * 2);
-                this.setHeight(89 * 2);
 				bossPattern = new DiagonalPattern(this, PATTERN_2_X_SPEED, PATTERN_2_Y_SPEED, PATTERN_2_COLOR);
 				logger.info("OMEGA : SpreadShot finished → DIAGONAL pattern");
 
@@ -185,8 +189,6 @@ public class OmegaBoss extends MidBoss {
 			}
 		}
 		else if (this.healPoint <= this.maxHp / 3 && this.bossPhase == 4) {
-            this.setWidth(70 * 2);
-            this.setHeight(51 * 2);
             ++this.bossPhase;
 			// Start with dash pattern
 			startDashPattern();
@@ -194,8 +196,6 @@ public class OmegaBoss extends MidBoss {
 
 		// Phase 3: Handle dash cooldown cycle
 		if (this.bossPhase >= 5) {
-            this.setWidth(77 * 2);
-            this.setHeight(89 * 2);
 			handleDashCycle();
 		}
 	}
@@ -217,8 +217,9 @@ public class OmegaBoss extends MidBoss {
 			startDashPattern();
 		}
 	}
-    private void isRight(){
-        this.rightDash = this.getPositionX() - targetShip.getPositionX() < 0;
+    private boolean isRight(){
+        DashPattern dash = (DashPattern) bossPattern;
+        return dash.getRightDash();
     }
 
 
@@ -227,7 +228,6 @@ public class OmegaBoss extends MidBoss {
 	 */
 	private void startDashPattern() {
 		bossPattern = new DashPattern(this, targetShip);
-        this.isRight();
 		isInDashCooldown = false;
 		logger.info("OMEGA : Starting dash attack");
 	}
