@@ -6,6 +6,7 @@ import engine.GameState;
 import engine.level.Level;
 import entity.GameConstant;
 import entity.GameModel;
+import entity.Ship;
 
 /**
  * Implements the game screen, where the action happens.
@@ -159,7 +160,29 @@ public class GameScreen extends Screen {
 		}
 	}
 
-	private void handlePlayerSkillInput() { /* TODO: Implement skill input handling */ }
+    /**
+     * Handles player skill input (C key for Player 1, Right Ctrl for Player 2).
+     * Manages charging skill activation and cancellation.
+     */
+    private void handlePlayerSkillInput() {
+        if (model.getShip() != null && model.getLivesP1() > 0 && !model.getShip().isDestroyed()) {
+            handleSinglePlayerSkillInput(model.getShip(), inputManager.isP1KeyDown(java.awt.event.KeyEvent.VK_C));
+        }
+
+        if (model.getShipP2() != null && model.getLivesP2() > 0 && !model.getShipP2().isDestroyed()) {
+            handleSinglePlayerSkillInput(model.getShipP2(), inputManager.isP2KeyDown(java.awt.event.KeyEvent.VK_CONTROL));
+        }
+    }
+
+    private void handleSinglePlayerSkillInput(Ship ship, boolean isKeyPressed) {
+        if (isKeyPressed) {
+            ship.startCharging();
+        } else {
+            if (ship.isCharging()) {
+                ship.stopCharging();
+            }
+        }
+    }
 
     /**
      * Builds the DTO that passes data from Model to View.
