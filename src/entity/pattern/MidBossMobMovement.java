@@ -34,7 +34,7 @@ public class MidBossMobMovement {
     /** Frequency for horizontal oscillation when descending. */
     private static final double OSCILLATION_FREQUENCY = 0.1;
     /** Multiplier to increase the speed of the horizontal sine wave movement. */
-    private static final int OSCILLATION_FREQUENCY_MULTIPLIER = 3;
+    private static final int OSCILLATION_FREQUENCY_MULTIPLIER = 5;
     /** Distance required to trigger an acceleration towards the target. */
     private static final double DISTANCE_THRESHOLD_FOR_SPEED_BOOST = 15.0;
     /** The highest Y-coordinate (ceiling) the child ships can move up to. */
@@ -162,9 +162,9 @@ public class MidBossMobMovement {
             if(child.getHealPoint() > child.getMaxHp()*0.5){
                 executeOrbitMovement(child, childIndex, bossCenterX, bossCenterY, initialChildCount);
             }else {
-                boolean isBottom = child.getPositionY() + child.getHeight() + this.speed > this.bottomHeight - this.BOTTOM_MARGIN;
+                boolean isBottom = child.getPositionY() + child.getHeight() + this.speed > this.bottomHeight;
                 int moveX = (int) (Math.cos(this.frameCount * this.OSCILLATION_FREQUENCY) * (this.speed * OSCILLATION_FREQUENCY_MULTIPLIER));
-                if(isBottom){ child.move(moveX,0);}
+                if(isBottom){ child.move(moveX, - child.getPositionY() + this.topHeight + TOP_MARGIN ); }
                 else {
                     int moveY = this.speed;
                     child.move(moveX, moveY);

@@ -1,7 +1,6 @@
 package entity;
 
 import engine.DrawManager;
-
 import java.awt.*;
 
 /**
@@ -15,6 +14,7 @@ public class MidBossMob extends MidBoss {
     private static final int HEIGHT= 16;
     /** Flag to determine horizontal movement direction. True for right, false for left. */
     private boolean directionRight = true;
+    private int colorID;
     /**
      * Constructs a new MidBossMob entity.
      * @param initPosX Initial X position.
@@ -22,11 +22,11 @@ public class MidBossMob extends MidBoss {
      * @param healthPoint Initial health points.
      * @param pointValue Score value granted upon destruction.
      */
-    public MidBossMob(int initPosX, int initPosY, int healthPoint, int pointValue) {
-        super(initPosX, initPosY, WIDTH, HEIGHT, healthPoint, pointValue, Color.cyan);
+    public MidBossMob(int initPosX, int initPosY, int healthPoint, int pointValue,int listID) {
+        super(initPosX, initPosY, WIDTH, HEIGHT, healthPoint, pointValue, Color.CYAN);
+        this.colorID = listID;
         this.spriteType = DrawManager.SpriteType.EnemyShipB1;
     }
-
     /**
      * Moves the entity by the specified distances in the X and Y axes.
      * @param distanceX Distance to move along the X-axis.
@@ -70,6 +70,8 @@ public class MidBossMob extends MidBoss {
     public int getMaxHp() { return this.maxHp; }
 
     public boolean getDirectionRight() { return this.directionRight; }
+
+    public int getColorID() { return this.colorID; }
 
     public void setDirectionRight(boolean directionRightValue) { this.directionRight = directionRightValue; }
 

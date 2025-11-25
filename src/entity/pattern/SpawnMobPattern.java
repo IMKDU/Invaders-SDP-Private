@@ -140,7 +140,8 @@ public class SpawnMobPattern extends BossPattern {
                     this.bossPositionX,
                     bossPositionY + (int)(SPAWN_VERTICAL_SPACING_BASE/shipCount * (count+1)),
                     MOB_HEALTH_POINT,
-                    MOB_POINT_VALUE
+                    MOB_POINT_VALUE,
+                    count
             );
             this.childShips.add(ship);
         }
