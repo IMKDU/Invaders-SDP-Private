@@ -129,7 +129,7 @@ public class GameModel {
         this.logger = Core.getLogger();
         this.width = width;
         this.height = height;
-        this.FinalSkillCnt = 2;
+        this.FinalSkillCnt = 1;
 
         this.currentLevel = level;
         this.bonusLife = bonusLife;
