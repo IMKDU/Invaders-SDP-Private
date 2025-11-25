@@ -1,5 +1,6 @@
 package screen;
 
+import audio.SoundManager;
 import engine.DrawManager;
 import engine.DTO.HUDInfoDTO;
 import entity.DropItem;
@@ -29,29 +30,41 @@ public class GameView {
 
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
-        if(model.isBlackHoleActive()){
-            drawManager.getEntityRenderer().drawBlackHole(
-                    model.getBlackHoleCX(),
-                    model.getBlackHoleCY(),
-                    model.getBlackHoleRadius()
-            );
-        }
-        if (dto.getShipP1().isInvincible()) {
-            drawManager.getEntityRenderer().drawShield(dto.getShipP1().getPositionX(), dto.getShipP1().getWidth(), dto.getShipP1().getPositionY(),dto.getShipP1().getHeight(), dto.getShipP1().getInvincibilityRatio());
-        }
-        if (dto.getShipP2().isInvincible()){
-            drawManager.getEntityRenderer().drawShield(dto.getShipP2().getPositionX() ,dto.getShipP2().getWidth(), dto.getShipP2().getPositionY(), dto.getShipP2().getHeight(), dto.getShipP2().getInvincibilityRatio());
-        }
-        /** Entity Rendering */
-        if (model.getEntitiesToRender() != null) {
-            for (var e : model.getEntitiesToRender()) {
-	            if (e instanceof DropItem) {
-		            drawManager.getItemRenderer().render((DropItem) e);
-		            continue;
-	            }
-				drawManager.getEntityRenderer().drawEntity(e);
+        //오리진 스킬 애니메이션 스킬횟수 > 0 그리고 p1점수 10이상일때 발동
+        // 구현 해야할거 발동후 로직, 아군 ship 무적
+        if (model.getFinalSkillCnt() > 0 && (dto.getScoreP1() >= 10)) {
+            drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
+            drawManager.getSpecialAnimationRenderer().draw();
+            if (drawManager.getSpecialAnimationRenderer().isFinished()){
+                model.useFinalSkill();
             }
+        }
 
+        else {
+            if (model.isBlackHoleActive()) {
+                drawManager.getEntityRenderer().drawBlackHole(
+                        model.getBlackHoleCX(),
+                        model.getBlackHoleCY(),
+                        model.getBlackHoleRadius()
+                );
+            }
+            if (dto.getShipP1().isInvincible()) {
+                drawManager.getEntityRenderer().drawShield(dto.getShipP1().getPositionX(), dto.getShipP1().getWidth(), dto.getShipP1().getPositionY(), dto.getShipP1().getHeight(), dto.getShipP1().getInvincibilityRatio());
+            }
+            if (dto.getShipP2().isInvincible()) {
+                drawManager.getEntityRenderer().drawShield(dto.getShipP2().getPositionX(), dto.getShipP2().getWidth(), dto.getShipP2().getPositionY(), dto.getShipP2().getHeight(), dto.getShipP2().getInvincibilityRatio());
+            }
+            /** Entity Rendering */
+            if (model.getEntitiesToRender() != null) {
+                for (var e : model.getEntitiesToRender()) {
+                    if (e instanceof DropItem) {
+                        drawManager.getItemRenderer().render((DropItem) e);
+                        continue;
+                    }
+                    drawManager.getEntityRenderer().drawEntity(e);
+                }
+
+            }
         }
 
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);
@@ -94,6 +107,8 @@ public class GameView {
             drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), dto.getHeight() / 2 - dto.getHeight() / 12);
             drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), dto.getHeight() / 2 + dto.getHeight() / 12);
         }
+
+
 
 
         /** frame complete */

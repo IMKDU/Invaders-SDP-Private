@@ -13,24 +13,36 @@ public class SoundManager {
     private static final Map<String, byte[]> AUDIO_CACHE = new HashMap<>();
     private static volatile boolean muted = false;  // global state of sound
     private static volatile String currentLooping = null;
+    private static final Map<String, java.util.List<Clip>> PLAY_MAP = new ConcurrentHashMap<>();
 
     public static void play(String resourcePath) {
-        if (muted) return;  // no sound played
+        if (muted) return;
+
         try {
             byte[] audioData = AUDIO_CACHE.computeIfAbsent(resourcePath, SoundManager::loadAudioData);
             if (audioData == null) return;
-            Clip clip = AudioSystem.getClip();
-            AudioInputStream ais = AudioSystem.getAudioInputStream(
-                    new ByteArrayInputStream(audioData)
-            );
 
+            Clip clip = AudioSystem.getClip();
+            AudioInputStream ais = AudioSystem.getAudioInputStream(new ByteArrayInputStream(audioData));
             clip.open(ais);
+
+            // PLAY_MAP에 등록
+            PLAY_MAP.computeIfAbsent(resourcePath, k -> new java.util.ArrayList<>()).add(clip);
+
+            // 종료되면 자동 제거
+            clip.addLineListener(event -> {
+                if (event.getType() == LineEvent.Type.STOP) {
+                    PLAY_MAP.get(resourcePath).remove(clip);
+                }
+            });
+
             clip.start();
 
         } catch (Exception e) {
             System.err.println("[Sound] Play failed: " + resourcePath + " -> " + e.getMessage());
         }
     }
+
     private static byte[] loadAudioData(String resourcePath) {
         String p = resourcePath.startsWith("/") ? resourcePath : "/" + resourcePath;
         try (InputStream is = SoundManager.class.getResourceAsStream(p);
@@ -98,15 +110,24 @@ public class SoundManager {
 
     public static void stop(String resourcePath) {
         try {
-            Clip c = CACHE.get(resourcePath);
-            if (c != null && c.isRunning()) {
-                c.stop();
-                c.setFramePosition(0);
+            java.util.List<Clip> list = PLAY_MAP.get(resourcePath);
+            if (list == null) return;
+
+            for (Clip c : list) {
+                if (c != null) {
+                    c.stop();
+                    c.flush();
+                    c.setFramePosition(0);
+                }
             }
+
+            list.clear();
+
         } catch (Exception e) {
             System.err.println("[Sound] Stop failed: " + resourcePath + " -> " + e.getMessage());
         }
     }
+
 
     public static void stopAll() {
         for (Clip c : CACHE.values()) {

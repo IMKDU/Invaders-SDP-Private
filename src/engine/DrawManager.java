@@ -7,11 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import engine.renderer.ItemRenderer;
-import engine.renderer.EntityRenderer;
-import engine.renderer.HUDRenderer;
-import engine.renderer.ShopRenderer;
-import engine.renderer.UIRenderer;
+import engine.renderer.*;
 import screen.TitleScreen.Star;
 import screen.TitleScreen.ShootingStar;
 
@@ -41,6 +37,7 @@ public final class DrawManager {
     private ShopRenderer shopRenderer;
     private UIRenderer uiRenderer;
 	private ItemRenderer itemRenderer;
+    private SpecialAnimationRenderer specialAnimationRenderer;
 	private double scale;
 
 	/** Sprite types mapped to their images. */
@@ -101,6 +98,7 @@ public final class DrawManager {
 			hudRenderer = new HUDRenderer(backBuffer, fontPack, entityRenderer);
             shopRenderer = new ShopRenderer(backBuffer,fontPack);
             uiRenderer = new UIRenderer(backBuffer,fontPack);
+            specialAnimationRenderer = new SpecialAnimationRenderer(backBuffer);
         }
     }
 
@@ -168,4 +166,7 @@ public final class DrawManager {
 
 	public ItemRenderer getItemRenderer() { return itemRenderer; }
 
+    public SpecialAnimationRenderer getSpecialAnimationRenderer() {
+        return specialAnimationRenderer;
+    }
 }

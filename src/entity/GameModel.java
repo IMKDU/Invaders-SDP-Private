@@ -112,6 +112,7 @@ public class GameModel {
 
     /** Milliseconds until the screen accepts user input. */
     private Cooldown inputDelay;
+    private int FinalSkillCnt;
 
     private List<Ship> ships;
     /** variables for Boss BlackHole Pattern */
@@ -128,6 +129,7 @@ public class GameModel {
         this.logger = Core.getLogger();
         this.width = width;
         this.height = height;
+        this.FinalSkillCnt = 2;
 
         this.currentLevel = level;
         this.bonusLife = bonusLife;
@@ -887,6 +889,12 @@ public class GameModel {
     public int getBlackHoleCX() { return blackHoleCX; }
     public int getBlackHoleCY() { return blackHoleCY; }
     public int getBlackHoleRadius() { return blackHoleRadius; }
+    public int getFinalSkillCnt(){
+        return FinalSkillCnt;
+    }
+    public void useFinalSkill(){
+        this.FinalSkillCnt--;
+    }
 
     public List<Entity> getEntitiesToRender() {
         List<Entity> renderList = new ArrayList<>();

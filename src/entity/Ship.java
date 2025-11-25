@@ -151,7 +151,7 @@ public class Ship extends Entity implements Collidable {
             if (this.isMove) {
                 this.spriteType = moveSprite;
                 if (!movingSoundPlaying) {
-                    SoundManager.playLoop("sfx/ShipMoving.wav");
+                    SoundManager.play("sfx/ShipMoving.wav");
                     movingSoundPlaying = true;
                 }
                 this.isMove = false;
