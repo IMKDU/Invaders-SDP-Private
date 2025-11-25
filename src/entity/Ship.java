@@ -9,6 +9,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Set;
 import entity.skills.ChargingSkill;
+import entity.skills.OriginSkill;
 
 /**
  * Implements a ship, to be controlled by the player.
@@ -34,6 +35,7 @@ public class Ship extends Entity implements Collidable {
 	private Cooldown shieldCooldown;
 	/** Checks if the ship is invincible. */
 	private boolean isInvincible;
+    private GameModel model;
 
     // === Which player: 1 = P1, 2 = P2 (default 1 for single-player compatibility) ===
 	private int playerId = 1;
@@ -63,7 +65,7 @@ public class Ship extends Entity implements Collidable {
 		super(positionX, positionY, 13 * 2, 8 * 2, color);
 
 		this.spriteType = SpriteType.Ship;
-		this.shootingCooldown = new Cooldown(ShopItem.getShootingInterval());
+		this.shootingCooldown = new Cooldown(/**ShopItem.getShootingInterval()*/100);
 		this.destructionCooldown = new Cooldown(1000);
 		this.shieldCooldown = new Cooldown(0);
 		this.isInvincible = false;
@@ -114,7 +116,9 @@ public class Ship extends Entity implements Collidable {
 	 * @return Checks if the bullet was shot correctly.
 	 */
 	public final boolean shoot(final Set<Bullet> bullets) {
-		if (this.shootingCooldown.checkFinished()) {
+        if (controlsDisabled) return false;
+
+        if (this.shootingCooldown.checkFinished()) {
 			this.shootingCooldown.reset();
 
 			// Get Spread Shot information from the DropItem class
@@ -159,13 +163,7 @@ public class Ship extends Entity implements Collidable {
 	private void registerSkills() {
 		this.chargingSkill = new ChargingSkill();
 		skills.put(SkillType.CHARGE, this.chargingSkill);
-
-		// Initialize each skill through ISkill interface
-		for (ISkill skill : skills.values()) {
-			if (skill != null) {
-				skill.use(this);
-			}
-		}
+        skills.put(SkillType.ORIGIN, new OriginSkill());
 	}
 
 	/**
@@ -223,7 +221,9 @@ public class Ship extends Entity implements Collidable {
 	 * reached.
 	 */
 	public final void moveRight() {
-		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+        if (controlsDisabled) return;
+
+        int shipspeed = ShopItem.getSHIPSpeedCOUNT();
 		this.positionX += SPEED*(1+shipspeed/10);
 	}
 
@@ -232,7 +232,9 @@ public class Ship extends Entity implements Collidable {
 	 * reached.
 	 */
 	public final void moveLeft() {
-		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+        if (controlsDisabled) return;
+
+        int shipspeed = ShopItem.getSHIPSpeedCOUNT();
 		this.positionX -= SPEED*(1+shipspeed/10);
 	}
 
@@ -241,7 +243,9 @@ public class Ship extends Entity implements Collidable {
 	 * reached.
 	 */
 	public final void moveUp() {
-		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+        if (controlsDisabled) return;
+
+        int shipspeed = ShopItem.getSHIPSpeedCOUNT();
 		this.positionY -= SPEED*(1+shipspeed/10);
 	}
 
@@ -250,7 +254,9 @@ public class Ship extends Entity implements Collidable {
 	 * reached.
 	 */
 	public final void moveDown() {
-		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+        if (controlsDisabled) return;
+
+        int shipspeed = ShopItem.getSHIPSpeedCOUNT();
 		this.positionY += SPEED*(1+shipspeed/10);
 	}
 
@@ -336,7 +342,27 @@ public class Ship extends Entity implements Collidable {
 		return 0.0;
 	}
 
-	@Override
+    public void setModel(GameModel model){ this.model = model; }
+
+    public GameModel getModel(){ return model; }
+
+
+    private boolean controlsDisabled = false;
+
+    public void disableAllControls(boolean b){
+        this.controlsDisabled = b;
+    }
+
+    public boolean isControlsDisabled(){
+        return this.controlsDisabled;
+    }
+
+    public ISkill getSkill(SkillType type) {
+        return skills.get(type);
+    }
+
+
+    @Override
 	public void onCollision(Collidable other, GameModel model) {
 		if (model.isLevelFinished()) return;
 		other.onCollideWithShip(this, model);

@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 import engine.*;
 import engine.level.ItemDrop;
 import entity.pattern.BlackHolePattern;
+import entity.pattern.ISkill;
+import entity.skills.OriginSkill;
 
 /**
  * Implements the Model for the game screen.
@@ -195,6 +197,9 @@ public class GameModel {
         this.ships = new ArrayList<>();
         if (this.ship != null) ships.add(this.ship);
         if (this.shipP2 != null) ships.add(this.shipP2);
+
+        this.ship.setModel(this);
+        this.shipP2.setModel(this);
     }
 
     /**
@@ -342,6 +347,20 @@ public class GameModel {
 
         for (DropItem dropItem : this.dropItems) {
             dropItem.update();
+        }
+
+        if (ship != null) {
+            ISkill origin = ship.getSkill(Ship.SkillType.ORIGIN);
+            if (origin instanceof OriginSkill os) {
+                os.update();
+            }
+        }
+
+        if (shipP2 != null) {
+            ISkill origin = shipP2.getSkill(Ship.SkillType.ORIGIN);
+            if (origin instanceof OriginSkill os) {
+                os.update();
+            }
         }
     }
 
