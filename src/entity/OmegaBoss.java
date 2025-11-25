@@ -102,7 +102,6 @@ public class OmegaBoss extends MidBoss {
 			bossPattern = new SpreadShotPattern(this, targetShip);
 			logger.info("OMEGA : Using SPREAD SHOT pattern");
 			this.bossPhase = 3;
-			return;
 		}
 
 		else if (this.healPoint <= this.maxHp / 2 && this.healPoint > this.maxHp / 3 && this.bossPhase == 3) {
