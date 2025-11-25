@@ -24,9 +24,11 @@ public class OriginSkill implements ISkill {
 
         this.ship = ship;
         this.model = ship.getModel();
+        if(this.model.getUsedOrigin()) return;
 
         this.used = true;
         this.active = true;
+        this.model.setUsedOrigin(true);
 
         this.startTime = System.currentTimeMillis();
         this.tickCooldown = new Cooldown(TICK_MS);

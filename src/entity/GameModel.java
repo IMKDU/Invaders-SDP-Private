@@ -124,6 +124,7 @@ public class GameModel {
     private Cooldown blackHoleCooldown;
     private int lastHp;
     private static final int BLACK_HOLE_DURATION_MS = 7000;
+    private static boolean usedOrigin = false;
 
 
     public GameModel(GameState gameState, Level level, boolean bonusLife, int maxLives, int width, int height) {
@@ -1008,6 +1009,12 @@ public class GameModel {
         this.score += LIFE_SCORE * Math.max(0, this.livesP2 - 1);
         return this.score;
     }
+
+    public void setUsedOrigin(boolean used){
+        this.usedOrigin = used;
+    }
+
+    public boolean getUsedOrigin(){return usedOrigin;}
 
     // --- Getters for View ---
 
