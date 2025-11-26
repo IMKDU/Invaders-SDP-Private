@@ -30,9 +30,9 @@ public class GameView {
 
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
-        //오리진 스킬 애니메이션 스킬횟수 > 0 그리고 p1점수 500이상일때 발동
+        //오리진 스킬 애니메이션 스킬횟수 > 0 그리고 p1점수 200이상일때 발동
         // 구현 해야할거 발동후 로직, 아군 ship 무적
-        if (model.getFinalSkillCnt() > 0 && (dto.getScoreP1() >= 500)) {
+        if (model.getFinalSkillCnt() > 0 && (dto.getScoreP1() >= 200)) {
             drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
             drawManager.getSpecialAnimationRenderer().draw();
             if (drawManager.getSpecialAnimationRenderer().isFinished()){
