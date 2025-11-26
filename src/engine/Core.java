@@ -104,6 +104,7 @@ public final class Core {
                     // Main menu.
                     currentScreen = new TitleScreen(FRAME_WIDTH, FRAME_HEIGHT, GameConstant.FPS);
                     if (!SoundManager.isCurrentLoop("sfx/menu_music.wav")) {
+                        SoundManager.stop("sfx/gameover.wav");
                         SoundManager.playLoop("sfx/menu_music.wav");
                     }
                     LOGGER.info("Starting " + Core.FRAME_WIDTH + "x" + Core.FRAME_HEIGHT

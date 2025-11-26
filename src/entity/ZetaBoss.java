@@ -1,5 +1,6 @@
 package entity;
 
+import audio.SoundManager;
 import engine.Core;
 import engine.Cooldown;
 import engine.DrawManager;
@@ -125,7 +126,7 @@ public class ZetaBoss extends MidBoss {
             }
             else {
                 // 대시 중일 때만 Dash 이미지 사용
-                if (isCurrentlyDashing()) {
+                if (!isInDashCooldown) {
                     this.setWidth(144 * 2);
                     this.setHeight(153 * 2);
 
@@ -147,7 +148,7 @@ public class ZetaBoss extends MidBoss {
                 else {
                     this.setWidth(119 * 2);
                     this.setHeight(126 * 2);
-                    if (movingRight){
+                    if (isDiagonalRight()){
                         if (this.spriteType == DrawManager.SpriteType.ZetaBossMovingRight1) {
                             this.spriteType = DrawManager.SpriteType.ZetaBossMovingRight2;
                         } else {
@@ -296,6 +297,7 @@ public class ZetaBoss extends MidBoss {
     @Override
     public void takeDamage(int damage) {
         this.healPoint -= damage;
+        SoundManager.play("sfx/ZetaBoss_hitting.wav");
     }
 
     public boolean isShowingPath() {

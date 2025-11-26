@@ -117,6 +117,7 @@ public class ShopScreen extends Screen {
         this.logger.info("Shop screen initialized with " +
                 gameState.getCoin() + " coins. BetweenLevels=" + betweenLevels);
         SoundManager.stop("sfx/Shop.wav");
+        SoundManager.stopAll();
         SoundManager.playLoop("sfx/Shop.wav");
     }
 
