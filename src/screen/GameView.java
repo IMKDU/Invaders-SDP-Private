@@ -3,11 +3,11 @@ package screen;
 import audio.SoundManager;
 import engine.DrawManager;
 import engine.DTO.HUDInfoDTO;
-import entity.DropItem;
-import entity.GameModel;
-import entity.LaserBullet;
+import entity.*;
 import entity.pattern.ApocalypseAttackPattern;
-import entity.GameConstant;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * GameView
@@ -21,6 +21,7 @@ public class GameView {
 
     private final GameModel model;
     private final DrawManager drawManager;
+    private final List<Entity> shipRenderQueue = new ArrayList<>();
 
     public GameView(GameModel model, DrawManager drawManager) {
         this.model = model;
@@ -55,6 +56,8 @@ public class GameView {
             if (dto.getShipP2().isInvincible()) {
                 drawManager.getEntityRenderer().drawShield(dto.getShipP2().getPositionX(), dto.getShipP2().getWidth(), dto.getShipP2().getPositionY(), dto.getShipP2().getHeight(), dto.getShipP2().getInvincibilityRatio());
             }
+
+            shipRenderQueue.clear();
             /** Entity Rendering */
             if (model.getEntitiesToRender() != null) {
                 for (int i = 0; i < model.getEntitiesToRender().size(); i++) {
@@ -64,7 +67,14 @@ public class GameView {
                         drawManager.getItemRenderer().render((DropItem) e);
                         continue;
                     }
+                    if (e instanceof Ship) { // ship을 맨 마지막에 그리기
+                        shipRenderQueue.add(e);
+                        continue;
+                    }
                     drawManager.getEntityRenderer().drawEntity(e);
+                }
+                for (Entity s : shipRenderQueue) {
+                    drawManager.getEntityRenderer().drawEntity(s);
                 }
             }
         }

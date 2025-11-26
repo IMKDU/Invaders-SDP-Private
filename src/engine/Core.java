@@ -88,7 +88,7 @@ public final class Core {
         GameConstant.initialize(FRAME_WIDTH, FRAME_HEIGHT);
 
 		levelManager = new LevelManager();
-		GameState gameState = new GameState(3, 0, MAX_LIVES, MAX_LIVES, 0, 0,0);
+		GameState gameState = new GameState(1, 0, MAX_LIVES, MAX_LIVES, 0, 0,0);
 
 		if (GameConstant.isTest){
 			while (true) {
@@ -98,7 +98,7 @@ public final class Core {
 		}
         int returnCode = 1;
 		do {
-            gameState = new GameState(3, 0, MAX_LIVES,MAX_LIVES, 0, 0,gameState.getCoin());
+            gameState = new GameState(1, 0, MAX_LIVES,MAX_LIVES, 0, 0,gameState.getCoin());
 			switch (returnCode) {
                 case 1:
                     // Main menu.
@@ -121,6 +121,7 @@ public final class Core {
 
 						// Music for each level
 						SoundManager.stopAll();
+                        SoundManager.stop("sfx/gameover.wav");
 						SoundManager.playLoop("sfx/level" + gameState.getLevel() + ".wav");
 
                         engine.level.Level currentLevel = levelManager.getLevel(gameState.getLevel());
@@ -133,6 +134,7 @@ public final class Core {
                         }
 
 						SoundManager.stopAll();
+                        SoundManager.stop("sfx/gameover.wav");
 						SoundManager.playLoop("sfx/level" + gameState.getLevel() + ".wav");
 
                         // Start a new level

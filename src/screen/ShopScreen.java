@@ -118,6 +118,7 @@ public class ShopScreen extends Screen {
                 gameState.getCoin() + " coins. BetweenLevels=" + betweenLevels);
         SoundManager.stop("sfx/Shop.wav");
         SoundManager.stopAll();
+        SoundManager.stopSingleLoop("sfx/ShipMoving.wav");
         SoundManager.playLoop("sfx/Shop.wav");
     }
 
