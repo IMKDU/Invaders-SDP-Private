@@ -33,6 +33,7 @@ public class OmegaBoss extends MidBoss {
 	private static final int PATTERN_2_Y_SPEED = 3;
 	/** Color of pattern 2 */
 	private static final Color PATTERN_2_COLOR = Color.MAGENTA;
+
 	/** Dash cooldown duration in milliseconds (5 seconds) */
 	private static final int DASH_COOLDOWN_MS = 5000;
 
@@ -63,6 +64,7 @@ public class OmegaBoss extends MidBoss {
 		this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
 
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
+
 		choosePattern();
 	}
 
@@ -72,18 +74,18 @@ public class OmegaBoss extends MidBoss {
 	 * executing the boss's movement patterns.
 	 */
 	@Override
-	public void update() {
-		choosePattern();
+    public void update() {
+        choosePattern();
 
-		if (bossPattern != null) {
-			bossPattern.move();
-			bossPattern.attack();
+        if (bossPattern != null) {
+            bossPattern.move();
+            bossPattern.attack();
 
-			// Update position from pattern
-			this.positionX = bossPattern.getBossPosition().x;
-			this.positionY = bossPattern.getBossPosition().y;
-		}
-	}
+                // Update position from pattern
+            this.positionX = bossPattern.getBossPosition().x;
+            this.positionY = bossPattern.getBossPosition().y;
+        }
+    }
 
 	/**
 	 * Chooses the appropriate pattern based on boss health
@@ -190,12 +192,54 @@ public class OmegaBoss extends MidBoss {
 		this.healPoint -= damage;
 	}
 
-	public boolean isShowingPath() {
-		if (bossPattern instanceof DashPattern) {
-			return ((DashPattern) bossPattern).isShowingPath();
-		}
-		return false;
-	}
+    public boolean isShowingPath() {
+        if (bossPattern instanceof DashPattern) {
+            return ((DashPattern) bossPattern).isShowingPath();
+        }
+        return false;
+    }
+
+    /**
+     * Calculate dash end point (by watching)
+     * @return [x, y] array
+     */
+    public int[] getDashEndPoint() {
+        if (bossPattern instanceof DashPattern) {
+            return ((DashPattern) bossPattern).getDashEndPoint(this.width, this.height);
+        }
+        return new int[]{this.positionX + this.width / 2, this.positionY + this.height / 2};
+    }
+
+    /**
+     * Get current boss pattern
+     */
+    public BossPattern getBossPattern() {
+        return this.bossPattern;
+    }
+
+    /**
+     * Get current boss phase
+     */
+    public int getBossPhase() {
+        return this.bossPhase;
+    }
+
+    /**
+     * Check if boss is in dash cooldown
+     */
+    public boolean isInDashCooldown() {
+        return isInDashCooldown;
+    }
+
+    /**
+     * Update target ship for pattern
+     */
+    public void setTarget(Ship target) {
+        this.targetShip = target;
+        if (bossPattern != null) {
+            bossPattern.setTarget(target);
+        }
+    }
 
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
@@ -205,47 +249,5 @@ public class OmegaBoss extends MidBoss {
 	@Override
 	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
 		model.requestBossHitByPlayerBullet(bullet, this);
-	}
-
-	/**
-	 * Calculate dash end point (by watching)
-	 * @return [x, y] array
-	 */
-	public int[] getDashEndPoint() {
-		if (bossPattern instanceof DashPattern) {
-			return ((DashPattern) bossPattern).getDashEndPoint(this.width, this.height);
-		}
-		return new int[]{this.positionX + this.width / 2, this.positionY + this.height / 2};
-	}
-
-	/**
-	 * Get current boss pattern
-	 */
-	public BossPattern getBossPattern() {
-		return this.bossPattern;
-	}
-
-	/**
-	 * Get current boss phase
-	 */
-	public int getBossPhase() {
-		return this.bossPhase;
-	}
-
-	/**
-	 * Check if boss is in dash cooldown
-	 */
-	public boolean isInDashCooldown() {
-		return isInDashCooldown;
-	}
-
-	/**
-	 * Update target ship for pattern
-	 */
-	public void setTarget(Ship target) {
-		this.targetShip = target;
-		if (bossPattern != null) {
-			bossPattern.setTarget(target);
-		}
 	}
 }

@@ -6,11 +6,14 @@ import java.awt.*;
 import java.util.Map;
 
 import engine.BackBuffer;
-import engine.Core;
 import entity.Entity;
 import engine.DrawManager.SpriteType;
+import entity.GameConstant;
 import entity.LaserBullet;
 import entity.OmegaBoss;
+import entity.ZetaBoss;
+import entity.MidBoss;
+import entity.pattern.ApocalypseAttackPattern;
 import entity.pattern.BossPattern;
 import entity.pattern.DashPattern;
 
@@ -57,6 +60,10 @@ public final class EntityRenderer {
 			OmegaBoss omegaBoss = (OmegaBoss) entity;
 			drawOmegaBoss(omegaBoss);
 		}
+        else if (entity instanceof ZetaBoss) {
+           ZetaBoss zetaBoss = (ZetaBoss) entity;
+           drawZetaBoss(zetaBoss);
+        }
 		else {
 			drawEntity(entity, entity.getPositionX(), entity.getPositionY());
 		}
@@ -76,13 +83,28 @@ public final class EntityRenderer {
 		}
 	}
 
+    private void drawZetaBoss(ZetaBoss zetaBoss) {
+        // 1. 보스 본체 그리기
+        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
+
+        // 2. 패턴 이펙트 그리기
+        BossPattern currentPattern = zetaBoss.getBossPattern();
+        if (currentPattern != null) {
+            drawBossPattern(zetaBoss, currentPattern);
+        }
+    }
+
 	/**
 	 * Draws pattern-specific visualizations based on pattern type.
 	 */
-	private void drawBossPattern(OmegaBoss boss, BossPattern pattern) {
+	private void drawBossPattern(MidBoss boss, BossPattern pattern) {
 		if (pattern instanceof DashPattern) {
 			drawDashPatternVisual(boss, (DashPattern) pattern);
 		}
+
+        else if (pattern instanceof ApocalypseAttackPattern) {
+            drawApocalypseVisual((ApocalypseAttackPattern) pattern);
+        }
 		// Add more pattern types here as needed
 		// else if (pattern instanceof ex1Pattern) {
 		//     drawLaserPatternVisual(boss, (ex1Pattern) pattern);
@@ -92,15 +114,63 @@ public final class EntityRenderer {
 		// }
 	}
 
+    /**
+     * [Added] Apocalypse Pattern Visualization Method
+     * (Ported logic from existing GameView/UIRenderer)
+     */
+    private void drawApocalypseVisual(ApocalypseAttackPattern pattern) {
+        Graphics g = backBuffer.getGraphics();
+        int screenWidth = GameConstant.SCREEN_WIDTH;
+        int screenHeight = GameConstant.SCREEN_HEIGHT;
+        int safeZoneColumn = pattern.getSafeZoneColumn();
+        int totalColumns = ApocalypseAttackPattern.TOTAL_COLUMNS;
+        int columnWidth = screenWidth / totalColumns;
+
+        if (pattern.isWarningActive()) {
+            // Draw warning screen (Red translucent)
+            Color attackColor = new Color(255, 0, 0, 100);
+            Color safeColor = new Color(255, 255, 255, 100);
+
+            for (int i = 0; i < totalColumns; i++) {
+                if (i == safeZoneColumn) {
+                    g.setColor(safeColor);
+                } else {
+                    g.setColor(attackColor);
+                }
+                g.fillRect(i * columnWidth, 0, columnWidth, screenHeight);
+            }
+        }
+        else if (pattern.isAttacking()) {
+            // Draw attack animation (Dark red)
+            float progress = pattern.getAttackAnimationProgress();
+            int currentAttackHeight = (int) (screenHeight * progress);
+            Color attackColor = new Color(255, 0, 0, 200);
+
+            g.setColor(attackColor);
+            for (int i = 0; i < totalColumns; i++) {
+                if (i != safeZoneColumn) {
+                    g.fillRect(i * columnWidth, 0, columnWidth, currentAttackHeight);
+                }
+            }
+        }
+    }
+
 	/**
 	 * Draws visualization for DashPattern.
 	 */
-	private void drawDashPatternVisual(OmegaBoss boss, DashPattern dashPattern) {
+	private void drawDashPatternVisual(MidBoss boss, DashPattern dashPattern) {
 		if (!dashPattern.isShowingPath()) {
 			return;
 		}
 
-		int[] targetPoint = boss.getDashEndPoint();
+        int[] targetPoint;
+        if (boss instanceof OmegaBoss) {
+            targetPoint = ((OmegaBoss) boss).getDashEndPoint();
+        } else if (boss instanceof ZetaBoss) {
+            targetPoint = ((ZetaBoss) boss).getDashEndPoint();
+        } else {
+            return;
+        }
 
 		// Calculate boss center point
 		int bossWidth = boss.getWidth();
