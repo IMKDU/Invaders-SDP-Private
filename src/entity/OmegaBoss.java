@@ -5,7 +5,6 @@ import engine.Core;
 import engine.Cooldown;
 import entity.pattern.*;
 
-
 import java.awt.*;
 import java.util.List;
 import java.util.logging.Logger;
@@ -76,8 +75,8 @@ public class OmegaBoss extends MidBoss {
 	 * executing the boss's movement patterns.
 	 */
 	@Override
-	public void update() {
-		choosePattern();
+    public void update() {
+        choosePattern();
 
 		if (bossPattern != null) {
 			bossPattern.move();
@@ -168,6 +167,7 @@ public class OmegaBoss extends MidBoss {
 		dashCooldown.reset();
 		logger.info("OMEGA : Dash cooldown started (5 seconds)");
 	}
+
 	/** move simple */
 	@Override
 	public void move(int distanceX, int distanceY) {
@@ -194,12 +194,54 @@ public class OmegaBoss extends MidBoss {
 		this.healPoint -= damage;
 	}
 
-	public boolean isShowingPath() {
-		if (bossPattern instanceof DashPattern) {
-			return ((DashPattern) bossPattern).isShowingPath();
-		}
-		return false;
-	}
+    public boolean isShowingPath() {
+        if (bossPattern instanceof DashPattern) {
+            return ((DashPattern) bossPattern).isShowingPath();
+        }
+        return false;
+    }
+
+    /**
+     * Calculate dash end point (by watching)
+     * @return [x, y] array
+     */
+    public int[] getDashEndPoint() {
+        if (bossPattern instanceof DashPattern) {
+            return ((DashPattern) bossPattern).getDashEndPoint(this.width, this.height);
+        }
+        return new int[]{this.positionX + this.width / 2, this.positionY + this.height / 2};
+    }
+
+    /**
+     * Get current boss pattern
+     */
+    public BossPattern getBossPattern() {
+        return this.bossPattern;
+    }
+
+    /**
+     * Get current boss phase
+     */
+    public int getBossPhase() {
+        return this.bossPhase;
+    }
+
+    /**
+     * Check if boss is in dash cooldown
+     */
+    public boolean isInDashCooldown() {
+        return isInDashCooldown;
+    }
+
+    /**
+     * Update target ship for pattern
+     */
+    public void setTarget(Ship target) {
+        this.targetShip = target;
+        if (bossPattern != null) {
+            bossPattern.setTarget(target);
+        }
+    }
 
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
@@ -209,48 +251,6 @@ public class OmegaBoss extends MidBoss {
 	@Override
 	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
 		model.requestBossHitByPlayerBullet(bullet, this);
-	}
-
-	/**
-	 * Calculate dash end point (by watching)
-	 * @return [x, y] array
-	 */
-	public int[] getDashEndPoint() {
-		if (bossPattern instanceof DashPattern) {
-			return ((DashPattern) bossPattern).getDashEndPoint(this.width, this.height);
-		}
-		return new int[]{this.positionX + this.width / 2, this.positionY + this.height / 2};
-	}
-
-	/**
-	 * Get current boss pattern
-	 */
-	public BossPattern getBossPattern() {
-		return this.bossPattern;
-	}
-
-	/**
-	 * Get current boss phase
-	 */
-	public int getBossPhase() {
-		return this.bossPhase;
-	}
-
-	/**
-	 * Check if boss is in dash cooldown
-	 */
-	public boolean isInDashCooldown() {
-		return isInDashCooldown;
-	}
-
-	/**
-	 * Update target ship for pattern
-	 */
-	public void setTarget(Ship target) {
-		this.targetShip = target;
-		if (bossPattern != null) {
-			bossPattern.setTarget(target);
-		}
 	}
 
 	public List<MidBossMob> getSpawnMobs() { return this.spawnPattern.getChildShips();}

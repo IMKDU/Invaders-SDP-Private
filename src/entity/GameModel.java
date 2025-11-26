@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import entity.pattern.ApocalypseAttackPattern;
 import java.util.logging.Logger;
 
 import engine.*;
@@ -63,6 +64,8 @@ public class GameModel {
     private Cooldown screenFinishedCooldown;
     /** OmegaBoss */
     private MidBoss omegaBoss;
+    /** ZetaBoss */
+    private MidBoss zetaBoss;
     /** Set of all bullets fired by on-screen ships. */
     private Set<Bullet> bullets;
     /** Set of all dropItems dropped by on screen ships. */
@@ -189,6 +192,7 @@ public class GameModel {
         this.finalBoss = null;
         this.omegaBoss = null;
         this.midBossChilds = null;
+        this.zetaBoss = null;
         this.currentPhase = StagePhase.wave;
 
 //        bossPattern = new BossPattern();
@@ -288,41 +292,65 @@ public class GameModel {
                 }
                 break;
             case boss_wave:
-                if (this.finalBoss == null && this.omegaBoss == null){
+                if (this.finalBoss == null && this.omegaBoss == null && this.zetaBoss == null){
                     bossReveal();
                     this.enemyShipFormationModel.clear();
                 }
                 if(this.finalBoss != null){
                     finalbossManage();
                 }
-                else if (this.omegaBoss != null){
+                if (this.omegaBoss != null){
                     this.omegaBoss.update();
-
-					if (this.omegaBoss instanceof OmegaBoss omega) {
+                    if (this.omegaBoss instanceof OmegaBoss omega) {
                         midBossChilds = omega.getSpawnMobs();
-						bossBullets.addAll(omega.getBossPattern().getBullets());
-					}
-					Set<Bullet> removeList = new HashSet<>();
-					for (Bullet b : bossBullets) {
-						b.update();
-						if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
-							removeList.add(b);
-						}
-					}
-					bossBullets.removeAll(removeList);
+                        bossBullets.addAll(omega.getBossPattern().getBullets());
+                    }
+                    Set<Bullet> removeList = new HashSet<>();
+                    for (Bullet b : bossBullets) {
+                        b.update();
+                        if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
+                            removeList.add(b);
+                        }
+                    }
+                    bossBullets.removeAll(removeList);
 
-					if (this.omegaBoss.isDestroyed()) {
-                        if ("omegaAndFinal".equals(this.currentLevel.getBossId())) {
+                    if (this.omegaBoss.isDestroyed()) {
+                        if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.omegaBoss = null;
-                            this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, ships, this.width, this.height);
-                            this.logger.info("Final Boss has spawned!");
+                            this.zetaBoss = new ZetaBoss(Color.MAGENTA, this.ship);
+                            this.logger.info("Zeta Boss has spawned!");
                         } else {
-                            this.levelFinished = true;
-                            this.screenFinishedCooldown.reset();
+
                         }
                     }
                 }
-                else{
+
+                // ZetaBoss logic added
+                if (this.zetaBoss != null) {
+                    this.zetaBoss.update();
+
+                    ApocalypseAttackPattern pattern = this.zetaBoss.getApocalypsePattern();
+                    if (pattern != null && pattern.isAttacking()) {
+                        float progress = pattern.getAttackAnimationProgress();
+                        executeApocalypseDamage(pattern.getSafeZoneColumn(), progress);
+                    }
+
+                    if (this.zetaBoss.isDestroyed()) {
+                        if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
+                            this.zetaBoss = null;
+                            this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, ships, this.width, this.height); // [추가] Final 소환
+                            this.logger.info("Final Boss has spawned!");
+                        } else {
+
+                        }
+                    }
+                }
+
+                boolean isFinalBossAlive = (this.finalBoss != null && !this.finalBoss.isDestroyed());
+                boolean isOmegaBossAlive = (this.omegaBoss != null && !this.omegaBoss.isDestroyed());
+                boolean isZetaBossAlive = (this.zetaBoss != null && !this.zetaBoss.isDestroyed());
+
+                if (!isFinalBossAlive && !isOmegaBossAlive && !isZetaBossAlive) {
                     if(!this.levelFinished){
                         this.levelFinished = true;
                         this.screenFinishedCooldown.reset();
@@ -372,6 +400,8 @@ public class GameModel {
 
 		if (finalBoss != null && !finalBoss.isDestroyed()) entities.add(finalBoss);
 		if (omegaBoss != null && !omegaBoss.isDestroyed()) entities.add(omegaBoss);
+        if (zetaBoss != null && !zetaBoss.isDestroyed()) entities.add(zetaBoss);
+
         if (midBossChilds != null){
             for(MidBossMob mb : midBossChilds){ entities.add(mb); }
         }
@@ -602,6 +632,69 @@ public class GameModel {
         cleanItems();
     }
 
+    /**
+     * Determines the damage for the boss's area-wide attack. (General method)
+     * @param safeZoneColumn (0-9) Safe zone column index
+     */
+    public void executeApocalypseDamage(int safeZoneColumn, float progress) {
+        if (safeZoneColumn < 0 || safeZoneColumn > 9) {
+            return;
+        }
+
+        // Calculate the current "bottom" Y-coordinate of the attack based on animation progress
+        int currentAttackHeight = (int) (this.height * progress);
+
+        int columnWidth = this.width / 10;
+
+        // --- Player 1 Check ---
+        if (this.livesP1 > 0 && this.ship != null && !this.ship.isDestroyed() && !this.ship.isInvincible()) {
+            // Based on the player's end X-coordinate
+            int playerLeftX = this.ship.getPositionX();
+            int playerRightX = this.ship.getPositionX() + this.ship.getWidth() - 1;
+
+            // Player's Y-coordinate (top)
+            int playerTopY = this.ship.getPositionY();
+
+            int leftColumn = playerLeftX / columnWidth;
+            int rightColumn = playerRightX / columnWidth;
+
+            // Is the player in a column that is not the safe zone?
+            boolean isInRedZone = (leftColumn != safeZoneColumn || rightColumn != safeZoneColumn);
+            // Is the "bottom" of the attack animation below the "top" of the player?
+            //    (i.e., has the attack reached the player?)
+            boolean isHitByAnimation = (currentAttackHeight >= playerTopY);
+
+            // If the player is not in the safe zone AND is hit by the animation
+            if (isInRedZone && isHitByAnimation) {
+                this.ship.destroy();
+                this.livesP1--;
+                showHealthPopup("-1 Life (Apocalypse!)");
+                this.logger.info("Hit by Apocalypse, " + this.livesP1 + " lives remaining.");
+            }
+        }
+
+        // --- Player 2 Check ---
+        if (this.shipP2 != null && this.livesP2 > 0 && !this.shipP2.isDestroyed() && !this.shipP2.isInvincible()) {
+            int playerLeftX = this.shipP2.getPositionX(); //
+            int playerRightX = this.shipP2.getPositionX() + this.shipP2.getWidth() - 1;
+
+            int playerTopY = this.shipP2.getPositionY();
+
+            int leftColumn = playerLeftX / columnWidth;
+            int rightColumn = playerRightX / columnWidth;
+
+            boolean isInRedZone = (leftColumn != safeZoneColumn || rightColumn != safeZoneColumn);
+            boolean isHitByAnimation = (currentAttackHeight >= playerTopY);
+
+            if (isInRedZone && isHitByAnimation) {
+                this.shipP2.destroy();
+                this.livesP2--;
+                showHealthPopup("-1 Life (Apocalypse!)");
+                this.logger.info("P2 Hit by Apocalypse, " + this.livesP2 + " lives remaining.");
+            }
+        }
+    }
+
 
     /**
      * Cleans bullets that go off screen.
@@ -725,9 +818,15 @@ public class GameModel {
                 this.logger.info("Final Boss has spawned!");
                 break;
             case "omegaBoss":
-            case "omegaAndFinal":
                 this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
-
+                this.logger.info("Omega Boss has spawned!");
+                break;
+            case "ZetaBoss":
+                this.zetaBoss = new ZetaBoss(Color.ORANGE, ship);
+                this.logger.info("Zeta Boss has spawned!");
+                break;
+            case "omegaAndZetaAndFinal":
+                this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
                 this.logger.info("Omega Boss has spawned!");
                 break;
             default:
@@ -875,6 +974,7 @@ public class GameModel {
     public Set<Bullet> getBossBullets() { return bossBullets; }
     public EnemyShipFormationModel getEnemyShipFormationModel() { return enemyShipFormationModel; }
     public MidBoss getOmegaBoss() { return omegaBoss; }
+    public MidBoss getZetaBoss() { return zetaBoss; }
     public List<MidBossMob> getMidBossChilds() { return midBossChilds; }
     public Set<Bullet> getBullets() { return bullets; }
     public Set<DropItem> getDropItems() { return dropItems; }
@@ -930,6 +1030,12 @@ public class GameModel {
         if (getOmegaBoss() != null) {
             renderList.add(getOmegaBoss());
         }
+
+        // [추가] ZetaBoss 렌더링 리스트 추가
+        if (getZetaBoss() != null) {
+            renderList.add(getZetaBoss());
+        }
+
         if (getFinalBoss() != null && !getFinalBoss().isDestroyed()) {
             renderList.add(getFinalBoss());
         }

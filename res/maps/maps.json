@@ -54,7 +54,7 @@
         { "enemyType": "enemyB", "itemId": "Shield", "dropChance": 0.15 },
         { "enemyType": "enemyB", "itemId": "Slow", "dropChance": 0.05 }
       ],
-      "bossId": "omegaBoss",
+      "bossId": "ZetaBoss",
       "completionBonus": { "currency": 30 }
     },
     {
@@ -121,7 +121,7 @@
         { "enemyType": "enemyC", "itemId": "Explode", "dropChance": 0.05 },
         { "enemyType": "enemyC", "itemId": "Stop", "dropChance": 0.05 }
       ],
-      "bossId": "finalBoss",
+      "bossId": "ZetaBoss",
       "completionBonus": { "currency": 70 }
     },
     {
@@ -142,7 +142,7 @@
         { "enemyType": "enemyC", "itemId": "Explode", "dropChance": 0.1 },
         { "enemyType": "enemyC", "itemId": "Heal", "dropChance": 0.05 }
       ],
-      "bossId": "omegaAndFinal",
+      "bossId": "omegaAndZetaAndFinal",
       "completionBonus": { "currency": 90 },
       "achievementTrigger": "Conqueror"
     }
