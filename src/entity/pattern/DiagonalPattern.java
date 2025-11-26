@@ -35,7 +35,10 @@ public class DiagonalPattern extends BossPattern {
         this.isRight = true;
         this.isDown = true;
 
-        // Update boss appearance for this pattern
+        // [BUG FIX] Apply color to the boss
+        if (bossBound instanceof Entity) {
+            ((Entity) bossBound).setColor(patternColor);
+        }
 
     }
 

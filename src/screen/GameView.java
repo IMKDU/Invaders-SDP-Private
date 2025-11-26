@@ -6,6 +6,7 @@ import engine.DTO.HUDInfoDTO;
 import entity.DropItem;
 import entity.GameModel;
 import entity.LaserBullet;
+import entity.pattern.ApocalypseAttackPattern;
 import entity.GameConstant;
 
 /**
@@ -56,14 +57,15 @@ public class GameView {
             }
             /** Entity Rendering */
             if (model.getEntitiesToRender() != null) {
-                for (var e : model.getEntitiesToRender()) {
+                for (int i = 0; i < model.getEntitiesToRender().size(); i++) {
+                    var e = model.getEntitiesToRender().get(i);
+
                     if (e instanceof DropItem) {
                         drawManager.getItemRenderer().render((DropItem) e);
                         continue;
                     }
                     drawManager.getEntityRenderer().drawEntity(e);
                 }
-
             }
         }
 
