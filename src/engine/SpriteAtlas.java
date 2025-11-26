@@ -63,11 +63,23 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.Laser, new BufferedImage(5,13,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.BlackHole1, new BufferedImage(1024,1024,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.BlackHole2, new BufferedImage(1024,1024,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.ZetaBoss1, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.ZetaBoss2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.ZetaBossMoving1, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.ZetaBossMoving2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.ZetaBossDash1, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.ZetaBossDash2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             fileManager.loadSprite(spriteMap);
             //여기서부터는 대칭 스프라이트
             spriteMap.put(SpriteType.OmegaBossDash3, mirrorSprite(spriteMap.get(SpriteType.OmegaBossDash1)));
             spriteMap.put(SpriteType.OmegaBossDash4, mirrorSprite(spriteMap.get(SpriteType.OmegaBossDash2)));
             spriteMap.put(SpriteType.EnemyShipSpecialLeft, mirrorSprite(spriteMap.get(SpriteType.EnemyShipSpecial)));
+            spriteMap.put(SpriteType.ZetaBossRight1, mirrorSprite(spriteMap.get(SpriteType.ZetaBoss1)));
+            spriteMap.put(SpriteType.ZetaBossRight2, mirrorSprite(spriteMap.get(SpriteType.ZetaBoss2)));
+            spriteMap.put(SpriteType.ZetaBossMovingRight1, mirrorSprite(spriteMap.get(SpriteType.ZetaBossMoving1)));
+            spriteMap.put(SpriteType.ZetaBossMovingRight2, mirrorSprite(spriteMap.get(SpriteType.ZetaBossMoving2)));
+            spriteMap.put(SpriteType.ZetaBossDashRight1, mirrorSprite(spriteMap.get(SpriteType.ZetaBossDash1)));
+            spriteMap.put(SpriteType.ZetaBossDashRight2, mirrorSprite(spriteMap.get(SpriteType.ZetaBossDash2)));
 
 
         } catch (IOException e) {

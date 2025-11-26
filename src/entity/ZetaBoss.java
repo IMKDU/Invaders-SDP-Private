@@ -23,9 +23,9 @@ public class ZetaBoss extends MidBoss {
     /** Initial position in the y-axis. */
     private static final int INIT_POS_Y = 80;
     /** Width of Zeta */
-    private static final int ZETA_WIDTH = 64;
+    private static final int ZETA_WIDTH = 100 * 2;
     /** Height of Zeta */
-    private static final int ZETA_HEIGHT = 28;
+    private static final int ZETA_HEIGHT = 100 * 2;
     /** Current Health of Zeta */
     private static final int ZETA_HEALTH = 60; // Slightly higher HP than Omega
     /** Point of Zeta when destroyed */
@@ -56,6 +56,8 @@ public class ZetaBoss extends MidBoss {
     private Cooldown dashCooldown;
     /** Flag to track if currently in dash cooldown */
     private boolean isInDashCooldown = false;
+    private Cooldown animationCooldown;
+    private boolean movingRight;
 
     /**
      * Constructor, establishes the boss entity's generic properties.
@@ -67,8 +69,9 @@ public class ZetaBoss extends MidBoss {
         super(INIT_POS_X, INIT_POS_Y, ZETA_WIDTH, ZETA_HEIGHT, ZETA_HEALTH, ZETA_POINT_VALUE, color);
         this.targetShip = player;
         // Reusing OmegaBoss sprites as placeholders
-        this.spriteType = DrawManager.SpriteType.OmegaBoss1;
+        this.spriteType = DrawManager.SpriteType.ZetaBoss1;
         this.logger = Core.getLogger();
+        this.animationCooldown = new Cooldown(200);
         this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
 
         // Initialize Apocalypse Pattern
@@ -84,6 +87,84 @@ public class ZetaBoss extends MidBoss {
      */
     @Override
     public void update() {
+        if (this.animationCooldown.checkFinished()) {
+            this.animationCooldown.reset();
+            if (this.bossPhase == 2) {
+                if (isHorizonRight()){
+                    if (this.spriteType == DrawManager.SpriteType.ZetaBossRight1) {
+                        this.spriteType = DrawManager.SpriteType.ZetaBossRight2;
+                    } else {
+                        this.spriteType = DrawManager.SpriteType.ZetaBossRight1;
+                    }
+                }
+                else {
+                    if (this.spriteType == DrawManager.SpriteType.ZetaBoss1) {
+                        this.spriteType = DrawManager.SpriteType.ZetaBoss2;
+                    } else {
+                        this.spriteType = DrawManager.SpriteType.ZetaBoss1;
+                    }
+                }
+            }
+            else if (this.bossPhase == 3){
+                this.setWidth(119 * 2);
+                this.setHeight(126 * 2);
+                if (isDiagonalRight()){
+                    if (this.spriteType == DrawManager.SpriteType.ZetaBossMovingRight1) {
+                        this.spriteType = DrawManager.SpriteType.ZetaBossMovingRight2;
+                    } else {
+                        this.spriteType = DrawManager.SpriteType.ZetaBossMovingRight1;
+                    }
+                }
+                else {
+                    if (this.spriteType == DrawManager.SpriteType.ZetaBossMoving1) {
+                        this.spriteType = DrawManager.SpriteType.ZetaBossMoving2;
+                    } else {
+                        this.spriteType = DrawManager.SpriteType.ZetaBossMoving1;
+                    }
+                }
+            }
+            else {
+                // 대시 중일 때만 Dash 이미지 사용
+                if (isCurrentlyDashing()) {
+                    this.setWidth(144 * 2);
+                    this.setHeight(153 * 2);
+
+                    if (this.isDashRight()) {
+                        if (this.spriteType == DrawManager.SpriteType.ZetaBossDashRight1) {
+                            this.spriteType = DrawManager.SpriteType.ZetaBossDashRight2;
+                        } else {
+                            this.spriteType = DrawManager.SpriteType.ZetaBossDashRight1;
+                        }
+                    } else {
+                        if (this.spriteType == DrawManager.SpriteType.ZetaBossDash1) {
+                            this.spriteType = DrawManager.SpriteType.ZetaBossDash2;
+                        } else {
+                            this.spriteType = DrawManager.SpriteType.ZetaBossDash1;
+                        }
+                    }
+                }
+                // 대시가 아닌 경우 → 기본 이동 애니메이션
+                else {
+                    this.setWidth(119 * 2);
+                    this.setHeight(126 * 2);
+                    if (movingRight){
+                        if (this.spriteType == DrawManager.SpriteType.ZetaBossMovingRight1) {
+                            this.spriteType = DrawManager.SpriteType.ZetaBossMovingRight2;
+                        } else {
+                            this.spriteType = DrawManager.SpriteType.ZetaBossMovingRight1;
+                        }
+                    }
+                    else {
+                        if (this.spriteType == DrawManager.SpriteType.ZetaBossMoving1) {
+                            this.spriteType = DrawManager.SpriteType.ZetaBossMoving2;
+                        } else {
+                            this.spriteType = DrawManager.SpriteType.ZetaBossMoving1;
+                        }
+                    }
+                }
+            }
+        }
+
         choosePattern();
 
         if (bossPattern != null) {
@@ -94,6 +175,24 @@ public class ZetaBoss extends MidBoss {
             this.positionX = bossPattern.getBossPosition().x;
             this.positionY = bossPattern.getBossPosition().y;
         }
+    }
+    private boolean isDashRight(){
+        if (bossPattern instanceof DashPattern) {
+            return ((DashPattern) bossPattern).getRightDash();
+        }
+        return true;
+    }
+    private boolean isHorizonRight(){
+        if (bossPattern instanceof HorizontalPattern horizontalPattern) {
+            return horizontalPattern.getIsRight();
+        }
+        return true;
+    }
+    private boolean isDiagonalRight(){
+        if (bossPattern instanceof DiagonalPattern) {
+            return ((DiagonalPattern) bossPattern).getIsRight();
+        }
+        return true;
     }
 
     /**
@@ -173,6 +272,12 @@ public class ZetaBoss extends MidBoss {
         isInDashCooldown = true;
         dashCooldown.reset();
         logger.info("ZETA : Dash cooldown started (5 seconds)");
+    }
+    private boolean isCurrentlyDashing() {
+        if (bossPattern instanceof DashPattern) {
+            return ((DashPattern) bossPattern).isDashing();
+        }
+        return false;
     }
 
     @Override

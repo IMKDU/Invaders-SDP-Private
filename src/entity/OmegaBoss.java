@@ -219,8 +219,10 @@ public class OmegaBoss extends MidBoss {
 		}
 	}
     private boolean isRight(){
-        DashPattern dash = (DashPattern) bossPattern;
-        return dash.getRightDash();
+        if (bossPattern instanceof DashPattern) {
+            return ((DashPattern) bossPattern).getRightDash();
+        }
+        return true;
     }
 
 
