@@ -1,17 +1,21 @@
 package entity;
 
 import java.awt.Color;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 import java.util.Random;
 
-public class DropItem extends Entity {
-    public enum ItemType {
-        Explode(2),
-        Slow(10),
-        Stop(10),
-        Push(5),
-        Shield(5),
-        Heal(5);
+import engine.Core;
+
+public class DropItem extends Entity implements Collidable {
+	public enum ItemType {
+        SubShip(2),
+		Slow(10),
+		Stop(10),
+		Push(5),
+		Shield(5),
+		Heal(5);
 
 		private final int weight;
 
@@ -118,6 +122,60 @@ public class DropItem extends Entity {
 		}
 		return false;
 	}
+
+    /**
+     * Logic for applying SubShip item effect.
+     * Spawns a sub-ship or extends the duration of an existing one.
+     *
+     * @param owner          The player ship that acquired the item
+     * @param activeSubShips List of all sub-ships currently in the game (managed by GameModel)
+     */
+    public static void activateSubShip(Ship owner, List<SubShip> activeSubShips) {
+        Logger logger = Core.getLogger();
+
+        // 1. Extract list of sub-ships belonging to the current player
+        List<SubShip> mySubShips = new ArrayList<>();
+        if (activeSubShips != null) {
+            for (SubShip s : activeSubShips) {
+                if (!s.isDestroyed() && s.getOwner().equals(owner)) {
+                    mySubShips.add(s);
+                }
+            }
+        } else {
+            return;
+        }
+
+        // 2. Branch logic based on sub-ship count
+        if (mySubShips.size() < 2) {
+            // [Spawn Logic] Spawn new one in empty spot if less than 2
+            boolean shouldSpawnLeft = true;
+            if (!mySubShips.isEmpty()) {
+                SubShip existing = mySubShips.get(0);
+                // If existing is left -> Spawn right
+                if (existing.isLeft()) {
+                    shouldSpawnLeft = false;
+                }
+            }
+            SubShip newSub = new SubShip(owner, shouldSpawnLeft);
+            activeSubShips.add(newSub);
+            logger.info("SubShip spawned for Player " + owner.getPlayerId());
+        } else {
+            // If already 2, reset duration of the oldest ship
+            SubShip oldest = mySubShips.get(0);
+
+            // Iterate list to find the ship with the earliest creation time
+            for (SubShip s : mySubShips) {
+                if (s.getCreationTime() < oldest.getCreationTime()) {
+                    oldest = s;
+                }
+            }
+
+            // Reset time (maintain for another 10 seconds)
+            oldest.resetCreationTime();
+            logger.info("SubShip duration reset for Player " + owner.getPlayerId());
+        }
+    }
+
 /**
  * Manages the in-game item (enhancement) system.
  * This is a temporary implementation focusing on functionality.

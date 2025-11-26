@@ -62,6 +62,9 @@ public final class EntityRenderer {
         if (img == null) {
             return;
         }
+        boolean isSubShip = (entity instanceof entity.SubShip);
+        double currentScale = isSubShip ? this.scale * 0.5 : this.scale;
+
         int originalW = img.getWidth();
         int originalH = img.getHeight();
         int scaledW = (int) (originalW * scale * 2);
@@ -216,11 +219,14 @@ public final class EntityRenderer {
 	}
 
     private void drawZetaBoss(ZetaBoss zetaBoss) {
+        // 1. Draw boss body
+        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
+
+        // 2. Draw pattern effects
         BossPattern currentPattern = zetaBoss.getBossPattern();
         if (currentPattern != null) {
             drawBossPattern(zetaBoss, currentPattern);
         }
-        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
     }
 
 	private void drawMidBossMob(MidBossMob midBossMob) {

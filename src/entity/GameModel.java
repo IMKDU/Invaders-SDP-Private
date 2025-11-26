@@ -73,6 +73,8 @@ public class GameModel {
     private Set<Bullet> bullets;
     /** Set of all dropItems dropped by on screen ships. */
     private Set<DropItem> dropItems;
+    /** set of subship */
+    private List<SubShip> subShips;
     /** Current score. */
     private int score;
     // === [ADD] Independent scores for two players ===
@@ -174,6 +176,8 @@ public class GameModel {
         this.shipP2.setPlayerId(2); // === [ADD] Player2 ===
         // special enemy initial
 
+        this.subShips = new ArrayList<>();
+
         GameSettings specialSettings = new GameSettings(
 				currentLevel.getFormationWidth(),
 		        currentLevel.getFormationHeight(),
@@ -259,6 +263,16 @@ public class GameModel {
         if (ship.shoot(this.bullets)) {
             this.bulletsShot++;
             AchievementManager.getInstance().onShotFired();
+
+            // Sub-ships fire together
+            if (this.subShips != null) {
+                for (SubShip sub : subShips) {
+                    // Fire only if the sub-ship is not destroyed and belongs to the player firing
+                    if (!sub.isDestroyed() && sub.getOwner().getPlayerId() == playerNum) {
+                        sub.shoot(this.bullets);
+                    }
+                }
+            }
         }
     }
 
@@ -380,6 +394,16 @@ public class GameModel {
         if (this.shipP2 != null) {
             this.shipP2.update();
         }
+
+        // Update SubShips
+        if (this.subShips != null) {
+            for (int i = 0; i < subShips.size(); i++) {
+                subShips.get(i).update();
+            }
+            // Remove destroyed or expired sub-ships
+            subShips.removeIf(SubShip::isDestroyed);
+        }
+
         // special enemy update
         this.enemyShipSpecialFormation.update();
 
@@ -421,6 +445,11 @@ public class GameModel {
 		if (shipP2 != null && livesP2 > 0 && !shipP2.isDestroyed()) {
 			entities.add(shipP2);
 		}
+
+        // Add sub-ships to collision check targets
+        for (SubShip sub : subShips) {
+            if (!sub.isDestroyed()) entities.add(sub);
+        }
 
 		for (EnemyShip e : enemyShipFormationModel) {
 			if (e != null && !e.isDestroyed()) entities.add(e);
@@ -743,12 +772,12 @@ public class GameModel {
 				pushEnemiesBack();
 				break;
 
-			case Explode:
-				int destroyed = enemyShipFormationModel.destroyAll();
-				int pts = destroyed * 5;
-				if (ship.getPlayerId() == 2) scoreP2 += pts;
-				else scoreP1 += pts;
-				break;
+			case SubShip:
+                if (this.subShips == null) {
+                    this.subShips = new ArrayList<>();
+                }
+                DropItem.activateSubShip(ship, this.subShips);
+                break;
 
 			case Slow:
 				enemyShipFormationModel.activateSlowdown();
@@ -872,6 +901,28 @@ public class GameModel {
                 this.livesP2--;
                 showHealthPopup("-1 Life (Apocalypse!)");
                 this.logger.info("P2 Hit by Apocalypse, " + this.livesP2 + " lives remaining.");
+            }
+        }
+
+        // 3. SubShip Check
+        if (this.subShips != null) {
+            for (SubShip sub : this.subShips) {
+                if (!sub.isDestroyed()) {
+                    int subX = sub.getPositionX();
+                    int subY = sub.getPositionY();
+                    int subRightX = subX + sub.getWidth() - 1;
+
+                    int leftColumn = subX / columnWidth;
+                    int rightColumn = subRightX / columnWidth;
+
+                    boolean isInRedZone = (leftColumn != safeZoneColumn || rightColumn != safeZoneColumn);
+                    boolean isHitByAnimation = (currentAttackHeight >= subY);
+
+                    if (isInRedZone && isHitByAnimation) {
+                        sub.destroy();
+                        this.logger.info("SubShip destroyed by Apocalypse!");
+                    }
+                }
             }
         }
     }
@@ -1206,6 +1257,11 @@ public class GameModel {
         }
         if (getShipP2() != null && getLivesP2() > 0) {
             renderList.add(getShipP2());
+        }
+
+        // added subships
+        if (this.subShips != null) {
+            renderList.addAll(this.subShips);
         }
 
         // 2. added special enemyship

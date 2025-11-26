@@ -262,6 +262,34 @@ public class ShopItem {
 		return BULLET_SPEED_VALUES[bulletSpeedLevel];
 	}
 
+    // ==================== Helper Methods for Specific Levels (Added) ====================
+
+    /**
+     * Returns the number of MultiShot bullets for a specific level.
+     */
+    public static int getMultiShotBulletCountForLevel(int level) {
+        if (level < 0) level = 0;
+        if (level > MAX_MULTI_SHOT_LEVEL) level = MAX_MULTI_SHOT_LEVEL;
+        return MULTI_SHOT_BULLETS[level];
+    }
+
+    /**
+     * Returns the spacing of MultiShot bullets for a specific level.
+     */
+    public static int getMultiShotSpacingForLevel(int level) {
+        if (level < 0) level = 0;
+        if (level > MAX_MULTI_SHOT_LEVEL) level = MAX_MULTI_SHOT_LEVEL;
+        return MULTI_SHOT_SPACING[level];
+    }
+
+    /**
+     * Returns the penetration count for a specific level.
+     */
+    public static int getPenetrationCountForLevel(int level) {
+        if (level < 0) level = 0;
+        if (level > MAX_PENETRATION_LEVEL) level = MAX_PENETRATION_LEVEL;
+        return PENETRATION_COUNT[level];
+    }
 
 	// ==================== Utility Methods ====================
 
