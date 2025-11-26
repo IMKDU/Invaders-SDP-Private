@@ -151,14 +151,14 @@ public class Ship extends Entity implements Collidable {
             if (this.isMove) {
                 this.spriteType = moveSprite;
                 if (!movingSoundPlaying) {
-                    SoundManager.play("sfx/ShipMoving.wav");
+                    SoundManager.playSingleLoop("sfx/ShipMoving.wav");
                     movingSoundPlaying = true;
                 }
                 this.isMove = false;
             } else {
                 this.spriteType = idleSprite;
                 if (movingSoundPlaying) {
-                    SoundManager.stop("sfx/ShipMoving.wav");
+                    SoundManager.stopSingleLoop("sfx/ShipMoving.wav");
                     movingSoundPlaying = false;
                 }
             }
@@ -193,6 +193,7 @@ public class Ship extends Entity implements Collidable {
     }
     public final void destroy() {
         if (!this.isInvincible) {
+            SoundManager.stopSingleLoop("sfx/ShipMoving.wav");
             SoundManager.play("sfx/destroy.wav");
             this.destructionCooldown.reset();
         }

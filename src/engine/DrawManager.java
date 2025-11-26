@@ -39,7 +39,7 @@ public final class DrawManager {
 	private ItemRenderer itemRenderer;
     private SpecialAnimationRenderer specialAnimationRenderer;
 	private double scale;
-
+    private final AnimationLoader loader;
 	/** Sprite types mapped to their images. */
 	private static Map<SpriteType, BufferedImage> spriteMap;
 
@@ -63,6 +63,7 @@ public final class DrawManager {
         spriteAtlas = new SpriteAtlas(fileManager);
         logger.info("Sprite atlas loaded!");
         logger.info("DrawManager initialized successfully");
+        this.loader = new AnimationLoader();
     }
 
 	/**
@@ -94,7 +95,7 @@ public final class DrawManager {
         backBuffer.initDraw(screenWidth, screenHeight);
         if(fontPack == null){
             fontPack = new FontPack(backBuffer.getGraphics(), fileManager);
-            entityRenderer = new EntityRenderer(spriteAtlas.getSpriteMap(),backBuffer,this.scale);
+            entityRenderer = new EntityRenderer(spriteAtlas.getSpriteMap(),backBuffer,this.scale, this.loader);
 			itemRenderer = new ItemRenderer(backBuffer, spriteAtlas.getSpriteMap(), this.scale);
 			hudRenderer = new HUDRenderer(backBuffer, fontPack, entityRenderer);
             shopRenderer = new ShopRenderer(backBuffer,fontPack);

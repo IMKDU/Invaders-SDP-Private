@@ -14,6 +14,7 @@ public class SoundManager {
     private static volatile boolean muted = false;  // global state of sound
     private static volatile String currentLooping = null;
     private static final Map<String, java.util.List<Clip>> PLAY_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, Clip> SINGLE_LOOP_MAP = new ConcurrentHashMap<>();
 
     public static void play(String resourcePath) {
         if (muted) return;
@@ -146,5 +147,37 @@ public class SoundManager {
 
     public static boolean isCurrentLoop(String path) {
         return currentLooping != null && currentLooping.equals(path);
+    }
+    public static void playSingleLoop(String path) {
+        if (muted) return;
+
+        try {
+            Clip c = SINGLE_LOOP_MAP.get(path);
+
+            // 없으면 로드 후 map에 저장
+            if (c == null) {
+                c = loadClip(path);
+                if (c == null) return;
+                SINGLE_LOOP_MAP.put(path, c);
+            }
+
+            if (!c.isRunning()) {
+                c.setFramePosition(0);
+                c.loop(Clip.LOOP_CONTINUOUSLY);
+                c.start();
+            }
+
+        } catch (Exception e) {
+            System.err.println("[Sound] playSingleLoop fail: " + e);
+        }
+    }
+
+    public static void stopSingleLoop(String path) {
+        Clip c = SINGLE_LOOP_MAP.get(path);
+        if (c != null && c.isRunning()) {
+            c.stop();
+            c.flush();
+            c.setFramePosition(0);
+        }
     }
 }

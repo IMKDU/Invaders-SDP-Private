@@ -7,10 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
-import engine.BackBuffer;
-import engine.Cooldown;
-import engine.Core;
-import engine.DrawManager;
+import engine.*;
 import entity.Entity;
 import engine.DrawManager.SpriteType;
 import entity.GameConstant;
@@ -27,17 +24,21 @@ import entity.pattern.DashPattern;
  * Acts as a sub-view in MVC architecture.
  */
 public final class EntityRenderer {
-
     private final Map<SpriteType, BufferedImage> spriteMap;
     private final BackBuffer backBuffer;
     private final double scale;
     private final Cooldown blackholeAnimationCooldown = new Cooldown(100);
     private SpriteType blackHoleType = SpriteType.BlackHole1;
+    private final Cooldown frameCooldown;
+    private BufferedImage[] apo;
+    private int apoFrameIndex = 0;
 
-    public EntityRenderer(Map<SpriteType, BufferedImage> spriteMap, BackBuffer backBuffer, double scale) {
+    public EntityRenderer(Map<SpriteType, BufferedImage> spriteMap, BackBuffer backBuffer, double scale ,AnimationLoader loader) {
         this.spriteMap = spriteMap;
         this.backBuffer = backBuffer;
         this.scale = scale;
+        this.frameCooldown = new Cooldown(70);
+        this.apo = loader.load("res/images/apo1");
     }
 
     /** Draws a single entity on the back buffer. */
@@ -161,14 +162,15 @@ public final class EntityRenderer {
 	}
 
     private void drawZetaBoss(ZetaBoss zetaBoss) {
-        // 1. 보스 본체 그리기
-        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
+
 
         // 2. 패턴 이펙트 그리기
         BossPattern currentPattern = zetaBoss.getBossPattern();
         if (currentPattern != null) {
             drawBossPattern(zetaBoss, currentPattern);
         }
+        // 1. 보스 본체 그리기
+        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
     }
 
 	/**
@@ -218,17 +220,17 @@ public final class EntityRenderer {
             }
         }
         else if (pattern.isAttacking()) {
-            // Draw attack animation (Dark red)
-            float progress = pattern.getAttackAnimationProgress();
-            int currentAttackHeight = (int) (screenHeight * progress);
-            Color attackColor = new Color(255, 0, 0, 200);
-
-            g.setColor(attackColor);
-            for (int i = 0; i < totalColumns; i++) {
-                if (i != safeZoneColumn) {
-                    g.fillRect(i * columnWidth, 0, columnWidth, currentAttackHeight);
-                }
+            if (frameCooldown.checkFinished()) {
+                frameCooldown.reset();
+                apoFrameIndex = (apoFrameIndex + 1) % apo.length;
             }
+
+            BufferedImage frame = apo[apoFrameIndex];
+            if (frame == null) return;
+            g.drawImage(frame, 0, 0, screenWidth, screenHeight, null);
+            g.setColor(new Color(63, 253, 0, 100));
+            g.fillRect(safeZoneColumn * columnWidth, 0, columnWidth, screenHeight);
+
         }
     }
 
