@@ -156,6 +156,13 @@ public class SpawnMobPattern extends BossPattern {
             if(ship.isDestroyed()) { iterator.remove(); }
         }
     }
+    public void clean() {
+        Iterator<MidBossMob> iterator = this.childShips.iterator();
+        while(iterator.hasNext()){
+            iterator.next().destroy();
+        }
+    }
+
     @Override
     public void attack(){}
 

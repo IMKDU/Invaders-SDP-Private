@@ -181,6 +181,7 @@ public class OmegaBoss extends MidBoss {
 		this.isDestroyed = true;
 		this.spriteType = DrawManager.SpriteType.OmegaBossDeath;
 		this.logger.info("OMEGA : Boss OMEGA destroyed!");
+		this.spawnPattern.clean();
 	}
 
 	/**
