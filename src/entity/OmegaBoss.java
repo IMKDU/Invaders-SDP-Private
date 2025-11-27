@@ -6,6 +6,7 @@ import engine.Cooldown;
 import entity.pattern.*;
 
 import java.awt.*;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -33,7 +34,6 @@ public class OmegaBoss extends MidBoss {
 	private static final int PATTERN_2_Y_SPEED = 3;
 	/** Color of pattern 2 */
 	private static final Color PATTERN_2_COLOR = Color.MAGENTA;
-
 	/** Dash cooldown duration in milliseconds (5 seconds) */
 	private static final int DASH_COOLDOWN_MS = 5000;
 
@@ -50,6 +50,8 @@ public class OmegaBoss extends MidBoss {
 	/** Flag to track if currently in dash cooldown */
 	private boolean isInDashCooldown = false;
 
+	private SpawnMobPattern spawnPattern;
+
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
 	 *
@@ -62,9 +64,8 @@ public class OmegaBoss extends MidBoss {
 		this.spriteType = DrawManager.SpriteType.OmegaBoss1;
 		this.logger = Core.getLogger();
 		this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
-
+		this.spawnPattern = new SpawnMobPattern(this,this.getHealPoint());
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
-
 		choosePattern();
 	}
 
@@ -77,15 +78,15 @@ public class OmegaBoss extends MidBoss {
     public void update() {
         choosePattern();
 
-        if (bossPattern != null) {
-            bossPattern.move();
-            bossPattern.attack();
-
-                // Update position from pattern
-            this.positionX = bossPattern.getBossPosition().x;
-            this.positionY = bossPattern.getBossPosition().y;
-        }
-    }
+		if (bossPattern != null) {
+			bossPattern.move();
+			bossPattern.attack();
+			spawnPattern.update(this,this.getHealPoint());
+			// Update position from pattern
+			this.positionX = bossPattern.getBossPosition().x;
+			this.positionY = bossPattern.getBossPosition().y;
+		}
+	}
 
 	/**
 	 * Chooses the appropriate pattern based on boss health
@@ -180,6 +181,7 @@ public class OmegaBoss extends MidBoss {
 		this.isDestroyed = true;
 		this.spriteType = DrawManager.SpriteType.OmegaBossDeath;
 		this.logger.info("OMEGA : Boss OMEGA destroyed!");
+		this.spawnPattern.clean();
 	}
 
 	/**
@@ -250,4 +252,6 @@ public class OmegaBoss extends MidBoss {
 	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
 		model.requestBossHitByPlayerBullet(bullet, this);
 	}
+
+	public List<MidBossMob> getSpawnMobs() { return this.spawnPattern.getChildShips();}
 }

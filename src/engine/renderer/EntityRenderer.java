@@ -4,12 +4,14 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.*;
 import java.util.Map;
+import java.util.Random;
 
 import engine.BackBuffer;
 import entity.Entity;
 import engine.DrawManager.SpriteType;
 import entity.GameConstant;
 import entity.LaserBullet;
+import entity.MidBossMob;
 import entity.OmegaBoss;
 import entity.ZetaBoss;
 import entity.MidBoss;
@@ -27,6 +29,20 @@ public final class EntityRenderer {
 	private final BackBuffer backBuffer;
 	private final double scale;
     private static final Color BLACK_HOLE_COLOR = new Color(200, 0, 255);
+	private Color[] colorPalette = {
+			new Color( 0xFF4081),
+			new Color( 0xFCDD8A),
+			new Color( 0xFF5722),
+			new Color( 0x8BC34A),
+			new Color( 0x9C27B0),
+			new Color( 0x6A89FF),
+			new Color( 0x6756C9),
+			new Color( 0xF2606F),
+			new Color( 0xF5A5A5),
+			new Color( 0x6F5E77),
+			new Color( 0x32A9B3),
+			new Color( 0x8303EE)
+	};
 	public EntityRenderer(Map<SpriteType, boolean[][]> spriteMap, BackBuffer backBuffer, double scale) {
 		this.spriteMap = spriteMap;
 		this.backBuffer = backBuffer;
@@ -64,6 +80,10 @@ public final class EntityRenderer {
            ZetaBoss zetaBoss = (ZetaBoss) entity;
            drawZetaBoss(zetaBoss);
         }
+		else if (entity instanceof MidBossMob) {
+			MidBossMob midBossMob = (MidBossMob) entity;
+			drawMidBossMob(midBossMob);
+		}
 		else {
 			drawEntity(entity, entity.getPositionX(), entity.getPositionY());
 		}
@@ -94,6 +114,11 @@ public final class EntityRenderer {
         }
     }
 
+	private void drawMidBossMob(MidBossMob midBossMob) {
+		int colorID = midBossMob.getColorID();
+		midBossMob.setColor(colorPalette[colorID%colorPalette.length]);
+		drawEntity(midBossMob, midBossMob.getPositionX(), midBossMob.getPositionY());
+	}
 	/**
 	 * Draws pattern-specific visualizations based on pattern type.
 	 */
