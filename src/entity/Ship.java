@@ -96,7 +96,7 @@ public class Ship extends Entity implements Collidable {
 
 			int centerX = positionX + this.width / 2;
 			int centerY = positionY;
-
+            SoundManager.stop("sfx/laser.wav");
 			if (bulletCount == 1) {
 				// Normal shot (when Spread Shot is not purchased)
 				Bullet b = BulletPool.getBullet(centerX, centerY, BULLET_SPEED);
