@@ -180,6 +180,14 @@ public class OmegaBoss extends MidBoss {
 		this.isDestroyed = true;
 		this.spriteType = DrawManager.SpriteType.OmegaBossDeath;
 		this.logger.info("OMEGA : Boss OMEGA destroyed!");
+
+		if (this.bossPattern != null) {
+			for (Bullet b : this.bossPattern.getBullets()) {
+				if (b instanceof BossBullet bossBullet) {
+					bossBullet.markForRemoval();
+				}
+			}
+		}
 	}
 
 	/**
