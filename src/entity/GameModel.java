@@ -54,6 +54,8 @@ public class GameModel {
     private Cooldown enemyShipSpecialCooldown;
     /** team drawing may implement */
     private FinalBoss finalBoss;
+    /** Spawn pattern has Mob */
+    private List<MidBossMob> midBossChilds;
     /** Time until bonus ship explosion disappears. */
     private Cooldown enemyShipSpecialExplosionCooldown;
     /** Time until Boss explosion disappears. */
@@ -191,6 +193,7 @@ public class GameModel {
         this.elapsedTime = 0;
         this.finalBoss = null;
         this.omegaBoss = null;
+        this.midBossChilds = null;
         this.zetaBoss = null;
         this.currentPhase = StagePhase.wave;
 
@@ -301,6 +304,7 @@ public class GameModel {
                 if (this.omegaBoss != null){
                     this.omegaBoss.update();
                     if (this.omegaBoss instanceof OmegaBoss omega) {
+                        midBossChilds = omega.getSpawnMobs();
                         bossBullets.addAll(omega.getBossPattern().getBullets());
                     }
                     Set<Bullet> removeList = new HashSet<>();
@@ -400,6 +404,9 @@ public class GameModel {
 		if (omegaBoss != null && !omegaBoss.isDestroyed()) entities.add(omegaBoss);
         if (zetaBoss != null && !zetaBoss.isDestroyed()) entities.add(zetaBoss);
 
+        if (midBossChilds != null){
+            for(MidBossMob mb : midBossChilds){ entities.add(mb); }
+        }
 		entities.addAll(bullets);
 		entities.addAll(bossBullets);
 		entities.addAll(dropItems);
@@ -968,6 +975,7 @@ public class GameModel {
     public EnemyShipFormationModel getEnemyShipFormationModel() { return enemyShipFormationModel; }
     public MidBoss getOmegaBoss() { return omegaBoss; }
     public MidBoss getZetaBoss() { return zetaBoss; }
+    public List<MidBossMob> getMidBossChilds() { return midBossChilds; }
     public Set<Bullet> getBullets() { return bullets; }
     public Set<DropItem> getDropItems() { return dropItems; }
     public int getScoreP1() { return scoreP1; }
@@ -1019,7 +1027,11 @@ public class GameModel {
                 renderList.add(enemy);
             }
         }
-
+        if (getMidBossChilds() != null) {
+            for (MidBossMob child : getMidBossChilds()) {
+                renderList.add(child);
+            }
+        }
         // 4. added boss
         if (getOmegaBoss() != null) {
             renderList.add(getOmegaBoss());
