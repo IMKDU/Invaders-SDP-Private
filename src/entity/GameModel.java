@@ -4,11 +4,11 @@ import engine.*;
 import engine.level.Level;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 import entity.pattern.ApocalypseAttackPattern;
+
+import java.util.List;
 import java.util.logging.Logger;
 
 import engine.*;
@@ -277,17 +277,18 @@ public class GameModel {
 	private void updateBossBullets() {
 		if (bossBullets.isEmpty()) return;
 
-		Set<Bullet> removeList = new HashSet<>();
+		Iterator<Bullet> iterator = bossBullets.iterator();
 
-		for (Bullet b : bossBullets) {
+		while (iterator.hasNext()) {
+			Bullet b = iterator.next();
 			b.update();
+
 			if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
-				removeList.add(b);
+				iterator.remove();
 			}
 		}
-
-		bossBullets.removeAll(removeList);
 	}
+
 
     /**
      * Updates all non-player-controlled game logic.
