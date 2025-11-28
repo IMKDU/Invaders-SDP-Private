@@ -4,11 +4,11 @@ import engine.*;
 import engine.level.Level;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 import entity.pattern.ApocalypseAttackPattern;
+
+import java.util.List;
 import java.util.logging.Logger;
 
 import engine.*;
@@ -277,6 +277,22 @@ public class GameModel {
         this.cleanupAllEntities();
     }
 
+	private void updateBossBullets() {
+		if (bossBullets.isEmpty()) return;
+
+		Iterator<Bullet> iterator = bossBullets.iterator();
+
+		while (iterator.hasNext()) {
+			Bullet b = iterator.next();
+			b.update();
+
+			if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
+				iterator.remove();
+			}
+		}
+	}
+
+
     /**
      * Updates all non-player-controlled game logic.
      */
@@ -305,14 +321,7 @@ public class GameModel {
                         midBossChilds = omega.getSpawnMobs();
                         bossBullets.addAll(omega.getBossPattern().getBullets());
                     }
-                    Set<Bullet> removeList = new HashSet<>();
-                    for (Bullet b : bossBullets) {
-                        b.update();
-                        if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
-                            removeList.add(b);
-                        }
-                    }
-                    bossBullets.removeAll(removeList);
+					updateBossBullets();
 
                     if (this.omegaBoss.isDestroyed()) {
                         if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
@@ -328,6 +337,7 @@ public class GameModel {
                 // ZetaBoss logic added
                 if (this.zetaBoss != null) {
                     this.zetaBoss.update();
+					updateBossBullets();
 
                     ApocalypseAttackPattern pattern = this.zetaBoss.getApocalypsePattern();
                     if (pattern != null && pattern.isAttacking()) {

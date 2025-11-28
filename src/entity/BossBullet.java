@@ -10,7 +10,10 @@ public class BossBullet extends Bullet implements Collidable {
     private int dx;
     /** amount of vertical change*/
     private int dy;
-    /** bossBullets carry bullets that the boss will shoot */
+
+	private boolean markedForRemoval = false;
+
+	/** bossBullets carry bullets that the boss will shoot */
     /**
      * Constructor, establishes boss bullets.
      *
@@ -46,6 +49,10 @@ public class BossBullet extends Bullet implements Collidable {
         this.positionY += this.dy;
     }
 
+	public void markForRemoval() {
+		this.markedForRemoval = true;
+	}
+
 	/**
 	 * Handles collision behavior for boss bullets.
 	 * Boss bullets damage the player when they collide.
@@ -64,4 +71,8 @@ public class BossBullet extends Bullet implements Collidable {
 		ship.onHitByBossBullet(this, model);
 	}
 
+	@Override
+	public boolean shouldBeRemoved() {
+		return markedForRemoval;
+	}
 }
