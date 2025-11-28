@@ -319,7 +319,6 @@ public class GameModel {
                 }
                 if (this.omegaBoss != null){
                     this.omegaBoss.update();
-                    this.omegaBoss.getHealthBar().setPosition(this.omegaBoss.getPositionX(), this.omegaBoss.getPositionY(), this.omegaBoss.getWidth());
                     this.omegaBoss.getHealthBar().setCurrent_HP(this.omegaBoss.getHealPoint());
                     if (this.omegaBoss instanceof OmegaBoss omega) {
                         midBossChilds = omega.getSpawnMobs();
@@ -341,7 +340,6 @@ public class GameModel {
                 // ZetaBoss logic added
                 if (this.zetaBoss != null) {
                     this.zetaBoss.update();
-                    this.zetaBoss.getHealthBar().setPosition(this.zetaBoss.getPositionX(), this.zetaBoss.getPositionY(), this.zetaBoss.getWidth());
                     this.zetaBoss.getHealthBar().setCurrent_HP(this.zetaBoss.getHealPoint());
 					updateBossBullets();
 
@@ -853,7 +851,6 @@ public class GameModel {
     public void finalbossManage(){
         if (this.finalBoss != null && !this.finalBoss.isDestroyed()) {
             this.finalBoss.update();
-            this.finalBoss.getHealthBar().setPosition(this.finalBoss.getPositionX(), this.finalBoss.getPositionY(), this.finalBoss.getWidth());
             this.finalBoss.getHealthBar().setCurrent_HP(this.finalBoss.getHealPoint());
             BlackHolePattern bh = finalBoss.getCurrentBlackHole();
 

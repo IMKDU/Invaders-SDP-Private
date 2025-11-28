@@ -38,6 +38,10 @@ public class HealthBar {
     public int getWidth(){
         return x2 - x1;
     }
+    public void update(int positionX, int positionY, int width, int current_HP){
+        setPosition(positionX, positionY, width);
+        setCurrent_HP(current_HP);
+    }
 
 
 
