@@ -92,7 +92,7 @@ public final class Core {
 
 		if (GameConstant.isTest){
 			while (true) {
-				currentScreen = new TestScreen(FRAME_WIDTH, FRAME_HEIGHT);
+				currentScreen = new TestScreen(FRAME_WIDTH, FRAME_HEIGHT, GameConstant.FPS);
 				frame.setScreen(currentScreen);
 			}
 		}
@@ -104,6 +104,7 @@ public final class Core {
                     // Main menu.
                     currentScreen = new TitleScreen(FRAME_WIDTH, FRAME_HEIGHT, GameConstant.FPS);
                     if (!SoundManager.isCurrentLoop("sfx/menu_music.wav")) {
+                        SoundManager.stop("sfx/gameover.wav");
                         SoundManager.playLoop("sfx/menu_music.wav");
                     }
                     LOGGER.info("Starting " + Core.FRAME_WIDTH + "x" + Core.FRAME_HEIGHT
@@ -120,6 +121,7 @@ public final class Core {
 
 						// Music for each level
 						SoundManager.stopAll();
+                        SoundManager.stop("sfx/gameover.wav");
 						SoundManager.playLoop("sfx/level" + gameState.getLevel() + ".wav");
 
                         engine.level.Level currentLevel = levelManager.getLevel(gameState.getLevel());
@@ -132,6 +134,7 @@ public final class Core {
                         }
 
 						SoundManager.stopAll();
+                        SoundManager.stop("sfx/gameover.wav");
 						SoundManager.playLoop("sfx/level" + gameState.getLevel() + ".wav");
 
                         // Start a new level

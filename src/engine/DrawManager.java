@@ -2,14 +2,12 @@ package engine;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import engine.renderer.EntityRenderer;
-import engine.renderer.HUDRenderer;
-import engine.renderer.ShopRenderer;
-import engine.renderer.UIRenderer;
+import engine.renderer.*;
 import screen.TitleScreen.Star;
 import screen.TitleScreen.ShootingStar;
 
@@ -38,19 +36,23 @@ public final class DrawManager {
     private HUDRenderer hudRenderer;
     private ShopRenderer shopRenderer;
     private UIRenderer uiRenderer;
-    private double scale;
-
+	private ItemRenderer itemRenderer;
+    private SpecialAnimationRenderer specialAnimationRenderer;
+	private double scale;
+    private final AnimationLoader loader;
 	/** Sprite types mapped to their images. */
-	private static Map<SpriteType, boolean[][]> spriteMap;
+	private static Map<SpriteType, BufferedImage> spriteMap;
 
 	/** Sprite types. */
-	public static enum SpriteType {
-		Ship, ShipDestroyed, Bullet, EnemyBullet, EnemyShipA1, EnemyShipA2,
-		EnemyShipB1, EnemyShipB2, EnemyShipC1, EnemyShipC2, EnemyShipSpecial,
-		FinalBoss1, FinalBoss2,FinalBossBullet,FinalBossDeath,OmegaBoss1, OmegaBoss2,OmegaBossDeath, Explosion, SoundOn, SoundOff, Item_MultiShot,
-		Item_Atkspeed, Item_Penetrate, Item_Explode, Item_Slow, Item_Stop,
-		Item_Push, Item_Shield, Item_Heal
-	}
+    public static enum SpriteType {
+        ShipP1,ShipP2,ShipP1Move,ShipP2Move,ShipP2Explosion1,ShipP2Explosion2, ShipP2Explosion3,Life, ShipP1Explosion1,ShipP1Explosion2,ShipP1Explosion3,
+        Bullet, EnemyBullet, EnemyShipA1, EnemyShipA2, Laser,
+        EnemyShipB1, EnemyShipB2, EnemyShipC1, EnemyShipC2, EnemyShipSpecial, EnemyShipSpecialLeft, EnemySpecialExplosion,
+        FinalBoss1, FinalBoss2,FinalBossBullet,FinalBossDeath,OmegaBoss1, OmegaBoss2,OmegaBossHitting,OmegaBossMoving1,OmegaBossMoving2,OmegaBossMoving3,OmegaBossMoving4,OmegaBossDeath, Explosion, SoundOn, SoundOff, Item_MultiShot,
+        Item_Atkspeed, Item_Penetrate, Item_Explode, Item_Slow, Item_Stop, Shield,
+        Item_Push, Item_Shield, Item_Heal, BlackHole1,BlackHole2, OmegaBossDash1, OmegaBossDash2, OmegaBossDash3, OmegaBossDash4, OmegaBossBullet,
+        ZetaBoss1, ZetaBoss2,ZetaBossRight1,ZetaBossRight2, ZetaBossMoving1, ZetaBossMoving2, ZetaBossMovingRight1, ZetaBossMovingRight2, ZetaBossDash1,ZetaBossDash2,ZetaBossDashRight1,ZetaBossDashRight2
+    }
 
 	/**
 	 * Private constructor.
@@ -61,6 +63,7 @@ public final class DrawManager {
         spriteAtlas = new SpriteAtlas(fileManager);
         logger.info("Sprite atlas loaded!");
         logger.info("DrawManager initialized successfully");
+        this.loader = new AnimationLoader();
     }
 
 	/**
@@ -75,7 +78,7 @@ public final class DrawManager {
 	/**
 	 * Sets the frame to draw the image on.
 	 */
-public void setFrame(final Frame currentFrame) {
+    public void setFrame(final Frame currentFrame) {
 		frame = currentFrame;
         backBuffer = new BackBuffer(frame);
 		fontPack = null;
@@ -92,10 +95,12 @@ public void setFrame(final Frame currentFrame) {
         backBuffer.initDraw(screenWidth, screenHeight);
         if(fontPack == null){
             fontPack = new FontPack(backBuffer.getGraphics(), fileManager);
-            entityRenderer = new EntityRenderer(spriteAtlas.getSpriteMap(),backBuffer,this.scale);
-            hudRenderer = new HUDRenderer(backBuffer, fontPack, entityRenderer);
+            entityRenderer = new EntityRenderer(spriteAtlas.getSpriteMap(),backBuffer,this.scale, this.loader);
+			itemRenderer = new ItemRenderer(backBuffer, spriteAtlas.getSpriteMap(), this.scale);
+			hudRenderer = new HUDRenderer(backBuffer, fontPack, entityRenderer);
             shopRenderer = new ShopRenderer(backBuffer,fontPack);
             uiRenderer = new UIRenderer(backBuffer,fontPack);
+            specialAnimationRenderer = new SpecialAnimationRenderer(backBuffer);
         }
     }
 
@@ -161,4 +166,9 @@ public void setFrame(final Frame currentFrame) {
 
     public UIRenderer getUIRenderer() { return uiRenderer; }
 
+	public ItemRenderer getItemRenderer() { return itemRenderer; }
+
+    public SpecialAnimationRenderer getSpecialAnimationRenderer() {
+        return specialAnimationRenderer;
+    }
 }

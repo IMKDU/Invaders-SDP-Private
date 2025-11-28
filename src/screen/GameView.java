@@ -1,10 +1,13 @@
 package screen;
 
+import audio.SoundManager;
 import engine.DrawManager;
 import engine.DTO.HUDInfoDTO;
-import entity.GameModel;
-import entity.LaserBullet;
-import entity.GameConstant;
+import entity.*;
+import entity.pattern.ApocalypseAttackPattern;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * GameView
@@ -18,6 +21,7 @@ public class GameView {
 
     private final GameModel model;
     private final DrawManager drawManager;
+    private final List<Entity> shipRenderQueue = new ArrayList<>();
 
     public GameView(GameModel model, DrawManager drawManager) {
         this.model = model;
@@ -28,12 +32,50 @@ public class GameView {
 
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
+        //오리진 스킬 애니메이션 스킬횟수 > 0 그리고 p1점수 100이상일때 발동
+        // 구현 해야할거 발동후 로직, 아군 ship 무적
+        if (model.getFinalSkillCnt() > 0 && (dto.getScoreP1() >= 100)) {
+            drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
+            drawManager.getSpecialAnimationRenderer().draw();
+            if (drawManager.getSpecialAnimationRenderer().isFinished()){
+                model.useFinalSkill();
+            }
+        }
 
-        /** Entity Rendering */
-        if (model.getEntitiesToRender() != null) {
-            for (int i = 0; i < model.getEntitiesToRender().size(); i++) {
-                var e = model.getEntitiesToRender().get(i);
-				drawManager.getEntityRenderer().drawEntity(e);
+        else {
+            if (model.isBlackHoleActive()) {
+                drawManager.getEntityRenderer().drawBlackHole(
+                        model.getBlackHoleCX(),
+                        model.getBlackHoleCY(),
+                        model.getBlackHoleRadius()
+                );
+            }
+            if (dto.getShipP1().isInvincible()) {
+                drawManager.getEntityRenderer().drawShield(dto.getShipP1().getPositionX(), dto.getShipP1().getWidth(), dto.getShipP1().getPositionY(), dto.getShipP1().getHeight(), dto.getShipP1().getInvincibilityRatio());
+            }
+            if (dto.getShipP2().isInvincible()) {
+                drawManager.getEntityRenderer().drawShield(dto.getShipP2().getPositionX(), dto.getShipP2().getWidth(), dto.getShipP2().getPositionY(), dto.getShipP2().getHeight(), dto.getShipP2().getInvincibilityRatio());
+            }
+
+            shipRenderQueue.clear();
+            /** Entity Rendering */
+            if (model.getEntitiesToRender() != null) {
+                for (int i = 0; i < model.getEntitiesToRender().size(); i++) {
+                    var e = model.getEntitiesToRender().get(i);
+
+                    if (e instanceof DropItem) {
+                        drawManager.getItemRenderer().render((DropItem) e);
+                        continue;
+                    }
+                    if (e instanceof Ship) { // ship을 맨 마지막에 그리기
+                        shipRenderQueue.add(e);
+                        continue;
+                    }
+                    drawManager.getEntityRenderer().drawEntity(e);
+                }
+                for (Entity s : shipRenderQueue) {
+                    drawManager.getEntityRenderer().drawEntity(s);
+                }
             }
         }
         if (model.getOmegaBoss() != null) {
@@ -42,8 +84,8 @@ public class GameView {
         if (model.getFinalBoss() != null) {
             drawManager.getEntityRenderer().drawHealthBar(model.getFinalBoss().getHealthBar());
         }
-        drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25);
-        drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50);
+        drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);
+        drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50, 2);
         drawManager.getHUDRenderer().drawCoin(dto.getWidth(), dto.getHeight(), dto.getCoin());
         drawManager.getHUDRenderer().drawLivesP1(dto.getLivesP1());
         drawManager.getHUDRenderer().drawLivesP2(dto.getLivesP2());
@@ -65,6 +107,7 @@ public class GameView {
             drawManager.getHUDRenderer().drawHealthPopup(dto.getWidth(), dto.getHealthPopupText());
         }
 
+
         /** countdown */
         if (!model.isInputDelayFinished()) {
             int countdown = (int) ((GameModel.INPUT_DELAY
@@ -81,6 +124,9 @@ public class GameView {
             drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), dto.getHeight() / 2 - dto.getHeight() / 12);
             drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), dto.getHeight() / 2 + dto.getHeight() / 12);
         }
+
+
+
 
         /** frame complete */
         drawManager.completeDrawing();

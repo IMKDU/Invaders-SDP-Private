@@ -12,8 +12,8 @@ import java.awt.*;
  * @author <a href="mailto:RobertoIA1987@gmail.com">Roberto Izquierdo Amo</a>
  * 
  */
-public class EnemyShip extends Entity {
-	
+public class EnemyShip extends Entity implements Collidable {
+
 	/** Point value of a type A enemy. */
 	private static final int A_TYPE_POINTS = 10;
 	/** Point value of a type B enemy. */
@@ -26,11 +26,11 @@ public class EnemyShip extends Entity {
 	/** Cooldown between sprite changes. */
 	private Cooldown animationCooldown;
     /** Cooldown between explosions. */
-    private Cooldown explosionCooldown;
+    private final Cooldown explosionCooldown;
 	/** Checks if the ship has been hit by a bullet. */
 	private boolean isDestroyed;
 	/** Values of the ship, in points, when destroyed. */
-	private int pointValue;
+	private final int pointValue;
 
 	/** Special enemy Direction enum **/
 	public enum Direction {
@@ -40,7 +40,7 @@ public class EnemyShip extends Entity {
 		LEFT,
 		/** Movement to the bottom of the screen. */
 		DOWN
-	};
+	}
 
 	/** Special enemy Direction variable **/
 	private Direction direction;
@@ -50,7 +50,7 @@ public class EnemyShip extends Entity {
 
 	/**
 	 * Constructor, establishes the ship's properties.
-	 * 
+	 *
 	 * @param positionX
 	 *            Initial position of the ship in the X axis.
 	 * @param positionY
@@ -60,39 +60,51 @@ public class EnemyShip extends Entity {
 	 */
 	public EnemyShip(final int positionX, final int positionY,
 			final SpriteType spriteType) {
-		super(positionX, positionY, 12 * 2, 8 * 2, Color.WHITE);
+		super(positionX, positionY, 25 * 2, 25 * 2, Color.WHITE);
 
 		this.spriteType = spriteType;
-		this.animationCooldown = new Cooldown(500);
+		this.animationCooldown = new Cooldown(100);
         this.explosionCooldown = new Cooldown(500);
 		this.isDestroyed = false;
 
 		switch (this.spriteType) {
-		case EnemyShipA1:
-		case EnemyShipA2:
-			this.pointValue = A_TYPE_POINTS;
-			break;
-		case EnemyShipB1:
-		case EnemyShipB2:
-			this.pointValue = B_TYPE_POINTS;
-			break;
-		case EnemyShipC1:
-		case EnemyShipC2:
-			this.pointValue = C_TYPE_POINTS;
-			break;
-		default:
-			this.pointValue = 0;
-			break;
+			case EnemyShipA1:
+			case EnemyShipA2:
+				this.pointValue = A_TYPE_POINTS;
+				break;
+			case EnemyShipB1:
+			case EnemyShipB2:
+				this.pointValue = B_TYPE_POINTS;
+				break;
+			case EnemyShipC1:
+			case EnemyShipC2:
+				this.pointValue = C_TYPE_POINTS;
+				break;
+			default:
+				this.pointValue = 0;
+				break;
 		}
 	}
+
+	public enum SpecialType {
+		RED,
+		BLUE
+	}
+
+	public SpecialType getSpecialType() {
+		return this.specialType;
+	}
+
+	private SpecialType specialType;
 
 	/**
 	 * Constructor, establishes the ship's properties for a special ship, with
 	 * known starting properties.
 	 */
-	public EnemyShip(Color color, Direction direction, int x_speed) {
-        super(-32, GameConstant.STAT_SEPARATION_LINE_HEIGHT, 16 * 2, 7 * 2, color);
+	public EnemyShip(SpecialType type, Direction direction, int x_speed) {
+        super(-32, GameConstant.STAT_SEPARATION_LINE_HEIGHT, 30 * 2, 38 * 2,  (type == SpecialType.RED) ? Color.RED : Color.BLUE);
 
+		this.specialType = type;
 		this.direction = direction;
 		this.X_SPEED = x_speed;
 		this.spriteType = SpriteType.EnemyShipSpecial;
@@ -112,14 +124,22 @@ public class EnemyShip extends Entity {
 
 	/**
 	 * Moves the ship the specified distance.
-	 * 
+	 *
 	 * @param distanceX
 	 *            Distance to move in the X axis.
 	 * @param distanceY
 	 *            Distance to move in the Y axis.
 	 */
-	public final void move(final int distanceX, final int distanceY) {
-		this.positionX += distanceX;
+	public final void move(final int distanceX, final int distanceY, boolean isSpecial) {
+        if (isSpecial){
+            if (distanceX >= 0){
+                this.spriteType = SpriteType.EnemyShipSpecial;
+            }
+            else {
+                this.spriteType = SpriteType.EnemyShipSpecialLeft;
+            }
+        }
+        this.positionX += distanceX;
 		this.positionY += distanceY;
 	}
 
@@ -131,26 +151,26 @@ public class EnemyShip extends Entity {
 			this.animationCooldown.reset();
 
 			switch (this.spriteType) {
-			case EnemyShipA1:
-				this.spriteType = SpriteType.EnemyShipA2;
-				break;
-			case EnemyShipA2:
-				this.spriteType = SpriteType.EnemyShipA1;
-				break;
-			case EnemyShipB1:
-				this.spriteType = SpriteType.EnemyShipB2;
-				break;
-			case EnemyShipB2:
-				this.spriteType = SpriteType.EnemyShipB1;
-				break;
-			case EnemyShipC1:
-				this.spriteType = SpriteType.EnemyShipC2;
-				break;
-			case EnemyShipC2:
-				this.spriteType = SpriteType.EnemyShipC1;
-				break;
-			default:
-				break;
+				case EnemyShipA1:
+					this.spriteType = SpriteType.EnemyShipA2;
+					break;
+				case EnemyShipA2:
+					this.spriteType = SpriteType.EnemyShipA1;
+					break;
+				case EnemyShipB1:
+					this.spriteType = SpriteType.EnemyShipB2;
+					break;
+				case EnemyShipB2:
+					this.spriteType = SpriteType.EnemyShipB1;
+					break;
+				case EnemyShipC1:
+					this.spriteType = SpriteType.EnemyShipC2;
+					break;
+				case EnemyShipC2:
+					this.spriteType = SpriteType.EnemyShipC1;
+					break;
+				default:
+					break;
 			}
 		}
 	}
@@ -158,12 +178,19 @@ public class EnemyShip extends Entity {
 	/**
 	 * Destroys the ship, causing an explosion.
 	 */
-	public final void destroy() {
+	public final void destroy(boolean isSpecial) {
         if (!this.isDestroyed) {
             this.isDestroyed = true;
-            this.spriteType = SpriteType.Explosion;
-			SoundManager.stop("sfx/disappearance.wav");
-            SoundManager.play("sfx/disappearance.wav");
+
+            if (isSpecial){
+                this.spriteType = SpriteType.EnemySpecialExplosion;
+                SoundManager.play("sfx/SpecialEnemyDeath.wav");
+            }
+            else {
+                this.spriteType = SpriteType.Explosion;
+                SoundManager.play("sfx/disappearance.wav");
+            }
+
             this.explosionCooldown.reset();
         }
 	}
@@ -195,6 +222,7 @@ public class EnemyShip extends Entity {
 
     /**
      * Check if the explosion effect is finished.
+     *
      * @return True if the explosion is finished.
      */
     public final boolean isExplosionFinished() {
@@ -213,8 +241,37 @@ public class EnemyShip extends Entity {
 			case EnemyShipC1:
 			case EnemyShipC2:
 				return "enemyC";
+			case EnemyShipSpecial:
+            case EnemyShipSpecialLeft:
+				return "enemySpecial";
 			default:
 				return null;
 		}
+	}
+
+	@Override
+	public void onCollision(Collidable other, GameModel model) {
+		other.onCollideWithEnemyShip(this, model);
+	}
+
+	@Override
+	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
+
+		if (this.isDestroyed()) return;
+
+		model.requestEnemyHitByPlayerBullet(bullet, this);
+	}
+
+	@Override
+	public void onHitByEnemyBullet(Bullet bullet, GameModel model) {
+	}
+
+	@Override
+	public void onHitByBossBullet(BossBullet bullet, GameModel model) {
+	}
+
+	@Override
+	public void onCollideWithShip(Ship ship, GameModel model) {
+		model.requestPlayerCrash(ship, this);
 	}
 }

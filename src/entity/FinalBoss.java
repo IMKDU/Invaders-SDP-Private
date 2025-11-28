@@ -6,11 +6,13 @@ import engine.Core;
 import screen.HealthBar;
 import engine.DrawManager;
 import entity.pattern.*;
+import entity.Ship;
+import java.util.List;
 
 import java.awt.*;
 import java.util.logging.Logger;
 
-public class FinalBoss extends Entity implements BossEntity{
+public class FinalBoss extends Entity implements BossEntity, Collidable{
 
     private int healPoint;
     private final int maxHp;
@@ -28,14 +30,20 @@ public class FinalBoss extends Entity implements BossEntity{
 	private HasBounds playerPosition;
 	private int bossPhase = 1;
 
+    private List<Ship> ships;
+    private boolean blackHole70 = false;
+    private boolean blackHole40 = false;
+    private boolean blackHole10 = false;
+    private BlackHolePattern currentBlackHole = null;
+
 	private Logger logger;
 
 
     /** basic attribute of final boss */
 
-    public FinalBoss(int positionX, int positionY, HasBounds playerPosition, int screenWidth, int screenHeight){
+    public FinalBoss(int positionX, int positionY, List<Ship> ships, int screenWidth, int screenHeight){
 
-        super(positionX, positionY,50 * 2,40 * 2, Color.RED);
+        super(positionX, positionY, 150 * 2,143 * 2, Color.RED);
         this.healPoint = 80;
         this.maxHp = healPoint;
         this.pointValue = 1000;
@@ -46,8 +54,7 @@ public class FinalBoss extends Entity implements BossEntity{
 
         this.animationCooldown = new Cooldown(500);
         this.healthBar = new HealthBar(this.getHealPoint(), this.getPositionX(), this.getPositionY(), this.getWidth(),this.getHeight());
-
-
+        this.ships = ships;
 		this.playerPosition = playerPosition;
 		logger = Core.getLogger();
 	    choosePattern();
@@ -72,6 +79,28 @@ public class FinalBoss extends Entity implements BossEntity{
             }
         }
         choosePattern();
+        double hpRatio = (double) this.healPoint / this.maxHp;
+
+        if (!blackHole70 && hpRatio <= 0.7) {
+            activateBlackHole();
+            blackHole70 = true;
+        }
+        if (!blackHole40 && hpRatio <= 0.4) {
+            activateBlackHole();
+            blackHole40 = true;
+        }
+        if (!blackHole10 && hpRatio <= 0.1) {
+            activateBlackHole();
+            blackHole10 = true;
+        }
+
+        if (currentBlackHole != null) {
+            currentBlackHole.attack();
+            if (currentBlackHole.isFinished()) {
+                currentBlackHole = null;
+            }
+        }
+
 		bossPattern.move();
 		bossPattern.attack();
 
@@ -83,7 +112,6 @@ public class FinalBoss extends Entity implements BossEntity{
     @Override
     public void takeDamage(int damage){
         this.healPoint -= damage;
-        SoundManager.stop("sfx/pikachu.wav");
         SoundManager.play("sfx/pikachu.wav");
         if(this.healPoint <= 0){
             this.destroy();
@@ -110,8 +138,18 @@ public class FinalBoss extends Entity implements BossEntity{
         }
 		else if (this.healPoint <= this.maxHp /6 && this.bossPhase == 4) {
 			++this.bossPhase;
-	        bossPattern = new TimeGapAttackPattern(this,playerPosition,screenWidth,screenHeight);
+	        bossPattern = new TimeGapAttackPattern(this,ships,screenWidth,screenHeight);
         }
+    }
+
+    private void activateBlackHole() {
+        logger.info("FINAL: Black Hole Pattern Activated!");
+
+        int cx = this.positionX + this.width / 2;
+        int cy = this.positionY + this.height + 60;
+        int radius = screenHeight;
+
+        currentBlackHole = new BlackHolePattern(this, ships, cx, cy, radius, 0.005, 7000);
     }
 
     /** move simple */
@@ -164,4 +202,18 @@ public class FinalBoss extends Entity implements BossEntity{
     public HealthBar getHealthBar(){
         return this.healthBar;
     }
+
+    public BlackHolePattern getCurrentBlackHole(){
+        return currentBlackHole;
+    }
+
+	@Override
+	public void onCollision(Collidable other, GameModel model) {
+		other.onCollideWithBoss(this, model);
+	}
+
+	@Override
+	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
+		model.requestBossHitByPlayerBullet(bullet, this);
+	}
 }
