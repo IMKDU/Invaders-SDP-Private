@@ -341,6 +341,8 @@ public class GameModel {
                 // ZetaBoss logic added
                 if (this.zetaBoss != null) {
                     this.zetaBoss.update();
+                    this.zetaBoss.getHealthBar().setPosition(this.zetaBoss.getPositionX(), this.zetaBoss.getPositionY(), this.zetaBoss.getWidth());
+                    this.zetaBoss.getHealthBar().setCurrent_HP(this.zetaBoss.getHealPoint());
 					updateBossBullets();
 
                     ApocalypseAttackPattern pattern = this.zetaBoss.getApocalypsePattern();

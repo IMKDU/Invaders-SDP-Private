@@ -9,6 +9,7 @@ import entity.pattern.BossPattern;
 import entity.pattern.DashPattern;
 import entity.pattern.DiagonalPattern;
 import entity.pattern.HorizontalPattern;
+import screen.HealthBar;
 
 import java.awt.*;
 import java.util.logging.Logger;
@@ -74,7 +75,7 @@ public class ZetaBoss extends MidBoss {
         this.logger = Core.getLogger();
         this.animationCooldown = new Cooldown(200);
         this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
-
+        this.healthBar = new HealthBar(this.getHealPoint(), this.getPositionX(), this.getPositionY(), this.getWidth(),this.getHeight());
         // Initialize Apocalypse Pattern
         this.apocalypsePattern = new ApocalypseAttackPattern(this);
 
@@ -339,5 +340,8 @@ public class ZetaBoss extends MidBoss {
     @Override
     public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
         model.requestBossHitByPlayerBullet(bullet, this);
+    }
+    public HealthBar getHealthBar(){
+        return this.healthBar;
     }
 }

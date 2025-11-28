@@ -57,7 +57,7 @@ public class OmegaBoss extends MidBoss {
     private boolean isMove = false;
     private boolean isDash = false;
     private Cooldown animationCooldown;
-    private HealthBar healthBar;
+//    private HealthBar healthBar;
 	private SpawnMobPattern spawnPattern;
 
 	/**
