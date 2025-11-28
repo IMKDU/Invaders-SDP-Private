@@ -99,12 +99,14 @@ public class OmegaBoss extends MidBoss {
 			++this.bossPhase;
 			bossPattern = new HorizontalPattern(this, PATTERN_1_X_SPEED);
 			logger.info("OMEGA : move using horizontal pattern");
+            return;
 		}
 		// PHASE 2 → SpreadShotPattern
 		else if (this.healPoint <= this.maxHp / 2 && this.healPoint > this.maxHp / 3 && this.bossPhase == 2) {
 			bossPattern = new SpreadShotPattern(this, targetShip);
 			logger.info("OMEGA : Using SPREAD SHOT pattern");
 			this.bossPhase = 3;
+            return;
 		}
 
 		else if (this.healPoint <= this.maxHp / 2 && this.healPoint > this.maxHp / 3 && this.bossPhase == 3) {
@@ -122,6 +124,7 @@ public class OmegaBoss extends MidBoss {
 			++this.bossPhase;
 			// Start with dash pattern
 			startDashPattern();
+            return;
 		}
 
 		// Phase 3: Handle dash cooldown cycle
