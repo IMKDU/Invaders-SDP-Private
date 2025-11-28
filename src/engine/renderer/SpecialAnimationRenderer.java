@@ -44,7 +44,7 @@ public class SpecialAnimationRenderer {
         this.soundPlay = false;
         this.currentFrames = shipFrames;
         this.frameCooldown = new Cooldown(60);
-        start(shipFrames);  // ship 먼저 재생
+        start(shipFrames);
 
     }
 
@@ -62,19 +62,19 @@ public class SpecialAnimationRenderer {
             this.resetAnimation();
         }
 
-        // 프레임 애니메이션 처리
+
         if (!finished && frameCooldown.checkFinished()) {
             frameCooldown.reset();
             frame++;
 
             if (frame >= currentFrames.length) {
                 frame = currentFrames.length - 1;
-                finished = true;   // 현재 phase 종료
+                finished = true;
             }
         }
 
 
-        // phase가 끝났다면 다음 phase로 전환
+
         if (finished) {
             switch (phase) {
                 case SHIP:

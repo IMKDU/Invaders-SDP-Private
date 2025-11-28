@@ -128,7 +128,7 @@ public class Ship extends Entity implements Collidable {
 	 */
     public final void update() {
         if (this.isInvincible && this.shieldCooldown.checkFinished()) {
-            this.isInvincible = false;//테스트용
+            this.isInvincible = false;
         }
         if (!this.destructionCooldown.checkFinished()) {
             double ratio = this.destructionCooldown.getRemaining() / (double) this.destructionCooldown.getTotal();

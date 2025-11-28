@@ -74,8 +74,8 @@ public final class EntityRenderer {
 
             img = tintImage(img, entity.getColor());
         }
-        int drawX = positionX; // 가운데 정렬: int drawX = positionX- scaledW / 2
-        int drawY = positionY; // 가운데 정렬: int drawY = positionY - scaledH / 2
+        int drawX = positionX;
+        int drawY = positionY;
         g2d.drawImage(img, drawX, drawY, scaledW, scaledH, null);
     }
 
@@ -89,10 +89,10 @@ public final class EntityRenderer {
             for (int y = 0; y < h; y++) {
                 int argb = src.getRGB(x, y);
 
-                // 알파 0이면 투명 (그리지 않음)
+
                 if ((argb >> 24) == 0) continue;
 
-                // 새 색상 적용 (알파는 유지)
+
                 int alpha = (argb >> 24) & 0xFF;
                 int rgb = (color.getRGB() & 0x00FFFFFF) | (alpha << 24);
                 tinted.setRGB(x, y, rgb);
@@ -132,7 +132,7 @@ public final class EntityRenderer {
                 int argb = src.getRGB(x, y);
 
                 int originalAlpha = (argb >> 24) & 0xFF;
-                if (originalAlpha == 0) continue; // 완전 투명
+                if (originalAlpha == 0) continue;
 
                 int newAlpha = Math.min(alpha, originalAlpha);
 
@@ -182,14 +182,10 @@ public final class EntityRenderer {
 	}
 
     private void drawZetaBoss(ZetaBoss zetaBoss) {
-
-
-        // 2. 패턴 이펙트 그리기
         BossPattern currentPattern = zetaBoss.getBossPattern();
         if (currentPattern != null) {
             drawBossPattern(zetaBoss, currentPattern);
         }
-        // 1. 보스 본체 그리기
         drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
     }
 
@@ -359,7 +355,7 @@ public final class EntityRenderer {
             double angle = Math.atan2(ey - sy, ex - sx);
             double length = Math.hypot(ex - sx, ey - sy);
             double scaleX = length / laserImg.getWidth() * scale;
-            double scaleY = 6.0 * scale; // 굵기 유지
+            double scaleY = 6.0 * scale;
             AffineTransform at = new AffineTransform();
             at.translate(sx, sy);
             at.rotate(angle);
@@ -432,7 +428,7 @@ public final class EntityRenderer {
                 int rgba = src.getRGB(x, y);
                 int alpha = (rgba >> 24) & 0xff;
 
-                if (alpha == 0) continue; // 투명 픽셀은 건너뜀
+                if (alpha == 0) continue;
 
                 tinted.setRGB(x, y, newColor.getRGB());
             }
@@ -445,7 +441,6 @@ public final class EntityRenderer {
     public void drawBlackHole(final int cx, final int cy, final int size) {
         Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
 
-        // 쿨다운 애니메이션 (필드로 선언해야 제대로 동작)
         if (this.blackholeAnimationCooldown.checkFinished()) {
             this.blackholeAnimationCooldown.reset();
             blackHoleType = (blackHoleType == SpriteType.BlackHole1)
@@ -458,16 +453,16 @@ public final class EntityRenderer {
         int drawX = cx - size / 2;
         int drawY = cy - size / 2;
 
-        // 현재 클리핑 영역 저장
+
         Shape oldClip = g2d.getClip();
 
-        // 원형 클리핑 생성
+
         g2d.setClip(new java.awt.geom.Ellipse2D.Float(drawX, drawY, size, size));
 
-        // 이미지 그리기
+
         g2d.drawImage(img, drawX, drawY, size, size, null);
 
-        // 클리핑 복원
+
         g2d.setClip(oldClip);
     }
 }

@@ -125,7 +125,6 @@ public class ZetaBoss extends MidBoss {
                 }
             }
             else {
-                // 대시 중일 때만 Dash 이미지 사용
                 if (!isInDashCooldown) {
                     this.setWidth(144 * 2);
                     this.setHeight(153 * 2);
@@ -144,7 +143,6 @@ public class ZetaBoss extends MidBoss {
                         }
                     }
                 }
-                // 대시가 아닌 경우 → 기본 이동 애니메이션
                 else {
                     this.setWidth(119 * 2);
                     this.setHeight(126 * 2);

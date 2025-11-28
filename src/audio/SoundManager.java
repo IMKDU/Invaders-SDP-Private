@@ -5,6 +5,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,10 +31,21 @@ public class SoundManager {
             // PLAY_MAP에 등록
             PLAY_MAP.computeIfAbsent(resourcePath, k -> new java.util.ArrayList<>()).add(clip);
 
-            // 종료되면 자동 제거
             clip.addLineListener(event -> {
-                if (event.getType() == LineEvent.Type.STOP) {
-                    PLAY_MAP.get(resourcePath).remove(clip);
+                LineEvent.Type type = event.getType();
+                if (type == LineEvent.Type.STOP || type == LineEvent.Type.CLOSE) {
+
+                    List<Clip> l = PLAY_MAP.get(resourcePath);
+                    if (l != null) {
+                        l.remove(clip);
+                    }
+                    try {
+                        clip.close();
+                    } catch (Exception ignore) {}
+
+                    try {
+                        ais.close();
+                    } catch (Exception ignore) {}
                 }
             });
 
@@ -154,7 +166,6 @@ public class SoundManager {
         try {
             Clip c = SINGLE_LOOP_MAP.get(path);
 
-            // 없으면 로드 후 map에 저장
             if (c == null) {
                 c = loadClip(path);
                 if (c == null) return;

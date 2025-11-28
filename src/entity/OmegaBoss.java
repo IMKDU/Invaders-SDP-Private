@@ -115,7 +115,7 @@ public class OmegaBoss extends MidBoss {
                 }
             }
             else {
-                if (!isInDashCooldown){ //대시 중일 때 dashCooldown.checkFinished()
+                if (!isInDashCooldown){
                     this.setWidth(70 * 2);
                     this.setHeight(51 * 2);
                     if (this.isRight()){
