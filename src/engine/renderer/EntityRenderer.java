@@ -3,10 +3,12 @@ package engine.renderer;
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.Random;
 
-import engine.BackBuffer;
+import engine.*;
 import entity.Entity;
 import engine.DrawManager.SpriteType;
 import entity.GameConstant;
@@ -24,48 +26,124 @@ import entity.pattern.DashPattern;
  * Acts as a sub-view in MVC architecture.
  */
 public final class EntityRenderer {
+    private final Map<SpriteType, BufferedImage> spriteMap;
+    private final BackBuffer backBuffer;
+    private final double scale;
+    private final Cooldown blackholeAnimationCooldown = new Cooldown(100);
+    private SpriteType blackHoleType = SpriteType.BlackHole1;
+    private final Cooldown frameCooldown;
+    private BufferedImage[] apo;
+    private int apoFrameIndex = 0;
+    private Color[] colorPalette = {
+            new Color( 0xFF4081),
+            new Color( 0xFCDD8A),
+            new Color( 0xFF5722),
+            new Color( 0x8BC34A),
+            new Color( 0x9C27B0),
+            new Color( 0x6A89FF),
+            new Color( 0x6756C9),
+            new Color( 0xF2606F),
+            new Color( 0xF5A5A5),
+            new Color( 0x6F5E77),
+            new Color( 0x32A9B3),
+            new Color( 0x8303EE)
+    };
 
-	private final Map<SpriteType, boolean[][]> spriteMap;
-	private final BackBuffer backBuffer;
-	private final double scale;
-    private static final Color BLACK_HOLE_COLOR = new Color(200, 0, 255);
-	private Color[] colorPalette = {
-			new Color( 0xFF4081),
-			new Color( 0xFCDD8A),
-			new Color( 0xFF5722),
-			new Color( 0x8BC34A),
-			new Color( 0x9C27B0),
-			new Color( 0x6A89FF),
-			new Color( 0x6756C9),
-			new Color( 0xF2606F),
-			new Color( 0xF5A5A5),
-			new Color( 0x6F5E77),
-			new Color( 0x32A9B3),
-			new Color( 0x8303EE)
-	};
-	public EntityRenderer(Map<SpriteType, boolean[][]> spriteMap, BackBuffer backBuffer, double scale) {
-		this.spriteMap = spriteMap;
-		this.backBuffer = backBuffer;
-		this.scale = scale;
-	}
+    public EntityRenderer(Map<SpriteType, BufferedImage> spriteMap, BackBuffer backBuffer, double scale ,AnimationLoader loader) {
+        this.spriteMap = spriteMap;
+        this.backBuffer = backBuffer;
+        this.scale = scale;
+        this.frameCooldown = new Cooldown(70);
+        this.apo = loader.load("res/images/apo1");
+    }
 
-	/** Draws a single entity on the back buffer. */
-	public void drawEntity(final Entity entity, final int positionX, final int positionY) {
-		boolean[][] image = spriteMap.get(entity.getSpriteType());
-		Graphics g = backBuffer.getGraphics();
-		g.setColor(entity.getColor());
+    /** Draws a single entity on the back buffer. */
+    public void drawEntity(final Entity entity, final int positionX, final int positionY) {
+        Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
+        BufferedImage img = spriteMap.get(entity.getSpriteType());
+        if (img == null) {
+            return;
+        }
+        int originalW = img.getWidth();
+        int originalH = img.getHeight();
+        int scaledW = (int) (originalW * scale * 2);
+        int scaledH = (int) (originalH * scale * 2);
 
-		for (int i = 0; i < image.length; i++) {
-			for (int j = 0; j < image[i].length; j++) {
-				if (image[i][j]) {
-					int pixelSize = (int) Math.max(1, 2 * scale);
-					int scaledX = positionX + (int)(i * pixelSize);
-					int scaledY = positionY + (int)(j * pixelSize);
-					g.fillRect(scaledX, scaledY, pixelSize, pixelSize);
-				}
-			}
-		}
-	}
+        if (entity.getSpriteType() == SpriteType.SoundOn ||
+                entity.getSpriteType() == SpriteType.SoundOff) {
+
+            img = tintImage(img, entity.getColor());
+        }
+        int drawX = positionX;
+        int drawY = positionY;
+        g2d.drawImage(img, drawX, drawY, scaledW, scaledH, null);
+    }
+
+    private BufferedImage tintImage(BufferedImage src, Color color) {
+        int w = src.getWidth();
+        int h = src.getHeight();
+
+        BufferedImage tinted = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                int argb = src.getRGB(x, y);
+
+
+                if ((argb >> 24) == 0) continue;
+
+
+                int alpha = (argb >> 24) & 0xFF;
+                int rgb = (color.getRGB() & 0x00FFFFFF) | (alpha << 24);
+                tinted.setRGB(x, y, rgb);
+            }
+        }
+        return tinted;
+    }
+    public void drawShield(int shipX,int shipWidth, int shipY, int shipHeight, double ratio) {
+        BufferedImage shield = spriteMap.get(SpriteType.Shield);
+        if (shield == null) return;
+        int sw = shield.getWidth();
+        int sh = shield.getHeight();
+
+        int scaledW = (int) (sw * scale * 2);
+        int scaledH = (int) (sh * scale * 2);
+
+        int centerX = shipX + shipWidth / 2;
+        int centerY = shipY + shipHeight / 2;
+
+        int drawX = centerX - scaledW / 2;
+        int drawY = centerY - scaledH / 2;
+
+        int alpha = (int) (255 * ratio);
+        if (alpha < 30) alpha = 30;
+        BufferedImage tinted = tintAlpha(shield, alpha);
+
+        Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
+        g2d.drawImage(tinted, drawX, drawY, scaledW, scaledH, null);
+    }
+
+    private BufferedImage tintAlpha(BufferedImage src, int alpha) {
+        int w = src.getWidth();
+        int h = src.getHeight();
+        BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        for (int x = 0; x < w; x++) {
+            for (int y = 0; y < h; y++) {
+                int argb = src.getRGB(x, y);
+
+                int originalAlpha = (argb >> 24) & 0xFF;
+                if (originalAlpha == 0) continue;
+
+                int newAlpha = Math.min(alpha, originalAlpha);
+
+                int rgb = (argb & 0x00FFFFFF) | (newAlpha << 24);
+
+                result.setRGB(x, y, rgb);
+            }
+        }
+
+        return result;
+    }
 
 	public void drawEntity(final Entity entity) {
 		if (entity instanceof LaserBullet) {
@@ -104,14 +182,11 @@ public final class EntityRenderer {
 	}
 
     private void drawZetaBoss(ZetaBoss zetaBoss) {
-        // 1. 보스 본체 그리기
-        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
-
-        // 2. 패턴 이펙트 그리기
         BossPattern currentPattern = zetaBoss.getBossPattern();
         if (currentPattern != null) {
             drawBossPattern(zetaBoss, currentPattern);
         }
+        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
     }
 
 	private void drawMidBossMob(MidBossMob midBossMob) {
@@ -166,17 +241,17 @@ public final class EntityRenderer {
             }
         }
         else if (pattern.isAttacking()) {
-            // Draw attack animation (Dark red)
-            float progress = pattern.getAttackAnimationProgress();
-            int currentAttackHeight = (int) (screenHeight * progress);
-            Color attackColor = new Color(255, 0, 0, 200);
-
-            g.setColor(attackColor);
-            for (int i = 0; i < totalColumns; i++) {
-                if (i != safeZoneColumn) {
-                    g.fillRect(i * columnWidth, 0, columnWidth, currentAttackHeight);
-                }
+            if (frameCooldown.checkFinished()) {
+                frameCooldown.reset();
+                apoFrameIndex = (apoFrameIndex + 1) % apo.length;
             }
+
+            BufferedImage frame = apo[apoFrameIndex];
+            if (frame == null) return;
+            g.drawImage(frame, 0, 0, screenWidth, screenHeight, null);
+            g.setColor(new Color(63, 253, 0, 100));
+            g.fillRect(safeZoneColumn * columnWidth, 0, columnWidth, screenHeight);
+
         }
     }
 
@@ -271,9 +346,36 @@ public final class EntityRenderer {
 		int sy = (int) Math.round(y1 - dy * big);
 		int ex = (int) Math.round(x1 + dx * big);
 		int ey = (int) Math.round(y1 + dy * big);
+        if (entity.getColor() == Color.GREEN){
+            g.drawLine(sx, sy, ex, ey);
+        }
+        else {
+            BufferedImage laserImg = spriteMap.get(SpriteType.Laser);
+            Graphics2D g2 = (Graphics2D) g;
+            double angle = Math.atan2(ey - sy, ex - sx);
+            double length = Math.hypot(ex - sx, ey - sy);
+            double scaleX = length / laserImg.getWidth() * scale;
+            double scaleY = 6.0 * scale;
+            AffineTransform at = new AffineTransform();
+            at.translate(sx, sy);
+            at.rotate(angle);
+            at.scale(scaleX, scaleY);
 
-		g.drawLine(sx, sy, ex, ey);
+            g2.drawImage(laserImg, at, null);
+        }
+
 	}
+    public void drawLife(final int positionX, final int positionY, final int playerId){
+        Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
+        BufferedImage image = spriteMap.get(SpriteType.Life);
+        if (playerId == 2){
+            image = this.tint(image, new Color(20, 74, 246, 180));
+        }
+        int scaledW = (int) (image.getWidth() * scale * 2);
+        int scaledH = (int) (image.getHeight() * scale * 2);
+        g2d.drawImage(image, positionX, positionY, scaledW, scaledH, null);
+    }
+
 
 	/**
 	 * Draws boss dash path with dashed line style.
@@ -315,14 +417,52 @@ public final class EntityRenderer {
 		g2d.drawLine(endX, endY, x2, y2);
 	}
 
+    public BufferedImage tint(BufferedImage src, Color newColor) {
+        int width = src.getWidth();
+        int height = src.getHeight();
+
+        BufferedImage tinted = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int rgba = src.getRGB(x, y);
+                int alpha = (rgba >> 24) & 0xff;
+
+                if (alpha == 0) continue;
+
+                tinted.setRGB(x, y, newColor.getRGB());
+            }
+        }
+
+        return tinted;
+    }
+
     /** Draw circle for pull_attack pattern */
-    public void drawBlackHole(final int cx, final int cy, final int radius){
-        int x = cx - radius;
-        int y = cy - radius;
+    public void drawBlackHole(final int cx, final int cy, final int size) {
+        Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
 
-        Graphics g = backBuffer.getGraphics();
-        g.setColor(BLACK_HOLE_COLOR);
-        g.drawOval(x, y, radius * 2, radius * 2);
+        if (this.blackholeAnimationCooldown.checkFinished()) {
+            this.blackholeAnimationCooldown.reset();
+            blackHoleType = (blackHoleType == SpriteType.BlackHole1)
+                    ? SpriteType.BlackHole2
+                    : SpriteType.BlackHole1;
+        }
 
+        BufferedImage img = spriteMap.get(blackHoleType);
+
+        int drawX = cx - size / 2;
+        int drawY = cy - size / 2;
+
+
+        Shape oldClip = g2d.getClip();
+
+
+        g2d.setClip(new java.awt.geom.Ellipse2D.Float(drawX, drawY, size, size));
+
+
+        g2d.drawImage(img, drawX, drawY, size, size, null);
+
+
+        g2d.setClip(oldClip);
     }
 }

@@ -40,7 +40,7 @@ public class Entity implements Collidable, HasBounds {
 	 *            Color of the entity.
 	 */
 	public Entity(final int positionX, final int positionY, final int width,
-				  final int height, final Color color) {
+			final int height, final Color color) {
 		this.positionX = positionX;
 		this.positionY = positionY;
 		this.width = width;
@@ -86,8 +86,15 @@ public class Entity implements Collidable, HasBounds {
 	public final void setPositionY(final int positionY) {
 		this.positionY = positionY;
 	}
+    public void setWidth(int width){
+        this.width = width;
+    }
+    public void setHeight(int height){
+        this.height = height;
+    }
 
-	/**
+
+    /**
 	 * Getter for the sprite that the entity will be drawn as.
 	 * 
 	 * @return Sprite corresponding to the entity.

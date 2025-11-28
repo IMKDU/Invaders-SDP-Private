@@ -117,6 +117,7 @@ public class GameModel {
 
     /** Milliseconds until the screen accepts user input. */
     private Cooldown inputDelay;
+    private int FinalSkillCnt;
 
     private List<Ship> ships;
     /** variables for Boss BlackHole Pattern */
@@ -133,6 +134,7 @@ public class GameModel {
         this.logger = Core.getLogger();
         this.width = width;
         this.height = height;
+        this.FinalSkillCnt = 1;
 
         this.currentLevel = level;
         this.bonusLife = bonusLife;
@@ -158,11 +160,11 @@ public class GameModel {
         /** Initialize the bullet Boss fired */
         this.bossBullets = new HashSet<>();
         enemyShipFormationModel = new EnemyShipFormationModel(this.currentLevel, width);
-		enemyShipFormationModel.applyEnemyColorByLevel(this.currentLevel);
-		this.ship = new Ship(this.width / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 19 / 20, Color.green);
+        this.enemyShipFormationModel.applyEnemyColor(this.currentLevel.getColorForLevel());
+        this.ship = new Ship(this.width / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 13 / 15,Color.GREEN,true);
         this.ship.setPlayerId(1);   //=== [ADD] Player 1 ===
 
-        this.shipP2 = new Ship(this.width * 3 / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 19 / 20, Color.pink);
+        this.shipP2 = new Ship(this.width * 3 / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 13 / 15,Color.RED,false);
         this.shipP2.setPlayerId(2); // === [ADD] Player2 ===
         // special enemy initial
 
@@ -348,7 +350,7 @@ public class GameModel {
                     if (this.zetaBoss.isDestroyed()) {
                         if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.zetaBoss = null;
-                            this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, ships, this.width, this.height); // [추가] Final 소환
+                            this.finalBoss = new FinalBoss(this.width / 2 - 150, 50, ships, this.width, this.height); // [추가] Final 소환
                             this.logger.info("Final Boss has spawned!");
                         } else {
 
@@ -438,14 +440,12 @@ public class GameModel {
 	 * Handles damage and rewards when a player bullet hits a normal enemy.
 	 */
 	public void requestEnemyHitByPlayerBullet(Bullet bullet, EnemyShip enemy) {
-
 		if (!bullets.contains(bullet)) return;
 		if (enemy.isDestroyed()) return;
 
 		int pts = enemy.getPointValue();
 		addPointsFor(bullet, pts);
 		coin += pts / 10;
-
 		AchievementManager.getInstance().onEnemyDefeated();
 
 		attemptItemDrop(enemy);
@@ -632,7 +632,7 @@ public class GameModel {
 	public void pushEnemiesBack() {
 		for (EnemyShip enemy : enemyShipFormationModel) {
 			if (enemy != null && !enemy.isDestroyed()) {
-				enemy.move(0, -20);
+				enemy.move(0, -20,false);
 			}
 		}
 	}
@@ -824,7 +824,7 @@ public class GameModel {
         this.logger.info("Spawning boss: " + bossName);
         switch (bossName) {
             case "finalBoss":
-                this.finalBoss = new FinalBoss(this.width / 2 - 50, 80,  ships, this.width, this.height);
+                this.finalBoss = new FinalBoss(this.width / 2 - 150, 80,  ships, this.width, this.height);
                 this.logger.info("Final Boss has spawned!");
                 break;
             case "omegaBoss":
@@ -878,14 +878,14 @@ public class GameModel {
                     bulletsToRemove.add(b);
                 }
                 /** If the bullet collides with ship */
-                else if (this.livesP1 > 0 && this.checkCollision(b, this.ship)) {
+                else if (this.livesP1 > 0 && this.checkCollision(b, this.ship) && !this.ship.isInvincible()) {
                     if (!this.ship.isDestroyed()) {
 						requestShipDamage(this.ship, 1);
                         this.logger.info("Hit on player ship, " + this.livesP1 + " lives remaining.");
                     }
                     bulletsToRemove.add(b);
                 }
-                else if (this.shipP2 != null && this.livesP2 > 0 && !this.shipP2.isDestroyed() && this.checkCollision(b, this.shipP2)) {
+                else if (this.shipP2 != null && this.livesP2 > 0 && !this.shipP2.isDestroyed() && this.checkCollision(b, this.shipP2) && !this.ship.isInvincible()) {
                     if (!this.shipP2.isDestroyed()) {
 						requestShipDamage(this.shipP2, 1);
                         this.logger.info("Hit on player ship2, " + this.livesP2 + " lives remaining.");
@@ -1006,6 +1006,12 @@ public class GameModel {
     public int getBlackHoleCX() { return blackHoleCX; }
     public int getBlackHoleCY() { return blackHoleCY; }
     public int getBlackHoleRadius() { return blackHoleRadius; }
+    public int getFinalSkillCnt(){
+        return FinalSkillCnt;
+    }
+    public void useFinalSkill(){
+        this.FinalSkillCnt--;
+    }
 
     public List<Entity> getEntitiesToRender() {
         List<Entity> renderList = new ArrayList<>();
