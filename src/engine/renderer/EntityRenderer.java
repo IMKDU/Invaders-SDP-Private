@@ -144,21 +144,34 @@ public final class EntityRenderer {
 
         return result;
     }
-    public void drawHealthBar(final HealthBar healthBar){
-        int [] position = healthBar.getPosition();
+    public void drawHealthBar(final HealthBar healthBar) {
+        Graphics2D g2 = (Graphics2D) backBuffer.getGraphics();
+        int height = GameConstant.STAT_SEPARATION_LINE_HEIGHT;
+        int barWidth = GameConstant.SCREEN_WIDTH * 3 / 10;
+        int barHeight = height / 2;
+        int barY = (height - barHeight) / 2;
+        int barX = GameConstant.SCREEN_WIDTH * 4 / 10;
         float ratio_hp = healthBar.getRatio_HP();
 
-        int width = healthBar.getWidth();
-        Graphics2D g2 = (Graphics2D) backBuffer.getGraphics();
+
+        int greenWidth = (int) (barWidth * ratio_hp);
+        int redWidth = barWidth - greenWidth;
+
+
+
+        Stroke oldStroke = g2.getStroke();
+        g2.setStroke(new BasicStroke(8));
+        g2.setColor(Color.LIGHT_GRAY);
+        g2.drawRect(barX, barY, barWidth, barHeight);
+        g2.setStroke(oldStroke);
+
         g2.setColor(Color.GREEN);
-        Stroke oldStroke = g2.getStroke(); // 선 굵기 백업
-        g2.setStroke(new BasicStroke(3));
-        g2.drawLine(position[0], position[1], position[2], position[3]);
-        if ((int)((float)position[0] + (width * ratio_hp)) != position[2]){
+        g2.fillRect(barX + 1, barY + 1, greenWidth - 1, barHeight - 1);
+
+        if (redWidth > 0) {
             g2.setColor(Color.RED);
-            g2.drawLine((int) ((float)position[0] + (width * ratio_hp)), position[1], position[2], position[3]);
+            g2.fillRect(barX + greenWidth, barY + 1, redWidth - 1, barHeight - 1);
         }
-        g2.setStroke(oldStroke); // 백업 받은거 원위치
     }
 
 	public void drawEntity(final Entity entity) {

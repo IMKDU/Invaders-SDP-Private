@@ -34,7 +34,7 @@ public class GameView {
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
         //오리진 스킬 애니메이션 스킬횟수 > 0 그리고 p1점수 100이상일때 발동
         // 구현 해야할거 발동후 로직, 아군 ship 무적
-        if (model.getFinalSkillCnt() > 0 && (dto.getScoreP1() >= 100)) {
+        if (model.getFinalSkillCnt() > 0 && (dto.getScoreP2() >= 100)) {
             drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
             drawManager.getSpecialAnimationRenderer().draw();
             if (drawManager.getSpecialAnimationRenderer().isFinished()){
@@ -80,12 +80,15 @@ public class GameView {
         }
         if (model.getOmegaBoss() != null) {
             drawManager.getEntityRenderer().drawHealthBar(model.getOmegaBoss().getHealthBar());
+            drawManager.getUIRenderer().drawBossName("Omega");
         }
         if (model.getFinalBoss() != null) {
             drawManager.getEntityRenderer().drawHealthBar(model.getFinalBoss().getHealthBar());
+            drawManager.getUIRenderer().drawBossName("???");
         }
         if (model.getZetaBoss() != null) {
             drawManager.getEntityRenderer().drawHealthBar(model.getZetaBoss().getHealthBar());
+            drawManager.getUIRenderer().drawBossName("Zeta");
         }
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50, 2);
