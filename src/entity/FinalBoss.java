@@ -5,6 +5,7 @@ import engine.Cooldown;
 import engine.Core;
 import engine.DrawManager;
 import entity.pattern.*;
+import entity.Ship;
 import java.util.List;
 
 import java.awt.*;
@@ -20,8 +21,6 @@ public class FinalBoss extends Entity implements BossEntity, Collidable{
     private Cooldown animationCooldown;
     private int screenWidth;
     private int screenHeight;
-    /** random x coordinate of Shoot2's bullet  */
-    private int random_x;
 
 	private BossPattern bossPattern;
 	private HasBounds playerPosition;
@@ -50,7 +49,9 @@ public class FinalBoss extends Entity implements BossEntity, Collidable{
         this.screenHeight = screenHeight;
 
         this.animationCooldown = new Cooldown(500);
+
         this.ships = ships;
+
 		this.playerPosition = playerPosition;
 		logger = Core.getLogger();
 	    choosePattern();
@@ -194,7 +195,6 @@ public class FinalBoss extends Entity implements BossEntity, Collidable{
 			bossPattern.setTarget(target);
 		}
 	}
-
 
     public BlackHolePattern getCurrentBlackHole(){
         return currentBlackHole;

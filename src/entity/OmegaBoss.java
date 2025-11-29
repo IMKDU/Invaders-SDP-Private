@@ -4,6 +4,8 @@ import audio.SoundManager;
 import engine.Cooldown;
 import engine.Core;
 import engine.DrawManager;
+import engine.Core;
+import engine.Cooldown;
 import entity.pattern.*;
 
 import java.awt.*;
@@ -54,6 +56,7 @@ public class OmegaBoss extends MidBoss {
     private boolean isMove = false;
     private boolean isDash = false;
     private Cooldown animationCooldown;
+
 	private SpawnMobPattern spawnPattern;
 
 	/**
