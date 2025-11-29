@@ -1,7 +1,6 @@
 package entity;
 
 import engine.Core;
-import screen.HealthBar;
 import entity.pattern.ApocalypseAttackPattern;
 
 import java.awt.*;
@@ -21,7 +20,6 @@ public abstract class MidBoss extends Entity implements BossEntity {
 	protected boolean isDestroyed = false;
 	protected int pattern = 1;
 	protected Logger logger;
-    protected HealthBar healthBar;
 
     protected ApocalypseAttackPattern apocalypsePattern;
 
@@ -92,5 +90,4 @@ public abstract class MidBoss extends Entity implements BossEntity {
 	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
 		model.requestBossHitByPlayerBullet(bullet, this);
 	}
-    public HealthBar getHealthBar() {return this.healthBar;}
 }

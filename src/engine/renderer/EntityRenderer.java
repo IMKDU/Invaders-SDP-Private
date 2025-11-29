@@ -168,7 +168,7 @@ public final class EntityRenderer {
         g2.setColor(Color.GREEN);
         g2.fillRect(barX + 1, barY + 1, greenWidth - 1, barHeight - 1);
 
-        if (redWidth > 0) {
+        if (redWidth > 0 && redWidth < barWidth) {
             g2.setColor(Color.RED);
             g2.fillRect(barX + greenWidth, barY + 1, redWidth - 1, barHeight - 1);
         }

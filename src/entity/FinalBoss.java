@@ -3,10 +3,8 @@ package entity;
 import audio.SoundManager;
 import engine.Cooldown;
 import engine.Core;
-import screen.HealthBar;
 import engine.DrawManager;
 import entity.pattern.*;
-import entity.Ship;
 import java.util.List;
 
 import java.awt.*;
@@ -24,7 +22,6 @@ public class FinalBoss extends Entity implements BossEntity, Collidable{
     private int screenHeight;
     /** random x coordinate of Shoot2's bullet  */
     private int random_x;
-    private HealthBar healthBar;
 
 	private BossPattern bossPattern;
 	private HasBounds playerPosition;
@@ -53,7 +50,6 @@ public class FinalBoss extends Entity implements BossEntity, Collidable{
         this.screenHeight = screenHeight;
 
         this.animationCooldown = new Cooldown(500);
-        this.healthBar = new HealthBar(this.getHealPoint(), this.getPositionX(), this.getPositionY(), this.getWidth(),this.getHeight());
         this.ships = ships;
 		this.playerPosition = playerPosition;
 		logger = Core.getLogger();
@@ -199,9 +195,6 @@ public class FinalBoss extends Entity implements BossEntity, Collidable{
 		}
 	}
 
-    public HealthBar getHealthBar(){
-        return this.healthBar;
-    }
 
     public BlackHolePattern getCurrentBlackHole(){
         return currentBlackHole;

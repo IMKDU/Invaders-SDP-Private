@@ -4,9 +4,6 @@ import audio.SoundManager;
 import engine.Cooldown;
 import engine.Core;
 import engine.DrawManager;
-import screen.HealthBar;
-import engine.Core;
-import engine.Cooldown;
 import entity.pattern.*;
 
 import java.awt.*;
@@ -57,7 +54,6 @@ public class OmegaBoss extends MidBoss {
     private boolean isMove = false;
     private boolean isDash = false;
     private Cooldown animationCooldown;
-//    private HealthBar healthBar;
 	private SpawnMobPattern spawnPattern;
 
 	/**
@@ -76,7 +72,6 @@ public class OmegaBoss extends MidBoss {
 		this.spawnPattern = new SpawnMobPattern(this,this.getHealPoint());
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		this.logger.info("OMEGA : move using the default pattern");
-        this.healthBar = new HealthBar(this.getHealPoint(), this.getPositionX(), this.getPositionY(), this.getWidth(),this.getHeight());
         SoundManager.play("sfx/OmegaBossAppearance.wav");
 		choosePattern();
 	}
@@ -338,8 +333,4 @@ public class OmegaBoss extends MidBoss {
 	}
 
 	public List<MidBossMob> getSpawnMobs() { return this.spawnPattern.getChildShips();}
-    @Override
-    public HealthBar getHealthBar() {
-        return this.healthBar;
-    }
 }

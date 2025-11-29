@@ -17,6 +17,10 @@ public class HealthBar {
         this.x2 = positionX + width;
         this.y2 = this.y1;
     }
+    public HealthBar(int HP){
+        this.maxHP = HP;
+        this.current_HP = HP;
+    }
     public void setCurrent_HP(int current_HP){
         this.current_HP = current_HP;
     }
