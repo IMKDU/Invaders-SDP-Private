@@ -1,6 +1,7 @@
 package entity.pattern;
 
 import engine.Cooldown;
+import engine.Core;
 import entity.Bullet;
 import entity.GameConstant;
 import entity.HasBounds;
@@ -59,7 +60,7 @@ public class OmegaBossPattern {
 		if(boss.getHealPoint()>boss.getMaxHealPoint()*2/5){
 			return 1;
 		}
-		if(boss.getMaxHealPoint()>boss.getMaxHealPoint()*3/10){
+		if(boss.getHealPoint()>boss.getMaxHealPoint()*3/10){
 			return 2;
 		}
 		return 3;
@@ -72,6 +73,7 @@ public class OmegaBossPattern {
 			attackPattern=patterns.get(1);
 			attackPattern.validateBackgroundPattern(false);
 			attackPattern.setCooldown(new Cooldown(attackCooldownMillis[0][0]));
+			Core.getLogger().info("OmegaBossPattern: phase1 start");
 		}
 	}
 	private void phase2(boolean isInit){
@@ -79,14 +81,22 @@ public class OmegaBossPattern {
 		if(isInit){
 			movePattern=patterns.getFirst();
 			attackPattern=patterns.get(2);
+			attackPattern.setCooldown(new Cooldown(attackCooldownMillis[1][0]));
+			Core.getLogger().info("OmegaBossPattern: phase2 start");
 		}
 
 	}
 	private void phase3(boolean isInit){
+		boolean isPinnedAttack = Math.random()>0.5 ;
 		currentPhase=3;
 		if(isInit){
 			movePattern=patterns.getFirst();
-			attackPattern = Math.random()>0.5 ? patterns.get(1) : patterns.getLast();
+			attackPattern = isPinnedAttack ? patterns.get(1) : patterns.getLast();
+			attackPattern.setCooldown(new Cooldown(attackCooldownMillis[2][0]));
+			Core.getLogger().info("OmegaBossPattern: phase3 start");
+		}
+		if(!isPinnedAttack){
+			movePattern=patterns.getLast();
 		}
 	}
 
