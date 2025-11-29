@@ -59,4 +59,7 @@ public class HorizontalPattern extends BossPattern {
     public void setTarget(HasBounds target) {
         // No target needed for this pattern
     }
+    public boolean getIsRight(){
+        return isRight;
+    }
 }

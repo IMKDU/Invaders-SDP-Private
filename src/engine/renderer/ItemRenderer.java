@@ -1,7 +1,7 @@
 package engine.renderer;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.Map;
 
 import engine.BackBuffer;
@@ -12,37 +12,31 @@ import entity.DropItem;
 public class ItemRenderer {
 
 	private final BackBuffer backBuffer;
-	private final Map<SpriteType, boolean[][]> spriteMap;
+	private final Map<SpriteType, BufferedImage> spriteMap;
 	private final double scale;
 
-	public ItemRenderer(BackBuffer backBuffer, Map<SpriteType, boolean[][]> spriteMap, double scale) {
+	public ItemRenderer(BackBuffer backBuffer, Map<SpriteType, BufferedImage> spriteMap, double scale) {
 		this.backBuffer = backBuffer;
 		this.spriteMap = spriteMap;
 		this.scale = scale;
 	}
 
 	public void render(DropItem item) {
-		SpriteType sprite = getSprite(item.getItemType());
-		Color color = getColor(item.getItemType());
+        Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
+        BufferedImage img = spriteMap.get(this.getSprite(item.getItemType()));
+        if (img == null) {
+            return;
+        }
+        int originalW = img.getWidth();
+        int originalH = img.getHeight();
+        int scaledW = (int) (originalW * scale * 2);
+        int scaledH = (int) (originalH * scale * 2);
 
-		boolean[][] image = spriteMap.get(sprite);
-		Graphics g = backBuffer.getGraphics();
-		g.setColor(color);
-
-		int posX = item.getPositionX();
-		int posY = item.getPositionY();
-
-		for (int i = 0; i < image.length; i++) {
-			for (int j = 0; j < image[i].length; j++) {
-				if (image[i][j]) {
-					int pixelSize = (int) Math.max(1, 2 * scale);
-					int scaledX = posX + (int)(i * pixelSize);
-					int scaledY = posY + (int)(j * pixelSize);
-					g.fillRect(scaledX, scaledY, pixelSize, pixelSize);
-				}
-			}
-		}
+        int drawX = item.getPositionX(); // 가운데 정렬: int drawX = positionX- scaledW / 2
+        int drawY = item.getPositionY(); // 가운데 정렬: int drawY = positionY - scaledH / 2
+        g2d.drawImage(img, drawX, drawY, scaledW, scaledH, null);
 	}
+
 
 	private SpriteType getSprite(DropItem.ItemType type) {
 		switch (type) {

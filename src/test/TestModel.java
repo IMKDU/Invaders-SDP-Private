@@ -23,8 +23,8 @@ public class TestModel {
 	public TestModel(int width, int height) {
 		this.width = width;
 		this.height = height;
-		this.player = new Ship(this.width/2, height-20, Color.GREEN);
-		this.entity = new OmegaBoss(Color.blue, player);
+        this.entity = new OmegaBoss(Color.blue, player);
+        this.player = new Ship(this.width/2, height-20, Color.GREEN,true);
 		this.bullets = new HashSet<>();
 	}
 
@@ -137,6 +137,9 @@ public class TestModel {
 
 		return distanceX < maxDistanceX && distanceY < maxDistanceY;
 	}
+    public Ship getPlayer() {
+        return player;
+    }
 
 }
 

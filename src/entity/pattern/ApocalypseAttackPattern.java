@@ -15,7 +15,7 @@ public class ApocalypseAttackPattern extends BossPattern {
     /** 2-second warning cooldown */
     private Cooldown warningCooldown;
     /** attack animation cooldown */
-    private static final int ATTACK_ANIMATION_DURATION = 500; // 0.5 sec
+    private static final int ATTACK_ANIMATION_DURATION = 1000; // 0.5 sec
     private Cooldown attackAnimationCooldown;
     private long attackAnimationStartTime; // For calculating animation progress
     private boolean isAttacking = false; // Whether the attack animation is active

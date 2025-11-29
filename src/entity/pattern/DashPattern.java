@@ -20,6 +20,7 @@ public class DashPattern extends BossPattern {
     private static final long PATH_SHOW_DURATION = 2000; // 2 seconds
     private static final int DASH_SPEED = 10;
     private boolean dashSkillInitialized = false;
+    private boolean rightDash;
 
     public DashPattern(HasBounds boss, HasBounds target) {
         super(new Point(boss.getPositionX(), boss.getPositionY()));
@@ -34,12 +35,14 @@ public class DashPattern extends BossPattern {
             dashSkillInitialized = true;
             logger.info("OMEGA : Dash skill initiated");
         }
+        this.rightDash = (target.getPositionX() - this.bossPosition.x) > 0;
     }
 
     @Override
     public void move() {
         // Continue dashing if already in dash
         if (isDashing) {
+            this.rightDash = (target.getPositionX() - this.bossPosition.x) > 0;
             dashToTarget();
             return;
         }
@@ -79,7 +82,6 @@ public class DashPattern extends BossPattern {
         // Move precisely using double direction values
         int newX = boss.getPositionX() + (int)(dashDirectionX * DASH_SPEED);
         int newY = boss.getPositionY() + (int)(dashDirectionY * DASH_SPEED);
-
         // Check boundaries with boss size
         boolean hitBoundary = false;
 
@@ -162,5 +164,8 @@ public class DashPattern extends BossPattern {
         }
 
         return new int[]{endX + bossWidth / 2, endY + bossHeight / 2};
+    }
+    public boolean getRightDash(){
+        return this.rightDash;
     }
 }
