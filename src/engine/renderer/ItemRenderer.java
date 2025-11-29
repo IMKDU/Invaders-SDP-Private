@@ -21,34 +21,31 @@ public class ItemRenderer {
 		this.scale = scale;
 	}
 
+	private void drawItemPlaceholder(Graphics2D g2d, DropItem item,
+									 Color fill, Color border) {
+		int size = (int) (20 * scale * 1.5);
+		int x = item.getPositionX();
+		int y = item.getPositionY();
+
+		g2d.setColor(fill);
+		g2d.fillOval(x, y, size, size);
+
+		g2d.setColor(border);
+		g2d.drawOval(x, y, size, size);
+	}
+
 	public void render(DropItem item) {
         Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
 
+		// === Bomb ===
 		if (item.getItemType() == DropItem.ItemType.Bomb) {
-			int size = (int) (20 * scale * 1.5);
-			int x = item.getPositionX();
-			int y = item.getPositionY();
-
-			g2d.setColor(Color.GRAY);
-			g2d.fillOval(x, y, size, size);
-
-			g2d.setColor(Color.WHITE);
-			g2d.drawOval(x, y, size, size);
-
+			drawItemPlaceholder(g2d, item, Color.GRAY, Color.WHITE);
 			return;
 		}
 
+		// === Coin ===
 		if (item.getItemType() == DropItem.ItemType.Coin) {
-			int size = (int)(20 * scale * 1.5);
-			int x = item.getPositionX();
-			int y = item.getPositionY();
-
-			g2d.setColor(Color.YELLOW);
-			g2d.fillOval(x, y, size, size);
-
-			g2d.setColor(Color.ORANGE);
-			g2d.drawOval(x, y, size, size);
-
+			drawItemPlaceholder(g2d, item, Color.YELLOW, Color.ORANGE);
 			return;
 		}
 
@@ -73,19 +70,6 @@ public class ItemRenderer {
 			case Stop:    return SpriteType.Item_Stop;
 			case Shield:  return SpriteType.Item_Shield;
 			case Heal:    return SpriteType.Item_Heal;
-			case Bomb:    return SpriteType.Item_Bomb;
-		}
-		throw new IllegalArgumentException("Unknown ItemType: " + type);
-	}
-
-	private Color getColor(DropItem.ItemType type) {
-		switch (type) {
-			case Explode: return Color.RED;
-			case Stop:    return Color.YELLOW;
-			case Shield:  return Color.CYAN;
-			case Heal:    return Color.GREEN;
-			case Bomb:    return Color.GRAY;
-			case Coin:    return Color.ORANGE;
 		}
 		throw new IllegalArgumentException("Unknown ItemType: " + type);
 	}

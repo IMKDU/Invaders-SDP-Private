@@ -569,11 +569,11 @@ public class GameModel {
 				break;
 
 			case Bomb:
-				ship.enableBomb(3);
+				ship.enableBomb(GameConstant.BOMB_ITEM_SHOTS);
 				break;
 
 			case Coin:
-				this.coin += 30;
+				this.coin += GameConstant.COIN_ITEM_VALUE;
 				break;
 
 			case Explode:
@@ -742,7 +742,7 @@ public class GameModel {
 
 		int pts = enemy.getPointValue();
 		addPointsFor(source, pts);
-		this.coin += pts / 10;
+		this.coin += pts / GameConstant.POINTS_TO_COIN_CONVERSION;
 		AchievementManager.getInstance().onEnemyDefeated();
 
 		attemptItemDrop(enemy);
@@ -762,7 +762,7 @@ public class GameModel {
 	private void applyBombDamageToBoss(Bullet source, BossEntity boss) {
 		if (boss == null || boss.isDestroyed()) return;
 
-		boss.takeDamage(2);
+		boss.takeDamage(GameConstant.BOMB_DAMAGE_TO_BOSS);
 
 		if (boss.getHealPoint() <= 0) {
 			boss.destroy();
@@ -778,36 +778,42 @@ public class GameModel {
 
 		int cx = source.getPositionX() + source.getWidth() / 2;
 		int cy = source.getPositionY() + source.getHeight() / 2;
-		final int radius = 100;
+		final int radius = GameConstant.BOMB_AOE_RADIUS;
 
-		for (EnemyShip e : enemyShipFormationModel) {
-			if (e != null && !e.isDestroyed() && inRange(e, cx, cy, radius)) {
-				applyBombDamageToEnemy(source, e);
-			}
+		java.util.List<Iterable<EnemyShip>> enemyFormations = new java.util.ArrayList<>();
+		if (enemyShipFormationModel != null) {
+			enemyFormations.add(enemyShipFormationModel);
+		}
+		if (enemyShipSpecialFormation != null) {
+			enemyFormations.add(enemyShipSpecialFormation);
 		}
 
-		for (EnemyShip e : enemyShipSpecialFormation) {
-			if (e != null && !e.isDestroyed() && inRange(e, cx, cy, radius)) {
-				applyBombDamageToEnemy(source, e);
-			}
-		}
-
-		if (midBossChilds != null) {
-			for (MidBossMob mob : midBossChilds) {
-				if (mob != null && !mob.isDestroyed() && inRange(mob, cx, cy, radius)) {
-					applyBombDamageToBoss(source, mob);
+		for (Iterable<EnemyShip> formation : enemyFormations) {
+			for (EnemyShip e : formation) {
+				if (e != null && !e.isDestroyed() && inRange(e, cx, cy, radius)) {
+					applyBombDamageToEnemy(source, e);
 				}
 			}
 		}
 
-		if (omegaBoss != null && !omegaBoss.isDestroyed() && inRange(omegaBoss, cx, cy, radius)) {
-			applyBombDamageToBoss(source, omegaBoss);
+		java.util.List<BossEntity> allBosses = new java.util.ArrayList<>();
+		if (omegaBoss != null) {
+			allBosses.add(omegaBoss);
 		}
-		if (zetaBoss != null && !zetaBoss.isDestroyed() && inRange(zetaBoss, cx, cy, radius)) {
-			applyBombDamageToBoss(source, zetaBoss);
+		if (zetaBoss != null) {
+			allBosses.add(zetaBoss);
 		}
-		if (finalBoss != null && !finalBoss.isDestroyed() && inRange(finalBoss, cx, cy, radius)) {
-			applyBombDamageToBoss(source, finalBoss);
+		if (finalBoss != null) {
+			allBosses.add(finalBoss);
+		}
+		if (midBossChilds != null) {
+			allBosses.addAll(midBossChilds);
+		}
+
+		for (BossEntity boss : allBosses) {
+			if (!boss.isDestroyed() && inRange((Entity) boss, cx, cy, radius)) {
+				applyBombDamageToBoss(source, boss);
+			}
 		}
 
 		requestRemoveBullet(source);

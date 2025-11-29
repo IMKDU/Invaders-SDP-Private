@@ -17,8 +17,18 @@ public final class GameConstant {
 	public static final int FPS = 60;
 	/** Set if this run is for debugging */
 	public static final boolean isTest = false;
+	/** Number of bomb shots granted */
+	public static final int BOMB_ITEM_SHOTS = 3;
+	/** Coins awarded when collecting a coin item */
+	public static final int COIN_ITEM_VALUE = 30;
+	/** Points-to-coin conversion rate */
+	public static final int POINTS_TO_COIN_CONVERSION = 10;
+	/** Damage dealt to bosses by bomb explosion */
+	public static final int BOMB_DAMAGE_TO_BOSS = 2;
+	/** Bomb explosion area radius (in pixels) */
+	public static final int BOMB_AOE_RADIUS = 100;
 
-    private GameConstant() {}
+	private GameConstant() {}
     private static boolean initialized = false;
 
     public static void initialize(int screenWidth, int screenHeight) {

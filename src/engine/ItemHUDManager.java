@@ -328,7 +328,7 @@ public class ItemHUDManager {
 			case Coin:
 				return Color.YELLOW;
 			case Bomb:
-				return Color.orange;
+				return Color.ORANGE;
             default:
                 return Color.GRAY;
         }

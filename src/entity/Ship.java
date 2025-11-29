@@ -24,6 +24,8 @@ public class Ship extends Entity implements Collidable {
 	private static final int BULLET_SPEED = -6;
 	/** Movement of the ship for each unit of time. */
 	private static final int SPEED = 2;
+	/** Y-offset from the ship position to the bullet spawn position */
+	private static final int BULLET_SPAWN_Y_OFFSET = 36;
 
 	/** Minimum time between shots. */
 	private Cooldown shootingCooldown;
@@ -100,7 +102,7 @@ public class Ship extends Entity implements Collidable {
 			int spacing = ShopItem.getMultiShotSpacing();
 
 			int centerX = positionX + this.width / 2;
-			int centerY = positionY - 36;
+			int centerY = positionY - BULLET_SPAWN_Y_OFFSET;
 
 			if (bombShotsRemaining > 0) {
 
