@@ -264,9 +264,7 @@ public final class EntityRenderer {
 		}
 
         int[] targetPoint;
-        if (boss instanceof OmegaBoss) {
-            targetPoint = ((OmegaBoss) boss).getDashEndPoint();
-        } else if (boss instanceof ZetaBoss) {
+		if (boss instanceof ZetaBoss) {
             targetPoint = ((ZetaBoss) boss).getDashEndPoint();
         } else {
             return;
