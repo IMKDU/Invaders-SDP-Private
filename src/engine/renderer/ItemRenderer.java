@@ -37,12 +37,6 @@ public class ItemRenderer {
 	public void render(DropItem item) {
         Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
 
-		// === Bomb ===
-		if (item.getItemType() == DropItem.ItemType.Bomb) {
-			drawItemPlaceholder(g2d, item, Color.GRAY, Color.WHITE);
-			return;
-		}
-
 		// === Coin ===
 		if (item.getItemType() == DropItem.ItemType.Coin) {
 			drawItemPlaceholder(g2d, item, Color.YELLOW, Color.ORANGE);
@@ -70,6 +64,7 @@ public class ItemRenderer {
 			case Stop:    return SpriteType.Item_Stop;
 			case Shield:  return SpriteType.Item_Shield;
 			case Heal:    return SpriteType.Item_Heal;
+            case Bomb:    return SpriteType.Item_Bomb;
 		}
 		throw new IllegalArgumentException("Unknown ItemType: " + type);
 	}
