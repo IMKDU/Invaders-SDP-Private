@@ -12,16 +12,16 @@ import engine.level.Level;
  */
 public class EnemyShipFactory {
 
-	/** Proportion of C-type ships. */
-	private static final double PROPORTION_C = 0.2;
-	/** Proportion of B-type ships. */
-	private static final double PROPORTION_B = 0.4;
-	/** Initial position in the x-axis. */
-	private static final int INIT_POS_X = 20;
-	/** Initial position in the y-axis. */
-	private static final int INIT_POS_Y = 100;
-	/** Distance between ships. */
-	private static final int SEPARATION_DISTANCE = 40;
+    /** Proportion of C-type ships. */
+    private static final double PROPORTION_C = 0.2;
+    /** Proportion of B-type ships. */
+    private static final double PROPORTION_B = 0.4;
+    /** Initial position in the x-axis. */
+    private static final int INIT_POS_X = 20;
+    /** Initial position in the y-axis. */
+    private static final int INIT_POS_Y = 100;
+    /** Distance between ships. */
+    private static final int SEPARATION_DISTANCE = 80;
 
 	/**
 	 * Creates the 2D list of enemy ships for the formation.

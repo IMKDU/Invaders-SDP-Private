@@ -10,7 +10,10 @@ public class BossBullet extends Bullet implements Collidable {
     private int dx;
     /** amount of vertical change*/
     private int dy;
-    /** bossBullets carry bullets that the boss will shoot */
+
+	private boolean markedForRemoval = false;
+
+	/** bossBullets carry bullets that the boss will shoot */
     /**
      * Constructor, establishes boss bullets.
      *
@@ -26,16 +29,22 @@ public class BossBullet extends Bullet implements Collidable {
      *            bullet's width
      * @param height
      *            bullet's height
-     * @param color
-     *            bullet's color
+     * @param type
+     *            bullet's sprite type
      */
-    public BossBullet(int x, int y, int dx, int dy, int width, int height, Color color) {
-        super(x, y, 0, color);
+    public BossBullet(int x, int y, int dx, int dy, int width, int height, String type) {
+        super(x, y, 0, Color.GREEN);
 		super.width = width;
 		super.height = height;
         this.dx = dx;
         this.dy = dy;
-        this.spriteType = DrawManager.SpriteType.FinalBossBullet;
+        if (type.equals("FinalBoss")){
+            this.spriteType = DrawManager.SpriteType.FinalBossBullet;
+        }
+        else if (type.equals("OmegaBoss")){
+            this.spriteType = DrawManager.SpriteType.OmegaBossBullet;
+        }
+
     }
     /**
      * move a bullet
@@ -45,6 +54,10 @@ public class BossBullet extends Bullet implements Collidable {
         this.positionX += this.dx;
         this.positionY += this.dy;
     }
+
+	public void markForRemoval() {
+		this.markedForRemoval = true;
+	}
 
 	/**
 	 * Handles collision behavior for boss bullets.
@@ -64,4 +77,8 @@ public class BossBullet extends Bullet implements Collidable {
 		ship.onHitByBossBullet(this, model);
 	}
 
+	@Override
+	public boolean shouldBeRemoved() {
+		return markedForRemoval;
+	}
 }

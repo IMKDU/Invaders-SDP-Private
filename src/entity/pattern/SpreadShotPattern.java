@@ -108,7 +108,7 @@ public class SpreadShotPattern extends BossPattern {
 				vy,
 				6,
 				12,
-				Color.ORANGE
+				"OmegaBoss"
 		);
 
 		this.bullets.add(bullet);

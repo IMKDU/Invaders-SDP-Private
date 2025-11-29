@@ -59,11 +59,11 @@ public class EnemyShip extends Entity implements Collidable {
 	 *            Sprite type, image corresponding to the ship.
 	 */
 	public EnemyShip(final int positionX, final int positionY,
-	                 final SpriteType spriteType) {
-		super(positionX, positionY, 12 * 2, 8 * 2, Color.WHITE);
+			final SpriteType spriteType) {
+		super(positionX, positionY, 25 * 2, 25 * 2, Color.WHITE);
 
 		this.spriteType = spriteType;
-		this.animationCooldown = new Cooldown(500);
+		this.animationCooldown = new Cooldown(100);
         this.explosionCooldown = new Cooldown(500);
 		this.isDestroyed = false;
 
@@ -102,7 +102,7 @@ public class EnemyShip extends Entity implements Collidable {
 	 * known starting properties.
 	 */
 	public EnemyShip(SpecialType type, Direction direction, int x_speed) {
-        super(-32, GameConstant.STAT_SEPARATION_LINE_HEIGHT, 16 * 2, 7 * 2,  (type == SpecialType.RED) ? Color.RED : Color.BLUE);
+        super(-32, GameConstant.STAT_SEPARATION_LINE_HEIGHT, 30 * 2, 38 * 2,  (type == SpecialType.RED) ? Color.RED : Color.BLUE);
 
 		this.specialType = type;
 		this.direction = direction;
@@ -130,8 +130,16 @@ public class EnemyShip extends Entity implements Collidable {
 	 * @param distanceY
 	 *            Distance to move in the Y axis.
 	 */
-	public final void move(final int distanceX, final int distanceY) {
-		this.positionX += distanceX;
+	public final void move(final int distanceX, final int distanceY, boolean isSpecial) {
+        if (isSpecial){
+            if (distanceX >= 0){
+                this.spriteType = SpriteType.EnemyShipSpecial;
+            }
+            else {
+                this.spriteType = SpriteType.EnemyShipSpecialLeft;
+            }
+        }
+        this.positionX += distanceX;
 		this.positionY += distanceY;
 	}
 
@@ -170,12 +178,19 @@ public class EnemyShip extends Entity implements Collidable {
 	/**
 	 * Destroys the ship, causing an explosion.
 	 */
-	public final void destroy() {
+	public final void destroy(boolean isSpecial) {
         if (!this.isDestroyed) {
             this.isDestroyed = true;
-            this.spriteType = SpriteType.Explosion;
-			SoundManager.stop("sfx/disappearance.wav");
-            SoundManager.play("sfx/disappearance.wav");
+
+            if (isSpecial){
+                this.spriteType = SpriteType.EnemySpecialExplosion;
+                SoundManager.play("sfx/SpecialEnemyDeath.wav");
+            }
+            else {
+                this.spriteType = SpriteType.Explosion;
+                SoundManager.play("sfx/disappearance.wav");
+            }
+
             this.explosionCooldown.reset();
         }
 	}
@@ -227,6 +242,7 @@ public class EnemyShip extends Entity implements Collidable {
 			case EnemyShipC2:
 				return "enemyC";
 			case EnemyShipSpecial:
+            case EnemyShipSpecialLeft:
 				return "enemySpecial";
 			default:
 				return null;

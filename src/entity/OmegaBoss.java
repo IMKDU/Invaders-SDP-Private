@@ -1,11 +1,15 @@
 package entity;
 
+import audio.SoundManager;
+import engine.Cooldown;
+import engine.Core;
 import engine.DrawManager;
 import engine.Core;
 import engine.Cooldown;
 import entity.pattern.*;
 
 import java.awt.*;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -18,9 +22,9 @@ public class OmegaBoss extends MidBoss {
 	/** Initial position in the y-axis. */
 	private static final int INIT_POS_Y = 80;
 	/** Width of Omega */
-	private static final int OMEGA_WIDTH = 64;
-	/** Height of Omega */
-	private static final int OMEGA_HEIGHT = 28;
+    private static final int OMEGA_WIDTH = 70 * 2;
+    /** Height of Omega */
+    private static final int OMEGA_HEIGHT = 51 * 2;
 	/** Current Health of Omega */
 	private static final int OMEGA_HEALTH = 45;
 	/** Point of Omega when destroyed */
@@ -49,6 +53,12 @@ public class OmegaBoss extends MidBoss {
 	private Cooldown dashCooldown;
 	/** Flag to track if currently in dash cooldown */
 	private boolean isInDashCooldown = false;
+    private boolean ishit = false;
+    private boolean isMove = false;
+    private boolean isDash = false;
+    private Cooldown animationCooldown;
+
+	private SpawnMobPattern spawnPattern;
 
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
@@ -59,11 +69,15 @@ public class OmegaBoss extends MidBoss {
 	public OmegaBoss(Color color, Ship player) {
 		super(INIT_POS_X, INIT_POS_Y, OMEGA_WIDTH, OMEGA_HEIGHT, OMEGA_HEALTH, OMEGA_POINT_VALUE, color);
 		this.targetShip = player;
-		this.spriteType = DrawManager.SpriteType.OmegaBoss1;
 		this.logger = Core.getLogger();
 		this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
+        this.spriteType= DrawManager.SpriteType.OmegaBoss1;
+        this.animationCooldown = new Cooldown(200);
+		this.spawnPattern = new SpawnMobPattern(this,this.getHealPoint());
 		this.explosionPattern = new BackgroundExplosionPattern();
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
+		this.logger.info("OMEGA : move using the default pattern");
+        SoundManager.play("sfx/OmegaBossAppearance.wav");
 		choosePattern();
 	}
 
@@ -74,12 +88,76 @@ public class OmegaBoss extends MidBoss {
 	 */
 	@Override
 	public void update() {
+        if (this.animationCooldown.checkFinished()) {
+            this.animationCooldown.reset();
+            if (this.bossPhase == 2 || this.bossPhase == 3){
+                this.setWidth(70 * 2);
+                this.setHeight(51 * 2);
+                if (this.ishit){
+                    this.spriteType = DrawManager.SpriteType.OmegaBossHitting;
+                    this.ishit = false;
+                }
+                else {
+                    if (this.spriteType == DrawManager.SpriteType.OmegaBoss1){
+                        this.spriteType = DrawManager.SpriteType.OmegaBoss2;
+                    }
+                    else {
+                        this.spriteType = DrawManager.SpriteType.OmegaBoss1;
+                    }
+                }
+            }
+            else if (this.bossPhase == 4) {
+                this.setWidth(77 * 2);
+                this.setHeight(89 * 2);
+                if (this.spriteType == DrawManager.SpriteType.OmegaBossMoving1){
+                    this.spriteType = DrawManager.SpriteType.OmegaBossMoving2;
+                }
+                else {
+                    this.spriteType = DrawManager.SpriteType.OmegaBossMoving1;
+                }
+            }
+            else {
+                if (!isInDashCooldown){
+                    this.setWidth(70 * 2);
+                    this.setHeight(51 * 2);
+                    if (this.isRight()){
+                        if (this.spriteType == DrawManager.SpriteType.OmegaBossDash3) {
+                            this.spriteType = DrawManager.SpriteType.OmegaBossDash4;
+                        }
+                        else {
+                            this.spriteType = DrawManager.SpriteType.OmegaBossDash3;
+                        }
+                    }
+                    else {
+                        if (this.spriteType == DrawManager.SpriteType.OmegaBossDash1) {
+                            this.spriteType = DrawManager.SpriteType.OmegaBossDash2;
+                        }
+                        else {
+                            this.spriteType = DrawManager.SpriteType.OmegaBossDash1;
+                        }
+                    }
+                }
+                else {
+                    this.setWidth(77 * 2);
+                    this.setHeight(89 * 2);
+                    if (this.spriteType == DrawManager.SpriteType.OmegaBossMoving1) {
+                        this.spriteType = DrawManager.SpriteType.OmegaBossMoving2;
+                    }
+                    else {
+                        this.spriteType = DrawManager.SpriteType.OmegaBossMoving1;
+                    }
+
+                }
+            }
+
+
+        }
 		choosePattern();
 		this.explosionPattern.update();
 		if (bossPattern != null) {
 			bossPattern.move();
 			bossPattern.attack();
-
+			spawnPattern.update(this,this.getHealPoint());
 			// Update position from pattern
 			this.positionX = bossPattern.getBossPosition().x;
 			this.positionY = bossPattern.getBossPosition().y;
@@ -100,7 +178,7 @@ public class OmegaBoss extends MidBoss {
 		}
 		// PHASE 2 → SpreadShotPattern
 		else if (this.healPoint <= this.maxHp / 2 && this.healPoint > this.maxHp / 3 && this.bossPhase == 2) {
-			bossPattern = new SpreadShotPattern(this, targetShip);
+            bossPattern = new SpreadShotPattern(this, targetShip);
 			logger.info("OMEGA : Using SPREAD SHOT pattern");
 			this.bossPhase = 3;
 			return;
@@ -110,7 +188,6 @@ public class OmegaBoss extends MidBoss {
 
 			if (bossPattern instanceof SpreadShotPattern &&
 					((SpreadShotPattern) bossPattern).isFinished()) {
-
 				bossPattern = new DiagonalPattern(this, PATTERN_2_X_SPEED, PATTERN_2_Y_SPEED, PATTERN_2_COLOR);
 				logger.info("OMEGA : SpreadShot finished → DIAGONAL pattern");
 
@@ -118,7 +195,7 @@ public class OmegaBoss extends MidBoss {
 			}
 		}
 		else if (this.healPoint <= this.maxHp / 3 && this.bossPhase == 4) {
-			++this.bossPhase;
+            ++this.bossPhase;
 			// Start with dash pattern
 			startDashPattern();
 		}
@@ -146,6 +223,13 @@ public class OmegaBoss extends MidBoss {
 			startDashPattern();
 		}
 	}
+    private boolean isRight(){
+        if (bossPattern instanceof DashPattern) {
+            return ((DashPattern) bossPattern).getRightDash();
+        }
+        return true;
+    }
+
 
 	/**
 	 * Start a new dash pattern
@@ -179,6 +263,7 @@ public class OmegaBoss extends MidBoss {
 		this.isDestroyed = true;
 		this.spriteType = DrawManager.SpriteType.OmegaBossDeath;
 		this.logger.info("OMEGA : Boss OMEGA destroyed!");
+		this.spawnPattern.clean();
 	}
 
 	/**
@@ -189,57 +274,52 @@ public class OmegaBoss extends MidBoss {
 	@Override
 	public void takeDamage(int damage) {
 		this.healPoint -= damage;
+        SoundManager.play("sfx/OmegaBoss_hitting.wav");
+        ishit =true;
 	}
 
-	public boolean isShowingPath() {
-		if (bossPattern instanceof DashPattern) {
-			return ((DashPattern) bossPattern).isShowingPath();
-		}
-		return false;
-	}
+    public boolean isShowingPath() {
+        if (bossPattern instanceof DashPattern) {
+            return ((DashPattern) bossPattern).isShowingPath();
+        }
+        return false;
+    }
 
+    /**
+     * Calculate dash end point (by watching)
+     * @return [x, y] array
+     */
+    public int[] getDashEndPoint() {
+        if (bossPattern instanceof DashPattern) {
+            return ((DashPattern) bossPattern).getDashEndPoint(this.width, this.height);
+        }
+        return new int[]{this.positionX + this.width / 2, this.positionY + this.height / 2};
+    }
+
+    /**
+     * Get current boss pattern
+     */
+    public BossPattern getBossPattern() {
+        return this.bossPattern;
+    }
+
+    /**
+     * Get current boss phase
+     */
+    public int getBossPhase() {
+        return this.bossPhase;
+    }
+
+    /**
+     * Check if boss is in dash cooldown
+     */
+    public boolean isInDashCooldown() {
+        return isInDashCooldown;
+    }
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
 		other.onCollideWithBoss(this, model);
 	}
-
-	@Override
-	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
-		model.requestBossHitByPlayerBullet(bullet, this);
-	}
-
-	/**
-	 * Calculate dash end point (by watching)
-	 * @return [x, y] array
-	 */
-	public int[] getDashEndPoint() {
-		if (bossPattern instanceof DashPattern) {
-			return ((DashPattern) bossPattern).getDashEndPoint(this.width, this.height);
-		}
-		return new int[]{this.positionX + this.width / 2, this.positionY + this.height / 2};
-	}
-
-	/**
-	 * Get current boss pattern
-	 */
-	public BossPattern getBossPattern() {
-		return this.bossPattern;
-	}
-
-	/**
-	 * Get current boss phase
-	 */
-	public int getBossPhase() {
-		return this.bossPhase;
-	}
-
-	/**
-	 * Check if boss is in dash cooldown
-	 */
-	public boolean isInDashCooldown() {
-		return isInDashCooldown;
-	}
-
 	/** get Explosion Pattern */
 	public BackgroundExplosionPattern getExplosionPattern() { return explosionPattern;}
 	/**
@@ -251,4 +331,11 @@ public class OmegaBoss extends MidBoss {
 			bossPattern.setTarget(target);
 		}
 	}
+
+	@Override
+	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
+		model.requestBossHitByPlayerBullet(bullet, this);
+	}
+
+	public List<MidBossMob> getSpawnMobs() { return this.spawnPattern.getChildShips();}
 }
