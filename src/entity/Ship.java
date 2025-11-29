@@ -42,9 +42,6 @@ public class Ship extends Entity implements Collidable {
     private boolean movingSoundPlaying = false;
     private GameModel model;
 
-    // === Which player: 1 = P1, 2 = P2 (default 1 for single-player compatibility) ===
-	private int playerId = 1;
-
 	// === Variable for Skil ===
 	public enum SkillType {
 		ORIGIN,
@@ -79,8 +76,6 @@ public class Ship extends Entity implements Collidable {
             this.spriteType = SpriteType.ShipP2;
             this.isP1Ship = false;
         }
-
-		this.spriteType = SpriteType.Ship;
 		this.shootingCooldown = new Cooldown(ShopItem.getShootingInterval());
 		this.destructionCooldown = new Cooldown(1000);
 		this.shieldCooldown = new Cooldown(0);
@@ -89,41 +84,6 @@ public class Ship extends Entity implements Collidable {
 		this.skills = new HashMap<SkillType, ISkill>();
 		registerSkills();
 	}
-
-	/**
-	 * Updates status of the ship.
-	 */
-//	public final void update() {
-//        if (this.isInvincible && this.shieldCooldown.checkFinished()) {
-//            this.isInvincible = false;
-//            this.setColor(Color.GREEN);
-//        }
-//
-//        if (!this.destructionCooldown.checkFinished())
-//            this.spriteType = SpriteType.ShipDestroyed;
-//        else
-//            this.spriteType = SpriteType.Ship;
-//
-//		// Update charging skill state
-//		if (this.chargingSkill != null) {
-//			this.chargingSkill.update();
-//		}
-//	}
-
-
-
-
-	/**
-	 * Switches the ship to its destroyed state.
-	 */
-//	public final void destroy() {
-//        if (!this.isInvincible) {
-//			SoundManager.stop("sfx/impact.wav");
-//            SoundManager.play("sfx/impact.wav");
-//            this.destructionCooldown.reset();
-//        }
-//    }
-
 	/**
 	 * Shoots a bullet upwards.
 	 *
