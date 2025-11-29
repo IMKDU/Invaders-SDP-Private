@@ -38,6 +38,7 @@ public class OmegaBoss extends MidBoss {
 
 	/** Boss pattern instance for delegating movement logic */
 	private BossPattern bossPattern;
+	private OmegaBossPattern omegaBossPattern;
 	/** Player reference for pattern targeting */
 	private Ship targetShip;
 	/** Current boss phase */
@@ -58,10 +59,11 @@ public class OmegaBoss extends MidBoss {
 		this.logger = Core.getLogger();
         this.spriteType= DrawManager.SpriteType.OmegaBoss1;
         this.animationCooldown = new Cooldown(200);
+		this.omegaBossPattern = new OmegaBossPattern(this, player);
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		this.logger.info("OMEGA : move using the default pattern");
         SoundManager.play("sfx/OmegaBossAppearance.wav");
-		choosePattern();
+//		choosePattern();
 	}
 
 	/**
@@ -72,15 +74,20 @@ public class OmegaBoss extends MidBoss {
 	@Override
 	public void update() {
 		chooseSprite();
-		choosePattern();
+//		choosePattern();
+		omegaBossPattern.update();
 
-		if (bossPattern != null) {
-			bossPattern.move();
-			bossPattern.attack();
-			// Update position from pattern
-			this.positionX = bossPattern.getBossPosition().x;
-			this.positionY = bossPattern.getBossPosition().y;
-		}
+//		if (bossPattern != null) {
+//			bossPattern.move();
+//			bossPattern.attack();
+//			// Update position from pattern
+//			this.positionX = bossPattern.getBossPosition().x;
+//			this.positionY = bossPattern.getBossPosition().y;
+//		}
+		omegaBossPattern.move();
+		omegaBossPattern.attack();
+		this.positionX = omegaBossPattern.getBossPosition().x;
+		this.positionY = omegaBossPattern.getBossPosition().y;
 	}
 
 	private void chooseSprite(){
@@ -176,7 +183,7 @@ public class OmegaBoss extends MidBoss {
 	}
 
 	public Set<Bullet> getBullets() {
-		return this.bossPattern.getBullets();
+		return this.omegaBossPattern.getBullets();
 	}
 
 	@Override

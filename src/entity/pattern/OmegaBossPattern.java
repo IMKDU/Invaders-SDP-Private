@@ -1,6 +1,7 @@
 package entity.pattern;
 
 import engine.Cooldown;
+import entity.Bullet;
 import entity.GameConstant;
 import entity.HasBounds;
 import entity.MidBoss;
@@ -8,8 +9,9 @@ import entity.MidBoss;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-public class OmegaBossPattern implements IBossPattern {
+public class OmegaBossPattern {
 
 	private static final int HORIZONTAL_SPEED = 2;
 
@@ -25,7 +27,7 @@ public class OmegaBossPattern implements IBossPattern {
 			{10000},
 			{5000}
 	};
-	private int currentPhase=1;
+	private int currentPhase=0;
 
 	private final MidBoss boss;
 	private HasBounds player;
@@ -68,6 +70,7 @@ public class OmegaBossPattern implements IBossPattern {
 		if(isInit){
 			movePattern=patterns.getFirst();
 			attackPattern=patterns.get(1);
+			attackPattern.validateBackgroundPattern(false);
 			attackPattern.setCooldown(new Cooldown(attackCooldownMillis[0][0]));
 		}
 	}
@@ -92,30 +95,21 @@ public class OmegaBossPattern implements IBossPattern {
 		moveCooldown.reset();
 	}
 
-	@Override
 	public void attack() {
 		if(attackPattern==null) return;
 		attackPattern.attack();
 	}
 
-	@Override
 	public void move() {
 		if(movePattern==null) return;
 		movePattern.move();
 	}
 
-	@Override
 	public Point getBossPosition() {
 		return movePattern.getBossPosition();
 	}
 
-	@Override
-	public void setTarget(HasBounds target) {
-
-	}
-
-	@Override
-	public void setCooldown(Cooldown cooldown) {
-
+	public Set<Bullet> getBullets() {
+		return this.attackPattern.getBullets();
 	}
 }

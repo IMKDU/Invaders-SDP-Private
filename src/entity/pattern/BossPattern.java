@@ -14,6 +14,7 @@ public abstract class BossPattern implements IBossPattern {
 	protected Point acceleration;
 	protected Cooldown shootCooldown;
 	protected Set<Bullet> bullets;
+	protected boolean validateBackbroundPattern=true;
 
 	public BossPattern(Point position) {
 		this.bossPosition = position;
@@ -32,4 +33,6 @@ public abstract class BossPattern implements IBossPattern {
 	}
 
 	public void setTarget(HasBounds target) { /* Default: do nothing */ }
+
+	public void validateBackgroundPattern(boolean condition){ validateBackbroundPattern=condition; }
 }

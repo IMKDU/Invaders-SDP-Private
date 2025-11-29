@@ -35,7 +35,9 @@ public class PinnedBossPattern extends BossPattern {
 
 	@Override
 	public void attack() {
-		backGroundPattern.attack();
+		if(validateBackbroundPattern){
+			backGroundPattern.attack();
+		}
 		if(this.shootCooldown.checkFinished()){
 			this.shootCooldown.reset();
 			int[] arr = {0,1,-1,2,-2};
