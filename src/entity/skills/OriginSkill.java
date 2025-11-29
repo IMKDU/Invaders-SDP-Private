@@ -34,7 +34,11 @@ public class OriginSkill implements ISkill {
         this.tickCooldown = new Cooldown(TICK_MS);
         this.tickCooldown.reset();
 
-        ship.activateInvincibility(DURATION_MS);
+        for (Ship s : model.getShips()) {
+            if (s != null && !s.isDestroyed()) {
+                s.activateInvincibility(DURATION_MS);
+            }
+        }
 
         ship.disableAllControls(true);
     }

@@ -1178,6 +1178,10 @@ public class GameModel {
     public void useFinalSkill(){
         this.FinalSkillCnt--;
     }
+    public List<Ship> getShips() {
+        return ships;
+    }
+
 
     public List<Entity> getEntitiesToRender() {
         List<Entity> renderList = new ArrayList<>();
