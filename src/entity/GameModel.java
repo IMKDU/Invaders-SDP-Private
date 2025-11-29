@@ -131,6 +131,7 @@ public class GameModel {
     private int lastHp;
     private static final int BLACK_HOLE_DURATION_MS = 7000;
     private static boolean usedOrigin = false;
+    private boolean originSkillActivated = false;
 
 
     public GameModel(GameState gameState, Level level, boolean bonusLife, int maxLives, int width, int height) {
@@ -1128,8 +1129,9 @@ public class GameModel {
     public void setUsedOrigin(boolean used){
         this.usedOrigin = used;
     }
-
     public boolean getUsedOrigin(){return usedOrigin;}
+    public boolean isOriginSkillActivated() { return originSkillActivated; }
+    public void setOriginSkillActivated(boolean v) { originSkillActivated = v; }
 
     // --- Getters for View ---
 

@@ -7,16 +7,22 @@ import entity.pattern.ISkill;
 public class OriginSkill implements ISkill {
 
     private static final int TOTAL_DAMAGE = 80;
-    private static final int DURATION_MS = 10000;
-    private static final int TICK_MS = 1000;
+    private static final int DURATION_MS = 8800;
+
+    private static final int BURST_WINDOW_MS = 1000;
+    private static final int BURST_HITS = 20;
+    private static final int BURST_INTERVAL = BURST_WINDOW_MS / BURST_HITS;
+
     private Ship ship;
     private GameModel model;
 
     private boolean used = false;
     private boolean active = false;
 
-    private Cooldown tickCooldown;
+    private Cooldown burstTick;
     private long startTime;
+    private int burstDamagePerHit;
+    private int burstHitsRemaining;
 
     @Override
     public void use(Ship ship) {
@@ -24,15 +30,24 @@ public class OriginSkill implements ISkill {
 
         this.ship = ship;
         this.model = ship.getModel();
-        if(this.model.getUsedOrigin()) return;
+        if (this.model.getUsedOrigin()) return;
 
         this.used = true;
         this.active = true;
         this.model.setUsedOrigin(true);
+        this.model.setOriginSkillActivated(true);
 
         this.startTime = System.currentTimeMillis();
-        this.tickCooldown = new Cooldown(TICK_MS);
-        this.tickCooldown.reset();
+
+        int instantDamage = (int) (TOTAL_DAMAGE * 0.2);
+        applyDamageToAll(instantDamage);
+
+        int remainingDamage = TOTAL_DAMAGE - instantDamage;
+        this.burstDamagePerHit = remainingDamage / BURST_HITS;
+        this.burstHitsRemaining = BURST_HITS;
+
+        this.burstTick = new Cooldown(BURST_INTERVAL);
+        this.burstTick.reset();
 
         for (Ship s : model.getShips()) {
             if (s != null && !s.isDestroyed()) {
@@ -47,22 +62,22 @@ public class OriginSkill implements ISkill {
         if (!active) return;
 
         long now = System.currentTimeMillis();
-
-        if (now - startTime >= DURATION_MS) {
+        long elapsed = now - startTime;
+        if (elapsed >= DURATION_MS) {
             active = false;
             ship.disableAllControls(false);
             return;
         }
-
-        if (tickCooldown.checkFinished()) {
-            tickCooldown.reset();
-            int dmg = TOTAL_DAMAGE / (DURATION_MS / TICK_MS);
-            applyDamageToAll(dmg);
+        if (elapsed >= DURATION_MS - BURST_WINDOW_MS && burstHitsRemaining > 0) {
+            if (burstTick.checkFinished()) {
+                burstTick.reset();
+                applyDamageToAll(burstDamagePerHit);
+                burstHitsRemaining--;
+            }
         }
     }
 
     private void applyDamageToAll(int dmg) {
-
         EnemyShipFormationModel formation = model.getEnemyShipFormationModel();
         if (formation != null) {
             for (EnemyShip e : formation) {
@@ -71,6 +86,7 @@ public class OriginSkill implements ISkill {
                 }
             }
         }
+
         EnemyShipSpecialFormation specialFormation = model.getEnemyShipSpecialFormation();
         if (specialFormation != null) {
             for (EnemyShip e : specialFormation) {
@@ -80,19 +96,19 @@ public class OriginSkill implements ISkill {
             }
         }
 
-        if (model.getFinalBoss() != null && !model.getFinalBoss().isDestroyed()){
+        if (model.getFinalBoss() != null && !model.getFinalBoss().isDestroyed()) {
             model.getFinalBoss().takeDamage(dmg);
         }
 
-        if (model.getOmegaBoss() != null && !model.getOmegaBoss().isDestroyed()){
+        if (model.getOmegaBoss() != null && !model.getOmegaBoss().isDestroyed()) {
             model.getOmegaBoss().takeDamage(dmg);
-            model.getOmegaBoss().update();
         }
 
-        if(model.getZetaBoss() != null && !model.getZetaBoss().isDestroyed()){
+        if (model.getZetaBoss() != null && !model.getZetaBoss().isDestroyed()) {
             model.getZetaBoss().takeDamage(dmg);
         }
     }
+
     public boolean isActive() { return active; }
     public boolean isUsed() { return used; }
 }
