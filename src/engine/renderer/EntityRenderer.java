@@ -8,14 +8,8 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 
 import engine.*;
-import entity.Entity;
+import entity.*;
 import engine.DrawManager.SpriteType;
-import entity.GameConstant;
-import entity.LaserBullet;
-import entity.MidBossMob;
-import entity.OmegaBoss;
-import entity.ZetaBoss;
-import entity.MidBoss;
 import entity.pattern.ApocalypseAttackPattern;
 import entity.pattern.BossPattern;
 import entity.pattern.DashPattern;
@@ -48,6 +42,7 @@ public final class EntityRenderer {
             new Color( 0x32A9B3),
             new Color( 0x8303EE)
     };
+    private HealthBar bossHealthBar;
 
     public EntityRenderer(Map<SpriteType, BufferedImage> spriteMap, BackBuffer backBuffer, double scale ,AnimationLoader loader) {
         this.spriteMap = spriteMap;
@@ -144,34 +139,41 @@ public final class EntityRenderer {
 
         return result;
     }
-    public void drawHealthBar(final HealthBar healthBar) {
-        Graphics2D g2 = (Graphics2D) backBuffer.getGraphics();
-        int height = GameConstant.STAT_SEPARATION_LINE_HEIGHT;
-        int barWidth = GameConstant.SCREEN_WIDTH * 3 / 10;
-        int barHeight = height / 2;
-        int barY = (height - barHeight) / 2;
-        int barX = GameConstant.SCREEN_WIDTH * 4 / 10;
-        float ratio_hp = healthBar.getRatio_HP();
-
-
-        int greenWidth = (int) (barWidth * ratio_hp);
-        int redWidth = barWidth - greenWidth;
-
-
-
-        Stroke oldStroke = g2.getStroke();
-        g2.setStroke(new BasicStroke(8));
-        g2.setColor(Color.LIGHT_GRAY);
-        g2.drawRect(barX, barY, barWidth, barHeight);
-        g2.setStroke(oldStroke);
-
-        g2.setColor(Color.GREEN);
-        g2.fillRect(barX + 1, barY + 1, greenWidth - 1, barHeight - 1);
-
-        if (redWidth > 0 && redWidth < barWidth) {
-            g2.setColor(Color.RED);
-            g2.fillRect(barX + greenWidth, barY + 1, redWidth - 1, barHeight - 1);
+    public void drawHealthBarWithHP(final BossEntity boss) {
+        if(bossHealthBar==null) {
+            bossHealthBar = new HealthBar(boss.getHealPoint());
         }
+        else {
+            Graphics2D g2 = (Graphics2D) backBuffer.getGraphics();
+            int height = GameConstant.STAT_SEPARATION_LINE_HEIGHT;
+            int barWidth = GameConstant.SCREEN_WIDTH * 3 / 10;
+            int barHeight = height / 2;
+            int barY = (height - barHeight) / 2;
+            int barX = GameConstant.SCREEN_WIDTH * 4 / 10;
+            bossHealthBar.setCurrent_HP(boss.getHealPoint());
+            float ratio_hp = bossHealthBar.getRatio_HP();
+
+            int greenWidth = (int) (barWidth * ratio_hp);
+            int redWidth = barWidth - greenWidth;
+
+            Stroke oldStroke = g2.getStroke();
+            g2.setStroke(new BasicStroke(8));
+            g2.setColor(Color.LIGHT_GRAY);
+            g2.drawRect(barX, barY, barWidth, barHeight);
+            g2.setStroke(oldStroke);
+
+            g2.setColor(Color.GREEN);
+            g2.fillRect(barX + 1, barY + 1, greenWidth - 1, barHeight - 1);
+
+            if (redWidth > 0 && redWidth < barWidth) {
+                g2.setColor(Color.RED);
+                g2.fillRect(barX + greenWidth, barY + 1, redWidth - 1, barHeight - 1);
+            }
+        }
+        if(boss.isDestroyed()) {
+            bossHealthBar = null;
+        }
+
     }
 
 	public void drawEntity(final Entity entity) {

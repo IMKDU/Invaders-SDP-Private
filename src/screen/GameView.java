@@ -79,15 +79,15 @@ public class GameView {
             }
         }
         if (model.getOmegaBoss() != null) {
-            drawManager.getEntityRenderer().drawHealthBar(model.getHealthBar());
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getOmegaBoss());
             drawManager.getUIRenderer().drawBossName("Omega");
         }
         if (model.getFinalBoss() != null) {
-            drawManager.getEntityRenderer().drawHealthBar(model.getHealthBar());
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getFinalBoss());
             drawManager.getUIRenderer().drawBossName("???");
         }
         if (model.getZetaBoss() != null) {
-            drawManager.getEntityRenderer().drawHealthBar(model.getHealthBar());
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getZetaBoss());
             drawManager.getUIRenderer().drawBossName("Zeta");
         }
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);

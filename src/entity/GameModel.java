@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import engine.*;
 import engine.level.ItemDrop;
 import entity.pattern.BlackHolePattern;
-import screen.HealthBar;
 
 /**
  * Implements the Model for the game screen.
@@ -93,7 +92,6 @@ public class GameModel {
     private int maxLives;
     /** Current coin. */
     private int coin;
-    private HealthBar healthBar;
 
     /** bossBullets carry bullets which Boss fires */
     private Set<Bullet> bossBullets;
@@ -321,7 +319,6 @@ public class GameModel {
                 }
                 if (this.omegaBoss != null){
                     this.omegaBoss.update();
-                    this.healthBar.setCurrent_HP(this.omegaBoss.getHealPoint());
                     if (this.omegaBoss instanceof OmegaBoss omega) {
                         midBossChilds = omega.getSpawnMobs();
                         bossBullets.addAll(omega.getBossPattern().getBullets());
@@ -332,7 +329,6 @@ public class GameModel {
                         if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.omegaBoss = null;
                             this.zetaBoss = new ZetaBoss(Color.MAGENTA, this.ship);
-                            this.healthBar = new HealthBar(this.zetaBoss.getHealPoint());
                             this.logger.info("Zeta Boss has spawned!");
                         } else {
 
@@ -343,7 +339,6 @@ public class GameModel {
                 // ZetaBoss logic added
                 if (this.zetaBoss != null) {
                     this.zetaBoss.update();
-                    this.healthBar.setCurrent_HP(this.zetaBoss.getHealPoint());
 					updateBossBullets();
 
                     ApocalypseAttackPattern pattern = this.zetaBoss.getApocalypsePattern();
@@ -356,7 +351,6 @@ public class GameModel {
                         if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.zetaBoss = null;
                             this.finalBoss = new FinalBoss(this.width / 2 - 150, 50, ships, this.width, this.height); // [추가] Final 소환
-                            this.healthBar = new HealthBar(this.finalBoss.getHealPoint());
                             this.logger.info("Final Boss has spawned!");
                         } else {
 
@@ -831,22 +825,18 @@ public class GameModel {
         switch (bossName) {
             case "finalBoss":
                 this.finalBoss = new FinalBoss(this.width / 2 - 150, 80,  ships, this.width, this.height);
-                this.healthBar = new HealthBar(this.finalBoss.getHealPoint());
                 this.logger.info("Final Boss has spawned!");
                 break;
             case "omegaBoss":
                 this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
-                this.healthBar = new HealthBar(this.omegaBoss.getHealPoint());
                 this.logger.info("Omega Boss has spawned!");
                 break;
             case "ZetaBoss":
                 this.zetaBoss = new ZetaBoss(Color.ORANGE, ship);
-                this.healthBar = new HealthBar(this.zetaBoss.getHealPoint());
                 this.logger.info("Zeta Boss has spawned!");
                 break;
             case "omegaAndZetaAndFinal":
                 this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
-                this.healthBar = new HealthBar(this.omegaBoss.getHealPoint());
                 this.logger.info("Omega Boss has spawned!");
                 break;
             default:
@@ -859,7 +849,6 @@ public class GameModel {
     public void finalbossManage(){
         if (this.finalBoss != null && !this.finalBoss.isDestroyed()) {
             this.finalBoss.update();
-            this.healthBar.setCurrent_HP(this.finalBoss.getHealPoint());
             BlackHolePattern bh = finalBoss.getCurrentBlackHole();
 
             if (bh != null && bh.isActive()) {
@@ -1012,7 +1001,6 @@ public class GameModel {
     public boolean isBonusLife() { return bonusLife; }
     public boolean isLevelFinished() { return levelFinished; }
     public Cooldown getScreenFinishedCooldown() { return screenFinishedCooldown; }
-    public HealthBar getHealthBar(){return this.healthBar;}
     public boolean isBlackHoleActive() { return blackHoleActive; }
     public int getBlackHoleCX() { return blackHoleCX; }
     public int getBlackHoleCY() { return blackHoleCY; }
