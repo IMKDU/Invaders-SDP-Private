@@ -5,9 +5,9 @@ import engine.DrawManager.SpriteType;
 
 public class BombBullet extends Bullet {
 
-	public BombBullet(int x, int y, int speed, Color color) {
-		super(x, y, speed, color);
-		this.spriteType = SpriteType.Bullet;
+	public BombBullet(int x, int y, int speed) {
+		super(x, y, speed);
+		this.spriteType = SpriteType.BombBullet;
 	}
 
 	@Override

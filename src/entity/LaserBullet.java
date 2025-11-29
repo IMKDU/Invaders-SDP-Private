@@ -12,7 +12,7 @@ public class LaserBullet extends Bullet {
 	private boolean shouldBeRemoved =false;
 
 	public LaserBullet(Point startPosition, Point targetPosition, int chargeCooldownMilli, int remainCooldownMilli) {
-		super(startPosition.x, startPosition.y, 0, Color.green);
+		super(startPosition.x, startPosition.y, 0);
 		this.targetPosition=targetPosition;
 		this.chargeCooldownMilli=chargeCooldownMilli;
 		this.remainCooldownMilli=remainCooldownMilli;

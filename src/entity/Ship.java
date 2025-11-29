@@ -106,7 +106,7 @@ public class Ship extends Entity implements Collidable {
 
 			if (bombShotsRemaining > 0) {
 
-				Bullet b = new BombBullet(centerX, centerY, BULLET_SPEED, Color.RED);
+				Bullet b = new BombBullet(centerX, centerY, BULLET_SPEED);
 				b.setOwnerId(this.playerId);
 				bullets.add(b);
 
