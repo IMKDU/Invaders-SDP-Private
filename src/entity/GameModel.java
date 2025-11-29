@@ -568,8 +568,12 @@ public class GameModel {
 				DropItem.applyTimeFreezeItem(3000);
 				break;
 
-			case Push:
-				pushEnemiesBack();
+			case Bomb:
+				ship.enableBomb(3);
+				break;
+
+			case Coin:
+				this.coin += 30;
 				break;
 
 			case Explode:
@@ -579,9 +583,6 @@ public class GameModel {
 				else scoreP1 += pts;
 				break;
 
-			case Slow:
-				enemyShipFormationModel.activateSlowdown();
-				break;
 		}
 
 		dropItems.remove(item);
@@ -626,16 +627,6 @@ public class GameModel {
 	}
 
 
-	/**
-	 * Pushes all enemy ships upward (used by Push-type item).
-	 */
-	public void pushEnemiesBack() {
-		for (EnemyShip enemy : enemyShipFormationModel) {
-			if (enemy != null && !enemy.isDestroyed()) {
-				enemy.move(0, -20,false);
-			}
-		}
-	}
 
     private void cleanupAllEntities() {
         cleanBullets();
@@ -735,8 +726,95 @@ public class GameModel {
         ItemPool.recycle(recyclable);
     }
 
+	private boolean inRange(Entity e, int cx, int cy, int radius) {
 
-    /**
+		int ex = e.getPositionX() + e.getWidth() / 2;
+		int ey = e.getPositionY() + e.getHeight() / 2;
+
+		int dx = ex - cx;
+		int dy = ey - cy;
+
+		return dx * dx + dy * dy <= radius * radius;
+	}
+
+	private void applyBombDamageToEnemy(Bullet source, EnemyShip enemy) {
+		if (enemy == null || enemy.isDestroyed()) return;
+
+		int pts = enemy.getPointValue();
+		addPointsFor(source, pts);
+		this.coin += pts / 10;
+		AchievementManager.getInstance().onEnemyDefeated();
+
+		attemptItemDrop(enemy);
+
+		String type = enemy.getEnemyType();
+		if ("enemySpecial".equals(type)) {
+			if (enemyShipSpecialFormation != null) {
+				enemyShipSpecialFormation.destroy(enemy);
+			}
+		} else {
+			if (enemyShipFormationModel != null) {
+				enemyShipFormationModel.destroy(enemy);
+			}
+		}
+	}
+
+	private void applyBombDamageToBoss(Bullet source, BossEntity boss) {
+		if (boss == null || boss.isDestroyed()) return;
+
+		boss.takeDamage(2);
+
+		if (boss.getHealPoint() <= 0) {
+			boss.destroy();
+			int pts = boss.getPointValue();
+			addPointsFor(source, pts);
+			this.coin += pts / 10;
+			AchievementManager.getInstance().unlockAchievement("Boss Slayer");
+		}
+	}
+
+	public void requestBombAoEDamage(Bullet source) {
+		if (source == null) return;
+
+		int cx = source.getPositionX() + source.getWidth() / 2;
+		int cy = source.getPositionY() + source.getHeight() / 2;
+		final int radius = 100;
+
+		for (EnemyShip e : enemyShipFormationModel) {
+			if (e != null && !e.isDestroyed() && inRange(e, cx, cy, radius)) {
+				applyBombDamageToEnemy(source, e);
+			}
+		}
+
+		for (EnemyShip e : enemyShipSpecialFormation) {
+			if (e != null && !e.isDestroyed() && inRange(e, cx, cy, radius)) {
+				applyBombDamageToEnemy(source, e);
+			}
+		}
+
+		if (midBossChilds != null) {
+			for (MidBossMob mob : midBossChilds) {
+				if (mob != null && !mob.isDestroyed() && inRange(mob, cx, cy, radius)) {
+					applyBombDamageToBoss(source, mob);
+				}
+			}
+		}
+
+		if (omegaBoss != null && !omegaBoss.isDestroyed() && inRange(omegaBoss, cx, cy, radius)) {
+			applyBombDamageToBoss(source, omegaBoss);
+		}
+		if (zetaBoss != null && !zetaBoss.isDestroyed() && inRange(zetaBoss, cx, cy, radius)) {
+			applyBombDamageToBoss(source, zetaBoss);
+		}
+		if (finalBoss != null && !finalBoss.isDestroyed() && inRange(finalBoss, cx, cy, radius)) {
+			applyBombDamageToBoss(source, finalBoss);
+		}
+
+		requestRemoveBullet(source);
+	}
+
+
+	/**
      * Checks if two entities are colliding.
      *
      * @param a

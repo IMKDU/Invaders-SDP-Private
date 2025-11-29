@@ -7,12 +7,11 @@ import java.util.Random;
 public class DropItem extends Entity {
     public enum ItemType {
         Explode(2),
-        Slow(10),
         Stop(10),
-        Push(5),
         Shield(5),
-        Heal(5);
-
+        Heal(5),
+		Bomb(5),
+		Coin(5);
 		private final int weight;
 
 		ItemType(final int weight) {

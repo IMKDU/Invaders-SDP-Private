@@ -38,6 +38,11 @@ public class Ship extends Entity implements Collidable {
     private boolean isP1Ship;
     private boolean isMove;
     private boolean movingSoundPlaying = false;
+	private int bombShotsRemaining = 0;
+
+	public void enableBomb(int count) {
+		this.bombShotsRemaining = count;
+	}
 
 	// === Variable for Skil ===
 	public enum SkillType {
@@ -95,7 +100,20 @@ public class Ship extends Entity implements Collidable {
 			int spacing = ShopItem.getMultiShotSpacing();
 
 			int centerX = positionX + this.width / 2;
-			int centerY = positionY;
+			int centerY = positionY - 36;
+
+			if (bombShotsRemaining > 0) {
+
+				Bullet b = new BombBullet(centerX, centerY, BULLET_SPEED, Color.RED);
+				b.setOwnerId(this.playerId);
+				bullets.add(b);
+
+				SoundManager.play("sfx/laser.wav");
+
+				bombShotsRemaining--;
+				return true;
+			}
+
 			if (bulletCount == 1) {
 				// Normal shot (when Spread Shot is not purchased)
 				Bullet b = BulletPool.getBullet(centerX, centerY, BULLET_SPEED);
