@@ -1,5 +1,6 @@
 package entity.pattern;
 
+import engine.Cooldown;
 import entity.HasBounds;
 
 import java.awt.*;
@@ -9,4 +10,5 @@ public interface IBossPattern {
 	void move();
 	Point getBossPosition();
 	void setTarget(HasBounds target);
+	void setCooldown(Cooldown cooldown);
 }
