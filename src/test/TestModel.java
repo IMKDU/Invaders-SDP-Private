@@ -23,7 +23,7 @@ public class TestModel {
 	public TestModel(int width, int height) {
 		this.width = width;
 		this.height = height;
-        this.entity = new OmegaBoss(Color.blue, player);
+        this.entity = new OmegaBoss(player);
         this.player = new Ship(this.width/2, height-20, Color.GREEN,true);
 		this.bullets = new HashSet<>();
 	}

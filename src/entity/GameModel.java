@@ -827,19 +827,15 @@ public class GameModel {
                 this.finalBoss = new FinalBoss(this.width / 2 - 150, 80,  ships, this.width, this.height);
                 this.logger.info("Final Boss has spawned!");
                 break;
-            case "omegaBoss":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
+            case "omegaBoss", "omegaAndZetaAndFinal":
+                this.omegaBoss = new OmegaBoss(ship);
                 this.logger.info("Omega Boss has spawned!");
                 break;
             case "ZetaBoss":
                 this.zetaBoss = new ZetaBoss(Color.ORANGE, ship);
                 this.logger.info("Zeta Boss has spawned!");
                 break;
-            case "omegaAndZetaAndFinal":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
-                this.logger.info("Omega Boss has spawned!");
-                break;
-            default:
+	        default:
                 this.logger.warning("Unknown bossId: " + bossName);
                 break;
         }

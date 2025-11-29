@@ -60,11 +60,10 @@ public class OmegaBoss extends MidBoss {
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
 	 *
-	 * @param color             Color of the boss entity.
 	 * @param player           The player ship to target
 	 */
-	public OmegaBoss(Color color, Ship player) {
-		super(INIT_POS_X, INIT_POS_Y, OMEGA_WIDTH, OMEGA_HEIGHT, OMEGA_HEALTH, OMEGA_POINT_VALUE, color);
+	public OmegaBoss(Ship player) {
+		super(INIT_POS_X, INIT_POS_Y, OMEGA_WIDTH, OMEGA_HEIGHT, OMEGA_HEALTH, OMEGA_POINT_VALUE, null);
 		this.targetShip = player;
 		this.logger = Core.getLogger();
         this.spriteType= DrawManager.SpriteType.OmegaBoss1;
