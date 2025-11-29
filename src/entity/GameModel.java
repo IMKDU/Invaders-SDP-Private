@@ -204,6 +204,9 @@ public class GameModel {
         this.ships = new ArrayList<>();
         if (this.ship != null) ships.add(this.ship);
         if (this.shipP2 != null) ships.add(this.shipP2);
+        if(this.currentLevel.getLevel() == 1){
+            this.enemyShipFormationModel.setSideLoopPattern();
+        }
     }
 
     /**

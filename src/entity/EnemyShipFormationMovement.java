@@ -158,4 +158,9 @@ public class EnemyShipFormationMovement implements IMovementStrategy {
 		this.slowDownCount = 0;
 		this.logger.info("Enemy formation slowed down!");
 	}
+
+	@Override
+	public boolean needsSmoothMovement() {
+		return false;
+	}
 }
