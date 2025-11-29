@@ -4,8 +4,6 @@ import audio.SoundManager;
 import engine.Cooldown;
 import engine.Core;
 import engine.DrawManager;
-import engine.Core;
-import engine.Cooldown;
 import entity.pattern.*;
 
 import java.awt.*;
@@ -46,16 +44,8 @@ public class OmegaBoss extends MidBoss {
 	private int bossPhase = 1;
 	/** Logger instance */
 	private Logger logger;
-	/** Cooldown timer for dash attack */
-	private Cooldown dashCooldown;
-	/** Flag to track if currently in dash cooldown */
-	private boolean isInDashCooldown = false;
     private boolean ishit = false;
-    private boolean isMove = false;
-    private boolean isDash = false;
     private Cooldown animationCooldown;
-
-	private SpawnMobPattern spawnPattern;
 
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
@@ -68,7 +58,6 @@ public class OmegaBoss extends MidBoss {
 		this.logger = Core.getLogger();
         this.spriteType= DrawManager.SpriteType.OmegaBoss1;
         this.animationCooldown = new Cooldown(200);
-		this.spawnPattern = new SpawnMobPattern(this,this.getHealPoint());
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		this.logger.info("OMEGA : move using the default pattern");
         SoundManager.play("sfx/OmegaBossAppearance.wav");
@@ -82,43 +71,46 @@ public class OmegaBoss extends MidBoss {
 	 */
 	@Override
 	public void update() {
-        if (this.animationCooldown.checkFinished()) {
-            this.animationCooldown.reset();
-            if (this.bossPhase == 2 || this.bossPhase == 3){
-                this.setWidth(70 * 2);
-                this.setHeight(51 * 2);
-                if (this.ishit){
-                    this.spriteType = DrawManager.SpriteType.OmegaBossHitting;
-                    this.ishit = false;
-                }
-                else {
-                    if (this.spriteType == DrawManager.SpriteType.OmegaBoss1){
-                        this.spriteType = DrawManager.SpriteType.OmegaBoss2;
-                    }
-                    else {
-                        this.spriteType = DrawManager.SpriteType.OmegaBoss1;
-                    }
-                }
-            }
-            else if (this.bossPhase == 4) {
-	            this.setWidth(77 * 2);
-	            this.setHeight(89 * 2);
-	            if (this.spriteType == DrawManager.SpriteType.OmegaBossMoving1) {
-		            this.spriteType = DrawManager.SpriteType.OmegaBossMoving2;
-	            } else {
-		            this.spriteType = DrawManager.SpriteType.OmegaBossMoving1;
-	            }
-            }
-        }
+		chooseSprite();
 		choosePattern();
 
 		if (bossPattern != null) {
 			bossPattern.move();
 			bossPattern.attack();
-			spawnPattern.update(this,this.getHealPoint());
 			// Update position from pattern
 			this.positionX = bossPattern.getBossPosition().x;
 			this.positionY = bossPattern.getBossPosition().y;
+		}
+	}
+
+	private void chooseSprite(){
+		if (this.animationCooldown.checkFinished()) {
+			this.animationCooldown.reset();
+			if (this.bossPhase == 2 || this.bossPhase == 3){
+				this.setWidth(70 * 2);
+				this.setHeight(51 * 2);
+				if (this.ishit){
+					this.spriteType = DrawManager.SpriteType.OmegaBossHitting;
+					this.ishit = false;
+				}
+				else {
+					if (this.spriteType == DrawManager.SpriteType.OmegaBoss1){
+						this.spriteType = DrawManager.SpriteType.OmegaBoss2;
+					}
+					else {
+						this.spriteType = DrawManager.SpriteType.OmegaBoss1;
+					}
+				}
+			}
+			else if (this.bossPhase == 4) {
+				this.setWidth(77 * 2);
+				this.setHeight(89 * 2);
+				if (this.spriteType == DrawManager.SpriteType.OmegaBossMoving1) {
+					this.spriteType = DrawManager.SpriteType.OmegaBossMoving2;
+				} else {
+					this.spriteType = DrawManager.SpriteType.OmegaBossMoving1;
+				}
+			}
 		}
 	}
 
@@ -161,13 +153,14 @@ public class OmegaBoss extends MidBoss {
 		this.positionY += distanceY;
 	}
 
-	/** Marks the entity as destroyed and changes its sprite to an explosion. */
+	/** Marks the entity as destroyed and changes its sprite to
+
+	private SpawnMobPattern spawnPattern; an explosion. */
 	@Override
 	public void destroy() {
 		this.isDestroyed = true;
 		this.spriteType = DrawManager.SpriteType.OmegaBossDeath;
 		this.logger.info("OMEGA : Boss OMEGA destroyed!");
-		this.spawnPattern.clean();
 	}
 
 	/**
@@ -205,6 +198,4 @@ public class OmegaBoss extends MidBoss {
 	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
 		model.requestBossHitByPlayerBullet(bullet, this);
 	}
-
-	public List<MidBossMob> getSpawnMobs() { return this.spawnPattern.getChildShips();}
 }

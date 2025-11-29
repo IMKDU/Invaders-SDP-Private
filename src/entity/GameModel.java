@@ -320,7 +320,6 @@ public class GameModel {
                 if (this.omegaBoss != null){
                     this.omegaBoss.update();
                     if (this.omegaBoss instanceof OmegaBoss omega) {
-                        midBossChilds = omega.getSpawnMobs();
                         bossBullets.addAll(omega.getBossPattern().getBullets());
                     }
 					updateBossBullets();
