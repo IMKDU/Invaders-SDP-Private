@@ -320,7 +320,7 @@ public class GameModel {
                 if (this.omegaBoss != null){
                     this.omegaBoss.update();
                     if (this.omegaBoss instanceof OmegaBoss omega) {
-                        bossBullets.addAll(omega.getBossPattern().getBullets());
+                        bossBullets.addAll(omega.getBullets());
                     }
 					updateBossBullets();
 

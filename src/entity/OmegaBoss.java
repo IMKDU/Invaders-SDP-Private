@@ -7,7 +7,7 @@ import engine.DrawManager;
 import entity.pattern.*;
 
 import java.awt.*;
-import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -87,8 +87,8 @@ public class OmegaBoss extends MidBoss {
 		if (this.animationCooldown.checkFinished()) {
 			this.animationCooldown.reset();
 			if (this.bossPhase == 2 || this.bossPhase == 3){
-				this.setWidth(70 * 2);
-				this.setHeight(51 * 2);
+				this.setWidth(OMEGA_WIDTH);
+				this.setHeight(OMEGA_HEIGHT);
 				if (this.ishit){
 					this.spriteType = DrawManager.SpriteType.OmegaBossHitting;
 					this.ishit = false;
@@ -175,19 +175,9 @@ public class OmegaBoss extends MidBoss {
         ishit =true;
 	}
 
-    /**
-     * Get current boss pattern
-     */
-    public BossPattern getBossPattern() {
-        return this.bossPattern;
-    }
-
-    /**
-     * Get current boss phase
-     */
-    public int getBossPhase() {
-        return this.bossPhase;
-    }
+	public Set<Bullet> getBullets() {
+		return this.bossPattern.getBullets();
+	}
 
 	@Override
 	public void onCollision(Collidable other, GameModel model) {

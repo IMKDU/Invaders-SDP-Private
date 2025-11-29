@@ -150,11 +150,7 @@ public final class EntityRenderer {
 			LaserBullet laser = (LaserBullet) entity;
 			drawLaserRotated(laser, laser.getTargetPosition().x, laser.getTargetPosition().y);
 		}
-		else if (entity instanceof OmegaBoss) {
-			OmegaBoss omegaBoss = (OmegaBoss) entity;
-			drawOmegaBoss(omegaBoss);
-		}
-        else if (entity instanceof ZetaBoss) {
+		else if (entity instanceof ZetaBoss) {
            ZetaBoss zetaBoss = (ZetaBoss) entity;
            drawZetaBoss(zetaBoss);
         }
@@ -173,12 +169,6 @@ public final class EntityRenderer {
 	private void drawOmegaBoss(OmegaBoss omegaBoss) {
 		// Draw boss sprite
 		drawEntity(omegaBoss, omegaBoss.getPositionX(), omegaBoss.getPositionY());
-
-		// Draw pattern-specific visuals
-		BossPattern currentPattern = omegaBoss.getBossPattern();
-		if (currentPattern != null) {
-			drawBossPattern(omegaBoss, currentPattern);
-		}
 	}
 
     private void drawZetaBoss(ZetaBoss zetaBoss) {
