@@ -134,7 +134,7 @@ public class OmegaBoss extends MidBoss {
 			return;
 		}
 
-		else if (this.healPoint <= this.maxHp / 2 && this.healPoint > this.maxHp / 3 && this.bossPhase == 3) {
+		else if (this.bossPhase == 3) {
 
 			if (bossPattern instanceof SpreadShotPattern &&
 					((SpreadShotPattern) bossPattern).isFinished()) {
