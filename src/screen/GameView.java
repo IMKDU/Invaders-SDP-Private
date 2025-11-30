@@ -32,13 +32,13 @@ public class GameView {
 
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
-        //오리진 스킬 애니메이션 스킬횟수 > 0 그리고 p1점수 100이상일때 발동
-        // 구현 해야할거 발동후 로직, 아군 ship 무적
-        if (model.getFinalSkillCnt() > 0 && (dto.getScoreP1() >= 100)) {
+        if (model.isOriginSkillActivated()) {
+
             drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
             drawManager.getSpecialAnimationRenderer().draw();
-            if (drawManager.getSpecialAnimationRenderer().isFinished()){
-                model.useFinalSkill();
+
+            if (drawManager.getSpecialAnimationRenderer().isFinished()) {
+                model.setOriginSkillActivated(false);
             }
         }
 
@@ -78,7 +78,18 @@ public class GameView {
                 }
             }
         }
-
+        if (model.getOmegaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getOmegaBoss());
+            drawManager.getUIRenderer().drawBossName("Omega");
+        }
+        if (model.getFinalBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getFinalBoss());
+            drawManager.getUIRenderer().drawBossName("???");
+        }
+        if (model.getZetaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getZetaBoss());
+            drawManager.getUIRenderer().drawBossName("Zeta");
+        }
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50, 2);
         drawManager.getHUDRenderer().drawCoin(dto.getWidth(), dto.getHeight(), dto.getCoin());
@@ -103,6 +114,16 @@ public class GameView {
         }
 
 
+        /** Charging skill visualization for Player 1 */
+        if (model.getShip() != null) {
+            drawChargingSkill(model.getShip(), dto.getWidth(), dto.getHeight());
+        }
+
+        /** Charging skill visualization for Player 2 */
+        if (model.getShipP2() != null) {
+            drawChargingSkill(model.getShipP2(), dto.getWidth(), dto.getHeight());
+        }
+
         /** countdown */
         if (!model.isInputDelayFinished()) {
             int countdown = (int) ((GameModel.INPUT_DELAY
@@ -126,4 +147,34 @@ public class GameView {
         /** frame complete */
         drawManager.completeDrawing();
     }
+
+    /**
+     * Draws the charging skill UI elements including charge bar and laser beam.
+     * @param ship The ship to draw charging skill for
+     * @param screenWidth Screen width
+     * @param screenHeight Screen height
+     */
+    private void drawChargingSkill(entity.Ship ship, int screenWidth, int screenHeight) {
+        // Draw charging progress bar
+        if (ship.isCharging()) {
+            double progress = ship.getChargeProgress();
+            drawManager.getEntityRenderer().drawChargingBar(
+                    ship.getPositionX(),
+                    ship.getPositionY() - 10,
+                    ship.getWidth(),
+                    progress
+            );
+        }
+
+        // Draw laser beam when active
+        if (ship.isLaserActive()) {
+            drawManager.getEntityRenderer().drawChargingLaser(
+                    ship.getPositionX() + ship.getWidth() / 2,
+                    ship.getPositionY(),
+                    ship.getWidth(),
+                    screenHeight
+            );
+        }
+    }
 }
+
