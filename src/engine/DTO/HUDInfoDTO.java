@@ -28,7 +28,11 @@ public final class HUDInfoDTO {
     private final String achievementText;
     private final String healthPopupText;
 
-    public HUDInfoDTO(
+	/** Teleport cooldown */
+	public float teleportCooldownP1;
+	public float teleportCooldownP2;
+
+	public HUDInfoDTO(
             int width,
             int height,
             int scoreP1,
@@ -43,7 +47,10 @@ public final class HUDInfoDTO {
             long elapsedTimeMillis,
             String levelName,
             String achievementText,
-            String healthPopupText) {
+            String healthPopupText,
+			float teleportCooldownP1,
+			float teleportCooldownP2
+	) {
 
         this.width = width;
         this.height = height;
@@ -56,10 +63,19 @@ public final class HUDInfoDTO {
         this.elapsedTimeMillis = elapsedTimeMillis;
         this.levelName = levelName;
         this.achievementText = achievementText;
-        this.healthPopupText = healthPopupText;
+		this.healthPopupText = healthPopupText;
+		this.teleportCooldownP1 = teleportCooldownP1;
+		this.teleportCooldownP2 = teleportCooldownP2;
         this.shipP1 = shipP1;
         this.shipP2 = shipP2;
     }
+	public float getTeleportCooldownP1() {
+		return teleportCooldownP1;
+	}
+
+	public float getTeleportCooldownP2() {
+		return teleportCooldownP2;
+	}
 
     public int getWidth() {
         return width;
