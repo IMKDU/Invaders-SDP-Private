@@ -1,11 +1,15 @@
 package engine.renderer;
 
 import engine.BackBuffer;
+import engine.DrawManager;
 import engine.FontPack;
 import engine.ItemHUDManager;
 import entity.Ship;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Map;
+
 
 /**
  * Handles all on-screen HUD rendering such as scores, coins, and timers.
@@ -18,6 +22,7 @@ public final class HUDRenderer {
     private final BackBuffer backBuffer;
     private final FontPack fontPack;
     private final EntityRenderer entityRenderer;
+    private final BufferedImage teleportCool;
 
 	// Teleport cooldown UI constants
 	private static final int P1_COOLDOWN_X = 170;
@@ -25,10 +30,11 @@ public final class HUDRenderer {
 	private static final int COOLDOWN_Y_OFFSET = 50;
 	private static final int TELEPORT_GAUGE_RADIUS = 26;
 
-    public HUDRenderer(BackBuffer backBuffer, FontPack fontPack, EntityRenderer entityRenderer) {
+    public HUDRenderer(BackBuffer backBuffer, FontPack fontPack, EntityRenderer entityRenderer, BufferedImage teleportCool) {
         this.backBuffer = backBuffer;
         this.fontPack = fontPack;
         this.entityRenderer = entityRenderer;
+        this.teleportCool = teleportCool;
     }
 
     /** Draw score. */
@@ -155,23 +161,50 @@ public final class HUDRenderer {
 
 	/** Draw circular cooldown gauge */
 	private void drawTeleportCooldown(Graphics2D g, int x, int y, double ratio, Color readyColor) {
-
 		int r = TELEPORT_GAUGE_RADIUS;
 		g.setColor(Color.DARK_GRAY);
 		g.fillOval(x, y, r, r);
 
 		if (ratio >= 1.0) {
-			g.setColor(readyColor);
-			g.fillOval(x, y, r, r);
-			return;
+            g.drawImage(this.teleportCool,x,y,r,r,null);
+
 		}
 
-		g.setColor(readyColor);
-		int angle = (int)(360 * ratio);
-		g.fillArc(x, y, r, r, 90, -angle);
+        else{
+            g.drawImage(this.teleportCool, x, y, r, r, null);
 
-		g.setColor(Color.BLACK);
-		g.drawOval(x, y, r, r);
+            float alpha = 0.5f;
+
+            Composite old = g.getComposite();
+            g.setComposite(AlphaComposite.getInstance(
+                    AlphaComposite.SRC_OVER,
+                    alpha
+            ));
+
+            g.setColor(Color.BLUE);
+            int h = (int)(r * ratio);
+            g.fillRect(x, y + (r - h), r, h);
+
+            g.setComposite(old);
+
+            int seconds = Math.max(
+                    1,
+                    (int)Math.ceil((1.0 - ratio) * 5)
+            );
+            String text = seconds + "";
+            g.setFont(fontPack.getRegular());
+            FontMetrics fm = g.getFontMetrics();
+            int textX = x + (TELEPORT_GAUGE_RADIUS - fm.stringWidth(text)) / 2;
+            int textY = y + (TELEPORT_GAUGE_RADIUS + fm.getAscent()) / 2 - 3;
+            g.setColor(Color.BLACK);
+            g.drawString(text, textX+1, textY+1);
+            g.setColor(Color.red);
+            g.drawString(text, textX, textY);
+
+        }
+
+
+
 	}
 	/** Draw teleport cooldowns for P1 and P2 */
 	public void drawTeleportCooldowns(int screenWidth, int screenHeight, double cooldownP1, double cooldownP2) {
