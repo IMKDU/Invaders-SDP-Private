@@ -59,7 +59,7 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
     private int shipCount;
 
     /** The logic component responsible for movement. */
-    private EnemyShipFormationMovement movementStrategy;
+    private IMovementStrategy movementStrategy;
     /** The logic component responsible for shooting. */
     private FormationShootingManager shootingManager;
 
@@ -130,12 +130,16 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
         this.movementSpeed = (int) (Math.pow(remainingProportion, 2)
                 * this.baseSpeed);
         this.movementSpeed += MINIMUM_SPEED;
-
+        if (this.movementStrategy.needsSmoothMovement()) {
+            this.movementStrategy.updateMovement();
+        }
         movementInterval++;
         if (movementInterval >= this.movementSpeed) {
             movementInterval = 0;
 
-            this.movementStrategy.updateMovement();
+            if (!this.movementStrategy.needsSmoothMovement()) {
+                this.movementStrategy.updateMovement();
+            }
 
             List<EnemyShip> destroyed;
             for (List<EnemyShip> column : this.enemyShips) {
@@ -389,4 +393,13 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 			default: return Color.WHITE;
 		}
 	}
+
+    /**
+     * Switches the movement pattern to the "Cross Formation"
+     * Ships move diagonally from corner to corner.
+     */
+    public void setCrossFormationPattern() {
+        this.movementStrategy = new CrossFormationMovement(this.enemyShips);
+        this.logger.info("Enemy pattern switched to Cross Formation (Blue Pattern).");
+    }
 }
