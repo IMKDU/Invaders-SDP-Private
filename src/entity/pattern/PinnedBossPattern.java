@@ -35,7 +35,7 @@ public class PinnedBossPattern extends BossPattern {
 
 	@Override
 	public void attack() {
-		if(validateBackbroundPattern){
+		if(validateBackgroundPattern){
 			backGroundPattern.attack();
 		}
 		if(this.shootCooldown.checkFinished()){
