@@ -69,6 +69,8 @@ public class GameModel {
     private MidBoss omegaBoss;
     /** ZetaBoss */
     private MidBoss zetaBoss;
+    /** GammaBoss */
+    private MidBoss gammaBoss;
     /** Set of all bullets fired by on-screen ships. */
     private Set<Bullet> bullets;
     /** Set of all dropItems dropped by on screen ships. */
@@ -201,6 +203,7 @@ public class GameModel {
         this.omegaBoss = null;
         this.midBossChilds = null;
         this.zetaBoss = null;
+        this.gammaBoss = null;
         this.currentPhase = StagePhase.wave;
 
 //        bossPattern = new BossPattern();
@@ -307,7 +310,7 @@ public class GameModel {
                 }
                 break;
             case boss_wave:
-                if (this.finalBoss == null && this.omegaBoss == null && this.zetaBoss == null){
+                if (this.finalBoss == null && this.omegaBoss == null && this.zetaBoss == null && this.gammaBoss == null){
                     bossReveal();
                     this.enemyShipFormationModel.clear();
                 }
@@ -356,11 +359,25 @@ public class GameModel {
                     }
                 }
 
+                // GammaBoss logic added
+                if (this.gammaBoss != null) {
+                    this.gammaBoss.update();
+                    if (this.gammaBoss instanceof GammaBoss gamma) {
+                        bossBullets.addAll(gamma.getBossPattern().getBullets());
+                    }
+                    updateBossBullets();
+
+                    if (this.gammaBoss.isDestroyed()) {
+                        this.logger.info("Gamma Boss destroyed!");
+                    }
+                }
+
                 boolean isFinalBossAlive = (this.finalBoss != null && !this.finalBoss.isDestroyed());
                 boolean isOmegaBossAlive = (this.omegaBoss != null && !this.omegaBoss.isDestroyed());
                 boolean isZetaBossAlive = (this.zetaBoss != null && !this.zetaBoss.isDestroyed());
+                boolean isGammaBossAlive = (this.gammaBoss != null && !this.gammaBoss.isDestroyed());
                 if (!originSkillActivated) {
-                    if (!isFinalBossAlive && !isOmegaBossAlive && !isZetaBossAlive) {
+                    if (!isFinalBossAlive && !isOmegaBossAlive && !isZetaBossAlive && !isGammaBossAlive) {
                         if (!this.levelFinished) {
                             this.levelFinished = true;
                             this.screenFinishedCooldown.reset();
@@ -986,6 +1003,10 @@ public class GameModel {
                 this.zetaBoss = new ZetaBoss(Color.ORANGE, ship);
                 this.logger.info("Zeta Boss has spawned!");
                 break;
+            case "gammaBoss":
+                this.gammaBoss = new GammaBoss(Color.CYAN, ships, this.width, this.height);
+                this.logger.info("Gamma Boss has spawned!");
+                break;
             case "omegaAndZetaAndFinal":
                 this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
                 this.logger.info("Omega Boss has spawned!");
@@ -1143,6 +1164,7 @@ public class GameModel {
     public EnemyShipFormationModel getEnemyShipFormationModel() { return enemyShipFormationModel; }
     public MidBoss getOmegaBoss() { return omegaBoss; }
     public MidBoss getZetaBoss() { return zetaBoss; }
+    public MidBoss getGammaBoss() { return gammaBoss; }
     public List<MidBossMob> getMidBossChilds() { return midBossChilds; }
     public Set<Bullet> getBullets() { return bullets; }
     public Set<DropItem> getDropItems() { return dropItems; }
@@ -1214,6 +1236,11 @@ public class GameModel {
         // [추가] ZetaBoss 렌더링 리스트 추가
         if (getZetaBoss() != null) {
             renderList.add(getZetaBoss());
+        }
+
+        // [추가] GammaBoss 렌더링 리스트 추가
+        if (getGammaBoss() != null) {
+            renderList.add(getGammaBoss());
         }
 
         if (getFinalBoss() != null && !getFinalBoss().isDestroyed()) {
