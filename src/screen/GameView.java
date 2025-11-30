@@ -124,6 +124,13 @@ public class GameView {
             drawChargingSkill(model.getShipP2(), dto.getWidth(), dto.getHeight());
         }
 
+        if(model.getExplosionEntity() != null){
+            drawManager.getEntityRenderer().drawExplosion(
+                    model.isExplosionBoom(),
+                    model.getExplosionEntity(),
+                    model.getWarningExplosion()
+            );
+        }
         /** countdown */
         if (!model.isInputDelayFinished()) {
             int countdown = (int) ((GameModel.INPUT_DELAY

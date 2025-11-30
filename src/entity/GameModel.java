@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import engine.*;
 import engine.level.ItemDrop;
+import entity.pattern.BackgroundExplosionPattern;
 import entity.pattern.BlackHolePattern;
 import entity.pattern.ISkill;
 import entity.skills.OriginSkill;
@@ -130,6 +131,7 @@ public class GameModel {
     private Cooldown blackHoleCooldown;
     private int lastHp;
     private static final int BLACK_HOLE_DURATION_MS = 7000;
+    private Explosion explosionEntity = null;
     private static boolean usedOrigin = false;
     private boolean originSkillActivated = false;
 
@@ -316,6 +318,7 @@ public class GameModel {
                     this.omegaBoss.update();
                     if (this.omegaBoss instanceof OmegaBoss omega) {
                         midBossChilds = omega.getSpawnMobs();
+                        this.explosionEntity = omega.getBoom();
                         bossBullets.addAll(omega.getBossPattern().getBullets());
                     }
 					updateBossBullets();
@@ -427,6 +430,7 @@ public class GameModel {
         if (midBossChilds != null){
             for(MidBossMob mb : midBossChilds){ entities.add(mb); }
         }
+        if (explosionEntity != null) entities.add(explosionEntity);
 		entities.addAll(bullets);
 		entities.addAll(bossBullets);
 		entities.addAll(dropItems);
@@ -1169,6 +1173,9 @@ public class GameModel {
         return ships;
     }
 
+    public boolean isExplosionBoom() { return explosionEntity.isBoom(); }
+    public Explosion getExplosionEntity() { return explosionEntity; }
+    public double getWarningExplosion() { return explosionEntity.getWarningProgress(); }
 
     public List<Entity> getEntitiesToRender() {
         List<Entity> renderList = new ArrayList<>();
@@ -1212,7 +1219,6 @@ public class GameModel {
         if (getFinalBoss() != null && !getFinalBoss().isDestroyed()) {
             renderList.add(getFinalBoss());
         }
-
         // 5. added items and bullets
         if (getBullets() != null) {
             renderList.addAll(getBullets());
