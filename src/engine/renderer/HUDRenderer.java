@@ -32,12 +32,14 @@ public final class HUDRenderer {
     }
 
     /** Draw score. */
-    public void drawScore(final int screenWidth, final int score, final int y) {
+    public void drawScore(final int screenWidth, final int score, final int y, final int playerId) {
         Graphics g = backBuffer.getGraphics();
         Font font = fontPack.getRegular();
         g.setFont(font);
         g.setColor(Color.WHITE);
-        String scoreString = String.format("P1:%04d", score);
+        String scoreString = String.format("P%d:%04d",playerId, score);
+
+
         g.drawString(scoreString, screenWidth - 120, y);
     }
 
@@ -79,9 +81,8 @@ public final class HUDRenderer {
         g.setFont(fontPack.getRegular());
         g.setColor(Color.WHITE);
         g.drawString("P1:", 10, 25);
-        Ship dummyShip = new Ship(0, 0, Color.GREEN);
         for (int i = 0; i < lives; i++) {
-            entityRenderer.drawEntity(dummyShip, 40 + 35 * i, 10);
+            entityRenderer.drawLife(50 + 35 * i, 10, 1);
         }
     }
 
@@ -91,9 +92,8 @@ public final class HUDRenderer {
         g.setFont(fontPack.getRegular());
         g.setColor(Color.WHITE);
         g.drawString("P2:", 10, 55);
-        Ship dummyShip = new Ship(0, 0, Color.PINK);
         for (int i = 0; i < lives; i++) {
-            entityRenderer.drawEntity(dummyShip, 40 + 35 * i, 40);
+            entityRenderer.drawLife(50 + 35 * i, 40, 2);
         }
     }
 

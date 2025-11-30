@@ -202,6 +202,8 @@ public class GameScreen extends Screen {
 				model.getLivesP1(),
 				model.getLivesP2(),
 				model.getLevel(),
+				model.getShip(),
+				model.getShipP2(),
 				model.getElapsedTime(),
 				model.getCurrentLevel().getLevelName(),
 				model.getAchievementText(),

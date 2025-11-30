@@ -2,25 +2,68 @@ package audio;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SoundManager {
     private static final Map<String, Clip> CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, byte[]> AUDIO_CACHE = new HashMap<>();
     private static volatile boolean muted = false;  // global state of sound
     private static volatile String currentLooping = null;
+    private static final Map<String, java.util.List<Clip>> PLAY_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, Clip> SINGLE_LOOP_MAP = new ConcurrentHashMap<>();
 
     public static void play(String resourcePath) {
-        if (muted) return;  // no sound played
+        if (muted) return;
+
         try {
-            Clip c = CACHE.computeIfAbsent(resourcePath, SoundManager::loadClip);
-            if (c == null) return;
-            if (c.isRunning()) c.stop();
-            c.setFramePosition(0);
-            c.start();
+            byte[] audioData = AUDIO_CACHE.computeIfAbsent(resourcePath, SoundManager::loadAudioData);
+            if (audioData == null) return;
+
+            Clip clip = AudioSystem.getClip();
+            AudioInputStream ais = AudioSystem.getAudioInputStream(new ByteArrayInputStream(audioData));
+            clip.open(ais);
+
+            // PLAY_MAP에 등록
+            PLAY_MAP.computeIfAbsent(resourcePath, k -> new java.util.ArrayList<>()).add(clip);
+
+            clip.addLineListener(event -> {
+                LineEvent.Type type = event.getType();
+                if (type == LineEvent.Type.STOP || type == LineEvent.Type.CLOSE) {
+
+                    List<Clip> l = PLAY_MAP.get(resourcePath);
+                    if (l != null) {
+                        l.remove(clip);
+                    }
+                    try {
+                        clip.close();
+                    } catch (Exception ignore) {}
+
+                    try {
+                        ais.close();
+                    } catch (Exception ignore) {}
+                }
+            });
+
+            clip.start();
+
         } catch (Exception e) {
             System.err.println("[Sound] Play failed: " + resourcePath + " -> " + e.getMessage());
+        }
+    }
+
+    private static byte[] loadAudioData(String resourcePath) {
+        String p = resourcePath.startsWith("/") ? resourcePath : "/" + resourcePath;
+        try (InputStream is = SoundManager.class.getResourceAsStream(p);
+             BufferedInputStream bis = new BufferedInputStream(is)) {
+            return bis.readAllBytes();
+        } catch (Exception e) {
+            System.err.println("[Sound] Load failed: " + p);
+            return null;
         }
     }
 
@@ -46,7 +89,6 @@ public class SoundManager {
         try {
             Clip c = CACHE.computeIfAbsent(resourcePath, SoundManager::loadClip);
             if (c == null) return;
-            stopAll();
             c.setFramePosition(0);
             c.loop(Clip.LOOP_CONTINUOUSLY);
             c.start();
@@ -81,15 +123,24 @@ public class SoundManager {
 
     public static void stop(String resourcePath) {
         try {
-            Clip c = CACHE.get(resourcePath);
-            if (c != null && c.isRunning()) {
-                c.stop();
-                c.setFramePosition(0);
+            java.util.List<Clip> list = PLAY_MAP.get(resourcePath);
+            if (list == null) return;
+
+            for (Clip c : list) {
+                if (c != null) {
+                    c.stop();
+                    c.flush();
+                    c.setFramePosition(0);
+                }
             }
+
+            list.clear();
+
         } catch (Exception e) {
             System.err.println("[Sound] Stop failed: " + resourcePath + " -> " + e.getMessage());
         }
     }
+
 
     public static void stopAll() {
         for (Clip c : CACHE.values()) {
@@ -108,5 +159,36 @@ public class SoundManager {
 
     public static boolean isCurrentLoop(String path) {
         return currentLooping != null && currentLooping.equals(path);
+    }
+    public static void playSingleLoop(String path) {
+        if (muted) return;
+
+        try {
+            Clip c = SINGLE_LOOP_MAP.get(path);
+
+            if (c == null) {
+                c = loadClip(path);
+                if (c == null) return;
+                SINGLE_LOOP_MAP.put(path, c);
+            }
+
+            if (!c.isRunning()) {
+                c.setFramePosition(0);
+                c.loop(Clip.LOOP_CONTINUOUSLY);
+                c.start();
+            }
+
+        } catch (Exception e) {
+            System.err.println("[Sound] playSingleLoop fail: " + e);
+        }
+    }
+
+    public static void stopSingleLoop(String path) {
+        Clip c = SINGLE_LOOP_MAP.get(path);
+        if (c != null && c.isRunning()) {
+            c.stop();
+            c.flush();
+            c.setFramePosition(0);
+        }
     }
 }

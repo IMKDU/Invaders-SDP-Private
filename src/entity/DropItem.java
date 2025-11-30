@@ -4,14 +4,14 @@ import java.awt.Color;
 
 import java.util.Random;
 
-public class DropItem extends Entity implements Collidable {
-	public enum ItemType {
-		Explode(2),
-		Slow(10),
-		Stop(10),
-		Push(5),
-		Shield(5),
-		Heal(5);
+public class DropItem extends Entity {
+    public enum ItemType {
+        Explode(2),
+        Slow(10),
+        Stop(10),
+        Push(5),
+        Shield(5),
+        Heal(5);
 
 		private final int weight;
 
@@ -67,7 +67,7 @@ public class DropItem extends Entity implements Collidable {
 	private ItemType itemType;
 
 	public DropItem(final int positionX, final int positionY, final int speed, final ItemType itemType) {
-		super(positionX, positionY, 5 * 2, 5 * 2, Color.WHITE);
+		super(positionX, positionY, 20 * 2, 20 * 2, Color.WHITE);
 		this.speed = speed;
 		this.itemType = itemType;
 	}
@@ -85,13 +85,13 @@ public class DropItem extends Entity implements Collidable {
 			return;
 		}
 
-		// All enemyship push
-		for (EnemyShip enemy : enemyShipFormation) {
-			if (enemy != null && !enemy.isDestroyed()) {
-				enemy.move(0, -distanceY);
-			}
-		}
-	}
+        // All enemyship push
+        for (EnemyShip enemy : enemyShipFormation) {
+            if (enemy != null && !enemy.isDestroyed()) {
+                enemy.move(0, -distanceY,false);
+            }
+        }
+    }
 
 	/**
 	 * Freeze DropItem : all enemy ship never move except special enemy.

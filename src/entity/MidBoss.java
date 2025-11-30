@@ -1,6 +1,7 @@
 package entity;
 
 import engine.Core;
+import entity.pattern.ApocalypseAttackPattern;
 
 import java.awt.*;
 import java.util.logging.Logger;
@@ -19,6 +20,8 @@ public abstract class MidBoss extends Entity implements BossEntity {
 	protected boolean isDestroyed = false;
 	protected int pattern = 1;
 	protected Logger logger;
+
+    protected ApocalypseAttackPattern apocalypsePattern;
 
 	/**
 	 * Constructor, establishes the boss entity's generic properties.
@@ -50,9 +53,33 @@ public abstract class MidBoss extends Entity implements BossEntity {
 	}
 
 	@Override
-	public boolean isDestroyed() {
-		return this.isDestroyed;
-	}
+	public boolean isDestroyed() { return this.isDestroyed; }
+
+    // Bosses that don't use this pattern (e.g., ZetaBoss) will inherit this default implementation.
+
+    /**
+     * (Used by View) Returns whether the warning is active
+     * @return Always returns false for bosses without this pattern.
+     */
+    public boolean isApocalypseWarning() {
+        return this.apocalypsePattern != null && this.apocalypsePattern.isWarningActive();
+    }
+
+    /**
+     * (Used by View) Returns the safe zone column index (0-9)
+     * @return Returns -1 for bosses without this pattern.
+     */
+    public int getSafeZoneColumn() {
+        return this.apocalypsePattern != null ? this.apocalypsePattern.getSafeZoneColumn() : -1;
+    }
+
+    /**
+     * (Used by GameModel) Returns the pattern component object itself
+     * @return Returns null for bosses without this pattern.
+     */
+    public ApocalypseAttackPattern getApocalypsePattern() {
+        return this.apocalypsePattern;
+    }
 
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
@@ -63,5 +90,4 @@ public abstract class MidBoss extends Entity implements BossEntity {
 	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
 		model.requestBossHitByPlayerBullet(bullet, this);
 	}
-
 }

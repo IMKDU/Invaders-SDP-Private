@@ -43,6 +43,7 @@ public class Cooldown {
 	protected Cooldown(final int milliseconds, final int variance) {
 		this.milliseconds = milliseconds;
 		this.variance = variance;
+        this.duration = milliseconds;
 		this.time = 0;
 	}
 
@@ -81,4 +82,14 @@ public class Cooldown {
 	}
 	public long getStartTime() { return this.time; }
 	public int getDuration() { return this.duration; }
+
+    public final long getRemaining() {
+        if (this.time == 0)
+            return 0;
+        long remaining = (this.time + this.duration) - System.currentTimeMillis();
+        return Math.max(0, remaining);
+    }
+    public final int getTotal() {
+        return this.duration;
+    }
 }

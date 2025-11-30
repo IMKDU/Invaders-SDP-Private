@@ -150,15 +150,15 @@ public class EnemyShipSpecialFormation implements Iterable<EnemyShip> {
                     movementX = enemyShipSpecial.getXSpeed();
                 else if (enemyShipSpecial.getDirection() == EnemyShip.Direction.LEFT)
                     movementX = -enemyShipSpecial.getXSpeed();
-                enemyShipSpecial.move(movementX, movementY);
+                enemyShipSpecial.move(movementX, movementY,true);
 
             /** explosion logic **/
-            } else if (this.enemyShipSpecialExplosionCooldown.checkFinished())
-				if (type == EnemyShip.SpecialType.RED) {
-					this.enemyShipSpecialRed = null;
-				} else if (type == EnemyShip.SpecialType.BLUE) {
-					this.enemyShipSpecialBlue = null;
-				}
+            } else if (enemyShipSpecial.isExplosionFinished())
+                if (type == EnemyShip.SpecialType.RED) {
+                    this.enemyShipSpecialRed = null;
+                } else if (type == EnemyShip.SpecialType.BLUE) {
+                    this.enemyShipSpecialBlue = null;
+                }
         }
     }
 
@@ -187,7 +187,7 @@ public class EnemyShipSpecialFormation implements Iterable<EnemyShip> {
          *            Ship to be destroyed.
          */
         public final void destroy (EnemyShip enemyShipSpecial){
-            enemyShipSpecial.destroy();
+            enemyShipSpecial.destroy(true);
 			if (enemyShipSpecial.getSpecialType() == EnemyShip.SpecialType.RED) {
                 this.enemyShipSpecialCooldown.reset();
             }
