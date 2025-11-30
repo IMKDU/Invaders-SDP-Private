@@ -107,6 +107,8 @@ public class GameModel {
     // Achievement popup
     private String achievementText;
     private Cooldown achievementPopupCooldown;
+    private boolean isTeleportP1;
+    private boolean isTeleportP2;
     private enum StagePhase{wave, boss_wave};
     private StagePhase currentPhase;
     /** Health change popup. */
@@ -134,6 +136,10 @@ public class GameModel {
     private Explosion explosionEntity = null;
     private static boolean usedOrigin = false;
     private boolean originSkillActivated = false;
+    private int teleportFromP1X;
+    private int teleportFromP1Y;
+    private int teleportFromP2X;
+    private int teleportFromP2Y;
 
 
     public GameModel(GameState gameState, Level level, boolean bonusLife, int maxLives, int width, int height) {
@@ -237,11 +243,21 @@ public class GameModel {
 	public void playerMoveOrTeleport(int playerNum, String direction, boolean teleport) {
 		Ship ship = (playerNum == 1) ? this.ship : this.shipP2;
 		if (ship == null || ship.isDestroyed()) return;
-
-		if (teleport && ship.canTeleport()) {
+		if (teleport && ship.canTeleport() && ship.getPlayerId() == 1) {
+            this.teleportFromP1X = ship.positionX;
+            this.teleportFromP1Y = ship.positionY;
+            this.isTeleportP1 = true;
 			ship.teleport(direction, width, height);
-		} else {
+		}
+        else if (teleport && ship.canTeleport() && ship.getPlayerId() == 2){
+            this.teleportFromP2X = ship.positionX;
+            this.teleportFromP2Y = ship.positionY;
+            this.isTeleportP2 = true;
+            ship.teleport(direction, width, height);
+        }
+        else {
 			ship.move(direction, this.width, this.height);
+
 		}
 	}
 
@@ -1163,6 +1179,18 @@ public class GameModel {
     public int getBlackHoleCX() { return blackHoleCX; }
     public int getBlackHoleCY() { return blackHoleCY; }
     public int getBlackHoleRadius() { return blackHoleRadius; }
+    public boolean getIsTeleportP1(){ return this.isTeleportP1;}
+    public int getTeleportFromP1X() { return teleportFromP1X; }
+    public int getTeleportFromP1Y() { return teleportFromP1Y; }
+    public boolean getIsTeleportP2(){ return this.isTeleportP2;}
+    public int getTeleportFromP2X() { return teleportFromP2X; }
+    public int getTeleportFromP2Y() { return teleportFromP2Y; }
+    public void setIsTelportP1(boolean isTeleportP1){
+        this.isTeleportP1 = isTeleportP1;
+    }
+    public void setIsTelportP2(boolean isTeleportP2){
+        this.isTeleportP2 = isTeleportP2;
+    }
     public int getFinalSkillCnt(){
         return FinalSkillCnt;
     }
