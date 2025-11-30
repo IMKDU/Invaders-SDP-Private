@@ -77,7 +77,7 @@ public class Ship extends Entity implements Collidable {
             this.spriteType = SpriteType.ShipP2;
             this.isP1Ship = false;
         }
-		this.shootingCooldown = new Cooldown(100);
+		this.shootingCooldown = new Cooldown(ShopItem.getShootingInterval());
 		this.destructionCooldown = new Cooldown(1000);
 		this.shieldCooldown = new Cooldown(0);
 		this.isInvincible = false;
