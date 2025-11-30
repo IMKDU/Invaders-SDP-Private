@@ -1,6 +1,7 @@
 package entity.pattern;
 
 import engine.Cooldown;
+import entity.GameModel;
 import entity.HasBounds;
 import entity.Ship;
 
@@ -49,9 +50,11 @@ public class BlackHolePattern extends BossPattern{
                 double ux = dx/dist;
                 double uy = dy/dist;
 
-
-                ship.setPositionX(ship.getPositionX()+(int)(ux*force));
-                ship.setPositionY(ship.getPositionY()+(int)(uy*force));
+                GameModel model = ships.getFirst().getModel();
+                if (model != null && !model.isOriginSkillActivated()) {
+                    ship.setPositionX(ship.getPositionX()+(int)(ux*force));
+                    ship.setPositionY(ship.getPositionY()+(int)(uy*force));
+                }
             }
         }
     }
