@@ -1,5 +1,6 @@
 package entity;
 
+import audio.SoundManager;
 import engine.*;
 import engine.level.Level;
 
@@ -138,8 +139,12 @@ public class GameModel {
     private boolean originSkillActivated = false;
     private int teleportFromP1X;
     private int teleportFromP1Y;
+    private int afterTeleportFromP1X;
+    private int afterTeleportFromP1Y;
     private int teleportFromP2X;
     private int teleportFromP2Y;
+    private int afterTeleportFromP2X;
+    private int afterTeleportFromP2Y;
 
 
     public GameModel(GameState gameState, Level level, boolean bonusLife, int maxLives, int width, int height) {
@@ -248,12 +253,16 @@ public class GameModel {
             this.teleportFromP1Y = ship.positionY;
             this.isTeleportP1 = true;
 			ship.teleport(direction, width, height);
+            this.afterTeleportFromP1X = ship.positionX;
+            this.afterTeleportFromP1Y = ship.positionY;
 		}
         else if (teleport && ship.canTeleport() && ship.getPlayerId() == 2){
             this.teleportFromP2X = ship.positionX;
             this.teleportFromP2Y = ship.positionY;
             this.isTeleportP2 = true;
             ship.teleport(direction, width, height);
+            this.afterTeleportFromP2X = ship.positionX;
+            this.afterTeleportFromP2Y = ship.positionY;
         }
         else {
 			ship.move(direction, this.width, this.height);
@@ -1185,6 +1194,10 @@ public class GameModel {
     public boolean getIsTeleportP2(){ return this.isTeleportP2;}
     public int getTeleportFromP2X() { return teleportFromP2X; }
     public int getTeleportFromP2Y() { return teleportFromP2Y; }
+    public int getAfterTeleportFromP1X() { return afterTeleportFromP1X; }
+    public int getAfterTeleportFromP1Y() { return afterTeleportFromP1Y; }
+    public int getAfterTeleportFromP2Y() { return afterTeleportFromP2Y; }
+    public int getAfterTeleportFromP2X() { return afterTeleportFromP2X; }
     public void setIsTelportP1(boolean isTeleportP1){
         this.isTeleportP1 = isTeleportP1;
     }

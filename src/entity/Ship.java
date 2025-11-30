@@ -132,7 +132,7 @@ public class Ship extends Entity implements Collidable {
 
 	public void teleport(String direction, int screenWidth, int screenHeight) {
 		if (!canTeleport()) return;
-
+        SoundManager.play("sfx/Teleport.wav");
 		switch (direction) {
 			case "RIGHT":
 				this.positionX = Math.min(this.positionX + TELEPORT_DISTANCE, screenWidth - this.width - 1);

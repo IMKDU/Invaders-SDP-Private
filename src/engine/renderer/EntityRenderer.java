@@ -24,8 +24,8 @@ public final class EntityRenderer {
     private final BackBuffer backBuffer;
     private final double scale;
     private final Cooldown blackholeAnimationCooldown = new Cooldown(100);
-    private final Cooldown TeleportCooldownP1 = new Cooldown(200);
-    private final Cooldown TeleportCooldownP2 = new Cooldown(200);
+    private final Cooldown TeleportCooldownP1 = new Cooldown(400);
+    private final Cooldown TeleportCooldownP2 = new Cooldown(400);
     private SpriteType blackHoleType = SpriteType.BlackHole1;
     private final Cooldown frameCooldown;
     private BufferedImage[] apo;
@@ -648,22 +648,36 @@ public final class EntityRenderer {
 			g2d.fillOval(particleX, particleY, particleSize, particleSize);
 		}
 	}
-    public void drawTeleport(int positionX, int width, int positionY, int height, boolean isTeleport, int playerId){
+    public void drawTeleport(int positionX, int width, int positionY, int height, boolean isTeleport, int playerId, int afterPositionX, int afterPositionY){
         Cooldown cd = (playerId == 1) ? TeleportCooldownP1 : TeleportCooldownP2;
+
         if (isTeleport)
             cd.reset();
 
-        if (!cd.checkFinished()){
+        if (!cd.checkFinished()) {
             Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
-            g2d.setColor(new Color(255, 255, 150, 180));
 
-            for (int i = 0; i < 30; i++) {
-                int px = positionX + (int) ((Math.random() - 0.5) * width * 1.2);
-                int py = positionY + (int) (Math.random() * height);
+            BufferedImage hole = spriteMap.get(SpriteType.Teleport);
 
-                int size = 2 + (int) (Math.random() * 3);
-                g2d.fillOval(px, py, size, size);
-            }
+            int drawW = (int) (hole.getWidth() * scale * 2);
+            int drawH = (int) (hole.getHeight() * scale * 2);
+
+            // --- BEFORE position (centered)
+            int cx = positionX + width / 2;
+            int cy = positionY + height / 2;
+
+            int drawX = cx - drawW / 2;
+            int drawY = cy - drawH / 2;
+
+            // --- AFTER position (centered)
+            int acx = afterPositionX + width / 2;
+            int acy = afterPositionY + height / 2;
+
+            int drawAfterX = acx - drawW / 2;
+            int drawAfterY = acy - drawH / 2;
+
+            g2d.drawImage(hole, drawX, drawY, drawW, drawH, null);
+            g2d.drawImage(hole, drawAfterX, drawAfterY, drawW, drawH, null);
         }
     }
 
