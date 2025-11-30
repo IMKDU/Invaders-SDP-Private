@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class OmegaBossPattern {
+public class OmegaBossPattern extends BossPattern implements IBossPattern {
 
 	private static final int HORIZONTAL_SPEED = 2;
 
@@ -24,22 +24,31 @@ public class OmegaBossPattern {
 	private Cooldown moveCooldown;
 
 	private final int[][] attackCooldownMillis = {
-			{10000},
-			{10000},
+			{8000},
+			{8000},
 			{5000}
 	};
+	private final int moveCooldownMillis = 8000;
 	private int currentPhase=0;
 
 	private final MidBoss boss;
 	private HasBounds player;
 
 	public OmegaBossPattern(MidBoss boss, HasBounds player) {
+		super(new Point(boss.getPositionX(),boss.getPositionY()));
 		this.boss = boss;
 		this.player = player;
+		attackCooldown = new Cooldown(attackCooldownMillis[0][0]);
+		moveCooldown = new Cooldown(moveCooldownMillis);
 
 		patterns.add(new HorizontalPattern(boss, HORIZONTAL_SPEED));
 		patterns.add(new PinnedBossPattern(boss, GameConstant.SCREEN_WIDTH, GameConstant.SCREEN_HEIGHT));
 		patterns.add(new SpreadShotPattern(boss, player));
+		initPatternConfiguration();
+	}
+
+	private void initPatternConfiguration(){
+		patterns.get(1).validateBackgroundPattern(false);
 	}
 
 	public void update(){
@@ -57,7 +66,7 @@ public class OmegaBossPattern {
 	}
 
 	public int checkPhase(){
-		if(boss.getHealPoint()>boss.getMaxHealPoint()*2/5){
+		if(boss.getHealPoint()>boss.getMaxHealPoint()*3/5){
 			return 1;
 		}
 		if(boss.getHealPoint()>boss.getMaxHealPoint()*3/10){
@@ -71,32 +80,38 @@ public class OmegaBossPattern {
 		if(isInit){
 			movePattern=patterns.getFirst();
 			attackPattern=patterns.get(1);
-			attackPattern.validateBackgroundPattern(false);
-			attackPattern.setCooldown(new Cooldown(attackCooldownMillis[0][0]));
+			resetCooldown();
+			attackPattern.setCooldown(attackCooldown);
 			Core.getLogger().info("OmegaBossPattern: phase1 start");
 		}
 	}
 	private void phase2(boolean isInit){
 		currentPhase=2;
 		if(isInit){
-			movePattern=patterns.getFirst();
-			attackPattern=patterns.get(2);
-			attackPattern.setCooldown(new Cooldown(attackCooldownMillis[1][0]));
+			movePattern=patterns.getLast();
+			attackPattern=patterns.getLast();
+			attackCooldown.setMilliseconds(attackCooldownMillis[1][0]);
+			resetCooldown();
+			attackPattern.setCooldown(attackCooldown);
 			Core.getLogger().info("OmegaBossPattern: phase2 start");
 		}
-
 	}
 	private void phase3(boolean isInit){
-		boolean isPinnedAttack = Math.random()>0.5 ;
 		currentPhase=3;
+		boolean isPinnedAttack;
 		if(isInit){
 			movePattern=patterns.getFirst();
-			attackPattern = isPinnedAttack ? patterns.get(1) : patterns.getLast();
-			attackPattern.setCooldown(new Cooldown(attackCooldownMillis[2][0]));
+			attackPattern = patterns.get(1);
+			attackCooldown.setMilliseconds(attackCooldownMillis[2][0]);
+			resetCooldown();
+			attackPattern.setCooldown(attackCooldown);
 			Core.getLogger().info("OmegaBossPattern: phase3 start");
 		}
-		if(!isPinnedAttack){
-			movePattern=patterns.getLast();
+		if(attackCooldown.checkFinished()){
+			isPinnedAttack = Math.random()<0.65;
+			movePattern = isPinnedAttack ? patterns.getFirst() : patterns.getLast();
+			attackPattern = isPinnedAttack ? patterns.get(1) : patterns.getLast();
+			if(isPinnedAttack) resetCooldown();
 		}
 	}
 
@@ -113,13 +128,29 @@ public class OmegaBossPattern {
 	public void move() {
 		if(movePattern==null) return;
 		movePattern.move();
-	}
-
-	public Point getBossPosition() {
-		return movePattern.getBossPosition();
+		if(movePattern != null){
+			bossPosition.x = movePattern.getBossPosition().x;
+			bossPosition.y = movePattern.getBossPosition().y;
+		}
 	}
 
 	public Set<Bullet> getBullets() {
 		return this.attackPattern.getBullets();
+	}
+
+	@Override
+	public void setTarget(HasBounds target) {
+		attackPattern.setTarget(target);
+	}
+
+	@Override
+	public void setCooldown(Cooldown cooldown) {
+		attackPattern.setCooldown(cooldown);
+		movePattern.setCooldown(cooldown);
+	}
+
+	@Override
+	public void validateBackgroundPattern(boolean condition) {
+		attackPattern.validateBackgroundPattern(condition);
 	}
 }
