@@ -507,7 +507,7 @@ public final class EntityRenderer {
 		Graphics g = backBuffer.getGraphics();
 		if (!isBoom) {
 
-			g.setColor(Color.red);
+			g.setColor(new Color(255,0,0,100));
 			g.drawOval(boom.getPositionX(),boom.getPositionY(),boom.getWidth(),boom.getHeight());
 			int currentWidth = (int) (boom.getWidth() * time);
 			int currentHeight = (int) (boom.getHeight() * time);
@@ -516,7 +516,7 @@ public final class EntityRenderer {
 			g.fillOval(boom.getPositionX() + offsetX, boom.getPositionY() + offsetY, currentWidth, currentHeight);
 		}
 		else {
-			g.setColor(Color.ORANGE);
+			g.setColor(new Color(255,200,0,170));
             g.fillOval(boom.getPositionX() - EXPLOSION_SIZE_CHANGE,
 					boom.getPositionY() - EXPLOSION_SIZE_CHANGE,
 					boom.getWidth() + EXPLOSION_SIZE_CHANGE * 2,
