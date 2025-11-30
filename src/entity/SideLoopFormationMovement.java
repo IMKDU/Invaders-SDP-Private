@@ -4,9 +4,9 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import entity.GameConstant; // GameConstant import 확인
-
+/**
+ * Handles the Side Loop movement pattern using a look-ahead vector strategy.
+ */
 public class SideLoopFormationMovement implements IMovementStrategy {
 
     private static final int SHIP_SPEED = 4;
@@ -14,8 +14,8 @@ public class SideLoopFormationMovement implements IMovementStrategy {
     private static final float SEARCH_STEP = 0.005f;
     private static final int RESPAWN_DELAY = 60;
     private static final int STAGGER_INTERVAL = 20;
-    private static final int ARC_WIDTH = 500;
-    private static final int PATH_HEIGHT = 550;
+    private static final int ARC_WIDTH = 700;
+    private static final int PATH_HEIGHT = 600;
     private static final double DISTANCE_THRESHOLD_FOR_SPEED_BOOST = 2.0;
 
     private List<List<EnemyShip>> enemyShips;
@@ -41,7 +41,10 @@ public class SideLoopFormationMovement implements IMovementStrategy {
             this.t = 0.0f;
         }
     }
-
+    /**
+     * Initializes the movement strategy with the given enemy ships.
+     * @param enemyShips List of enemy ships.
+     */
     public SideLoopFormationMovement(List<List<EnemyShip>> enemyShips) {
         this.enemyShips = enemyShips;
         this.shipStates = new HashMap<>();
@@ -57,8 +60,10 @@ public class SideLoopFormationMovement implements IMovementStrategy {
         initializeShips();
     }
 
+    /**
+     * Sets up the Bezier curve control points for both sides.
+     */
     private void initializePaths() {
-        // [Left Path] 왼쪽은 x=0 이면 딱 붙어서 나오므로 수정 불필요
         l_p0 = new Point(0, startY);
         l_p1 = new Point(ARC_WIDTH, startY);
         l_p2 = new Point(ARC_WIDTH, startY + PATH_HEIGHT);
@@ -66,12 +71,14 @@ public class SideLoopFormationMovement implements IMovementStrategy {
 
         int rightWallX = screenWidth - shipWidth;
 
-        r_p0 = new Point(rightWallX, startY); // 시작점 보정
+        r_p0 = new Point(rightWallX, startY);
         r_p1 = new Point(rightWallX - ARC_WIDTH, startY);
         r_p2 = new Point(rightWallX - ARC_WIDTH, startY + PATH_HEIGHT);
-        r_p3 = new Point(rightWallX, startY + PATH_HEIGHT); // 끝점 보정
+        r_p3 = new Point(rightWallX, startY + PATH_HEIGHT);
     }
-
+    /**
+     * Sets the initial position and state for each ship.
+     */
     private void initializeShips() {
         if (enemyShips == null) return;
 
@@ -93,7 +100,9 @@ public class SideLoopFormationMovement implements IMovementStrategy {
             }
         }
     }
-
+    /**
+     * Updates the movement logic for all ships.
+     */
     @Override
     public void updateMovement() {
         if (enemyShips == null) return;
@@ -117,7 +126,11 @@ public class SideLoopFormationMovement implements IMovementStrategy {
             }
         }
     }
-
+    /**
+     * Calculates the look-ahead target position on the curve.
+     * @param ship The ship to move.
+     * @param state The state of the ship.
+     */
     private void moveShipWithLookAhead(EnemyShip ship, ShipState state) {
         int currentX = ship.getPositionX();
         int currentY = ship.getPositionY();
@@ -138,7 +151,12 @@ public class SideLoopFormationMovement implements IMovementStrategy {
 
         moveToTargetVector(ship, targetPos.x, targetPos.y);
     }
-
+    /**
+     * Moves the ship towards the target using vector calculation.
+     * @param ship The ship to move.
+     * @param targetX The target X coordinate.
+     * @param targetY The target Y coordinate.
+     */
     private void moveToTargetVector(EnemyShip ship, int targetX, int targetY) {
         double dx = targetX - ship.getPositionX();
         double dy = targetY - ship.getPositionY();
@@ -160,7 +178,11 @@ public class SideLoopFormationMovement implements IMovementStrategy {
 
         ship.move(moveX, moveY, false);
     }
-
+    /**
+     * Handles the completion of the path and starts the cooldown.
+     * @param ship The ship that finished the path.
+     * @param state The state of the ship.
+     */
     private void startRun(EnemyShip ship, ShipState state) {
         state.isMoving = true;
         state.t = 0.0f;
@@ -168,18 +190,35 @@ public class SideLoopFormationMovement implements IMovementStrategy {
         ship.setPositionX(start.x);
         ship.setPositionY(start.y);
     }
-
+    /**
+     * Handles the completion of the path and starts the cooldown.
+     * @param ship The ship that finished the path.
+     * @param state The state of the ship.
+     */
     private void finishRun(EnemyShip ship, ShipState state) {
         state.isMoving = false;
         state.waitTimer = RESPAWN_DELAY;
         ship.setPositionX(-500);
     }
-
+    /**
+     * Returns the appropriate Bezier point based on the team.
+     * @param t Time step (0.0 to 1.0).
+     * @param isLeft True if left team, false otherwise.
+     * @return Calculated point.
+     */
     private Point getBezierPoint(float t, boolean isLeft) {
         if (isLeft) return getCubicBezierPoint(t, l_p0, l_p1, l_p2, l_p3);
         else return getCubicBezierPoint(t, r_p0, r_p1, r_p2, r_p3);
     }
-
+    /**
+     * Returns the calculated point on the Cubic Bezier curve.
+     * @param t Time step (0.0 to 1.0).
+     * @param p0 Start point.
+     * @param p1 Control point 1.
+     * @param p2 Control point 2.
+     * @param p3 End point.
+     * @return Calculated point.
+     */
     private Point getCubicBezierPoint(float t, Point p0, Point p1, Point p2, Point p3) {
         if (t > 1.0f) t = 1.0f;
         float u = 1 - t;
@@ -195,7 +234,10 @@ public class SideLoopFormationMovement implements IMovementStrategy {
 
     @Override
     public void activateSlowdown() { }
-
+    /**
+     * Returns true to enable smooth per-frame updates.
+     * @return True.
+     */
     @Override
     public boolean needsSmoothMovement() {
         return true;
