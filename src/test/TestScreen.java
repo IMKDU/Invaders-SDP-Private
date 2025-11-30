@@ -97,7 +97,9 @@ public class TestScreen extends Screen {
                 0,
 				"test",
 				"test",
-				"test"
+				"test",
+				1f,
+				1f
 		);
 	}
 }

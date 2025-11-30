@@ -40,6 +40,7 @@ public class OmegaBoss extends MidBoss {
 	/** Dash cooldown duration in milliseconds (5 seconds) */
 	private static final int DASH_COOLDOWN_MS = 5000;
 
+	private BackgroundExplosionPattern explosionPattern;
 	/** Boss pattern instance for delegating movement logic */
 	private BossPattern bossPattern;
 	/** Player reference for pattern targeting */
@@ -73,6 +74,7 @@ public class OmegaBoss extends MidBoss {
         this.spriteType= DrawManager.SpriteType.OmegaBoss1;
         this.animationCooldown = new Cooldown(200);
 		this.spawnPattern = new SpawnMobPattern(this,this.getHealPoint());
+		this.explosionPattern = new BackgroundExplosionPattern();
 		this.logger.info("OMEGA : Initializing Boss OMEGA");
 		this.logger.info("OMEGA : move using the default pattern");
         SoundManager.play("sfx/OmegaBossAppearance.wav");
@@ -151,11 +153,11 @@ public class OmegaBoss extends MidBoss {
 
         }
 		choosePattern();
-
 		if (bossPattern != null) {
 			bossPattern.move();
 			bossPattern.attack();
 			spawnPattern.update(this,this.getHealPoint());
+			explosionPattern.attack();
 			// Update position from pattern
 			this.positionX = bossPattern.getBossPosition().x;
 			this.positionY = bossPattern.getBossPosition().y;
@@ -321,20 +323,20 @@ public class OmegaBoss extends MidBoss {
     public boolean isInDashCooldown() {
         return isInDashCooldown;
     }
-
-    /**
-     * Update target ship for pattern
-     */
-    public void setTarget(Ship target) {
-        this.targetShip = target;
-        if (bossPattern != null) {
-            bossPattern.setTarget(target);
-        }
-    }
-
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
 		other.onCollideWithBoss(this, model);
+	}
+	/** get Explosion Pattern */
+	public Explosion getBoom() { return explosionPattern.getBoom();}
+	/**
+	 * Update target ship for pattern
+	 */
+	public void setTarget(Ship target) {
+		this.targetShip = target;
+		if (bossPattern != null) {
+			bossPattern.setTarget(target);
+		}
 	}
 
 	@Override
