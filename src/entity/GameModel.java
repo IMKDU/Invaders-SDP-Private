@@ -443,6 +443,7 @@ public class GameModel {
 		if (finalBoss != null && !finalBoss.isDestroyed()) entities.add(finalBoss);
 		if (omegaBoss != null && !omegaBoss.isDestroyed()) entities.add(omegaBoss);
         if (zetaBoss != null && !zetaBoss.isDestroyed()) entities.add(zetaBoss);
+        if (gammaBoss != null && !gammaBoss.isDestroyed()) entities.add(gammaBoss);
 
         if (midBossChilds != null){
             for(MidBossMob mb : midBossChilds){ entities.add(mb); }
@@ -531,6 +532,17 @@ public class GameModel {
                 omegaBoss.takeDamage(1);
                 if (omegaBoss.isDestroyed()) {
                     handleAnyBossDestruction(omegaBoss, playerNum);
+                }
+            }
+        }
+
+        // Check collision with gamma boss
+        if (gammaBoss != null && !gammaBoss.isDestroyed()) {
+            if (checkLaserEntityCollision(gammaBoss, laserLeft, laserRight, laserTop, laserBottom)) {
+                // Deal damage to gamma boss (laser deals 1 damage per frame it's active)
+                gammaBoss.takeDamage(1);
+                if (gammaBoss.isDestroyed()) {
+                    handleAnyBossDestruction(gammaBoss, playerNum);
                 }
             }
         }
