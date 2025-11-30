@@ -111,9 +111,11 @@ public class OmegaBoss extends MidBoss {
 	/** Marks the entity as destroyed and changes its sprite to an explosion. */
 	@Override
 	public void destroy() {
-		this.isDestroyed = true;
-		this.spriteType = DrawManager.SpriteType.OmegaBossDeath;
-		this.logger.info("OMEGA : Boss OMEGA destroyed!");
+		if(!this.isDestroyed){
+			this.isDestroyed = true;
+			this.spriteType = DrawManager.SpriteType.OmegaBossDeath;
+			this.logger.info("OMEGA : Boss OMEGA destroyed!");
+		}
 	}
 
 	/**

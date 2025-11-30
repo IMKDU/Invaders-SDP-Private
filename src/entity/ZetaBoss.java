@@ -296,6 +296,9 @@ public class ZetaBoss extends MidBoss {
     public void takeDamage(int damage) {
         this.healPoint -= damage;
         SoundManager.play("sfx/ZetaBoss_hitting.wav");
+        if(this.healPoint <= 0) {
+            this.destroy();
+        }
     }
 
     public boolean isShowingPath() {
