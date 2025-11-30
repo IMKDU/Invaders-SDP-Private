@@ -32,6 +32,7 @@ public class GameView {
 
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
+        if (model.getFinalSkillCnt() > 0 && (dto.getScoreP2() >= 100)) {
 
         if (model.isOriginSkillActivated()) {
 
@@ -84,7 +85,18 @@ public class GameView {
                 }
             }
         }
-
+        if (model.getOmegaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getOmegaBoss());
+            drawManager.getUIRenderer().drawBossName("Omega");
+        }
+        if (model.getFinalBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getFinalBoss());
+            drawManager.getUIRenderer().drawBossName("???");
+        }
+        if (model.getZetaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getZetaBoss());
+            drawManager.getUIRenderer().drawBossName("Zeta");
+        }
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50, 2);
         drawManager.getHUDRenderer().drawCoin(dto.getWidth(), dto.getHeight(), dto.getCoin());
