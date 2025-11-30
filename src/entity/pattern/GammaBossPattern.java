@@ -22,6 +22,8 @@ import java.util.Set;
  * - Phase 2 (60-30%): ZigZag (5s) → TimeGap (4 lasers) → Dash → repeat
  * - Phase 3 (30-0%): ZigZag (5s) → TimeGap (8 lasers) → 2x Dash → repeat
  * </p>
+ *
+ * Uses existing base patterns: {@link ZigZagPattern}, {@link TimeGapAttackPattern}, {@link DashPattern}
  */
 public class GammaBossPattern extends BossPattern implements IBossPattern {
 
@@ -37,8 +39,6 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	private final int screenWidth;
 	private final int screenHeight;
 
-	/** List of all available sub-patterns for Gamma. */
-	private List<IBossPattern> patterns = new ArrayList<>();
 	/** Currently selected attack pattern. */
 	private IBossPattern attackPattern;
 	/** Currently selected movement pattern. */
@@ -65,7 +65,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	private List<Ship> targetShips;
 
 	/** Pattern cycle tracking. */
-	private int patternCycleCount = 0;
+	private int zigzagCycleCount = 0;
 	/** Current sub-pattern in the cycle (for phase 2 and 3). */
 	private PatternCycleState cycleState = PatternCycleState.ZIGZAG;
 	/** Dash counter for phase 3 (2 consecutive dashes). */
@@ -73,12 +73,10 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	/** Flag to track if in dash cooldown. */
 	private boolean isInDashCooldown = false;
 
-	/** Pattern indices in the patterns list. */
-	private static final int ZIGZAG_8S_INDEX = 0;
-	private static final int ZIGZAG_5S_INDEX = 1;
-	private static final int TIMEGAP_4_INDEX = 2;
-	private static final int TIMEGAP_8_INDEX = 3;
-	private static final int DASH_INDEX = 4;
+	/** Track laser count for TimeGapAttackPattern. */
+	private int lasersFired = 0;
+	/** Maximum lasers for current phase. */
+	private int maxLasersForPhase = 0;
 
 	/**
 	 * Enum for tracking current pattern cycle state.
@@ -105,37 +103,6 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 		this.screenHeight = screenHeight;
 		this.attackCooldown = new Cooldown(attackCooldownMillis[0][0]);
 		this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
-
-		initializePatterns();
-	}
-
-	/**
-	 * Initialize all sub-patterns used by GammaBoss.
-	 */
-	private void initializePatterns() {
-		// Pattern 0: ZigZag with 8-second cooldown (Phase 1)
-		GammaBossZigZagPattern zigzag8s = new GammaBossZigZagPattern(boss, screenWidth, screenHeight, 8000);
-		patterns.add(zigzag8s);
-
-		// Pattern 1: ZigZag with 5-second cooldown (Phase 2 & 3)
-		GammaBossZigZagPattern zigzag5s = new GammaBossZigZagPattern(boss, screenWidth, screenHeight, 5000);
-		patterns.add(zigzag5s);
-
-		// Pattern 2: TimeGap with 4 lasers (Phase 2)
-		GammaBossTimeGapPattern timegap4 = new GammaBossTimeGapPattern(boss, targetShips, screenWidth, screenHeight, 4);
-		patterns.add(timegap4);
-
-		// Pattern 3: TimeGap with 8 lasers (Phase 3)
-		GammaBossTimeGapPattern timegap8 = new GammaBossTimeGapPattern(boss, targetShips, screenWidth, screenHeight, 8);
-		patterns.add(timegap8);
-
-		// Pattern 4: Dash with retreat
-		GammaBossDashPattern dash = new GammaBossDashPattern(boss, getRandomAliveShip(), screenWidth, screenHeight);
-		patterns.add(dash);
-
-		// Disable background patterns for ZigZag patterns to avoid double shooting
-		zigzag8s.validateBackgroundPattern(false);
-		zigzag5s.validateBackgroundPattern(false);
 	}
 
 	/**
@@ -188,13 +155,16 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	private void phase1(boolean isInit) {
 		currentPhase = 1;
 		if (isInit) {
-			movePattern = patterns.get(ZIGZAG_8S_INDEX);
-			attackPattern = patterns.get(ZIGZAG_8S_INDEX);
+			ZigZagPattern zigzag = new ZigZagPattern(boss, screenWidth, screenHeight);
+			Cooldown cooldown8s = new Cooldown(attackCooldownMillis[0][0]);
+			zigzag.setCooldown(cooldown8s);
+
+			movePattern = zigzag;
+			attackPattern = zigzag;
 			attackCooldown.setMilliseconds(attackCooldownMillis[0][0]);
 			attackCooldown.reset();
-			attackPattern.setCooldown(attackCooldown);
 			cycleState = PatternCycleState.ZIGZAG;
-			patternCycleCount = 0;
+			zigzagCycleCount = 0;
 			Core.getLogger().info("GammaBossPattern: Phase 1 start - ZigZag (8s cooldown)");
 		}
 	}
@@ -207,13 +177,16 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	private void phase2(boolean isInit) {
 		currentPhase = 2;
 		if (isInit) {
-			movePattern = patterns.get(ZIGZAG_5S_INDEX);
-			attackPattern = patterns.get(ZIGZAG_5S_INDEX);
+			ZigZagPattern zigzag = new ZigZagPattern(boss, screenWidth, screenHeight);
+			Cooldown cooldown5s = new Cooldown(attackCooldownMillis[1][0]);
+			zigzag.setCooldown(cooldown5s);
+
+			movePattern = zigzag;
+			attackPattern = zigzag;
 			attackCooldown.setMilliseconds(attackCooldownMillis[1][0]);
 			attackCooldown.reset();
-			attackPattern.setCooldown(attackCooldown);
 			cycleState = PatternCycleState.ZIGZAG;
-			patternCycleCount = 0;
+			zigzagCycleCount = 0;
 			Core.getLogger().info("GammaBossPattern: Phase 2 start - ZigZag → TimeGap (4) → Dash cycle");
 		}
 
@@ -228,13 +201,16 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	private void phase3(boolean isInit) {
 		currentPhase = 3;
 		if (isInit) {
-			movePattern = patterns.get(ZIGZAG_5S_INDEX);
-			attackPattern = patterns.get(ZIGZAG_5S_INDEX);
+			ZigZagPattern zigzag = new ZigZagPattern(boss, screenWidth, screenHeight);
+			Cooldown cooldown5s = new Cooldown(attackCooldownMillis[2][0]);
+			zigzag.setCooldown(cooldown5s);
+
+			movePattern = zigzag;
+			attackPattern = zigzag;
 			attackCooldown.setMilliseconds(attackCooldownMillis[2][0]);
 			attackCooldown.reset();
-			attackPattern.setCooldown(attackCooldown);
 			cycleState = PatternCycleState.ZIGZAG;
-			patternCycleCount = 0;
+			zigzagCycleCount = 0;
 			consecutiveDashCount = 0;
 			Core.getLogger().info("GammaBossPattern: Phase 3 start - ZigZag → TimeGap (8) → 2x Dash cycle");
 		}
@@ -250,46 +226,50 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 		if (cycleState == PatternCycleState.ZIGZAG) {
 			// After 2 attack cycles, switch to TimeGap
 			if (attackCooldown.checkFinished()) {
-				patternCycleCount++;
-				if (patternCycleCount >= 2) {
-					// Reset TimeGap pattern
-					patterns.set(TIMEGAP_4_INDEX,
-						new GammaBossTimeGapPattern(boss, targetShips, screenWidth, screenHeight, 4));
-
-					movePattern = patterns.get(TIMEGAP_4_INDEX);
-					attackPattern = patterns.get(TIMEGAP_4_INDEX);
+				zigzagCycleCount++;
+				if (zigzagCycleCount >= 2) {
+					// Switch to TimeGap pattern
+					TimeGapAttackPattern timegap = new TimeGapAttackPattern(boss, targetShips, screenWidth, screenHeight);
+					movePattern = timegap;
+					attackPattern = timegap;
 					cycleState = PatternCycleState.TIMEGAP;
-					patternCycleCount = 0;
+					zigzagCycleCount = 0;
+					lasersFired = 0;
+					maxLasersForPhase = 4;
 					Core.getLogger().info("GammaBossPattern: Phase 2 - Switching to TimeGap (4 lasers)");
 				}
 			}
 		} else if (cycleState == PatternCycleState.TIMEGAP) {
-			// Check if TimeGap finished
-			if (attackPattern instanceof GammaBossTimeGapPattern &&
-					((GammaBossTimeGapPattern) attackPattern).isFinished()) {
+			// Check if we've fired enough lasers
+			if (lasersFired >= maxLasersForPhase) {
 				// Switch to Dash if cooldown ready
 				if (!isInDashCooldown) {
-					// Create new dash pattern with current target
-					patterns.set(DASH_INDEX,
-						new GammaBossDashPattern(boss, getRandomAliveShip(), screenWidth, screenHeight));
-
-					movePattern = patterns.get(DASH_INDEX);
-					attackPattern = patterns.get(DASH_INDEX);
-					cycleState = PatternCycleState.DASH;
-					Core.getLogger().info("GammaBossPattern: Phase 2 - Starting Dash");
+					Ship target = getRandomAliveShip();
+					if (target != null) {
+						DashPattern dash = new DashPattern(boss, target);
+						movePattern = dash;
+						attackPattern = dash;
+						cycleState = PatternCycleState.DASH;
+						Core.getLogger().info("GammaBossPattern: Phase 2 - Starting Dash");
+					}
 				}
 			}
 		} else if (cycleState == PatternCycleState.DASH) {
 			// Check if Dash finished
-			if (attackPattern instanceof GammaBossDashPattern &&
-					((GammaBossDashPattern) attackPattern).isDashCompleted()) {
+			if (attackPattern instanceof DashPattern &&
+					((DashPattern) attackPattern).isDashCompleted()) {
 				// Start dash cooldown and return to ZigZag
 				startDashCooldown();
-				movePattern = patterns.get(ZIGZAG_5S_INDEX);
-				attackPattern = patterns.get(ZIGZAG_5S_INDEX);
+
+				ZigZagPattern zigzag = new ZigZagPattern(boss, screenWidth, screenHeight);
+				Cooldown cooldown5s = new Cooldown(attackCooldownMillis[1][0]);
+				zigzag.setCooldown(cooldown5s);
+
+				movePattern = zigzag;
+				attackPattern = zigzag;
 				attackCooldown.reset();
 				cycleState = PatternCycleState.ZIGZAG;
-				patternCycleCount = 0;
+				zigzagCycleCount = 0;
 				Core.getLogger().info("GammaBossPattern: Phase 2 - Returning to ZigZag");
 			}
 		}
@@ -303,59 +283,64 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 		if (cycleState == PatternCycleState.ZIGZAG) {
 			// After 2 attack cycles, switch to TimeGap
 			if (attackCooldown.checkFinished()) {
-				patternCycleCount++;
-				if (patternCycleCount >= 2) {
-					// Reset TimeGap pattern
-					patterns.set(TIMEGAP_8_INDEX,
-						new GammaBossTimeGapPattern(boss, targetShips, screenWidth, screenHeight, 8));
-
-					movePattern = patterns.get(TIMEGAP_8_INDEX);
-					attackPattern = patterns.get(TIMEGAP_8_INDEX);
+				zigzagCycleCount++;
+				if (zigzagCycleCount >= 2) {
+					// Switch to TimeGap pattern
+					TimeGapAttackPattern timegap = new TimeGapAttackPattern(boss, targetShips, screenWidth, screenHeight);
+					movePattern = timegap;
+					attackPattern = timegap;
 					cycleState = PatternCycleState.TIMEGAP;
-					patternCycleCount = 0;
+					zigzagCycleCount = 0;
+					lasersFired = 0;
+					maxLasersForPhase = 8;
 					consecutiveDashCount = 0;
 					Core.getLogger().info("GammaBossPattern: Phase 3 - Switching to TimeGap (8 lasers)");
 				}
 			}
 		} else if (cycleState == PatternCycleState.TIMEGAP) {
-			// Check if TimeGap finished
-			if (attackPattern instanceof GammaBossTimeGapPattern &&
-					((GammaBossTimeGapPattern) attackPattern).isFinished()) {
+			// Check if we've fired enough lasers
+			if (lasersFired >= maxLasersForPhase) {
 				// Switch to Dash if cooldown ready
 				if (!isInDashCooldown) {
-					// Create new dash pattern with current target
-					patterns.set(DASH_INDEX,
-						new GammaBossDashPattern(boss, getRandomAliveShip(), screenWidth, screenHeight));
-
-					movePattern = patterns.get(DASH_INDEX);
-					attackPattern = patterns.get(DASH_INDEX);
-					cycleState = PatternCycleState.DASH;
-					Core.getLogger().info("GammaBossPattern: Phase 3 - Starting Dash " + (consecutiveDashCount + 1));
+					Ship target = getRandomAliveShip();
+					if (target != null) {
+						DashPattern dash = new DashPattern(boss, target);
+						movePattern = dash;
+						attackPattern = dash;
+						cycleState = PatternCycleState.DASH;
+						Core.getLogger().info("GammaBossPattern: Phase 3 - Starting Dash " + (consecutiveDashCount + 1));
+					}
 				}
 			}
 		} else if (cycleState == PatternCycleState.DASH) {
 			// Check if Dash finished
-			if (attackPattern instanceof GammaBossDashPattern &&
-					((GammaBossDashPattern) attackPattern).isDashCompleted()) {
+			if (attackPattern instanceof DashPattern &&
+					((DashPattern) attackPattern).isDashCompleted()) {
 				consecutiveDashCount++;
 
 				// Check if we need another dash (2 consecutive in Phase 3)
 				if (consecutiveDashCount < 2 && !isInDashCooldown) {
-					// Create new dash pattern for second dash
-					patterns.set(DASH_INDEX,
-						new GammaBossDashPattern(boss, getRandomAliveShip(), screenWidth, screenHeight));
-
-					movePattern = patterns.get(DASH_INDEX);
-					attackPattern = patterns.get(DASH_INDEX);
-					Core.getLogger().info("GammaBossPattern: Phase 3 - Starting second consecutive Dash");
+					// Start second dash immediately
+					Ship target = getRandomAliveShip();
+					if (target != null) {
+						DashPattern dash = new DashPattern(boss, target);
+						movePattern = dash;
+						attackPattern = dash;
+						Core.getLogger().info("GammaBossPattern: Phase 3 - Starting second consecutive Dash");
+					}
 				} else {
 					// Both dashes complete, return to ZigZag
 					startDashCooldown();
-					movePattern = patterns.get(ZIGZAG_5S_INDEX);
-					attackPattern = patterns.get(ZIGZAG_5S_INDEX);
+
+					ZigZagPattern zigzag = new ZigZagPattern(boss, screenWidth, screenHeight);
+					Cooldown cooldown5s = new Cooldown(attackCooldownMillis[2][0]);
+					zigzag.setCooldown(cooldown5s);
+
+					movePattern = zigzag;
+					attackPattern = zigzag;
 					attackCooldown.reset();
 					cycleState = PatternCycleState.ZIGZAG;
-					patternCycleCount = 0;
+					zigzagCycleCount = 0;
 					consecutiveDashCount = 0;
 					Core.getLogger().info("GammaBossPattern: Phase 3 - 2x Dash complete, returning to ZigZag");
 				}
@@ -394,8 +379,8 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	 * @return true if currently showing dash path
 	 */
 	public boolean isShowingPath() {
-		if (attackPattern instanceof GammaBossDashPattern) {
-			return ((GammaBossDashPattern) attackPattern).isShowingPath();
+		if (attackPattern instanceof DashPattern) {
+			return ((DashPattern) attackPattern).isShowingPath();
 		}
 		return false;
 	}
@@ -408,8 +393,8 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	 * @return Dash end point coordinates
 	 */
 	public int[] getDashEndPoint(int bossWidth, int bossHeight) {
-		if (attackPattern instanceof GammaBossDashPattern) {
-			return ((GammaBossDashPattern) attackPattern).getDashEndPoint(bossWidth, bossHeight);
+		if (attackPattern instanceof DashPattern) {
+			return ((DashPattern) attackPattern).getDashEndPoint(bossWidth, bossHeight);
 		}
 		return new int[]{bossPosition.x + bossWidth / 2, bossPosition.y + bossHeight / 2};
 	}
@@ -418,6 +403,14 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	public void attack() {
 		if (attackPattern == null) return;
 		attackPattern.attack();
+
+		// Track laser count for TimeGapAttackPattern
+		if (cycleState == PatternCycleState.TIMEGAP && attackPattern instanceof TimeGapAttackPattern) {
+			Set<Bullet> bullets = attackPattern.getBullets();
+			if (!bullets.isEmpty()) {
+				lasersFired += bullets.size();
+			}
+		}
 	}
 
 	@Override
@@ -452,13 +445,6 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 		}
 		if (movePattern != null) {
 			movePattern.setCooldown(cooldown);
-		}
-	}
-
-	@Override
-	public void validateBackgroundPattern(boolean condition) {
-		if (attackPattern != null) {
-			attackPattern.validateBackgroundPattern(condition);
 		}
 	}
 
