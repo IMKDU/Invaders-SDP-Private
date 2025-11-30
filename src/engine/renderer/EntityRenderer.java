@@ -7,6 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
+import audio.SoundManager;
 import engine.*;
 import entity.*;
 import engine.DrawManager.SpriteType;
@@ -26,6 +27,7 @@ public final class EntityRenderer {
     private final Cooldown blackholeAnimationCooldown = new Cooldown(100);
     private final Cooldown TeleportCooldownP1 = new Cooldown(400);
     private final Cooldown TeleportCooldownP2 = new Cooldown(400);
+    private final Cooldown BombImageCooldown = new Cooldown(200);
     private SpriteType blackHoleType = SpriteType.BlackHole1;
     private final Cooldown frameCooldown;
     private BufferedImage[] apo;
@@ -33,6 +35,7 @@ public final class EntityRenderer {
     private static final double RED_YELLOW_THRESHOLD = 1.0 / 3.0;
     private static final double YELLOW_GREEN_THRESHOLD = 2.0 / 3.0;
     private int EXPLOSION_SIZE_CHANGE = 10;
+    private boolean bombToggle;
     private Color[] colorPalette = {
             new Color( 0xFF4081),
             new Color( 0xFCDD8A),
@@ -508,23 +511,52 @@ public final class EntityRenderer {
 	public void drawExplosion(boolean isBoom, HasBounds boom, double time) {
 		Graphics g = backBuffer.getGraphics();
 		if (!isBoom) {
+            g.setColor(new Color(255,0,0,100));
+            g.drawOval(boom.getPositionX(),boom.getPositionY(),boom.getWidth(),boom.getHeight());
+            int currentWidth = (int) (boom.getWidth() * time);
+            int currentHeight = (int) (boom.getHeight() * time);
+            int offsetX = (boom.getWidth() - currentWidth) / 2;
+            int offsetY = (boom.getHeight() - currentHeight) / 2;
 
-			g.setColor(new Color(255,0,0,100));
-			g.drawOval(boom.getPositionX(),boom.getPositionY(),boom.getWidth(),boom.getHeight());
-			int currentWidth = (int) (boom.getWidth() * time);
-			int currentHeight = (int) (boom.getHeight() * time);
-			int offsetX = (boom.getWidth() - currentWidth) / 2;
-			int offsetY = (boom.getHeight() - currentHeight) / 2;
-			g.fillOval(boom.getPositionX() + offsetX, boom.getPositionY() + offsetY, currentWidth, currentHeight);
+            g.fillOval(boom.getPositionX() + offsetX, boom.getPositionY() + offsetY, currentWidth, currentHeight);
+
+            BufferedImage bomb1 = spriteMap.get(SpriteType.Bomb1);
+            BufferedImage bomb2 = spriteMap.get(SpriteType.Bomb2);
+            int sw = bomb1.getWidth();
+            int sh = bomb1.getHeight();
+
+            int scaledW = (int) (sw * scale * 2);
+            int scaledH = (int) (sh * scale * 2);
+
+            int centerX = boom.getPositionX() + boom.getWidth() / 2;
+            int centerY = boom.getPositionY() + boom.getHeight() / 2;
+
+            int drawX = centerX - scaledW / 2;
+            int drawY = centerY - scaledH / 2;
+
+            if (this.BombImageCooldown.checkFinished()) {
+                this.BombImageCooldown.reset();
+                bombToggle = !bombToggle;
+            }
+
+            g.drawImage(bombToggle ? bomb1 : bomb2, drawX, drawY, scaledW, scaledH, null);
+
 		}
 		else {
-			g.setColor(new Color(255,200,0,170));
-            g.fillOval(boom.getPositionX() - EXPLOSION_SIZE_CHANGE,
-					boom.getPositionY() - EXPLOSION_SIZE_CHANGE,
-					boom.getWidth() + EXPLOSION_SIZE_CHANGE * 2,
-					boom.getHeight() + EXPLOSION_SIZE_CHANGE * 2);
+            BufferedImage bombexplosion = spriteMap.get(SpriteType.BombExplosion);
+            int sw = bombexplosion.getWidth();
+            int sh = bombexplosion.getHeight();
+            int scaledW = (int) (sw * scale * 2);
+            int scaledH = (int) (sh * scale * 2);
+            int centerX = boom.getPositionX() + boom.getWidth() / 2;
+            int centerY = boom.getPositionY() + boom.getHeight() / 2;
+            int drawX = centerX - scaledW / 2;
+            int drawY = centerY - scaledH / 2;
+            g.drawImage(bombexplosion, drawX, drawY, scaledW, scaledH, null);
+            SoundManager.play("sfx/BombExplosion.wav");
 		}
 	}
+
 
 
 	/**

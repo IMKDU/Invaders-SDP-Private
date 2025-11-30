@@ -172,25 +172,15 @@ public final class HUDRenderer {
 
         else{
             g.drawImage(this.teleportCool, x, y, r, r, null);
-
             float alpha = 0.5f;
-
             Composite old = g.getComposite();
-            g.setComposite(AlphaComposite.getInstance(
-                    AlphaComposite.SRC_OVER,
-                    alpha
-            ));
-
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
             g.setColor(Color.BLUE);
             int h = (int)(r * ratio);
             g.fillRect(x, y + (r - h), r, h);
-
             g.setComposite(old);
 
-            int seconds = Math.max(
-                    1,
-                    (int)Math.ceil((1.0 - ratio) * 5)
-            );
+            int seconds = Math.max(1, (int)Math.ceil((1.0 - ratio) * 5));
             String text = seconds + "";
             g.setFont(fontPack.getRegular());
             FontMetrics fm = g.getFontMetrics();

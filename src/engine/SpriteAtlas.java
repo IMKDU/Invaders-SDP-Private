@@ -71,6 +71,9 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.ZetaBossDash2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Teleport, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.TeleportCool, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Bomb1, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Bomb2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.BombExplosion, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             fileManager.loadSprite(spriteMap);
             //여기서부터는 대칭 스프라이트
             spriteMap.put(SpriteType.OmegaBossDash3, mirrorSprite(spriteMap.get(SpriteType.OmegaBossDash1)));
