@@ -371,14 +371,15 @@ public class GameModel {
                 boolean isFinalBossAlive = (this.finalBoss != null && !this.finalBoss.isDestroyed());
                 boolean isOmegaBossAlive = (this.omegaBoss != null && !this.omegaBoss.isDestroyed());
                 boolean isZetaBossAlive = (this.zetaBoss != null && !this.zetaBoss.isDestroyed());
-
-                if (!isFinalBossAlive && !isOmegaBossAlive && !isZetaBossAlive) {
-                    if(!this.levelFinished){
-                        this.levelFinished = true;
-                        this.screenFinishedCooldown.reset();
+                if (!originSkillActivated) {
+                    if (!isFinalBossAlive && !isOmegaBossAlive && !isZetaBossAlive) {
+                        if (!this.levelFinished) {
+                            this.levelFinished = true;
+                            this.screenFinishedCooldown.reset();
+                        }
                     }
+                    break;
                 }
-                break;
         }
         this.ship.update();
         if (this.shipP2 != null) {
