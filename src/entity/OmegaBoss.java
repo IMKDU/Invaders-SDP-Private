@@ -108,9 +108,7 @@ public class OmegaBoss extends MidBoss {
 		this.positionY += distanceY;
 	}
 
-	/** Marks the entity as destroyed and changes its sprite to
-
-	private SpawnMobPattern spawnPattern; an explosion. */
+	/** Marks the entity as destroyed and changes its sprite to an explosion. */
 	@Override
 	public void destroy() {
 		this.isDestroyed = true;
@@ -121,8 +119,7 @@ public class OmegaBoss extends MidBoss {
 	/**
 	 * Reduces health and destroys the entity if it drops to zero or below.
 	 *
-	 * @param damage The amount of damage to inflict.		targetShip = player;
-
+	 * @param damage The amount of damage to inflict.
 	 */
 	@Override
 	public void takeDamage(int damage) {

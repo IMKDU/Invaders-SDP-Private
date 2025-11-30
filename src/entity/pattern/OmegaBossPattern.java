@@ -15,6 +15,9 @@ import java.util.Set;
 public class OmegaBossPattern extends BossPattern implements IBossPattern {
 
 	private static final int HORIZONTAL_SPEED = 2;
+	private static final double PHASE3_ATTACK_SELECT_RATIO = 0.65;
+	private static final double PHASE1_TO_PHASE2_TRIGGER = (double) 3 /5;
+	private static final double PHASE2_TO_PHASE3_TRIGGER = (double) 3 /10;
 
 	private List<IBossPattern> patterns = new ArrayList<IBossPattern>();
 	private IBossPattern attackPattern;
@@ -66,10 +69,10 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 	}
 
 	public int checkPhase(){
-		if(boss.getHealPoint()>boss.getMaxHealPoint()*3/5){
+		if(boss.getHealPoint()>boss.getMaxHealPoint()*PHASE1_TO_PHASE2_TRIGGER){
 			return 1;
 		}
-		if(boss.getHealPoint()>boss.getMaxHealPoint()*3/10){
+		if(boss.getHealPoint()>boss.getMaxHealPoint()*PHASE2_TO_PHASE3_TRIGGER){
 			return 2;
 		}
 		return 3;
@@ -98,7 +101,7 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 	}
 	private void phase3(boolean isInit){
 		currentPhase=3;
-		boolean isPinnedAttack = Math.random()<0.65;
+		boolean isPinnedAttack = Math.random()<PHASE3_ATTACK_SELECT_RATIO;
 		if(isInit){
 			movePattern=patterns.getFirst();
 			attackPattern = patterns.get(1);
@@ -134,6 +137,9 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 	}
 
 	public Set<Bullet> getBullets() {
+		if (this.attackPattern == null) {
+			return java.util.Collections.emptySet();
+		}
 		return this.attackPattern.getBullets();
 	}
 
