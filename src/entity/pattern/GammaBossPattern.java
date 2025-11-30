@@ -40,9 +40,9 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	private final int screenHeight;
 
 	/** Currently selected attack pattern. */
-	private IBossPattern attackPattern;
+	private BossPattern attackPattern;
 	/** Currently selected movement pattern. */
-	private IBossPattern movePattern;
+	private BossPattern movePattern;
 
 	/** Cooldown for attack switching/firing. */
 	private Cooldown attackCooldown;
