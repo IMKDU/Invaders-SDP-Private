@@ -22,10 +22,19 @@ public class BackgroundExplosionPattern extends BossPattern {
     }
 
     /**
-     * Manages the pattern's lifecycle: spawns a new explosion if the cooldown is ready,
-     * or updates the existing explosion until it is destroyed.
+     * Spawns a new explosion entity at a random position within the valid game area.
+     * */
+    private void spawnExplosion() {
+        int randomX = (int) (Math.random() * (GameConstant.SCREEN_WIDTH - MARGIN));
+        int randomY = GameConstant.STAT_SEPARATION_LINE_HEIGHT + (int) (Math.random() * (GameConstant.ITEMS_SEPARATION_LINE_HEIGHT - GameConstant.STAT_SEPARATION_LINE_HEIGHT - MARGIN_2));
+        explosionEntity = new Explosion(randomX, randomY);
+    }
+
+    /**
+     * Executes the attack logic
      */
-    public void update() {
+    @Override
+    public void attack() {
         if (explosionEntity != null) {
             explosionEntity.update();
             if (explosionEntity.isDestroyed()) {
@@ -36,22 +45,6 @@ public class BackgroundExplosionPattern extends BossPattern {
             spawnExplosion();
             cooldown.reset();
         }
-    }
-
-    /**
-     * Spawns a new explosion entity at a random position within the valid game area.
-     * */
-    private void spawnExplosion() {
-        int randomX = (int) (Math.random() * (GameConstant.SCREEN_WIDTH - MARGIN));
-        int randomY = GameConstant.STAT_SEPARATION_LINE_HEIGHT + (int) (Math.random() * (GameConstant.ITEMS_SEPARATION_LINE_HEIGHT - GameConstant.STAT_SEPARATION_LINE_HEIGHT - MARGIN_2));
-        explosionEntity = new Explosion(randomX, randomY);
-    }
-
-    /**
-     * Executes the attack logic (unused in this pattern).
-     */
-    @Override
-    public void attack() {
     }
 
     /**

@@ -153,11 +153,11 @@ public class OmegaBoss extends MidBoss {
 
         }
 		choosePattern();
-		this.explosionPattern.update();
 		if (bossPattern != null) {
 			bossPattern.move();
 			bossPattern.attack();
 			spawnPattern.update(this,this.getHealPoint());
+			explosionPattern.attack();
 			// Update position from pattern
 			this.positionX = bossPattern.getBossPosition().x;
 			this.positionY = bossPattern.getBossPosition().y;
@@ -175,13 +175,14 @@ public class OmegaBoss extends MidBoss {
 			++this.bossPhase;
 			bossPattern = new HorizontalPattern(this, PATTERN_1_X_SPEED);
 			logger.info("OMEGA : move using horizontal pattern");
+            return;
 		}
 		// PHASE 2 → SpreadShotPattern
 		else if (this.healPoint <= this.maxHp / 2 && this.healPoint > this.maxHp / 3 && this.bossPhase == 2) {
             bossPattern = new SpreadShotPattern(this, targetShip);
 			logger.info("OMEGA : Using SPREAD SHOT pattern");
 			this.bossPhase = 3;
-			return;
+            return;
 		}
 
 		else if (this.healPoint <= this.maxHp / 2 && this.healPoint > this.maxHp / 3 && this.bossPhase == 3) {
@@ -198,6 +199,7 @@ public class OmegaBoss extends MidBoss {
             ++this.bossPhase;
 			// Start with dash pattern
 			startDashPattern();
+            return;
 		}
 
 		// Phase 3: Handle dash cooldown cycle
@@ -260,10 +262,12 @@ public class OmegaBoss extends MidBoss {
 	/** Marks the entity as destroyed and changes its sprite to an explosion. */
 	@Override
 	public void destroy() {
-		this.isDestroyed = true;
-		this.spriteType = DrawManager.SpriteType.OmegaBossDeath;
-		this.logger.info("OMEGA : Boss OMEGA destroyed!");
-		this.spawnPattern.clean();
+        if(!this.isDestroyed){
+            this.isDestroyed = true;
+            this.spriteType = DrawManager.SpriteType.OmegaBossDeath;
+            this.logger.info("OMEGA : Boss OMEGA destroyed!");
+            this.spawnPattern.clean();
+        }
 	}
 
 	/**
@@ -276,6 +280,9 @@ public class OmegaBoss extends MidBoss {
 		this.healPoint -= damage;
         SoundManager.play("sfx/OmegaBoss_hitting.wav");
         ishit =true;
+        if(this.healPoint <= 0) {
+            this.destroy();
+        }
 	}
 
     public boolean isShowingPath() {
@@ -321,7 +328,7 @@ public class OmegaBoss extends MidBoss {
 		other.onCollideWithBoss(this, model);
 	}
 	/** get Explosion Pattern */
-	public BackgroundExplosionPattern getExplosionPattern() { return explosionPattern;}
+	public Explosion getBoom() { return explosionPattern.getBoom();}
 	/**
 	 * Update target ship for pattern
 	 */
