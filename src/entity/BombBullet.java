@@ -6,7 +6,7 @@ import engine.DrawManager.SpriteType;
 public class BombBullet extends Bullet {
 
 	public BombBullet(int x, int y, int speed) {
-		super(x, y, speed);
+		super(x, y, speed, 17, 40);
 		this.spriteType = SpriteType.BombBullet;
 	}
 
