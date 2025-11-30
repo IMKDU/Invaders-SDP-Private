@@ -32,8 +32,6 @@ public class GameView {
 
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
-        if (model.getFinalSkillCnt() > 0 && (dto.getScoreP2() >= 100)) {
-
         if (model.isOriginSkillActivated()) {
 
             drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
@@ -43,8 +41,8 @@ public class GameView {
                 model.setOriginSkillActivated(false);
             }
 
-        // While the Origin Skill animation is playing,
-        // stop all other rendering and immediately finalize the frame
+            // While the Origin Skill animation is playing,
+            // stop all other rendering and immediately finalize the frame
             drawManager.completeDrawing();
             return;
         }
