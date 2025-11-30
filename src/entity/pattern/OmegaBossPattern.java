@@ -12,31 +12,60 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Pattern coordinator for the Omega mid-boss.
+ *
+ * <p>
+ * Selects and combines concrete {@link IBossPattern} implementations
+ * (e.g. horizontal, pinned, spread shot) based on the boss's HP phase,
+ * and delegates movement/attack to the active patterns.
+ * </p>
+ */
 public class OmegaBossPattern extends BossPattern implements IBossPattern {
 
+	/** Horizontal speed used in phase 1 movement. */
 	private static final int HORIZONTAL_SPEED = 2;
+	/** Pattern select threshold: Pinned(58%), Another(42%) */
 	private static final double PHASE3_ATTACK_SELECT_RATIO = 0.58;
+	/** HP ratio threshold: phase 1 → phase 2. */
 	private static final double PHASE1_TO_PHASE2_TRIGGER = (double) 3 /5;
+	/** HP ratio threshold: phase 2 → phase 3. */
 	private static final double PHASE2_TO_PHASE3_TRIGGER = (double) 3 /10;
 
+	/** List of all available sub-patterns for Omega. */
 	private List<IBossPattern> patterns = new ArrayList<IBossPattern>();
+	/** Currently selected attack pattern. */
 	private IBossPattern attackPattern;
+	/** Currently selected movement pattern. */
 	private IBossPattern movePattern;
 
+	/** Cooldown for attack switching/firing. */
 	private Cooldown attackCooldown;
+	/** Cooldown for movement switching. */
 	private Cooldown moveCooldown;
 
+	/** Attack cooldown values for each phase. */
 	private final int[][] attackCooldownMillis = {
 			{8000},
 			{8000},
 			{5000}
 	};
+	/** Movement cooldown value shared across phases. */
 	private final int moveCooldownMillis = 8000;
+	/** Currently active phase (1, 2, or 3). */
 	private int currentPhase=0;
 
+	/** Reference to the owning boss. */
 	private final MidBoss boss;
+	/** Reference to the player target. */
 	private HasBounds player;
 
+	/**
+	 * Creates a new Omega boss pattern controller.
+	 *
+	 * @param boss   The owning mid-boss instance.
+	 * @param player The current player target.
+	 */
 	public OmegaBossPattern(MidBoss boss, HasBounds player) {
 		super(new Point(boss.getPositionX(),boss.getPositionY()));
 		this.boss = boss;
@@ -54,6 +83,14 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 		patterns.get(1).validateBackgroundPattern(false);
 	}
 
+	/**
+	 * Performs one update step:
+	 * <ul>
+	 *     <li>Determines the current phase from boss HP.</li>
+	 *     <li>Initializes patterns if the phase has changed.</li>
+	 *     <li>Runs phase-specific configuration logic.</li>
+	 * </ul>
+	 */
 	public void update(){
 		int trigger = checkPhase();
 		boolean isInit = trigger != currentPhase;
@@ -68,6 +105,11 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 		}
 	}
 
+	/**
+	 * Returns the current phase index based on boss HP.
+	 *
+	 * @return 1, 2, or 3 depending on HP thresholds.
+	 */
 	public int checkPhase(){
 		if(boss.getHealPoint()>boss.getMaxHealPoint()*PHASE1_TO_PHASE2_TRIGGER){
 			return 1;
@@ -78,6 +120,11 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 		return 3;
 	}
 
+	/**
+	 * Phase 1 configuration: horizontal movement + pinned attack.
+	 *
+	 * @param isInit {@code true} if phase just started.
+	 */
 	private void phase1(boolean isInit){
 		currentPhase=1;
 		if(isInit){
@@ -88,6 +135,13 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 			Core.getLogger().info("OmegaBossPattern: phase1 start");
 		}
 	}
+
+
+	/**
+	 * Phase 2 configuration: pinned movement and attack.
+	 *
+	 * @param isInit {@code true} if phase just started.
+	 */
 	private void phase2(boolean isInit){
 		currentPhase=2;
 		if(isInit){
@@ -99,6 +153,12 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 			Core.getLogger().info("OmegaBossPattern: phase2 start");
 		}
 	}
+
+	/**
+	 * Phase 3 configuration: mixes pinned and spread-shot patterns.
+	 *
+	 * @param isInit {@code true} if phase just started.
+	 */
 	private void phase3(boolean isInit){
 		currentPhase=3;
 		boolean isPinnedAttack = Math.random()<PHASE3_ATTACK_SELECT_RATIO;
@@ -117,16 +177,21 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 		}
 	}
 
+	/**
+	 * Resets both attack and movement cooldowns.
+	 */
 	private void resetCooldown(){
 		attackCooldown.reset();
 		moveCooldown.reset();
 	}
 
+	@Override
 	public void attack() {
 		if(attackPattern==null) return;
 		attackPattern.attack();
 	}
 
+	@Override
 	public void move() {
 		if(movePattern==null) return;
 		movePattern.move();
@@ -136,6 +201,7 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 		}
 	}
 
+	@Override
 	public Set<Bullet> getBullets() {
 		if (this.attackPattern == null) {
 			return java.util.Collections.emptySet();
