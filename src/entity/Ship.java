@@ -109,9 +109,9 @@ public class Ship extends Entity implements Collidable {
 			int spacing = ShopItem.getMultiShotSpacing();
 
 			int centerX = positionX + this.width / 2;
-			int centerY = positionY;
 
 			if (bombShotsRemaining > 0) {
+				int centerY = positionY - BULLET_SPAWN_Y_OFFSET;
 
 				Bullet b = new BombBullet(centerX, centerY, BULLET_SPEED, Color.RED);
 				b.setOwnerId(this.playerId);
@@ -122,6 +122,7 @@ public class Ship extends Entity implements Collidable {
 				bombShotsRemaining--;
 				return true;
 			}
+			int centerY = positionY;
 
 			if (bulletCount == 1) {
 				// Normal shot (when Spread Shot is not purchased)
