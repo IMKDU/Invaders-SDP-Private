@@ -98,7 +98,7 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 	}
 	private void phase3(boolean isInit){
 		currentPhase=3;
-		boolean isPinnedAttack;
+		boolean isPinnedAttack = Math.random()<0.65;
 		if(isInit){
 			movePattern=patterns.getFirst();
 			attackPattern = patterns.get(1);
@@ -108,7 +108,6 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 			Core.getLogger().info("OmegaBossPattern: phase3 start");
 		}
 		if(attackCooldown.checkFinished()){
-			isPinnedAttack = Math.random()<0.65;
 			movePattern = isPinnedAttack ? patterns.getFirst() : patterns.getLast();
 			attackPattern = isPinnedAttack ? patterns.get(1) : patterns.getLast();
 			if(isPinnedAttack) resetCooldown();
