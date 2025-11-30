@@ -11,11 +11,19 @@ import java.awt.*;
  * Handles all on-screen HUD rendering such as scores, coins, and timers.
  * Acts as a sub-view in the MVC structure.
  */
+
+
 public final class HUDRenderer {
 
     private final BackBuffer backBuffer;
     private final FontPack fontPack;
     private final EntityRenderer entityRenderer;
+
+	// Teleport cooldown UI constants
+	private static final int P1_COOLDOWN_X = 170;
+	private static final int P2_COOLDOWN_X_OFFSET = 200;
+	private static final int COOLDOWN_Y_OFFSET = 50;
+	private static final int TELEPORT_GAUGE_RADIUS = 26;
 
     public HUDRenderer(BackBuffer backBuffer, FontPack fontPack, EntityRenderer entityRenderer) {
         this.backBuffer = backBuffer;
@@ -145,4 +153,33 @@ public final class HUDRenderer {
         g.drawString(text, (screenWidth - textWidth) / 2, y + popupHeight / 2 + 5);
     }
 
+	/** Draw circular cooldown gauge */
+	private void drawTeleportCooldown(Graphics2D g, int x, int y, double ratio, Color readyColor) {
+
+		int r = TELEPORT_GAUGE_RADIUS;
+		g.setColor(Color.DARK_GRAY);
+		g.fillOval(x, y, r, r);
+
+		if (ratio >= 1.0) {
+			g.setColor(readyColor);
+			g.fillOval(x, y, r, r);
+			return;
+		}
+
+		g.setColor(readyColor);
+		int angle = (int)(360 * ratio);
+		g.fillArc(x, y, r, r, 90, -angle);
+
+		g.setColor(Color.BLACK);
+		g.drawOval(x, y, r, r);
+	}
+	/** Draw teleport cooldowns for P1 and P2 */
+	public void drawTeleportCooldowns(int screenWidth, int screenHeight, double cooldownP1, double cooldownP2) {
+
+		Graphics2D g = (Graphics2D) backBuffer.getGraphics();
+
+		drawTeleportCooldown(g, P1_COOLDOWN_X, screenHeight - COOLDOWN_Y_OFFSET, cooldownP1, Color.GREEN);
+		drawTeleportCooldown(g, screenWidth - P2_COOLDOWN_X_OFFSET, screenHeight - COOLDOWN_Y_OFFSET, cooldownP2, Color.PINK);
+
+	}
 }

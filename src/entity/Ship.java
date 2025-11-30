@@ -35,7 +35,8 @@ public class Ship extends Entity implements Collidable {
 	private Cooldown shieldCooldown;
 	/** Checks if the ship is invincible. */
 	private boolean isInvincible;
-    // === [ADD] Which player: 1 = P1, 2 = P2 (default 1 for single-player compatibility) ===
+	private static final int TELEPORT_COOLDOWN_MS = 5000;
+	// === [ADD] Which player: 1 = P1, 2 = P2 (default 1 for single-player compatibility) ===
     private int playerId = 1;
     private boolean isP1Ship;
     private boolean isMove;
@@ -83,6 +84,74 @@ public class Ship extends Entity implements Collidable {
 
 		this.skills = new HashMap<SkillType, ISkill>();
 		registerSkills();
+	}
+
+
+	public void move(String direction, int screenWidth, int screenHeight) {
+		switch (direction) {
+			case "RIGHT":
+				if (positionX + width + SPEED <= screenWidth - 1)
+					moveRight();
+				break;
+
+			case "LEFT":
+				if (positionX - SPEED >= 1)
+					moveLeft();
+				break;
+
+			case "UP":
+				if (positionY - SPEED >= GameConstant.STAT_SEPARATION_LINE_HEIGHT)
+					moveUp();
+				break;
+
+			case "DOWN":
+				if (positionY + height + SPEED <= screenHeight)
+					moveDown();
+				break;
+		}
+	}
+
+	public float getTeleportCooldownProgress() {
+		if (teleportCooldown == null) return 1f;
+
+		if (teleportCooldown.checkFinished()) return 1f;
+
+		long now = System.currentTimeMillis();
+		long passed = now - teleportCooldown.getStartTime();
+		float ratio = (float) passed / teleportCooldown.getDuration();
+
+		return Math.max(0f, Math.min(1f, ratio));
+	}
+
+	private Cooldown teleportCooldown = new Cooldown(TELEPORT_COOLDOWN_MS);
+	private static final int TELEPORT_DISTANCE = 100;
+
+	public boolean canTeleport() {
+		return teleportCooldown.checkFinished();
+	}
+
+	public void teleport(String direction, int screenWidth, int screenHeight) {
+		if (!canTeleport()) return;
+
+		switch (direction) {
+			case "RIGHT":
+				this.positionX = Math.min(this.positionX + TELEPORT_DISTANCE, screenWidth - this.width - 1);
+				break;
+
+			case "LEFT":
+				this.positionX = Math.max(this.positionX - TELEPORT_DISTANCE, 1);
+				break;
+
+			case "UP":
+				this.positionY = Math.max(this.positionY - TELEPORT_DISTANCE, GameConstant.STAT_SEPARATION_LINE_HEIGHT);
+				break;
+
+			case "DOWN":
+				this.positionY = Math.min(this.positionY + TELEPORT_DISTANCE, screenHeight - this.height - 1);
+				break;
+		}
+		teleportCooldown.reset();
+
 	}
 	/**
 	 * Shoots a bullet upwards.
