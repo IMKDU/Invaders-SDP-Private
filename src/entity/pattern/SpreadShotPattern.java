@@ -34,6 +34,8 @@ public class SpreadShotPattern extends BossPattern {
 		if (shootCooldown!=null && shootCooldown.checkFinished()){
 			isFinished = false;
 			movingToCenter = true;
+			currentTargetX = 0;
+			shootCooldown.reset();
 		}
 		if (isFinished) return;
 
@@ -46,11 +48,6 @@ public class SpreadShotPattern extends BossPattern {
 	public void attack() {
 		if (shootCooldown==null){
 			this.shootCooldown = new Cooldown(SHOOT_COOLDOWN_MILLI);
-		}
-		if (shootCooldown.checkFinished()){
-			logger.info("SpreadShotPattern : Spread shot started.");
-			currentTargetX = 0;
-			shootCooldown.reset();
 		}
 		if (movingToCenter) return;
 		performSpreadShot();

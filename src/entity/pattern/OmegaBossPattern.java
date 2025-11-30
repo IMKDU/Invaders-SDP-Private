@@ -15,7 +15,7 @@ import java.util.Set;
 public class OmegaBossPattern extends BossPattern implements IBossPattern {
 
 	private static final int HORIZONTAL_SPEED = 2;
-	private static final double PHASE3_ATTACK_SELECT_RATIO = 0.65;
+	private static final double PHASE3_ATTACK_SELECT_RATIO = 0.58;
 	private static final double PHASE1_TO_PHASE2_TRIGGER = (double) 3 /5;
 	private static final double PHASE2_TO_PHASE3_TRIGGER = (double) 3 /10;
 
