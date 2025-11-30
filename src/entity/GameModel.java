@@ -1001,7 +1001,6 @@ public class GameModel {
     public boolean isBonusLife() { return bonusLife; }
     public boolean isLevelFinished() { return levelFinished; }
     public Cooldown getScreenFinishedCooldown() { return screenFinishedCooldown; }
-
     public boolean isBlackHoleActive() { return blackHoleActive; }
     public int getBlackHoleCX() { return blackHoleCX; }
     public int getBlackHoleCY() { return blackHoleCY; }
