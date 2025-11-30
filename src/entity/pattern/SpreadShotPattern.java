@@ -1,5 +1,6 @@
 package entity.pattern;
 
+import engine.Cooldown;
 import engine.Core;
 import entity.*;
 import java.awt.*;
@@ -17,6 +18,7 @@ public class SpreadShotPattern extends BossPattern {
 	private boolean movingToCenter = true;
 	private int currentTargetX = 0;
 	private static final int SPREAD_STEP = 12;
+	private static final int SHOOT_COOLDOWN_MILLI = 500;
 
 	private boolean isFinished = false;
 
@@ -29,6 +31,10 @@ public class SpreadShotPattern extends BossPattern {
 
 	@Override
 	public void move() {
+		if (shootCooldown!=null && shootCooldown.checkFinished()){
+			isFinished = false;
+			movingToCenter = true;
+		}
 		if (isFinished) return;
 
 		if (movingToCenter) {
@@ -38,8 +44,15 @@ public class SpreadShotPattern extends BossPattern {
 
 	@Override
 	public void attack() {
+		if (shootCooldown==null){
+			this.shootCooldown = new Cooldown(SHOOT_COOLDOWN_MILLI);
+		}
+		if (shootCooldown.checkFinished()){
+			logger.info("SpreadShotPattern : Spread shot started.");
+			currentTargetX = 0;
+			shootCooldown.reset();
+		}
 		if (movingToCenter) return;
-
 		performSpreadShot();
 	}
 
@@ -51,13 +64,12 @@ public class SpreadShotPattern extends BossPattern {
 	private static final int MOVE_SPEED = 6;
 
 	private void moveToCenter() {
-		int bossX = bossPosition.x;
 		int bossWidth = boss.getWidth();
 
 		int targetX = (widthBoundary - bossWidth) / 2;
 
-		if (bossX < targetX) bossPosition.x += MOVE_SPEED;
-		else if (bossX > targetX) bossPosition.x -= MOVE_SPEED;
+		if (boss.getPositionX() < targetX) bossPosition.x = boss.getPositionX() + MOVE_SPEED;
+		else if (boss.getPositionX() > targetX) bossPosition.x = boss.getPositionX() - MOVE_SPEED;
 
 		bossPosition.y = boss.getPositionY();
 
@@ -70,7 +82,7 @@ public class SpreadShotPattern extends BossPattern {
 	}
 
 	private void performSpreadShot() {
-		if (target == null) {
+		if (target == null || isFinished) {
 			isFinished = true;
 			return;
 		}
@@ -79,7 +91,7 @@ public class SpreadShotPattern extends BossPattern {
 		int rightLimit = widthBoundary - safeSpace;
 
 		if (currentTargetX >= rightLimit) {
-			logger.info("OMEGA : Spread shot completed.");
+			logger.info("SpreadShotPattern : Spread shot completed.");
 			isFinished = true;
 			return;
 		}
