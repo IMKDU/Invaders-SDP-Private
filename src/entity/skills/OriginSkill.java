@@ -7,7 +7,7 @@ import entity.pattern.ISkill;
 public class OriginSkill implements ISkill {
 
     private static final int TOTAL_DAMAGE = 80;
-    private static final int DURATION_MS = 10000;
+    private static final int DURATION_MS = 11000;
 
     private static final int BURST_WINDOW_MS = 1000;
     private static final int BURST_HITS = (int)(TOTAL_DAMAGE*0.2);
