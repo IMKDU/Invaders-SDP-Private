@@ -12,6 +12,11 @@ import java.util.logging.Logger;
 
 /**
  * Omega - Middle Boss
+ *
+ * <p>
+ * Controls animation, sprite transitions, damage handling, and delegates
+ * movement/attack logic to {@link OmegaBossPattern}.
+ * </p>
  */
 public class OmegaBoss extends MidBoss {
 
@@ -32,11 +37,13 @@ public class OmegaBoss extends MidBoss {
 	/** Point of Omega when destroyed */
 	private static final int OMEGA_POINT_VALUE = 500;
 
-	/** Pattern for Omega-boss */
+	/** Pattern manager for Omega's movement and attack logic. */
 	private OmegaBossPattern omegaBossPattern;
 	/** Logger instance */
 	private Logger logger;
+	/** Flag indicating if boss was recently hit (for flashing animation). */
     private boolean ishit = false;
+	/** Cooldown for sprite animation switching. */
     private Cooldown animationCooldown;
 
 	/**
@@ -57,8 +64,15 @@ public class OmegaBoss extends MidBoss {
 
 	/**
 	 * Updates the entity's state for the current game frame.
-	 * This method is called on every tick of the game loop and is responsible for
-	 * executing the boss's movement patterns.
+	 * <p>
+	 * This method:
+	 * <ol>
+	 *     <li>Chooses the correct sprite based on animation state and phase.</li>
+	 *     <li>Updates the pattern logic ({@link OmegaBossPattern#update()}).</li>
+	 *     <li>Executes pattern movement and attacks.</li>
+	 *     <li>Synchronizes boss coordinates with the pattern.</li>
+	 * </ol>
+	 * </p>
 	 */
 	@Override
 	public void update() {
@@ -70,6 +84,18 @@ public class OmegaBoss extends MidBoss {
 		this.positionY = omegaBossPattern.getBossPosition().y;
 	}
 
+	/**
+	 * Selects the current sprite based on:
+	 * <ul>
+	 *     <li>Phase (normal vs angry)</li>
+	 *     <li>Hit animation</li>
+	 *     <li>Idle animation cycle every 200 ms</li>
+	 * </ul>
+	 *
+	 * <p>
+	 * Also resizes the boss sprite when entering the angry phase.
+	 * </p>
+	 */
 	private void chooseSprite(){
 		if (this.animationCooldown.checkFinished()) {
 			this.animationCooldown.reset();
@@ -101,7 +127,12 @@ public class OmegaBoss extends MidBoss {
 		}
 	}
 
-	/** move simple */
+	/**
+	 * Simple position-based movement. Mostly used by pattern logic.
+	 *
+	 * @param distanceX Movement offset on x-axis.
+	 * @param distanceY Movement offset on y-axis.
+	 */
 	@Override
 	public void move(int distanceX, int distanceY) {
 		this.positionX += distanceX;
@@ -118,11 +149,6 @@ public class OmegaBoss extends MidBoss {
 		}
 	}
 
-	/**
-	 * Reduces health and destroys the entity if it drops to zero or below.
-	 *
-	 * @param damage The amount of damage to inflict.
-	 */
 	@Override
 	public void takeDamage(int damage) {
 		this.healPoint -= damage;
@@ -130,6 +156,11 @@ public class OmegaBoss extends MidBoss {
         ishit =true;
 	}
 
+	/**
+	 * Returns all bullets fired by the boss pattern.
+	 *
+	 * @return Set of active bullets created by {@link OmegaBossPattern}.
+	 */
 	public Set<Bullet> getBullets() {
 		return this.omegaBossPattern.getBullets();
 	}
