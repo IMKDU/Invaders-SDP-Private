@@ -403,14 +403,6 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	public void attack() {
 		if (attackPattern == null) return;
 		attackPattern.attack();
-
-		// Track laser count for TimeGapAttackPattern
-		if (cycleState == PatternCycleState.TIMEGAP && attackPattern instanceof TimeGapAttackPattern) {
-			Set<Bullet> bullets = attackPattern.getBullets();
-			if (!bullets.isEmpty()) {
-				lasersFired += bullets.size();
-			}
-		}
 	}
 
 	@Override
@@ -428,7 +420,15 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 		if (this.attackPattern == null) {
 			return java.util.Collections.emptySet();
 		}
-		return this.attackPattern.getBullets();
+
+		Set<Bullet> bullets = this.attackPattern.getBullets();
+
+		// Track laser count for TimeGapAttackPattern
+		if (cycleState == PatternCycleState.TIMEGAP && !bullets.isEmpty()) {
+			lasersFired += bullets.size();
+		}
+
+		return bullets;
 	}
 
 	@Override
