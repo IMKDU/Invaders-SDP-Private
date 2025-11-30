@@ -40,11 +40,6 @@ public class GameView {
             if (drawManager.getSpecialAnimationRenderer().isFinished()) {
                 model.setOriginSkillActivated(false);
             }
-
-            // While the Origin Skill animation is playing,
-            // stop all other rendering and immediately finalize the frame
-            drawManager.completeDrawing();
-            return;
         }
 
         else {
