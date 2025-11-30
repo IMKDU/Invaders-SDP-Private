@@ -90,6 +90,10 @@ public class GameView {
             drawManager.getEntityRenderer().drawHealthBarWithHP(model.getZetaBoss());
             drawManager.getUIRenderer().drawBossName("Zeta");
         }
+        if (model.getGammaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getGammaBoss());
+            drawManager.getUIRenderer().drawBossName("Gamma");
+        }
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50, 2);
         drawManager.getHUDRenderer().drawCoin(dto.getWidth(), dto.getHeight(), dto.getCoin());
