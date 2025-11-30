@@ -14,7 +14,7 @@ public abstract class BossPattern implements IBossPattern {
 	protected Point acceleration;
 	protected Cooldown shootCooldown;
 	protected Set<Bullet> bullets;
-	protected boolean validateBackbroundPattern=true;
+	protected boolean validateBackgroundPattern=true;
 
 	public BossPattern(Point position) {
 		this.bossPosition = position;
@@ -22,7 +22,7 @@ public abstract class BossPattern implements IBossPattern {
 	}
 
 	public void setCooldown(Cooldown cooldown) { this.shootCooldown=cooldown; }
-	public Point getBossPosition() { return this.bossPosition; }
+	public Point getBossPosition() { return new Point(this.bossPosition); }
 	public Set<Bullet> getBullets(){
 		if (this.bullets.isEmpty()) {
 			return java.util.Collections.emptySet();
@@ -34,5 +34,5 @@ public abstract class BossPattern implements IBossPattern {
 
 	public void setTarget(HasBounds target) { /* Default: do nothing */ }
 
-	public void validateBackgroundPattern(boolean condition){ validateBackbroundPattern=condition; }
+	public void validateBackgroundPattern(boolean condition){ validateBackgroundPattern=condition; }
 }
