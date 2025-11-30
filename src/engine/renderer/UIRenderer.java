@@ -4,6 +4,7 @@ import engine.Achievement;
 import engine.BackBuffer;
 import engine.FontPack;
 import engine.Score;
+import entity.GameConstant;
 
 import java.util.List;
 import java.awt.Color;
@@ -326,5 +327,26 @@ public final class UIRenderer {
     // center text horizontally
     private int centerX(final int screenWidth, Graphics g, String text) {
         return (screenWidth - g.getFontMetrics().stringWidth(text)) / 2;
+    }
+
+    public void drawBossName(String bossName) {
+        Graphics g = backBuffer.getGraphics();
+        g.setFont(fontPack.getFontBig());
+        g.setColor(Color.GREEN);
+        FontMetrics fm = g.getFontMetrics();
+        int textWidth = fm.stringWidth(bossName);
+        int padding = 10;
+
+        int height = GameConstant.STAT_SEPARATION_LINE_HEIGHT;
+        int barHeight = height / 2;
+        int barY = (height - barHeight) / 2;
+        int barX = GameConstant.SCREEN_WIDTH * 4 / 10;
+        int textX = barX - textWidth - padding;
+        int textY = barY + (barHeight / 2) + (fm.getAscent() / 2);
+
+        g.setColor(Color.RED);
+        g.drawString(bossName, textX, textY);
+
+
     }
 }

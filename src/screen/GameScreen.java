@@ -6,6 +6,7 @@ import engine.GameState;
 import engine.level.Level;
 import entity.GameConstant;
 import entity.GameModel;
+import entity.Ship;
 
 import java.awt.event.KeyEvent;
 
@@ -176,7 +177,57 @@ public class GameScreen extends Screen {
 		}
 	}
 
-	private void handlePlayerSkillInput() { /* TODO: Implement skill input handling */ }
+    /**
+     * Handles player skill input (C key for Player 1, Right Ctrl for Player 2).
+     * Manages charging skill activation and cancellation.
+     */
+    private void handlePlayerSkillInput() {
+
+        boolean isChargingDownP1 = inputManager.isP1KeyDown(java.awt.event.KeyEvent.VK_C);
+        boolean isChargingDownP2 = inputManager.isP2KeyDown(java.awt.event.KeyEvent.VK_CONTROL);
+
+        if (model.getShip() != null && model.getLivesP1() > 0 && !model.getShip().isDestroyed()) {
+            handleChargingInput(model.getShip(), isChargingDownP1);
+        }
+
+        if (model.getShipP2() != null && model.getLivesP2() > 0 && !model.getShipP2().isDestroyed()) {
+            handleChargingInput(model.getShipP2(), isChargingDownP2);
+        }
+
+
+        boolean isOriginDown = inputManager.isKeyDown(java.awt.event.KeyEvent.VK_O);
+        if (isOriginDown) {
+            handleOriginSkillInput();
+        }
+    }
+
+
+    private void handleChargingInput(Ship ship, boolean isKeyPressed) {
+
+        if (isKeyPressed) {
+            ship.startCharging();
+        } else {
+            if (ship.isCharging()) {
+                ship.stopCharging();
+            }
+        }
+    }
+
+    private void handleOriginSkillInput() {
+        Ship s1 = model.getShip();
+        Ship s2 = model.getShipP2();
+
+        if (s1 != null && !s1.isDestroyed() && model.getLivesP1() > 0) {
+            s1.useSkill(Ship.SkillType.ORIGIN);
+            return;
+        }
+
+        if (s2 != null && !s2.isDestroyed() && model.getLivesP2() > 0) {
+            s2.useSkill(Ship.SkillType.ORIGIN);
+
+        }
+    }
+
 
     /**
      * Builds the DTO that passes data from Model to View.
