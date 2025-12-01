@@ -177,7 +177,7 @@ public class Ship extends Entity implements Collidable {
 				// Normal shot (when Spread Shot is not purchased)
 				Bullet b = BulletPool.getBullet(centerX, centerY, speed);
 				SoundManager.stop("sfx/laser.wav");
-				SoundManager.play("sfx/laser.wav");
+				SoundManager.playPooled("sfx/laser.wav");
 				b.setOwnerId(this.playerId);  // === [ADD] Ownership flag: 1 = P1, 2 = P2, null for legacy logic ===
 
 				bullets.add(b);
@@ -193,7 +193,7 @@ public class Ship extends Entity implements Collidable {
 					bullets.add(b);
 
                     // might consider putting a different sound
-                    SoundManager.play("sfx/laser.wav");
+                    SoundManager.playPooled("sfx/laser.wav");
                 }
 			}
 			return true;
