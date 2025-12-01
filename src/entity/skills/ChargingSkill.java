@@ -112,8 +112,8 @@ public class ChargingSkill implements ISkill {
         lastChargingSkillUse = laserStartTime;
 
         // Play sound effect
-        SoundManager.stop("sfx/laser.wav");
-        SoundManager.play("sfx/laser.wav");
+        SoundManager.stop("sfx/ChargingLaser.wav");
+        SoundManager.play("sfx/ChargingLaser.wav");
     }
 
     /**
