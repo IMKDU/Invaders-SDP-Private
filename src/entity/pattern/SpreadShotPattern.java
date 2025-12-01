@@ -88,7 +88,7 @@ public class SpreadShotPattern extends BossPattern {
 		int gunY = bossPosition.y + boss.getHeight();
 
 		int targetX = currentTargetX;
-		int targetY = target.getPositionY();
+		int targetY = GameConstant.SCREEN_HEIGHT;
 
 		double dx = targetX - gunX;
 		double dy = targetY - gunY;
