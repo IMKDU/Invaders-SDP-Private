@@ -10,7 +10,6 @@ import java.util.Set;
 
 public class PinnedBossPattern extends BossPattern {
 
-	protected Cooldown shootCooldown;
 	protected HasBounds boss;
 
 	/** for move pattern */
