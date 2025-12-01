@@ -40,7 +40,7 @@ public final class DrawManager {
     private SpecialAnimationRenderer specialAnimationRenderer;
 	private double scale;
     private final AnimationLoader loader;
-	/** Sprite types mapped to their images. */
+    /** Sprite types mapped to their images. */
 	private static Map<SpriteType, BufferedImage> spriteMap;
 
 	/** Sprite types. */
@@ -114,6 +114,11 @@ public final class DrawManager {
         }
         backBuffer.end();
 	}
+
+    public void startShake(int duration, int intensity) {
+        backBuffer.setShake(duration, intensity);
+    }
+
 	/**
 	 * Draws the starfield background.
 	 *
