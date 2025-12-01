@@ -38,7 +38,7 @@
         { "enemyType": "enemyB", "itemId": "Shield", "dropChance": 0.1 },
         { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 }
       ],
-      "bossId": "omegaBoss",
+      "bossId": "gammaBoss",
       "completionBonus": { "currency": 20 }
     },
     {
