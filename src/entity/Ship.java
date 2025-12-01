@@ -371,6 +371,7 @@ public class Ship extends Entity implements Collidable {
 	 */
 	public void startCharging() {
 		if (this.chargingSkill != null) {
+            chargingSkill.use(this);
 			this.chargingSkill.startCharging();
 		}
 	}
@@ -381,6 +382,7 @@ public class Ship extends Entity implements Collidable {
 	 */
 	public void stopCharging() {
 		if (this.chargingSkill != null) {
+            chargingSkill.use(this);
 			this.chargingSkill.stopCharging();
 		}
 	}
