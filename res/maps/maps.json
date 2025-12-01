@@ -128,8 +128,8 @@
       "level": 7,
       "levelName": "7. Omega",
       "enemyFormation": {
-        "formationWidth": 8,
-        "formationHeight": 7,
+        "formationWidth": 6,
+        "formationHeight": 6,
         "baseSpeed": 2,
         "shootingFrecuency": 500
       },
