@@ -18,7 +18,8 @@ public class CrossFormationMovement implements IMovementStrategy {
 
     private final int PHASE_COOLDOWN_MS = 2000;
     private final int STAGGER_INTERVAL_MS = 500;
-
+    private final int OVERSHOOT_X = 100;
+    private final int ARRIVAL_THRESHOLD = 20;
     private final double DISTANCE_THRESHOLD_FOR_SPEED_BOOST = 2.0;
 
     private List<List<EnemyShip>> enemyShips;
@@ -28,6 +29,7 @@ public class CrossFormationMovement implements IMovementStrategy {
     private int shipWidth;
     private int safeStartY;
     private int safeEndY;
+    private Point tempPoint = new Point();
 
     private boolean isLeftToRightPhase;
     private int finishedShipCount;
@@ -88,14 +90,13 @@ public class CrossFormationMovement implements IMovementStrategy {
      * Adjusts positions to ensure ships spawn outside the visible area.
      */
     private void setupPhaseCoordinates() {
-        int overShootX = 100;
 
         if (isLeftToRightPhase) {
-            this.currentStart = new Point(-overShootX, safeStartY);
-            this.currentEnd = new Point(screenWidth + overShootX, safeEndY);
+            this.currentStart = new Point(-OVERSHOOT_X, safeStartY);
+            this.currentEnd = new Point(screenWidth + OVERSHOOT_X, safeEndY);
         } else {
-            this.currentStart = new Point(screenWidth + overShootX - shipWidth, safeStartY);
-            this.currentEnd = new Point(-overShootX, safeEndY);
+            this.currentStart = new Point(screenWidth + OVERSHOOT_X - shipWidth, safeStartY);
+            this.currentEnd = new Point(-OVERSHOOT_X, safeEndY);
         }
     }
 
@@ -193,24 +194,27 @@ public class CrossFormationMovement implements IMovementStrategy {
     private void moveShipWithLookAhead(EnemyShip ship, ShipState state) {
         int currentX = ship.getPositionX();
         int currentY = ship.getPositionY();
-        Point targetPos = getLinearPoint(state.t);
-        double dist = Math.sqrt(Math.pow(targetPos.x - currentX, 2) + Math.pow(targetPos.y - currentY, 2));
-        // Look Ahead Logic: Push target forward if too close
-        while (dist < LOOK_AHEAD_DISTANCE && state.t < 1.0f) {
+        updateLinearPoint(state.t);
+        double dx = tempPoint.x - currentX;
+        double dy = tempPoint.y - currentY;
+        double distance = Math.sqrt(dx * dx + dy * dy);
+        while (distance < LOOK_AHEAD_DISTANCE && state.t < 1.0f) {
             state.t += LINE_SPEED;
-            targetPos = getLinearPoint(state.t);
-            dist = Math.sqrt(Math.pow(targetPos.x - currentX, 2) + Math.pow(targetPos.y - currentY, 2));
+            updateLinearPoint(state.t);
+            dx = tempPoint.x - currentX;
+            dy = tempPoint.y - currentY;
+            distance = Math.sqrt(dx * dx + dy * dy);
         }
 
         // Check if path is finished
-        if (state.t >= 1.0f && dist < 20) {
+        if (state.t >= 1.0f && distance < ARRIVAL_THRESHOLD) {
             state.isFinished = true;
             finishedShipCount++;
             if (isLeftToRightPhase) ship.setPositionX(screenWidth + 1000);
             else ship.setPositionX(-1000);
             return;
         }
-        moveToTargetVector(ship, targetPos.x, targetPos.y);
+        moveToTargetVector(ship, tempPoint.x, tempPoint.y);
     }
 
     /**
@@ -236,16 +240,12 @@ public class CrossFormationMovement implements IMovementStrategy {
         ship.move(moveX, moveY, false);
     }
 
-    /**
-     * Calculates a point on the linear path based on progress t.
-     * @param t The progress on the line (0.0 to 1.0).
-     * @return The calculated Point.
-     */
-    private Point getLinearPoint(float t) {
+
+    private void updateLinearPoint(float t) {
         if (t > 1.0f) t = 1.0f;
         int x = (int) (currentStart.x + (currentEnd.x - currentStart.x) * t);
         int y = (int) (currentStart.y + (currentEnd.y - currentStart.y) * t);
-        return new Point(x, y);
+        this.tempPoint.setLocation(x, y);
     }
     /**
      * Starts the cooldown timer between phases.
