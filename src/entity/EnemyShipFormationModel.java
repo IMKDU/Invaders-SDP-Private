@@ -110,6 +110,11 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 
         this.width = (this.nShipsWide - 1) * SEPARATION_DISTANCE + this.shipWidth;
         this.height = (this.nShipsHigh - 1) * SEPARATION_DISTANCE + this.shipHeight;
+
+        if(level.getLevel() == 2){
+            CrossFormationMovement cross = new CrossFormationMovement(enemyShips);
+            setMovementStrategy(cross);
+        }
         if(level.getLevel() == 1){
             SideLoopFormationMovement sideLoop = new SideLoopFormationMovement(enemyShips);
             setMovementStrategy(sideLoop);
@@ -399,6 +404,7 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 			default: return Color.WHITE;
 		}
 	}
+
     public void setMovementStrategy(IMovementStrategy strategy) {
         this.movementStrategy = strategy;
         this.logger.info("Movement Strategy switched to: " + strategy.getClass().getSimpleName());

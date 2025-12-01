@@ -121,13 +121,14 @@ public class EnemyShipFormationMovement implements IMovementStrategy {
 	 * Activates the slowdown effect, resetting its duration.
 	 */
 	@Override
+	public void activateSlowdown() {
+		this.isSlowedDown = true;
+		this.slowDownCount = 0;
+		this.logger.info("Enemy formation slowed down!");
+	}
+
+	@Override
 	public boolean needsSmoothMovement() {
 		return false;
 	}
-    @Override
-    public void activateSlowdown() {
-        isSlowedDown = true;
-        slowDownCount = 0;
-        logger.info("Enemy formation slowed down!");
-    }
 }
