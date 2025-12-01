@@ -48,7 +48,7 @@ public class TestModel {
 		List<Entity> renderList = new ArrayList<>();
 		renderList.add(entity);
 		renderList.add(player);
-		renderList.addAll(bullets);  // 총알도 포함
+		renderList.addAll(bullets);  // including bullets
 		return renderList;
 	}
 

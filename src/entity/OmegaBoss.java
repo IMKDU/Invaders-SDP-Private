@@ -9,6 +9,7 @@ import entity.pattern.*;
 import java.awt.*;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.List;
 
 /**
  * Omega - Middle Boss
