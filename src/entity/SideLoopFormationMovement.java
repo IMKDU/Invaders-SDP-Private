@@ -23,6 +23,7 @@ public class SideLoopFormationMovement implements IMovementStrategy {
     private final int ARC_WIDTH = 700;
     private final int PATH_HEIGHT = 600;
     private final double DISTANCE_THRESHOLD_FOR_SPEED_BOOST = 2.0;
+    private final int SPEED_BOOST_DISTANCE_THRESHOLD = 10;
 
     private List<List<EnemyShip>> enemyShips;
     private Map<EnemyShip, ShipState> shipStates;
@@ -147,10 +148,6 @@ public class SideLoopFormationMovement implements IMovementStrategy {
                     startRun(ship, state);
                 }
 
-                if (!state.isMoving && canStart) {
-                    startRun(ship, state);
-                }
-
                 if (state.isMoving) {
                     moveShipWithLookAhead(ship, state);
                 }
@@ -207,7 +204,7 @@ public class SideLoopFormationMovement implements IMovementStrategy {
             return;
         }
 
-        double speedMultiplier = (distance > 10) ? DISTANCE_THRESHOLD_FOR_SPEED_BOOST : 1.0;
+        double speedMultiplier = (distance > SPEED_BOOST_DISTANCE_THRESHOLD) ? DISTANCE_THRESHOLD_FOR_SPEED_BOOST : 1.0;
 
         int moveX = (int) (dx * SHIP_SPEED / distance * speedMultiplier);
         int moveY = (int) (dy * SHIP_SPEED / distance * speedMultiplier);
