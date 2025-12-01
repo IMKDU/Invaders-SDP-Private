@@ -117,6 +117,13 @@ public class EnemyShipFormationMovement implements IMovementStrategy {
         }
     }
 
+	/**
+	 * Activates the slowdown effect, resetting its duration.
+	 */
+	@Override
+	public boolean needsSmoothMovement() {
+		return false;
+	}
     @Override
     public void activateSlowdown() {
         isSlowedDown = true;
