@@ -67,8 +67,8 @@ public final class EntityRenderer {
 
         int originalW = img.getWidth();
         int originalH = img.getHeight();
-        int scaledW = (int) (originalW * scale * 2);
-        int scaledH = (int) (originalH * scale * 2);
+        int scaledW = (int) (originalW * currentScale * 2);
+        int scaledH = (int) (originalH * currentScale * 2);
 
         if (entity.getSpriteType() == SpriteType.SoundOn ||
                 entity.getSpriteType() == SpriteType.SoundOff) {

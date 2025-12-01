@@ -37,7 +37,11 @@ public class SubShip extends Entity {
         super(0, 0, 13, 8, isLeft ? Color.CYAN : Color.ORANGE);
         this.owner = owner;
         this.isLeft = isLeft;
-        this.spriteType = SpriteType.Ship; // Reusing ship sprite, will scale in renderer
+        if (owner.getPlayerId() == 1) {
+            this.spriteType = SpriteType.ShipP1;
+        } else {
+            this.spriteType = SpriteType.ShipP2;
+        }
 
         // Position offset: Left side or Right side
         int gap = 10;
