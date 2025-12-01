@@ -322,7 +322,14 @@ public class GameModel {
                     if (this.omegaBoss instanceof OmegaBoss omega) {
                         midBossChilds = omega.getSpawnMobs();
                         this.explosionEntity = omega.getBoom();
-                        bossBullets.addAll(omega.getBossPattern().getBullets());
+
+                        if (omega.getBossPattern() != null) {
+                            bossBullets.addAll(omega.getBossPattern().getBullets());
+                        }
+
+                        if (omega.getGuidedMissilePattern() != null) {
+                            this.bossBullets.addAll(omega.getGuidedMissilePattern().getBullets());
+                        }
                     }
 					updateBossBullets();
 
@@ -640,6 +647,19 @@ public class GameModel {
                 (ship.getPlayerId() == 2 && livesP2 == 0)) {
 
             ships.remove(ship);
+
+            if (this.bossBullets != null) {
+                for (Bullet b : this.bossBullets) {
+                    // Check if bullet is guided missile
+                    if (b instanceof GuidedBullet) {
+                        GuidedBullet gb = (GuidedBullet) b;
+                        // if the target died
+                        if (gb.getTarget() == ship) {
+                            gb.setTarget(null);
+                        }
+                    }
+                }
+            }
         }
 		if (this.isGameOver()) {
 			this.setGameOver();
@@ -982,7 +1002,7 @@ public class GameModel {
                 this.logger.info("Final Boss has spawned!");
                 break;
             case "omegaBoss":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
+                this.omegaBoss = new OmegaBoss(Color.ORANGE, ships);
                 this.logger.info("Omega Boss has spawned!");
                 break;
             case "ZetaBoss":
@@ -990,7 +1010,7 @@ public class GameModel {
                 this.logger.info("Zeta Boss has spawned!");
                 break;
             case "omegaAndZetaAndFinal":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
+                this.omegaBoss = new OmegaBoss(Color.ORANGE, ships);
                 this.logger.info("Omega Boss has spawned!");
                 break;
             default:
@@ -1226,9 +1246,11 @@ public class GameModel {
         if (getBullets() != null) {
             renderList.addAll(getBullets());
         }
+
 		if (getBossBullets() != null && !getBossBullets().isEmpty()) {
 			renderList.addAll(getBossBullets());
 		}
+
         if (getDropItems() != null) {
             renderList.addAll(getDropItems());
         }
