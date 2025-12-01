@@ -295,8 +295,8 @@ public class ItemHUDManager {
      */
     private String getDroppedItemLetter(DropItem.ItemType itemType) {
         switch (itemType) {
-            case Explode:
-                return "E";
+            case SubShip:
+                return "S";
             case Slow:
                 return "L";
             case Stop:
@@ -317,7 +317,7 @@ public class ItemHUDManager {
      */
     private Color getDroppedItemColor(DropItem.ItemType itemType) {
         switch (itemType) {
-            case Explode:
+            case SubShip:
                 return Color.RED;
             case Slow:
                 return Color.BLUE;
