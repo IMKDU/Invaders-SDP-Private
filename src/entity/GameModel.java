@@ -213,9 +213,6 @@ public class GameModel {
 
         this.ship.setModel(this);
         this.shipP2.setModel(this);
-        if(this.currentLevel.getLevel() == 1){
-            this.enemyShipFormationModel.setSideLoopPattern();
-        }
     }
 
     /**

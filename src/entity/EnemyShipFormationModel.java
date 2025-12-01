@@ -109,6 +109,10 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 
         this.width = (this.nShipsWide - 1) * SEPARATION_DISTANCE + this.shipWidth;
         this.height = (this.nShipsHigh - 1) * SEPARATION_DISTANCE + this.shipHeight;
+        if(level.getLevel() == 1){
+            SideLoopFormationMovement sideLoop = new SideLoopFormationMovement(enemyShips);
+            setMovementStrategy(sideLoop);
+        }
     }
 
     /**
@@ -393,12 +397,8 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 			default: return Color.WHITE;
 		}
 	}
-    /**
-     * Switch the movement pattern to the "Side Loop" (Snake) pattern.
-     */
-    public void setSideLoopPattern() {
-        SideLoopFormationMovement sideLoop = new SideLoopFormationMovement(this.enemyShips);
-        this.movementStrategy = sideLoop;
-        this.logger.info("Enemy pattern switched to Side Loop.");
+    public void setMovementStrategy(IMovementStrategy strategy) {
+        this.movementStrategy = strategy;
+        this.logger.info("Movement Strategy switched to: " + strategy.getClass().getSimpleName());
     }
 }
