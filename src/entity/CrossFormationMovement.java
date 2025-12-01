@@ -21,6 +21,8 @@ public class CrossFormationMovement implements IMovementStrategy {
     private final int OVERSHOOT_X = 100;
     private final int ARRIVAL_THRESHOLD = 20;
     private final double DISTANCE_THRESHOLD_FOR_SPEED_BOOST = 2.0;
+    private final int OFFSCREEN_BUFFER = 1000;
+    private final int MIN_DISTANCE_FOR_SPEED_BOOST = 10;
 
     private List<List<EnemyShip>> enemyShips;
     private Map<EnemyShip, ShipState> shipStates;
@@ -108,7 +110,7 @@ public class CrossFormationMovement implements IMovementStrategy {
 
         this.finishedShipCount = 0;
         int count = 0;
-        int waitingX = isLeftToRightPhase ? -1000 : screenWidth + 1000;
+        int waitingX = isLeftToRightPhase ? -OFFSCREEN_BUFFER : screenWidth + OFFSCREEN_BUFFER;
 
         for (List<EnemyShip> column : enemyShips) {
             for (EnemyShip ship : column) {
@@ -210,8 +212,8 @@ public class CrossFormationMovement implements IMovementStrategy {
         if (state.t >= 1.0f && distance < ARRIVAL_THRESHOLD) {
             state.isFinished = true;
             finishedShipCount++;
-            if (isLeftToRightPhase) ship.setPositionX(screenWidth + 1000);
-            else ship.setPositionX(-1000);
+            if (isLeftToRightPhase) ship.setPositionX(screenWidth + OFFSCREEN_BUFFER);
+            else ship.setPositionX(-OFFSCREEN_BUFFER);
             return;
         }
         moveToTargetVector(ship, tempPoint.x, tempPoint.y);
@@ -232,7 +234,7 @@ public class CrossFormationMovement implements IMovementStrategy {
             ship.setPositionY(targetY);
             return;
         }
-        double speedMultiplier = (distance > 10) ? DISTANCE_THRESHOLD_FOR_SPEED_BOOST : 1.0;
+        double speedMultiplier = (distance > MIN_DISTANCE_FOR_SPEED_BOOST) ? DISTANCE_THRESHOLD_FOR_SPEED_BOOST : 1.0;
         int moveX = (int) (dx * SHIP_SPEED / distance * speedMultiplier);
         int moveY = (int) (dy * SHIP_SPEED / distance * speedMultiplier);
         if (moveX == 0 && dx != 0) moveX = (dx > 0) ? 1 : -1;
