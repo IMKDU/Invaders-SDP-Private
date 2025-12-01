@@ -337,12 +337,9 @@ public class OmegaBoss extends MidBoss {
 	}
 
     /**
-<<<<<<< HEAD
      * method for getting guided missle pattern
-=======
      * Method to retrieve the guided missile pattern.
      * This method must be called in GameModel to render the guided missiles on the screen.
->>>>>>> 6f7349b (feat-SCRUM-53: Fixed comments in english)
      */
     public GuidedMissilePattern getGuidedMissilePattern() {
         return this.guidedMissilePattern;
