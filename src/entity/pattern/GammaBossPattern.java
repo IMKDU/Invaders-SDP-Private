@@ -32,8 +32,10 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	/** HP ratio threshold: phase 2 → phase 3 (30%). */
 	private static final double PHASE2_TO_PHASE3_TRIGGER = 0.3;
 
-	/** Dash cooldown duration in milliseconds (15 seconds). */
-	private static final int DASH_COOLDOWN_MS = 15000;
+	/** Dash cooldown duration for Phase 2 (7.5 seconds). */
+	private static final int DASH_COOLDOWN_PHASE2_MS = 7500;
+	/** Dash cooldown duration for Phase 3 (5 seconds). */
+	private static final int DASH_COOLDOWN_PHASE3_MS = 5000;
 
 	/** Screen dimensions. */
 	private final int screenWidth;
@@ -52,8 +54,8 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	/** Attack cooldown values for each phase. */
 	private final int[][] attackCooldownMillis = {
 			{8000},  // Phase 1: 8 seconds
-			{7000},  // Phase 2: 7 seconds (ZigZag)
-			{5000}   // Phase 3: 5 seconds (ZigZag)
+			{5000},  // Phase 2: 7 seconds (ZigZag)
+			{3000}   // Phase 3: 5 seconds (ZigZag)
 	};
 
 	/** Currently active phase (1, 2, or 3). */
@@ -106,7 +108,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 		this.screenWidth = screenWidth;
 		this.screenHeight = screenHeight;
 		this.attackCooldown = new Cooldown(attackCooldownMillis[0][0]);
-		this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
+		this.dashCooldown = new Cooldown(DASH_COOLDOWN_PHASE2_MS);
 	}
 
 	/**
@@ -243,10 +245,10 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 
 		cycleState = PatternCycleState.ATTACK;
 	}
-
 	/**
 	 * Handles Phase 2 pattern cycling.
 	 * Cycle: Random(ZigZag 7s OR TimeGap 4) → Dash 1x → repeat
+	 * If TimeGap selected and dash is on cooldown, use ZigZag until cooldown finishes
 	 */
 	private void handlePhase2Cycle() {
 		if (cycleState == PatternCycleState.ATTACK) {
@@ -268,6 +270,13 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 				if (lasersFired >= maxLasersForPhase) {
 					attackComplete = true;
 					Core.getLogger().info("GammaBossPattern: Phase 2 - TimeGap 4 lasers complete");
+
+					// TimeGap complete but dash on cooldown → switch to ZigZag temporarily
+					if (isInDashCooldown) {
+						Core.getLogger().info("GammaBossPattern: Phase 2 - TimeGap complete, switching to ZigZag until dash ready");
+						switchToTemporaryZigZag(2);
+						return;
+					}
 				}
 			}
 
@@ -298,6 +307,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	/**
 	 * Handles Phase 3 pattern cycling.
 	 * Cycle: Random(ZigZag 5s OR TimeGap 8) → Dash 2x → repeat
+	 * If TimeGap selected and dash is on cooldown, use ZigZag until cooldown finishes
 	 */
 	private void handlePhase3Cycle() {
 		if (cycleState == PatternCycleState.ATTACK) {
@@ -319,6 +329,13 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 				if (lasersFired >= maxLasersForPhase) {
 					attackComplete = true;
 					Core.getLogger().info("GammaBossPattern: Phase 3 - TimeGap 8 lasers complete");
+
+					// TimeGap complete but dash on cooldown → switch to ZigZag temporarily
+					if (isInDashCooldown) {
+						Core.getLogger().info("GammaBossPattern: Phase 3 - TimeGap complete, switching to ZigZag until dash ready");
+						switchToTemporaryZigZag(3);
+						return;
+					}
 				}
 			}
 
@@ -361,12 +378,53 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	}
 
 	/**
+	 * Switch to temporary ZigZag pattern while waiting for dash cooldown.
+	 * This is used when TimeGap completes but dash is still on cooldown.
+	 *
+	 * @param phase Current phase (2 or 3)
+	 */
+	private void switchToTemporaryZigZag(int phase) {
+		// Switch to ZigZag pattern
+		ZigZagPattern zigzag = new ZigZagPattern(boss, screenWidth, screenHeight);
+		int cooldownMs = attackCooldownMillis[phase - 1][0];
+		Cooldown cooldown = new Cooldown(cooldownMs);
+		zigzag.setCooldown(cooldown);
+
+		movePattern = zigzag;
+		attackPattern = zigzag;
+		attackCooldown.setMilliseconds(cooldownMs);
+		attackCooldown.reset();
+		attackCyclesCompleted = 0;
+
+		// Mark that we're now using ZigZag
+		usingZigZag = true;
+
+		Core.getLogger().info("GammaBossPattern: Phase " + phase + " - Temporary ZigZag while waiting for dash cooldown");
+	}
+
+	/**
 	 * Start dash cooldown.
+	 */
+	/**
+	 * Start dash cooldown with phase-specific duration.
 	 */
 	private void startDashCooldown() {
 		isInDashCooldown = true;
+
+		// Set cooldown duration based on current phase
+		int cooldownMs;
+		if (currentPhase == 2) {
+			cooldownMs = DASH_COOLDOWN_PHASE2_MS;
+		} else if (currentPhase == 3) {
+			cooldownMs = DASH_COOLDOWN_PHASE3_MS;
+		} else {
+			cooldownMs = DASH_COOLDOWN_PHASE2_MS; // Fallback
+		}
+
+		dashCooldown.setMilliseconds(cooldownMs);
 		dashCooldown.reset();
-		Core.getLogger().info("GammaBossPattern: Dash cooldown started (15 seconds)");
+
+		Core.getLogger().info("GammaBossPattern: Dash cooldown started (" + cooldownMs + "ms)");
 	}
 
 	/**
@@ -415,6 +473,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	public void attack() {
 		if (attackPattern == null) return;
 		attackPattern.attack();
+		Core.getLogger().info(attackCooldown.checkFinished() + " ");
 	}
 
 	@Override
