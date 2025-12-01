@@ -4,6 +4,7 @@ import audio.SoundManager;
 import engine.Cooldown;
 import engine.Core;
 import engine.DrawManager;
+import entity.pattern.BackgroundExplosionPattern;
 import entity.pattern.GammaBossPattern;
 
 import java.awt.*;
@@ -41,6 +42,8 @@ public class GammaBoss extends MidBoss {
 
     /** Boss pattern coordinator for delegating movement and attack logic */
     private GammaBossPattern bossPattern;
+    /** Background explosion pattern for environmental hazards */
+    private BackgroundExplosionPattern explosionPattern;
     /** Player ships reference for pattern targeting */
     private List<Ship> targetShips;
     /** Logger instance */
@@ -71,6 +74,9 @@ public class GammaBoss extends MidBoss {
         // Initialize pattern coordinator
         this.bossPattern = new GammaBossPattern(this, ships, screenWidth, screenHeight);
 
+        // Initialize background explosion pattern
+        this.explosionPattern = new BackgroundExplosionPattern();
+
         this.logger.info("GAMMA: Initializing Boss GAMMA");
         SoundManager.play("sfx/OmegaBossAppearance.wav");
     }
@@ -96,6 +102,11 @@ public class GammaBoss extends MidBoss {
             // Update position from pattern
             this.positionX = bossPattern.getBossPosition().x;
             this.positionY = bossPattern.getBossPosition().y;
+        }
+
+        // Update background explosion pattern
+        if (explosionPattern != null) {
+            explosionPattern.attack();
         }
     }
 
@@ -210,6 +221,15 @@ public class GammaBoss extends MidBoss {
      */
     public void setTargetShips(List<Ship> ships) {
         this.targetShips = ships;
+    }
+
+    /**
+     * Get the current background explosion entity.
+     *
+     * @return Current Explosion entity, or null if none active
+     */
+    public Explosion getBoom() {
+        return explosionPattern != null ? explosionPattern.getBoom() : null;
     }
 
     @Override

@@ -384,6 +384,7 @@ public class GameModel {
                 if (this.gammaBoss != null) {
                     this.gammaBoss.update();
                     if (this.gammaBoss instanceof GammaBoss gamma) {
+                        this.explosionEntity = gamma.getBoom();
                         bossBullets.addAll(gamma.getBossPattern().getBullets());
                     }
                     updateBossBullets();
