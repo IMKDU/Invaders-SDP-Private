@@ -12,6 +12,10 @@
       "enemyTypes": [
         { "type": "enemyA", "count": 20 }
       ],
+      "itemDrops": [
+        { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 }
+      ],
+
       "completionBonus": { "currency": 10 }
     },
     {
@@ -28,9 +32,11 @@
         { "type": "enemyB", "count": 10 }
       ],
       "itemDrops": [
-        { "enemyType": "enemyA", "itemId": "Heal", "dropChance": 0.15 },
+        { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
+        { "enemyType": "enemyA", "itemId": "Heal", "dropChance": 0.1 },
         { "enemyType": "enemyA", "itemId": "Shield", "dropChance": 0.05 },
-        { "enemyType": "enemyB", "itemId": "Shield", "dropChance": 0.1 }
+        { "enemyType": "enemyB", "itemId": "Shield", "dropChance": 0.1 },
+        { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 }
       ],
       "bossId": "omegaBoss",
       "completionBonus": { "currency": 20 }
@@ -50,9 +56,11 @@
       ],
       "itemDrops": [
         { "enemyType": "enemyA", "itemId": "Heal", "dropChance": 0.1 },
+        { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyA", "itemId": "Push", "dropChance": 0.05 },
         { "enemyType": "enemyB", "itemId": "Shield", "dropChance": 0.15 },
-        { "enemyType": "enemyB", "itemId": "Slow", "dropChance": 0.05 }
+        { "enemyType": "enemyB", "itemId": "Slow", "dropChance": 0.05 },
+        { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 }
       ],
       "bossId": "ZetaBoss",
       "completionBonus": { "currency": 30 }
@@ -71,10 +79,12 @@
         { "type": "enemyB", "count": 18 }
       ],
       "itemDrops": [
+        { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyA", "itemId": "Shield", "dropChance": 0.15 },
         { "enemyType": "enemyA", "itemId": "Slow", "dropChance": 0.05 },
         { "enemyType": "enemyB", "itemId": "Slow", "dropChance": 0.1 },
-        { "enemyType": "enemyB", "itemId": "Push", "dropChance": 0.05 }
+        { "enemyType": "enemyB", "itemId": "Push", "dropChance": 0.05 },
+        { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 }
       ],
       "bossId": "finalBoss",
       "completionBonus": { "currency": 40 }
@@ -94,10 +104,13 @@
         { "type": "enemyC", "count": 14 }
       ],
       "itemDrops": [
+        { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyB", "itemId": "Slow", "dropChance": 0.15 },
         { "enemyType": "enemyB", "itemId": "Stop", "dropChance": 0.05 },
+        { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyC", "itemId": "Stop", "dropChance": 0.1 },
-        { "enemyType": "enemyC", "itemId": "Push", "dropChance": 0.05 }
+        { "enemyType": "enemyC", "itemId": "Push", "dropChance": 0.05 },
+        { "enemyType": "enemyC", "itemId": "SubShip", "dropChance": 0.1 }
       ],
       "bossId": "omegaBoss",
       "completionBonus": { "currency": 50 }
@@ -117,8 +130,8 @@
       ],
       "itemDrops": [
         { "enemyType": "enemyB", "itemId": "Stop", "dropChance": 0.1 },
-        { "enemyType": "enemyB", "itemId": "Explode", "dropChance": 0.02 },
-        { "enemyType": "enemyC", "itemId": "Explode", "dropChance": 0.05 },
+        { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 },
+        { "enemyType": "enemyC", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyC", "itemId": "Stop", "dropChance": 0.05 }
       ],
       "bossId": "ZetaBoss",
@@ -139,7 +152,9 @@
         { "type": "enemyC", "count": 23 }
       ],
       "itemDrops": [
-        { "enemyType": "enemyC", "itemId": "Explode", "dropChance": 0.1 },
+        { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
+        { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 },
+        { "enemyType": "enemyC", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyC", "itemId": "Heal", "dropChance": 0.05 }
       ],
       "bossId": "omegaAndZetaAndFinal",

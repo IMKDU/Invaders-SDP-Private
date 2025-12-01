@@ -40,7 +40,7 @@ public class ItemRenderer {
 
 	private SpriteType getSprite(DropItem.ItemType type) {
 		switch (type) {
-			case Explode: return SpriteType.Item_Explode;
+            case SubShip: return SpriteType.Item_SubShip;
 			case Slow:    return SpriteType.Item_Slow;
 			case Stop:    return SpriteType.Item_Stop;
 			case Push:    return SpriteType.Item_Push;
@@ -52,7 +52,7 @@ public class ItemRenderer {
 
 	private Color getColor(DropItem.ItemType type) {
 		switch (type) {
-			case Explode: return Color.RED;
+			case SubShip: return Color.RED;
 			case Slow:    return Color.BLUE;
 			case Stop:    return Color.YELLOW;
 			case Push:    return Color.ORANGE;
