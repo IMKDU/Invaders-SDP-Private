@@ -109,6 +109,11 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 
         this.width = (this.nShipsWide - 1) * SEPARATION_DISTANCE + this.shipWidth;
         this.height = (this.nShipsHigh - 1) * SEPARATION_DISTANCE + this.shipHeight;
+
+        if(level.getLevel() == 2){
+            CrossFormationMovement cross = new CrossFormationMovement(enemyShips);
+            setMovementStrategy(cross);
+        }
     }
 
     /**
@@ -394,12 +399,8 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 		}
 	}
 
-    /**
-     * Switches the movement pattern to the "Cross Formation"
-     * Ships move diagonally from corner to corner.
-     */
-    public void setCrossFormationPattern() {
-        this.movementStrategy = new CrossFormationMovement(this.enemyShips);
-        this.logger.info("Enemy pattern switched to Cross Formation (Blue Pattern).");
+    public void setMovementStrategy(IMovementStrategy strategy) {
+        this.movementStrategy = strategy;
+        this.logger.info("Movement Strategy switched to: " + strategy.getClass().getSimpleName());
     }
 }

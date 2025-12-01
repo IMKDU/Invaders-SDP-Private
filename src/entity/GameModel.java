@@ -213,9 +213,6 @@ public class GameModel {
 
         this.ship.setModel(this);
         this.shipP2.setModel(this);
-        if(currentLevel.getLevel() == 7){
-            enemyShipFormationModel.setCrossFormationPattern();
-        }
     }
 
     /**
