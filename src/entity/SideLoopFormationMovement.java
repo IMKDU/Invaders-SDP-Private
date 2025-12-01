@@ -5,20 +5,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import engine.Cooldown;
 /**
  * Handles the Side Loop movement pattern using a look-ahead vector strategy.
  * Implements a "Follow-the-Leader" logic to prevent ship overlapping.
  */
 public class SideLoopFormationMovement implements IMovementStrategy {
 
-    private static final int SHIP_SPEED = 4;
-    private static final int LOOK_AHEAD_DISTANCE = 80;
-    private static final float SEARCH_STEP = 0.005f;
-    private static final float SPAWN_GAP_T = 0.22f;
-    private static final int RESPAWN_DELAY = 60;
-    private static final int ARC_WIDTH = 700;
-    private static final int PATH_HEIGHT = 600;
-    private static final double DISTANCE_THRESHOLD_FOR_SPEED_BOOST = 2.0;
+    private final int SHIP_SPEED = 4;
+    private final int LOOK_AHEAD_DISTANCE = 80;
+    private final float SEARCH_STEP = 0.005f;
+
+    // Distance gap for follow-the-leader logic
+    private final float SPAWN_GAP_T = 0.22f;
+
+    private final int RESPAWN_DELAY_MS = 1000;
+    private final int ARC_WIDTH = 700;
+    private final int PATH_HEIGHT = 600;
+    private final double DISTANCE_THRESHOLD_FOR_SPEED_BOOST = 2.0;
 
     private List<List<EnemyShip>> enemyShips;
     private Map<EnemyShip, ShipState> shipStates;
@@ -30,19 +34,23 @@ public class SideLoopFormationMovement implements IMovementStrategy {
     private int startY;
     private int shipWidth;
 
+    /**
+     * Inner class to track individual ship state.
+     * Replaced 'int waitTimer' with 'Cooldown' object.
+     */
     private class ShipState {
         float t;
-        int waitTimer;
+        Cooldown cooldown;
         boolean isMoving;
         boolean isLeftTeam;
         boolean isFinished;
 
         public ShipState(boolean isLeft) {
-            this.waitTimer = 0;
             this.isLeftTeam = isLeft;
             this.isMoving = false;
             this.isFinished = false;
             this.t = 0.0f;
+            this.cooldown = new Cooldown(0);
         }
     }
     /**
@@ -55,8 +63,8 @@ public class SideLoopFormationMovement implements IMovementStrategy {
         this.screenWidth = GameConstant.SCREEN_WIDTH;
         this.startY = GameConstant.STAT_SEPARATION_LINE_HEIGHT + 50;
         this.shipWidth = 0;
-        if (enemyShips != null && !enemyShips.isEmpty() && !enemyShips.get(0).isEmpty()) {
-            this.shipWidth = enemyShips.get(0).get(0).getWidth();
+        if (enemyShips != null && !enemyShips.isEmpty() && !enemyShips.getFirst().isEmpty()) {
+            this.shipWidth = enemyShips.getFirst().getFirst().getWidth();
         }
         initializePaths();
         initializeShips();
@@ -118,28 +126,23 @@ public class SideLoopFormationMovement implements IMovementStrategy {
                 ShipState state = shipStates.get(ship);
                 if (state == null) continue;
 
-                // Handle Cooldown after finishing path
-                if (state.waitTimer > 0) {
-                    state.waitTimer--;
-                    if (state.waitTimer == 0) {
-                        state.isFinished = false;
-                        state.isMoving = false;
-                        state.t = 0.0f;
-                    }
+                if (!state.cooldown.checkFinished()) {
                     continue;
                 }
 
+                if (state.isFinished && state.cooldown.checkFinished()) {
+                    state.isFinished = false;
+                    state.isMoving = false;
+                    state.t = 0.0f;
+                }
                 if (state.isFinished) continue;
 
-                // Follow-the-Leader Logic
                 ShipState leader = state.isLeftTeam ? prevLeftShipState : prevRightShipState;
                 boolean canStart = false;
 
                 if (leader == null) {
-                    // First ship in the team starts immediately
                     canStart = true;
                 } else {
-                    // Subsequent ships start only if the leader has traveled enough distance
                     if (leader.isFinished || (leader.isMoving && leader.t >= SPAWN_GAP_T)) {
                         canStart = true;
                     }
@@ -153,7 +156,6 @@ public class SideLoopFormationMovement implements IMovementStrategy {
                     moveShipWithLookAhead(ship, state);
                 }
 
-                // Register current ship as the leader for the next one
                 if (state.isLeftTeam) prevLeftShipState = state;
                 else prevRightShipState = state;
             }
@@ -161,7 +163,7 @@ public class SideLoopFormationMovement implements IMovementStrategy {
     }
 
     /**
-     * Calculates the look-ahead target and checks for path completion.
+     * Calculates look-ahead target and checks for path completion.
      * @param ship The ship to move.
      * @param state The ship's state.
      */
@@ -228,21 +230,21 @@ public class SideLoopFormationMovement implements IMovementStrategy {
     }
 
     /**
-     * Finalizes the path and starts the respawn cooldown.
      * @param ship The ship to hide.
      * @param state The ship's state.
      */
     private void finishRun(EnemyShip ship, ShipState state) {
         state.isMoving = false;
         state.isFinished = true;
-        state.waitTimer = RESPAWN_DELAY;
+        state.cooldown.setMilliseconds(RESPAWN_DELAY_MS);
+        state.cooldown.reset();
         ship.setPositionX(-500);
     }
 
     /**
-     * Returns the correct Bezier point for the team.
+     * Returns the appropriate Bezier point based on the team.
      * @param t Progress (0.0 to 1.0).
-     * @param isLeft Team flag.
+     * @param isLeft True if left team, false otherwise.
      * @return The calculated Point.
      */
     private Point getBezierPoint(float t, boolean isLeft) {
