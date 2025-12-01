@@ -48,6 +48,8 @@ public class GammaBoss extends MidBoss {
 
 	/** Animation cooldown for sprite changes */
 	private Cooldown animationCooldown;
+	/** Flag to track if boss was hit (for visual feedback) */
+	private boolean ishit = false;
 
 	/**
 	 * Constructor, establishes the GammaBoss entity's properties.
@@ -100,12 +102,18 @@ public class GammaBoss extends MidBoss {
 	/**
 	 * Update sprite based on current phase.
 	 * Cycles between OmegaBoss1 and OmegaBoss2 for animation.
+	 * Shows hitting sprite when boss is hit.
 	 */
 	private void updateSprite() {
-		if (this.spriteType == DrawManager.SpriteType.OmegaBoss1) {
-			this.spriteType = DrawManager.SpriteType.OmegaBoss2;
+		if (this.ishit) {
+			this.spriteType = DrawManager.SpriteType.OmegaBossHitting;
+			this.ishit = false;
 		} else {
-			this.spriteType = DrawManager.SpriteType.OmegaBoss1;
+			if (this.spriteType == DrawManager.SpriteType.OmegaBoss1) {
+				this.spriteType = DrawManager.SpriteType.OmegaBoss2;
+			} else {
+				this.spriteType = DrawManager.SpriteType.OmegaBoss1;
+			}
 		}
 	}
 
@@ -135,6 +143,7 @@ public class GammaBoss extends MidBoss {
 	public void takeDamage(int damage) {
 		this.healPoint -= damage;
 		SoundManager.play("sfx/OmegaBoss_hitting.wav");
+		ishit = true;
 
 		if (this.healPoint <= 0) {
 			this.destroy();

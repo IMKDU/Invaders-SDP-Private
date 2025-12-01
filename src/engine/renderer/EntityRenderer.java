@@ -231,10 +231,35 @@ public final class EntityRenderer {
      * Draws GammaBoss entity with pattern-specific visualizations.
      */
     private void drawGammaBoss(GammaBoss gammaBoss) {
-        BossPattern currentPattern = gammaBoss.getBossPattern();
-        if (currentPattern != null) {
-            drawBossPattern(gammaBoss, currentPattern);
+        // Check if showing dash path and draw it
+        if (gammaBoss.isShowingPath()) {
+            int[] targetPoint = gammaBoss.getDashEndPoint();
+            int bossWidth = gammaBoss.getWidth();
+            int bossHeight = gammaBoss.getHeight();
+            int startX = gammaBoss.getPositionX() + bossWidth / 2;
+            int startY = gammaBoss.getPositionY() + bossHeight / 2;
+            int targetX = targetPoint[0];
+            int targetY = targetPoint[1];
+
+            // Calculate direction vector and extend to long endpoint
+            double dx = targetX - startX;
+            double dy = targetY - startY;
+            double len = Math.sqrt(dx * dx + dy * dy);
+
+            if (len > 0) {
+                dx /= len;
+                dy /= len;
+
+                // Extend to sufficient distance (beyond screen)
+                double extendDistance = 2000.0;
+                int endX = (int) Math.round(startX + dx * extendDistance);
+                int endY = (int) Math.round(startY + dy * extendDistance);
+
+                // Draw path
+                drawDashPath(startX, startY, endX, endY);
+            }
         }
+
         drawEntity(gammaBoss, gammaBoss.getPositionX(), gammaBoss.getPositionY());
     }
 
