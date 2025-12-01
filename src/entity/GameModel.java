@@ -73,7 +73,7 @@ public class GameModel {
     private Set<Bullet> bullets;
     /** Set of all dropItems dropped by on screen ships. */
     private Set<DropItem> dropItems;
-    /** set of subship */
+    /** List of subship */
     private List<SubShip> subShips;
     /** Current score. */
     private int score;
@@ -212,8 +212,8 @@ public class GameModel {
 //        lastHp = Integer.MAX_VALUE;
         /** ships list for boss argument */
         this.ships = new ArrayList<>();
-        if (this.ship != null) ships.add(this.ship);
-        if (this.shipP2 != null) ships.add(this.shipP2);
+        if (this.ship != null && this.livesP1 > 0) ships.add(this.ship);
+        if (this.shipP2 != null && this.livesP2 > 0) ships.add(this.shipP2);
 
         this.ship.setModel(this);
         this.shipP2.setModel(this);
@@ -397,8 +397,8 @@ public class GameModel {
 
         // Update SubShips
         if (this.subShips != null) {
-            for (int i = 0; i < subShips.size(); i++) {
-                subShips.get(i).update();
+            for (SubShip subShip : subShips) {
+                subShip.update();
             }
             // Remove destroyed or expired sub-ships
             subShips.removeIf(SubShip::isDestroyed);
@@ -773,9 +773,6 @@ public class GameModel {
 				break;
 
 			case SubShip:
-                if (this.subShips == null) {
-                    this.subShips = new ArrayList<>();
-                }
                 DropItem.activateSubShip(ship, this.subShips);
                 break;
 

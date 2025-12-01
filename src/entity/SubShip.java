@@ -22,6 +22,8 @@ public class SubShip extends Entity {
     private long creationTime;
     /** Duration of the sub-ship in milliseconds (10 seconds). */
     private static final long DURATION = 10000L;
+    /** Initial time between shots. */
+    private static final int SHOOTING_INTERVAL = 750;
     /** Time between shots (same as basic ship). */
     private Cooldown shootingCooldown;
 
@@ -48,7 +50,7 @@ public class SubShip extends Entity {
         this.offsetX = isLeft ? -(this.width + gap) : (owner.getWidth() + gap);
 
         this.creationTime = System.currentTimeMillis();
-        this.shootingCooldown = new Cooldown(750); // Basic shooting interval
+        this.shootingCooldown = new Cooldown(SHOOTING_INTERVAL); // Basic shooting interval
         this.isDestroyed = false;
 
         updatePosition();
@@ -130,20 +132,14 @@ public class SubShip extends Entity {
             int centerY = positionY;
 
             // --- Bullet firing logic (apply calculated values) ---
-            if (bulletCount <= 1) {
-                Bullet b = BulletPool.getBullet(centerX, centerY, speed);
+            int startOffset = -(bulletCount / 2) * spacing;
+
+            for (int i = 0; i < bulletCount; i++) {
+                int offsetX = startOffset + (i * spacing);
+                Bullet b = BulletPool.getBullet(centerX + offsetX, centerY, speed);
                 b.setOwnerId(owner.getPlayerId());
                 b.setMaxPenetration(penetrationCount);
                 bullets.add(b);
-            } else {
-                int startOffset = -(bulletCount / 2) * spacing;
-                for (int i = 0; i < bulletCount; i++) {
-                    int offsetX = startOffset + (i * spacing);
-                    Bullet b = BulletPool.getBullet(centerX + offsetX, centerY, speed);
-                    b.setOwnerId(owner.getPlayerId());
-                    b.setMaxPenetration(penetrationCount);
-                    bullets.add(b);
-                }
             }
         }
     }
