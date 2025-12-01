@@ -12,7 +12,7 @@ import engine.Cooldown;
  */
 public class SideLoopFormationMovement implements IMovementStrategy {
 
-    private final int SHIP_SPEED = 4;
+    private static final int SHIP_SPEED = 4;
     private final int LOOK_AHEAD_DISTANCE = 80;
     private final float SEARCH_STEP = 0.005f;
 
@@ -32,11 +32,13 @@ public class SideLoopFormationMovement implements IMovementStrategy {
 
     private int screenWidth;
     private int startY;
+    private final int START_Y_MARGIN = 50;
     private int shipWidth;
+    private final int ARRIVAL_THRESHOLD = 20;
+    private Point tempPoint;
 
     /**
      * Inner class to track individual ship state.
-     * Replaced 'int waitTimer' with 'Cooldown' object.
      */
     private class ShipState {
         float t;
@@ -61,11 +63,12 @@ public class SideLoopFormationMovement implements IMovementStrategy {
         this.enemyShips = enemyShips;
         this.shipStates = new HashMap<>();
         this.screenWidth = GameConstant.SCREEN_WIDTH;
-        this.startY = GameConstant.STAT_SEPARATION_LINE_HEIGHT + 50;
+        this.startY = GameConstant.STAT_SEPARATION_LINE_HEIGHT + START_Y_MARGIN;
         this.shipWidth = 0;
         if (enemyShips != null && !enemyShips.isEmpty() && !enemyShips.getFirst().isEmpty()) {
             this.shipWidth = enemyShips.getFirst().getFirst().getWidth();
         }
+        tempPoint = new Point();
         initializePaths();
         initializeShips();
     }
@@ -138,14 +141,10 @@ public class SideLoopFormationMovement implements IMovementStrategy {
                 if (state.isFinished) continue;
 
                 ShipState leader = state.isLeftTeam ? prevLeftShipState : prevRightShipState;
-                boolean canStart = false;
+                boolean canStart = (leader == null) || leader.isFinished || (leader.isMoving && leader.t >= SPAWN_GAP_T);
 
-                if (leader == null) {
-                    canStart = true;
-                } else {
-                    if (leader.isFinished || (leader.isMoving && leader.t >= SPAWN_GAP_T)) {
-                        canStart = true;
-                    }
+                if (!state.isMoving && canStart) {
+                    startRun(ship, state);
                 }
 
                 if (!state.isMoving && canStart) {
@@ -170,22 +169,25 @@ public class SideLoopFormationMovement implements IMovementStrategy {
     private void moveShipWithLookAhead(EnemyShip ship, ShipState state) {
         int currentX = ship.getPositionX();
         int currentY = ship.getPositionY();
+        updateBezierPoint(state.t, state.isLeftTeam);
+        double dx = tempPoint.x - currentX;
+        double dy = tempPoint.y - currentY;
+        double distance = Math.sqrt(dx * dx + dy * dy);
 
-        Point targetPos = getBezierPoint(state.t, state.isLeftTeam);
-        double dist = Math.sqrt(Math.pow(targetPos.x - currentX, 2) + Math.pow(targetPos.y - currentY, 2));
-
-        while (dist < LOOK_AHEAD_DISTANCE && state.t < 1.0f) {
+        while (distance < LOOK_AHEAD_DISTANCE && state.t < 1.0f) {
             state.t += SEARCH_STEP;
-            targetPos = getBezierPoint(state.t, state.isLeftTeam);
-            dist = Math.sqrt(Math.pow(targetPos.x - currentX, 2) + Math.pow(targetPos.y - currentY, 2));
+            updateBezierPoint(state.t, state.isLeftTeam);
+            dx = tempPoint.x - currentX;
+            dy = tempPoint.y - currentY;
+            distance = Math.sqrt(dx * dx + dy * dy);
         }
 
-        if (state.t >= 1.0f && dist < 20) {
+        if (state.t >= 1.0f && distance < ARRIVAL_THRESHOLD) {
             finishRun(ship, state);
             return;
         }
 
-        moveToTargetVector(ship, targetPos.x, targetPos.y);
+        moveToTargetVector(ship, tempPoint.x, tempPoint.y);
     }
 
     /**
@@ -224,12 +226,13 @@ public class SideLoopFormationMovement implements IMovementStrategy {
     private void startRun(EnemyShip ship, ShipState state) {
         state.isMoving = true;
         state.t = 0.0f;
-        Point start = getBezierPoint(0.0f, state.isLeftTeam);
-        ship.setPositionX(start.x);
-        ship.setPositionY(start.y);
+        updateBezierPoint(0.0f, state.isLeftTeam);
+        ship.setPositionX(tempPoint.x);
+        ship.setPositionY(tempPoint.y);
     }
 
     /**
+     * Finalizes the path and starts the respawn cooldown.
      * @param ship The ship to hide.
      * @param state The ship's state.
      */
@@ -242,36 +245,33 @@ public class SideLoopFormationMovement implements IMovementStrategy {
     }
 
     /**
-     * Returns the appropriate Bezier point based on the team.
+     * Updates 'tempPoint' with the calculated Bezier coordinates.
      * @param t Progress (0.0 to 1.0).
-     * @param isLeft True if left team, false otherwise.
-     * @return The calculated Point.
+     * @param isLeft Team flag.
      */
-    private Point getBezierPoint(float t, boolean isLeft) {
-        if (isLeft) return getCubicBezierPoint(t, l_p0, l_p1, l_p2, l_p3);
-        else return getCubicBezierPoint(t, r_p0, r_p1, r_p2, r_p3);
+    private void updateBezierPoint(float t, boolean isLeft) {
+        if (isLeft) updateCubicBezierPoint(t, l_p0, l_p1, l_p2, l_p3);
+        else updateCubicBezierPoint(t, r_p0, r_p1, r_p2, r_p3);
     }
 
     /**
-     * Calculates a point on a Cubic Bezier curve.
+     * Calculates Cubic Bezier curve and updates 'tempPoint'.
      * @param t Progress (0.0 to 1.0).
      * @param p0 Start point.
      * @param p1 Control point 1.
      * @param p2 Control point 2.
      * @param p3 End point.
-     * @return The calculated Point.
      */
-    private Point getCubicBezierPoint(float t, Point p0, Point p1, Point p2, Point p3) {
+    private void updateCubicBezierPoint(float t, Point p0, Point p1, Point p2, Point p3) {
         if (t > 1.0f) t = 1.0f;
         float u = 1 - t;
         float tt = t * t;
         float uu = u * u;
         float uuu = uu * u;
         float ttt = tt * t;
-
         double x = uuu * p0.x + 3 * uu * t * p1.x + 3 * u * tt * p2.x + ttt * p3.x;
         double y = uuu * p0.y + 3 * uu * t * p1.y + 3 * u * tt * p2.y + ttt * p3.y;
-        return new Point((int) x, (int) y);
+        this.tempPoint.setLocation((int) x, (int) y);
     }
 
     @Override
