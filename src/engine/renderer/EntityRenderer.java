@@ -192,6 +192,10 @@ public final class EntityRenderer {
            ZetaBoss zetaBoss = (ZetaBoss) entity;
            drawZetaBoss(zetaBoss);
         }
+        else if (entity instanceof GammaBoss) {
+           GammaBoss gammaBoss = (GammaBoss) entity;
+           drawGammaBoss(gammaBoss);
+        }
 		else if (entity instanceof MidBossMob) {
 			MidBossMob midBossMob = (MidBossMob) entity;
 			drawMidBossMob(midBossMob);
@@ -221,6 +225,17 @@ public final class EntityRenderer {
             drawBossPattern(zetaBoss, currentPattern);
         }
         drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
+    }
+
+    /**
+     * Draws GammaBoss entity with pattern-specific visualizations.
+     */
+    private void drawGammaBoss(GammaBoss gammaBoss) {
+        BossPattern currentPattern = gammaBoss.getBossPattern();
+        if (currentPattern != null) {
+            drawBossPattern(gammaBoss, currentPattern);
+        }
+        drawEntity(gammaBoss, gammaBoss.getPositionX(), gammaBoss.getPositionY());
     }
 
 	private void drawMidBossMob(MidBossMob midBossMob) {
@@ -302,6 +317,8 @@ public final class EntityRenderer {
             targetPoint = ((OmegaBoss) boss).getDashEndPoint();
         } else if (boss instanceof ZetaBoss) {
             targetPoint = ((ZetaBoss) boss).getDashEndPoint();
+        } else if (boss instanceof GammaBoss) {
+            targetPoint = ((GammaBoss) boss).getDashEndPoint();
         } else {
             return;
         }

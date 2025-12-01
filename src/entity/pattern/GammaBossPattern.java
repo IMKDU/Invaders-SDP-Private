@@ -52,8 +52,8 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	/** Attack cooldown values for each phase. */
 	private final int[][] attackCooldownMillis = {
 			{8000},  // Phase 1: 8 seconds
-			{5000},  // Phase 2: 5 seconds
-			{5000}   // Phase 3: 5 seconds
+			{7000},  // Phase 2: 7 seconds (ZigZag)
+			{5000}   // Phase 3: 5 seconds (ZigZag)
 	};
 
 	/** Currently active phase (1, 2, or 3). */
@@ -64,10 +64,8 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	/** Reference to the player ships for targeting. */
 	private List<Ship> targetShips;
 
-	/** Pattern cycle tracking. */
-	private int zigzagCycleCount = 0;
 	/** Current sub-pattern in the cycle (for phase 2 and 3). */
-	private PatternCycleState cycleState = PatternCycleState.ZIGZAG;
+	private PatternCycleState cycleState = PatternCycleState.ATTACK;
 	/** Dash counter for phase 3 (2 consecutive dashes). */
 	private int consecutiveDashCount = 0;
 	/** Flag to track if in dash cooldown. */
@@ -78,12 +76,18 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 	/** Maximum lasers for current phase. */
 	private int maxLasersForPhase = 0;
 
+	/** Track if using ZigZag or TimeGap for current attack cycle. */
+	private boolean usingZigZag = false;
+	/** Number of attack cycles completed (for ZigZag). */
+	private int attackCyclesCompleted = 0;
+	/** Required attack cycles before switching to dash. */
+	private static final int REQUIRED_ATTACK_CYCLES = 2;
+
 	/**
 	 * Enum for tracking current pattern cycle state.
 	 */
 	private enum PatternCycleState {
-		ZIGZAG,
-		TIMEGAP,
+		ATTACK,  // ZigZag or TimeGap attack
 		DASH
 	}
 
@@ -163,153 +167,171 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 			attackPattern = zigzag;
 			attackCooldown.setMilliseconds(attackCooldownMillis[0][0]);
 			attackCooldown.reset();
-			cycleState = PatternCycleState.ZIGZAG;
-			zigzagCycleCount = 0;
+			cycleState = PatternCycleState.ATTACK;
 			Core.getLogger().info("GammaBossPattern: Phase 1 start - ZigZag (8s cooldown)");
 		}
 	}
 
 	/**
-	 * Phase 2 configuration: ZigZag → TimeGap (4 lasers) → Dash cycle.
+	 * Phase 2 configuration: Random(ZigZag 7s OR TimeGap 4) → Dash 1x.
 	 *
 	 * @param isInit true if phase just started
 	 */
 	private void phase2(boolean isInit) {
 		currentPhase = 2;
 		if (isInit) {
-			ZigZagPattern zigzag = new ZigZagPattern(boss, screenWidth, screenHeight);
-			Cooldown cooldown5s = new Cooldown(attackCooldownMillis[1][0]);
-			zigzag.setCooldown(cooldown5s);
-
-			movePattern = zigzag;
-			attackPattern = zigzag;
-			attackCooldown.setMilliseconds(attackCooldownMillis[1][0]);
-			attackCooldown.reset();
-			cycleState = PatternCycleState.ZIGZAG;
-			zigzagCycleCount = 0;
-			Core.getLogger().info("GammaBossPattern: Phase 2 start - ZigZag → TimeGap (4) → Dash cycle");
+			// Start with random attack pattern selection
+			selectRandomAttackPattern(2);
+			Core.getLogger().info("GammaBossPattern: Phase 2 start - Random attack → Dash 1x");
 		}
 
 		handlePhase2Cycle();
 	}
 
 	/**
-	 * Phase 3 configuration: ZigZag → TimeGap (8 lasers) → 2x Dash cycle.
+	 * Phase 3 configuration: Random(ZigZag 5s OR TimeGap 8) → Dash 2x.
 	 *
 	 * @param isInit true if phase just started
 	 */
 	private void phase3(boolean isInit) {
 		currentPhase = 3;
 		if (isInit) {
-			ZigZagPattern zigzag = new ZigZagPattern(boss, screenWidth, screenHeight);
-			Cooldown cooldown5s = new Cooldown(attackCooldownMillis[2][0]);
-			zigzag.setCooldown(cooldown5s);
-
-			movePattern = zigzag;
-			attackPattern = zigzag;
-			attackCooldown.setMilliseconds(attackCooldownMillis[2][0]);
-			attackCooldown.reset();
-			cycleState = PatternCycleState.ZIGZAG;
-			zigzagCycleCount = 0;
+			// Start with random attack pattern selection
 			consecutiveDashCount = 0;
-			Core.getLogger().info("GammaBossPattern: Phase 3 start - ZigZag → TimeGap (8) → 2x Dash cycle");
+			selectRandomAttackPattern(3);
+			Core.getLogger().info("GammaBossPattern: Phase 3 start - Random attack → Dash 2x");
 		}
 
 		handlePhase3Cycle();
 	}
 
 	/**
+	 * Randomly selects between ZigZag or TimeGap attack pattern.
+	 *
+	 * @param phase Current phase (2 or 3)
+	 */
+	private void selectRandomAttackPattern(int phase) {
+		// Randomly choose between ZigZag (true) or TimeGap (false)
+		usingZigZag = Math.random() < 0.5;
+
+		if (usingZigZag) {
+			// Use ZigZag pattern
+			ZigZagPattern zigzag = new ZigZagPattern(boss, screenWidth, screenHeight);
+			int cooldownMs = attackCooldownMillis[phase - 1][0];
+			Cooldown cooldown = new Cooldown(cooldownMs);
+			zigzag.setCooldown(cooldown);
+
+			movePattern = zigzag;
+			attackPattern = zigzag;
+			attackCooldown.setMilliseconds(cooldownMs);
+			attackCooldown.reset();
+			attackCyclesCompleted = 0;
+
+			Core.getLogger().info("GammaBossPattern: Phase " + phase + " - Selected ZigZag pattern (" + cooldownMs + "ms cooldown)");
+		} else {
+			// Use TimeGap pattern
+			int maxLasers = (phase == 2) ? 4 : 8;
+			TimeGapAttackPattern timegap = new TimeGapAttackPattern(boss, targetShips, screenWidth, screenHeight);
+
+			movePattern = timegap;
+			attackPattern = timegap;
+			lasersFired = 0;
+			maxLasersForPhase = maxLasers;
+
+			Core.getLogger().info("GammaBossPattern: Phase " + phase + " - Selected TimeGap pattern (" + maxLasers + " lasers)");
+		}
+
+		cycleState = PatternCycleState.ATTACK;
+	}
+
+	/**
 	 * Handles Phase 2 pattern cycling.
-	 * Cycle: ZigZag → TimeGap (4 lasers) → Dash → repeat
+	 * Cycle: Random(ZigZag 7s OR TimeGap 4) → Dash 1x → repeat
 	 */
 	private void handlePhase2Cycle() {
-		if (cycleState == PatternCycleState.ZIGZAG) {
-			// After 2 attack cycles, switch to TimeGap
-			if (attackCooldown.checkFinished()) {
-				zigzagCycleCount++;
-				if (zigzagCycleCount >= 2) {
-					// Switch to TimeGap pattern
-					TimeGapAttackPattern timegap = new TimeGapAttackPattern(boss, targetShips, screenWidth, screenHeight);
-					movePattern = timegap;
-					attackPattern = timegap;
-					cycleState = PatternCycleState.TIMEGAP;
-					zigzagCycleCount = 0;
-					lasersFired = 0;
-					maxLasersForPhase = 4;
-					Core.getLogger().info("GammaBossPattern: Phase 2 - Switching to TimeGap (4 lasers)");
+		if (cycleState == PatternCycleState.ATTACK) {
+			// Check if attack phase is complete
+			boolean attackComplete = false;
+
+			if (usingZigZag) {
+				// ZigZag: check if 2 attack cycles completed
+				if (attackCooldown.checkFinished()) {
+					attackCyclesCompleted++;
+					attackCooldown.reset();
+					if (attackCyclesCompleted >= REQUIRED_ATTACK_CYCLES) {
+						attackComplete = true;
+						Core.getLogger().info("GammaBossPattern: Phase 2 - ZigZag 2 cycles complete");
+					}
+				}
+			} else {
+				// TimeGap: check if enough lasers fired
+				if (lasersFired >= maxLasersForPhase) {
+					attackComplete = true;
+					Core.getLogger().info("GammaBossPattern: Phase 2 - TimeGap 4 lasers complete");
 				}
 			}
-		} else if (cycleState == PatternCycleState.TIMEGAP) {
-			// Check if we've fired enough lasers
-			if (lasersFired >= maxLasersForPhase) {
-				// Switch to Dash if cooldown ready
-				if (!isInDashCooldown) {
-					Ship target = getRandomAliveShip();
-					if (target != null) {
-						DashPattern dash = new DashPattern(boss, target);
-						movePattern = dash;
-						attackPattern = dash;
-						cycleState = PatternCycleState.DASH;
-						Core.getLogger().info("GammaBossPattern: Phase 2 - Starting Dash");
-					}
+
+			// Switch to Dash if attack complete and dash cooldown ready
+			if (attackComplete && !isInDashCooldown) {
+				Ship target = getRandomAliveShip();
+				if (target != null) {
+					DashPattern dash = new DashPattern(boss, target);
+					movePattern = dash;
+					attackPattern = dash;
+					cycleState = PatternCycleState.DASH;
+					consecutiveDashCount = 0;
+					Core.getLogger().info("GammaBossPattern: Phase 2 - Starting Dash");
 				}
 			}
 		} else if (cycleState == PatternCycleState.DASH) {
 			// Check if Dash finished
 			if (attackPattern instanceof DashPattern &&
 					((DashPattern) attackPattern).isDashCompleted()) {
-				// Start dash cooldown and return to ZigZag
+				// Start dash cooldown and select new random attack pattern
 				startDashCooldown();
-
-				ZigZagPattern zigzag = new ZigZagPattern(boss, screenWidth, screenHeight);
-				Cooldown cooldown5s = new Cooldown(attackCooldownMillis[1][0]);
-				zigzag.setCooldown(cooldown5s);
-
-				movePattern = zigzag;
-				attackPattern = zigzag;
-				attackCooldown.reset();
-				cycleState = PatternCycleState.ZIGZAG;
-				zigzagCycleCount = 0;
-				Core.getLogger().info("GammaBossPattern: Phase 2 - Returning to ZigZag");
+				selectRandomAttackPattern(2);
+				Core.getLogger().info("GammaBossPattern: Phase 2 - Dash complete, starting new random attack");
 			}
 		}
 	}
 
 	/**
 	 * Handles Phase 3 pattern cycling.
-	 * Cycle: ZigZag → TimeGap (8 lasers) → 2x Dash → repeat
+	 * Cycle: Random(ZigZag 5s OR TimeGap 8) → Dash 2x → repeat
 	 */
 	private void handlePhase3Cycle() {
-		if (cycleState == PatternCycleState.ZIGZAG) {
-			// After 2 attack cycles, switch to TimeGap
-			if (attackCooldown.checkFinished()) {
-				zigzagCycleCount++;
-				if (zigzagCycleCount >= 2) {
-					// Switch to TimeGap pattern
-					TimeGapAttackPattern timegap = new TimeGapAttackPattern(boss, targetShips, screenWidth, screenHeight);
-					movePattern = timegap;
-					attackPattern = timegap;
-					cycleState = PatternCycleState.TIMEGAP;
-					zigzagCycleCount = 0;
-					lasersFired = 0;
-					maxLasersForPhase = 8;
-					consecutiveDashCount = 0;
-					Core.getLogger().info("GammaBossPattern: Phase 3 - Switching to TimeGap (8 lasers)");
+		if (cycleState == PatternCycleState.ATTACK) {
+			// Check if attack phase is complete
+			boolean attackComplete = false;
+
+			if (usingZigZag) {
+				// ZigZag: check if 2 attack cycles completed
+				if (attackCooldown.checkFinished()) {
+					attackCyclesCompleted++;
+					attackCooldown.reset();
+					if (attackCyclesCompleted >= REQUIRED_ATTACK_CYCLES) {
+						attackComplete = true;
+						Core.getLogger().info("GammaBossPattern: Phase 3 - ZigZag 2 cycles complete");
+					}
+				}
+			} else {
+				// TimeGap: check if enough lasers fired
+				if (lasersFired >= maxLasersForPhase) {
+					attackComplete = true;
+					Core.getLogger().info("GammaBossPattern: Phase 3 - TimeGap 8 lasers complete");
 				}
 			}
-		} else if (cycleState == PatternCycleState.TIMEGAP) {
-			// Check if we've fired enough lasers
-			if (lasersFired >= maxLasersForPhase) {
-				// Switch to Dash if cooldown ready
-				if (!isInDashCooldown) {
-					Ship target = getRandomAliveShip();
-					if (target != null) {
-						DashPattern dash = new DashPattern(boss, target);
-						movePattern = dash;
-						attackPattern = dash;
-						cycleState = PatternCycleState.DASH;
-						Core.getLogger().info("GammaBossPattern: Phase 3 - Starting Dash " + (consecutiveDashCount + 1));
-					}
+
+			// Switch to Dash if attack complete and dash cooldown ready
+			if (attackComplete && !isInDashCooldown) {
+				Ship target = getRandomAliveShip();
+				if (target != null) {
+					DashPattern dash = new DashPattern(boss, target);
+					movePattern = dash;
+					attackPattern = dash;
+					cycleState = PatternCycleState.DASH;
+					consecutiveDashCount = 0;
+					Core.getLogger().info("GammaBossPattern: Phase 3 - Starting Dash 1/2");
 				}
 			}
 		} else if (cycleState == PatternCycleState.DASH) {
@@ -319,30 +341,20 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 				consecutiveDashCount++;
 
 				// Check if we need another dash (2 consecutive in Phase 3)
-				if (consecutiveDashCount < 2 && !isInDashCooldown) {
+				if (consecutiveDashCount < 2) {
 					// Start second dash immediately
 					Ship target = getRandomAliveShip();
 					if (target != null) {
 						DashPattern dash = new DashPattern(boss, target);
 						movePattern = dash;
 						attackPattern = dash;
-						Core.getLogger().info("GammaBossPattern: Phase 3 - Starting second consecutive Dash");
+						Core.getLogger().info("GammaBossPattern: Phase 3 - Starting Dash 2/2");
 					}
 				} else {
-					// Both dashes complete, return to ZigZag
+					// Both dashes complete, start dash cooldown and select new random attack pattern
 					startDashCooldown();
-
-					ZigZagPattern zigzag = new ZigZagPattern(boss, screenWidth, screenHeight);
-					Cooldown cooldown5s = new Cooldown(attackCooldownMillis[2][0]);
-					zigzag.setCooldown(cooldown5s);
-
-					movePattern = zigzag;
-					attackPattern = zigzag;
-					attackCooldown.reset();
-					cycleState = PatternCycleState.ZIGZAG;
-					zigzagCycleCount = 0;
-					consecutiveDashCount = 0;
-					Core.getLogger().info("GammaBossPattern: Phase 3 - 2x Dash complete, returning to ZigZag");
+					selectRandomAttackPattern(3);
+					Core.getLogger().info("GammaBossPattern: Phase 3 - 2x Dash complete, starting new random attack");
 				}
 			}
 		}
@@ -423,8 +435,8 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
 
 		Set<Bullet> bullets = this.attackPattern.getBullets();
 
-		// Track laser count for TimeGapAttackPattern
-		if (cycleState == PatternCycleState.TIMEGAP && !bullets.isEmpty()) {
+		// Track laser count for TimeGapAttackPattern (when in ATTACK state and using TimeGap)
+		if (cycleState == PatternCycleState.ATTACK && !usingZigZag && !bullets.isEmpty()) {
 			lasersFired += bullets.size();
 		}
 
