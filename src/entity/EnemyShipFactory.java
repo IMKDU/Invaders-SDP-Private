@@ -34,9 +34,9 @@ public class EnemyShipFactory {
 	 */
 	public List<List<EnemyShip>> build(Level level, int nShipsWide, int nShipsHigh) {
 
-		List<List<EnemyShip>> enemyShips = new ArrayList<>();
+		List<List<EnemyShip>> enemyShips = new ArrayList<>(nShipsWide);
 		for (int i = 0; i < nShipsWide; i++) {
-			enemyShips.add(new ArrayList<EnemyShip>());
+			enemyShips.add(new ArrayList<>(nShipsHigh));
 		}
 
 		final int cells = nShipsWide * nShipsHigh;
@@ -52,9 +52,10 @@ public class EnemyShipFactory {
 					chosen = spriteQueue.get(qIndex++);
 				} else {
 					// Fallback
-					if (i / (float) nShipsHigh < PROPORTION_C)
+                    float ratio = i / (float) nShipsHigh;
+					if (ratio < PROPORTION_C)
 						chosen = SpriteType.EnemyShipC1;
-					else if (i / (float) nShipsHigh < PROPORTION_B + PROPORTION_C)
+					else if (ratio < PROPORTION_B + PROPORTION_C)
 						chosen = SpriteType.EnemyShipB1;
 					else
 						chosen = SpriteType.EnemyShipA1;
@@ -129,14 +130,6 @@ public class EnemyShipFactory {
 			for (int row = 0; row < height; row++) {
 				columnMajor.add(rowMajor.get(row * width + col));
 			}
-		}
-
-		// Clamp/pad to exact cells size for safety.
-		if (columnMajor.size() > cells) {
-			return new ArrayList<>(columnMajor.subList(0, cells));
-		}
-		while (columnMajor.size() < cells) {
-			columnMajor.add(SpriteType.EnemyShipA1);
 		}
 		return columnMajor;
 	}

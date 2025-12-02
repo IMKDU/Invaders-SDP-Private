@@ -1,155 +1,128 @@
 package entity;
 
 import java.util.logging.Logger;
-
 import engine.Core;
 
 /**
- * Implements a diagonal movement pattern for the formation,
- * reversing direction upon hitting screen boundaries.
- * This class also manages the slowdown status effect.
+ * Diagonal movement pattern with slowdown effect and screen-boundary bouncing.
  */
 public class EnemyShipFormationMovement implements IMovementStrategy {
 
+    /** Movement direction vector enum */
+    private enum Direction {
+        DOWN_RIGHT(1, 1),
+        DOWN_LEFT(-1, 1),
+        UP_RIGHT(1, -1),
+        UP_LEFT(-1, -1);
+
+        final int dx;
+        final int dy;
+
+        Direction(int dx, int dy) {
+            this.dx = dx;
+            this.dy = dy;
+        }
+    }
+
+    private Direction direction = Direction.DOWN_RIGHT;
+
+    private boolean isSlowedDown = false;
+    private int slowDownCount = 0;
+
+    private static final int ORIGINAL_X_SPEED = 8;
+    private static final int SLOWED_X_SPEED = 4;
+    private static final int Y_SPEED = 4;
+    private static final int INIT_POS_Y = 100;
+    private static final int SIDE_MARGIN = 20;
+    private static final int SLOWDOWN_DURATION = 18;
+
+    private final EnemyShipFormationModel model;
+    private final Logger logger;
+    private final int bottomLimit;
+    private final int screenWidth;
+
+    public EnemyShipFormationMovement(EnemyShipFormationModel model, int bottomLimit, int screenWidth) {
+        this.model = model;
+        this.bottomLimit = bottomLimit;
+        this.screenWidth = screenWidth;
+        this.logger = Core.getLogger();
+    }
+
+    @Override
+    public void updateMovement() {
+
+        updateSlowdown();
+
+        updateDirectionBasedOnBoundaries();
+
+        int dx = direction.dx * getCurrentXSpeed();
+        int dy = direction.dy * Y_SPEED;
+
+        model.setPosition(model.getPositionX() + dx, model.getPositionY() + dy);
+        model.moveAllShips(dx, dy);
+    }
+
+    private int getCurrentXSpeed() {
+        return isSlowedDown ? SLOWED_X_SPEED : ORIGINAL_X_SPEED;
+    }
+
+    private void updateSlowdown() {
+        if (isSlowedDown) {
+            slowDownCount++;
+            if (slowDownCount >= SLOWDOWN_DURATION) {
+                isSlowedDown = false;
+                slowDownCount = 0;
+                logger.info("Slowdown effect ended.");
+            }
+        }
+    }
+
+    private void updateDirectionBasedOnBoundaries() {
+
+        int x = model.getPositionX();
+        int y = model.getPositionY();
+        int width = model.getWidth();
+        int height = model.getHeight();
+
+        boolean atBottom = y + height > bottomLimit;
+        boolean atTop = y <= INIT_POS_Y;
+        boolean atRight = x + width >= screenWidth - SIDE_MARGIN;
+        boolean atLeft = x <= SIDE_MARGIN;
+
+        switch (direction) {
+
+            case DOWN_RIGHT:
+                if (atBottom && atRight) direction = Direction.UP_LEFT;
+                else if (atBottom)       direction = Direction.UP_RIGHT;
+                else if (atRight)        direction = Direction.DOWN_LEFT;
+                break;
+
+            case DOWN_LEFT:
+                if (atBottom && atLeft) direction = Direction.UP_RIGHT;
+                else if (atBottom)      direction = Direction.UP_LEFT;
+                else if (atLeft)        direction = Direction.DOWN_RIGHT;
+                break;
+
+            case UP_RIGHT:
+                if (atTop && atRight) direction = Direction.DOWN_LEFT;
+                else if (atTop)       direction = Direction.DOWN_RIGHT;
+                else if (atRight)     direction = Direction.UP_LEFT;
+                break;
+
+            case UP_LEFT:
+                if (atTop && atLeft) direction = Direction.DOWN_RIGHT;
+                else if (atTop)      direction = Direction.DOWN_LEFT;
+                else if (atLeft)     direction = Direction.UP_RIGHT;
+                break;
+        }
+    }
+
 	/**
-	 * Defines the possible movement directions.
+	 * Activates the slowdown effect, resetting its duration.
 	 */
-	private enum Direction {
-		DOWN_RIGHT, DOWN_LEFT, UP_RIGHT, UP_LEFT
-	}
 
-	/** Current movement direction. */
-	private Direction currentDirection;
-	/** Application logger. */
-	private Logger logger;
-
-	/** Initial vertical position to check for top boundary. */
-	private static final int INIT_POS_Y = 100;
-	/** Base vertical speed. */
-	private static final int Y_SPEED = 4;
-	/** Margin from the screen edges. */
-	private static final int SIDE_MARGIN = 20;
-
-	/** Default horizontal speed. */
-	private static final int ORIGINAL_X_SPEED = 8;
-	/** Horizontal speed when slowed. */
-	private static final int SLOWED_X_SPEED = 4;
-	/** Duration of the slowdown effect in movement cycles. */
-	private static final int SLOWDOWN_DURATION = 18;
-
-
-	/** Flag indicating if the slowdown effect is active. */
-	private boolean isSlowedDown;
-	/** Counter for the remaining duration of the slowdown effect. */
-	private int slowDownCount;
-	private EnemyShipFormationModel model;
-	/** The maximum Y-coordinate (bottom boundary) the formation is allowed to move to. */
-	private int formationBottomLimit;
-	/** The total width of the playable area, used for calculating the right boundary. */
-	private int formationScreenWidth;
-
-	/**
-	 * Initializes the movement logic.
-	 *
-	 * @param model The parent formation model this strategy will control.
-	 */
-	public EnemyShipFormationMovement(EnemyShipFormationModel model, int bottomLimit, int screenWidth) {
-		this.model = model;
-		this.logger = Core.getLogger();
-		this.currentDirection = Direction.DOWN_RIGHT;
-		this.isSlowedDown = false;
-		this.slowDownCount = 0;
-		this.formationBottomLimit = bottomLimit;
-		this.formationScreenWidth = screenWidth;
-	}
-
-	/**
-	 * Updates the formation's position based on the diagonal movement logic.
-	 *
-	 */
 	@Override
-	public void updateMovement() {
-
-		updateSlowdownInternal();
-
-		int positionX = model.getPositionX();
-		int positionY = model.getPositionY();
-		int width = model.getWidth();
-		int height = model.getHeight();
-
-		boolean isAtBottom = positionY + height > formationBottomLimit;
-		boolean isAtRightSide = positionX + width >= formationScreenWidth - SIDE_MARGIN;
-		boolean isAtLeftSide = positionX <= SIDE_MARGIN;
-		boolean isAtTop = positionY <= INIT_POS_Y;
-
-		if (currentDirection == Direction.DOWN_RIGHT) {
-			if (isAtBottom && isAtRightSide) currentDirection = Direction.UP_LEFT;
-			else if (isAtBottom) currentDirection = Direction.UP_RIGHT;
-			else if (isAtRightSide) currentDirection = Direction.DOWN_LEFT;
-		} else if (currentDirection == Direction.DOWN_LEFT) {
-			if (isAtBottom && isAtLeftSide) currentDirection = Direction.UP_RIGHT;
-			else if (isAtBottom) currentDirection = Direction.UP_LEFT;
-			else if (isAtLeftSide) currentDirection = Direction.DOWN_RIGHT;
-		} else if (currentDirection == Direction.UP_RIGHT) {
-			if (isAtTop && isAtRightSide) currentDirection = Direction.DOWN_LEFT;
-			else if (isAtTop) currentDirection = Direction.DOWN_RIGHT;
-			else if (isAtRightSide) currentDirection = Direction.UP_LEFT;
-		} else if (currentDirection == Direction.UP_LEFT) {
-			if (isAtTop && isAtLeftSide) currentDirection = Direction.DOWN_RIGHT;
-			else if (isAtTop) currentDirection = Direction.DOWN_LEFT;
-			else if (isAtLeftSide) currentDirection = Direction.UP_RIGHT;
-		}
-
-		int movementX = 0;
-		int movementY = 0;
-		int currentXSpeed = getCurrentXSpeedInternal();
-
-		if (currentDirection == Direction.DOWN_RIGHT) {
-			movementX = currentXSpeed;
-			movementY = Y_SPEED;
-		} else if (currentDirection == Direction.DOWN_LEFT) {
-			movementX = -currentXSpeed;
-			movementY = Y_SPEED;
-		} else if (currentDirection == Direction.UP_RIGHT) {
-			movementX = currentXSpeed;
-			movementY = -Y_SPEED;
-		} else if (currentDirection == Direction.UP_LEFT) {
-			movementX = -currentXSpeed;
-			movementY = -Y_SPEED;
-		}
-
-		model.setPosition(positionX + movementX, positionY + movementY);
-
-		model.moveAllShips(movementX, movementY);
-	}
-
-	/**
-	 * Gets the current horizontal speed, accounting for slowdown.
-	 *
-	 * @return The horizontal speed (pixels per move).
-	 */
-	private int getCurrentXSpeedInternal() {
-		if (isSlowedDown) {
-			return SLOWED_X_SPEED;
-		}
-		return ORIGINAL_X_SPEED;
-	}
-
-	/**
-	 * Updates the internal slowdown counter and deactivates the effect if it expires.
-	 */
-	private void updateSlowdownInternal() {
-		if (isSlowedDown) {
-			slowDownCount++;
-			if (slowDownCount >= SLOWDOWN_DURATION) {
-				isSlowedDown = false;
-				slowDownCount = 0;
-				this.logger.info("Slowdown effect ended.");
-			}
-		}
-	}
-	@Override
-	public boolean needsSmoothMovement(){
+	public boolean needsSmoothMovement() {
 		return false;
 	}
 }
