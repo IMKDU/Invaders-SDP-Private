@@ -271,9 +271,6 @@ public class SideLoopFormationMovement implements IMovementStrategy {
         this.tempPoint.setLocation((int) x, (int) y);
     }
 
-    @Override
-    public void activateSlowdown() { }
-
     /**
      * Indicates this strategy requires per-frame updates.
      * @return True.

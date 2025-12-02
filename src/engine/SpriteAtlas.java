@@ -39,10 +39,8 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.Explosion, new BufferedImage(25,25,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.SoundOn, new BufferedImage(15,15,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.SoundOff, new BufferedImage(15,15,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.Item_Explode, new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.Item_Slow, new BufferedImage(13,8,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Item_SubShip, new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Item_Stop, new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.Item_Push, new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Item_Shield, new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Item_Heal, new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Shield, new BufferedImage(61,61,BufferedImage.TYPE_INT_ARGB));

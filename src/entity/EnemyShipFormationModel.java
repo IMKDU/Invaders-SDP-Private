@@ -296,12 +296,7 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
         return this.shipCount <= 0;
     }
 
-    /**
-     * Activates slowdown effect on the formation.
-     */
-    public void activateSlowdown() {
-        this.movementStrategy.activateSlowdown();
-    }
+
 
     /**
      * Clears all ships from the formation and resets the shooting manager.
