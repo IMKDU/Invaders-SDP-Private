@@ -617,6 +617,17 @@ public class GameModel {
                 }
             }
         }
+
+        // Check collision with zeta boss
+        if (zetaBoss != null && !zetaBoss.isDestroyed()) {
+            if (checkLaserEntityCollision(zetaBoss, laserLeft, laserRight, laserTop, laserBottom)) {
+                // Deal damage to gamma boss (laser deals 1 damage per frame it's active)
+                zetaBoss.takeDamage(1);
+                if (zetaBoss.isDestroyed()) {
+                    handleAnyBossDestruction(zetaBoss, playerNum);
+                }
+            }
+        }
     }
 
     /**
