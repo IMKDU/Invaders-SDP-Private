@@ -17,7 +17,6 @@ public class TimeGapAttackPattern extends BossPattern {
 	private final int chargeCooldownMilli = 200;
 	private final int remainCooldownMilli = 1000;
 	private final int movingSmoothRatio = 10;
-	private Cooldown shootCooldown;
 	private HasBounds boss;
 	private HasBounds target;
 	private Point targetPosition;
