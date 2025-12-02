@@ -16,6 +16,7 @@ public class LaserBullet extends Bullet {
 		this.targetPosition=targetPosition;
 		this.chargeCooldownMilli=chargeCooldownMilli;
 		this.remainCooldownMilli=remainCooldownMilli;
+		this.color = Color.GREEN;
 	}
 
 	@Override

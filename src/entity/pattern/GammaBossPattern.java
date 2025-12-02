@@ -234,7 +234,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
             // Use TimeGap pattern
             int maxLasers = (phase == 2) ? 4 : 8;
             TimeGapAttackPattern timegap = new TimeGapAttackPattern(boss, targetShips, screenWidth, screenHeight);
-
+            timegap.setChargeCooldown(1500);
             movePattern = timegap;
             attackPattern = timegap;
             lasersFired = 0;
