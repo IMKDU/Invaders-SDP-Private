@@ -122,6 +122,14 @@ public class Bullet extends Entity implements Collidable {
 		this.maxPenetration = ShopItem.getPenetrationCount();
 	}
 
+    /**
+     * Manually sets the maximum penetration count of the bullet.
+     * (Used when the sub-ship adjusts penetration based on its own level)
+     */
+    public void setMaxPenetration(int maxPenetration) {
+        this.maxPenetration = maxPenetration;
+    }
+
 	/**
 	 * does the bullet go off the screen
 	 */

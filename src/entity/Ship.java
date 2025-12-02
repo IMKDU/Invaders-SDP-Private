@@ -22,8 +22,6 @@ public class Ship extends Entity implements Collidable {
 	// === Constants ===
 	/** Time between shots. */
 	private static final int SHOOTING_INTERVAL = 750;
-	/** Speed of the bullets shot by the ship. */
-	private static final int BULLET_SPEED = -6;
 	/** Movement of the ship for each unit of time. */
 	private static final int SPEED = 2;
 	/** Y-offset from the ship position to the bullet spawn position */
@@ -43,13 +41,12 @@ public class Ship extends Entity implements Collidable {
     private boolean isP1Ship;
     private boolean isMove;
     private boolean movingSoundPlaying = false;
-    private GameModel model;
 	private int bombShotsRemaining = 0;
+    private GameModel model;
 
-	public void enableBomb(int count) {
-		this.bombShotsRemaining = count;
-	}
-
+    public void enableBomb(int count) {
+        this.bombShotsRemaining = count;
+    }
 	// === Variable for Skil ===
 	public enum SkillType {
 		ORIGIN,
@@ -177,12 +174,14 @@ public class Ship extends Entity implements Collidable {
 			int bulletCount = ShopItem.getMultiShotBulletCount();
 			int spacing = ShopItem.getMultiShotSpacing();
 
+            int speed = ShopItem.getBulletSpeed();
+
 			int centerX = positionX + this.width / 2;
 			int centerY = positionY - BULLET_SPAWN_Y_OFFSET;
 
 			if (bombShotsRemaining > 0) {
 
-				Bullet b = new BombBullet(centerX, centerY, BULLET_SPEED);
+				Bullet b = new BombBullet(centerX, centerY, speed);
 				b.setOwnerId(this.playerId);
 				bullets.add(b);
 
@@ -194,9 +193,10 @@ public class Ship extends Entity implements Collidable {
 
 			if (bulletCount == 1) {
 				// Normal shot (when Spread Shot is not purchased)
-				Bullet b = BulletPool.getBullet(centerX, centerY, BULLET_SPEED);
-                SoundManager.play("sfx/laser.wav");
-                b.setOwnerId(this.playerId);  // === [ADD] Ownership flag: 1 = P1, 2 = P2, null for legacy logic ===
+				Bullet b = BulletPool.getBullet(centerX, centerY, speed);
+				SoundManager.stop("sfx/laser.wav");
+				SoundManager.playPooled("sfx/laser.wav");
+				b.setOwnerId(this.playerId);  // === [ADD] Ownership flag: 1 = P1, 2 = P2, null for legacy logic ===
 
 				bullets.add(b);
 			} else {
@@ -205,13 +205,13 @@ public class Ship extends Entity implements Collidable {
 
 				for (int i = 0; i < bulletCount; i++) {
 					int offsetX = startOffset + (i * spacing);
-					Bullet b = BulletPool.getBullet(centerX + offsetX, centerY, BULLET_SPEED);
+					Bullet b = BulletPool.getBullet(centerX + offsetX, centerY, speed);
 					b.setOwnerId(this.playerId);   // Ownership flag
 
 					bullets.add(b);
 
                     // might consider putting a different sound
-                    SoundManager.play("sfx/laser.wav");
+                    SoundManager.playPooled("sfx/laser.wav");
                 }
 			}
 			return true;
@@ -258,6 +258,8 @@ public class Ship extends Entity implements Collidable {
                 }
             }
         }
+		// Update charging skill state
+		this.chargingSkill.update();
     }
     /**
      * Register user skills into skill map.
