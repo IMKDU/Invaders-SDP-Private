@@ -13,7 +13,8 @@
         { "type": "enemyA", "count": 20 }
       ],
       "itemDrops": [
-        { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 }
+        { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
+        { "enemyType": "enemyA", "itemId": "Bomb", "dropChance": 0.05 }
       ],
 
       "completionBonus": { "currency": 10 }
