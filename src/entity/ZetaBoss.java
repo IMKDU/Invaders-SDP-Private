@@ -74,10 +74,9 @@ public class ZetaBoss extends MidBoss {
         this.logger = Core.getLogger();
         this.animationCooldown = new Cooldown(200);
         this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
-
         // Initialize Apocalypse Pattern
         this.apocalypsePattern = new ApocalypseAttackPattern(this);
-
+        DrawManager.getInstance().startShake(100, 10);
         this.logger.info("ZETA : Initializing Boss ZETA");
 
         choosePattern();
