@@ -17,15 +17,21 @@ import java.util.logging.Logger;
  * Pattern coordinator for the Zeta mid-boss.
  *
  * <p>
- * Manages three distinct phases based on HP percentage:
- * - Phase 1 (100-70%): BlackHole → Apocalypse → Diagonal movement
- * - Phase 2 (70-40%): BlackHole → Apocalypse → ZigZag Angry
- * - Phase 3 (40-0%): BlackHole → Apocalypse → Random(Diagonal or ZigZag)
+ * ZetaBoss has TWO independent attack patterns:
+ * 1. BlackHole: Continuously repeating (Active → Cooldown → Active...)
+ * 2. Apocalypse: Priority interrupt that forces BlackHole to stop
  * </p>
  *
- * Pattern Cooldowns by Phase:
- * - BlackHole: 10s (Phase 1), 7s (Phase 2), 5s (Phase 3)
- * - Apocalypse: 13s (Phase 1), 10s (Phase 2), 7s (Phase 3)
+ * Pattern Priority:
+ * - Apocalypse > BlackHole
+ * - When Apocalypse activates, BlackHole is force-stopped
+ * - After Apocalypse ends, BlackHole restarts fresh from Active state
+ *
+ * Movement:
+ * - Boss always moves EXCEPT during Apocalypse (5 seconds total)
+ * - Phase 1: Diagonal movement
+ * - Phase 2: ZigZag Angry movement
+ * - Phase 3: Random(Diagonal or ZigZag Angry)
  */
 public class ZetaBossPattern extends BossPattern implements IBossPattern {
 
@@ -36,7 +42,6 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
     // BlackHole parameters
     private static final int BLACKHOLE_RADIUS = 300;
     private static final double BLACKHOLE_PULL_CONSTANT = 0.005;
-    private static final int BLACKHOLE_DURATION = 5000; // 5 seconds
 
     // Pattern speeds
     private static final int DIAGONAL_X_SPEED = 4;
@@ -47,15 +52,21 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
     private static final int SCREEN_WIDTH = 448;
     private static final int SCREEN_HEIGHT = 600;
 
-    /** Pattern cycle states */
-    private enum PatternCycle {
-        BLACKHOLE,
-        APOCALYPSE,
-        MOVEMENT
+    /** BlackHole states */
+    private enum BlackHoleState {
+        ACTIVE,         // BlackHole is pulling players
+        COOLDOWN,       // BlackHole is inactive
+        FORCED_STOP     // BlackHole stopped by Apocalypse
     }
 
-    /** Currently active pattern cycle */
-    private PatternCycle currentCycle = PatternCycle.BLACKHOLE;
+    /** Apocalypse states */
+    private enum ApocalypseState {
+        READY,          // Ready to activate (cooldown finished)
+        CHARGING,       // 3 seconds charging phase
+        FIRING,         // 2 seconds firing phase
+        COOLDOWN        // Waiting for cooldown
+    }
+
     /** Current boss phase (1, 2, or 3) */
     private int currentPhase = 1;
 
@@ -68,19 +79,22 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
     /** Random generator for random selections */
     private final Random random;
 
-    /** Currently active pattern */
-    private BossPattern activePattern;
-    /** Apocalypse pattern instance */
-    private ApocalypseAttackPattern apocalypsePattern;
-    /** Current active BlackHole pattern */
+    // BlackHole state management
+    private BlackHoleState blackHoleState = BlackHoleState.COOLDOWN;
     private BlackHolePattern currentBlackHole = null;
+    private Cooldown blackHoleDurationTimer;
+    private Cooldown blackHoleCooldownTimer;
+    private int blackHoleDuration;
+    private int blackHoleCooldown;
 
-    /** Pattern cooldowns */
-    private Cooldown blackHoleCooldown;
-    private Cooldown apocalypseCooldown;
+    // Apocalypse state management
+    private ApocalypseState apocalypseState = ApocalypseState.COOLDOWN;
+    private ApocalypseAttackPattern apocalypsePattern;
+    private Cooldown apocalypseCooldownTimer;
+    private int apocalypseCooldown;
 
-    /** Flag to track pattern completion */
-    private boolean waitingForPatternCompletion = false;
+    // Movement pattern
+    private BossPattern movementPattern;
 
     /**
      * Creates a new Zeta boss pattern controller.
@@ -98,26 +112,52 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
         // Initialize Apocalypse Pattern
         this.apocalypsePattern = new ApocalypseAttackPattern(boss);
 
-        // Initialize cooldowns for phase 1
-        updateCooldownsForPhase();
+        // Initialize timers for phase 1
+        updateTimersForPhase();
 
-        // Start with BlackHole pattern
-        startBlackHolePattern();
+        // Start BlackHole cooldown
+        this.blackHoleCooldownTimer.reset();
+
+        // Start Apocalypse cooldown
+        this.apocalypseCooldownTimer.reset();
+
+        // Initialize movement pattern
+        this.movementPattern = createMovementPattern();
 
         this.logger.info("ZetaBossPattern: Initialized");
     }
 
     /**
-     * Performs one update step:
-     * - Determines current phase from boss HP
-     * - Manages pattern cycle transitions
+     * Performs one update step following priority order:
+     * 1. Check Apocalypse cooldown (highest priority)
+     * 2. Update active Apocalypse
+     * 3. Update BlackHole cycle
+     * 4. Update movement (except during Apocalypse)
      */
     public void update() {
-        // Update current phase based on health
+        // Update phase based on HP
         updatePhase();
 
-        // Update pattern cycle
-        updatePatternCycle();
+        // Priority 1: Check if Apocalypse cooldown finished
+        if (apocalypseState == ApocalypseState.COOLDOWN && apocalypseCooldownTimer.checkFinished()) {
+            forceStopBlackHole();
+            startApocalypse();
+            stopMovement();
+            return;
+        }
+
+        // Priority 2: Handle active Apocalypse
+        if (apocalypseState == ApocalypseState.CHARGING || apocalypseState == ApocalypseState.FIRING) {
+            updateApocalypse();
+            stopMovement();
+            return;
+        }
+
+        // Priority 3: Handle BlackHole cycle
+        updateBlackHoleCycle();
+
+        // Priority 4: Update movement (always except during Apocalypse)
+        updateMovement();
     }
 
     /**
@@ -135,113 +175,123 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
             this.currentPhase = 3;
         }
 
-        // Update cooldowns if phase changed
+        // Update timers if phase changed
         if (previousPhase != this.currentPhase) {
-            updateCooldownsForPhase();
+            updateTimersForPhase();
+            // Recreate movement pattern for new phase
+            this.movementPattern = createMovementPattern();
             logger.info("ZetaBossPattern: Phase changed to " + this.currentPhase);
         }
     }
 
     /**
-     * Updates cooldowns based on current phase
+     * Updates timers based on current phase
      */
-    private void updateCooldownsForPhase() {
+    private void updateTimersForPhase() {
         switch (this.currentPhase) {
             case 1: // 100-70%
-                this.blackHoleCooldown = new Cooldown(10000); // 10 seconds
-                this.apocalypseCooldown = new Cooldown(13000); // 13 seconds
+                this.blackHoleDuration = 5000; // 5 seconds
+                this.blackHoleCooldown = 10000; // 10 seconds
+                this.apocalypseCooldown = 20000; // 20 seconds
                 break;
             case 2: // 70-40%
-                this.blackHoleCooldown = new Cooldown(7000); // 7 seconds
-                this.apocalypseCooldown = new Cooldown(10000); // 10 seconds
+                this.blackHoleDuration = 7000; // 7 seconds
+                this.blackHoleCooldown = 7000; // 7 seconds
+                this.apocalypseCooldown = 15000; // 15 seconds
                 break;
             case 3: // 40-0%
-                this.blackHoleCooldown = new Cooldown(5000); // 5 seconds
-                this.apocalypseCooldown = new Cooldown(7000); // 7 seconds
+                this.blackHoleDuration = 9000; // 9 seconds
+                this.blackHoleCooldown = 5000; // 5 seconds
+                this.apocalypseCooldown = 10000; // 10 seconds
                 break;
+        }
+
+        // Create new timers with updated durations
+        this.blackHoleDurationTimer = new Cooldown(this.blackHoleDuration);
+        this.blackHoleCooldownTimer = new Cooldown(this.blackHoleCooldown);
+        this.apocalypseCooldownTimer = new Cooldown(this.apocalypseCooldown);
+    }
+
+    /**
+     * Force stops BlackHole when Apocalypse starts
+     */
+    private void forceStopBlackHole() {
+        if (blackHoleState == BlackHoleState.ACTIVE) {
+            logger.info("ZetaBossPattern: BlackHole force-stopped by Apocalypse");
+        }
+        blackHoleState = BlackHoleState.FORCED_STOP;
+        currentBlackHole = null;
+    }
+
+    /**
+     * Starts Apocalypse attack
+     */
+    private void startApocalypse() {
+        apocalypseState = ApocalypseState.CHARGING;
+        apocalypsePattern.start(1);
+        logger.info("ZetaBossPattern: Apocalypse activated!");
+    }
+
+    /**
+     * Updates Apocalypse state
+     */
+    private void updateApocalypse() {
+        apocalypsePattern.attack();
+
+        // Check if Apocalypse finished
+        if (!apocalypsePattern.isPatternActive()) {
+            apocalypseState = ApocalypseState.COOLDOWN;
+            apocalypseCooldownTimer.reset();
+
+            // Restart BlackHole fresh from Active state
+            restartBlackHoleFresh();
+
+            // Resume movement
+            this.movementPattern = createMovementPattern();
+
+            logger.info("ZetaBossPattern: Apocalypse ended, restarting BlackHole");
         }
     }
 
     /**
-     * Updates the pattern cycle: BlackHole → Apocalypse → Movement → repeat
+     * Restarts BlackHole from fresh Active state after Apocalypse
      */
-    private void updatePatternCycle() {
-        // If waiting for pattern completion, check if it's done
-        if (waitingForPatternCompletion) {
-            if (isCurrentPatternComplete()) {
-                waitingForPatternCompletion = false;
-                advanceToNextCycle();
-            }
-            return;
-        }
+    private void restartBlackHoleFresh() {
+        activateBlackHole();
+    }
 
-        // Check if we should start the next pattern in the cycle
-        switch (currentCycle) {
-            case BLACKHOLE:
-                if (blackHoleCooldown.checkFinished()) {
-                    startBlackHolePattern();
-                    waitingForPatternCompletion = true;
+    /**
+     * Updates BlackHole cycle (Active ↔ Cooldown)
+     */
+    private void updateBlackHoleCycle() {
+        switch (blackHoleState) {
+            case ACTIVE:
+                // Check if duration finished
+                if (blackHoleDurationTimer.checkFinished()) {
+                    deactivateBlackHole();
                 }
                 break;
-            case APOCALYPSE:
-                if (apocalypseCooldown.checkFinished()) {
-                    startApocalypsePattern();
-                    waitingForPatternCompletion = true;
+
+            case COOLDOWN:
+                // Check if cooldown finished
+                if (blackHoleCooldownTimer.checkFinished()) {
+                    activateBlackHole();
                 }
                 break;
-            case MOVEMENT:
-                // Movement pattern continues until BlackHole cooldown is ready
-                if (blackHoleCooldown.checkFinished()) {
-                    advanceToNextCycle();
-                }
+
+            case FORCED_STOP:
+                // Wait for Apocalypse to finish (handled in updateApocalypse)
                 break;
         }
     }
 
     /**
-     * Checks if the current pattern has completed
+     * Activates BlackHole at a random position
      */
-    private boolean isCurrentPatternComplete() {
-        switch (currentCycle) {
-            case BLACKHOLE:
-                return currentBlackHole != null && currentBlackHole.isFinished();
-            case APOCALYPSE:
-                return !apocalypsePattern.isPatternActive();
-            case MOVEMENT:
-                return false; // Movement pattern runs until interrupted
-            default:
-                return true;
-        }
-    }
-
-    /**
-     * Advances to the next pattern in the cycle
-     */
-    private void advanceToNextCycle() {
-        switch (currentCycle) {
-            case BLACKHOLE:
-                currentCycle = PatternCycle.APOCALYPSE;
-                logger.info("ZetaBossPattern: Cycle advancing to APOCALYPSE");
-                break;
-            case APOCALYPSE:
-                currentCycle = PatternCycle.MOVEMENT;
-                startMovementPattern();
-                logger.info("ZetaBossPattern: Cycle advancing to MOVEMENT");
-                break;
-            case MOVEMENT:
-                currentCycle = PatternCycle.BLACKHOLE;
-                logger.info("ZetaBossPattern: Cycle advancing to BLACKHOLE");
-                break;
-        }
-    }
-
-    /**
-     * Starts the BlackHole pattern at a random position
-     */
-    private void startBlackHolePattern() {
+    private void activateBlackHole() {
         // Generate random center position for BlackHole
-        int centerX = random.nextInt(SCREEN_WIDTH - 200) + 100; // Keep away from edges
-        int centerY = random.nextInt(200) + 150; // Upper half of screen
+        int centerX = random.nextInt(SCREEN_WIDTH - 200) + 100;
+        int centerY = random.nextInt(200) + 150;
 
         currentBlackHole = new BlackHolePattern(
             boss,
@@ -250,65 +300,88 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
             centerY,
             BLACKHOLE_RADIUS,
             BLACKHOLE_PULL_CONSTANT,
-            BLACKHOLE_DURATION
+            blackHoleDuration
         );
 
-        this.activePattern = currentBlackHole;
-        this.blackHoleCooldown.reset();
+        blackHoleState = BlackHoleState.ACTIVE;
+        blackHoleDurationTimer.reset();
 
-        logger.info("ZetaBossPattern: BlackHole Pattern activated at (" + centerX + ", " + centerY + ")");
+        logger.info("ZetaBossPattern: BlackHole activated at (" + centerX + ", " + centerY + ")");
     }
 
     /**
-     * Starts the Apocalypse pattern
+     * Deactivates BlackHole and starts cooldown
      */
-    private void startApocalypsePattern() {
-        this.activePattern = this.apocalypsePattern;
-        this.apocalypsePattern.start(1);
-        this.apocalypseCooldown.reset();
+    private void deactivateBlackHole() {
+        blackHoleState = BlackHoleState.COOLDOWN;
+        currentBlackHole = null;
+        blackHoleCooldownTimer.reset();
 
-        logger.info("ZetaBossPattern: Apocalypse Pattern activated!");
+        logger.info("ZetaBossPattern: BlackHole deactivated, cooldown started");
     }
 
     /**
-     * Starts the movement pattern based on current phase
+     * Creates movement pattern based on current phase
      */
-    private void startMovementPattern() {
+    private BossPattern createMovementPattern() {
         switch (this.currentPhase) {
             case 1: // Phase 1: DiagonalPattern
-                this.activePattern = new DiagonalPattern(boss, DIAGONAL_X_SPEED, DIAGONAL_Y_SPEED, DIAGONAL_COLOR);
-                logger.info("ZetaBossPattern: Movement Pattern - Diagonal");
-                break;
+                logger.info("ZetaBossPattern: Movement - Diagonal");
+                return new DiagonalPattern(boss, DIAGONAL_X_SPEED, DIAGONAL_Y_SPEED, DIAGONAL_COLOR);
             case 2: // Phase 2: ZigZagAngryPattern
-                this.activePattern = new ZigZagAngryPattern(boss, SCREEN_WIDTH, SCREEN_HEIGHT);
-                logger.info("ZetaBossPattern: Movement Pattern - ZigZag Angry");
-                break;
+                logger.info("ZetaBossPattern: Movement - ZigZag Angry");
+                return new ZigZagAngryPattern(boss, SCREEN_WIDTH, SCREEN_HEIGHT);
             case 3: // Phase 3: Random between Diagonal and ZigZagAngry
                 if (random.nextBoolean()) {
-                    this.activePattern = new DiagonalPattern(boss, DIAGONAL_X_SPEED, DIAGONAL_Y_SPEED, DIAGONAL_COLOR);
-                    logger.info("ZetaBossPattern: Movement Pattern - Diagonal (random)");
+                    logger.info("ZetaBossPattern: Movement - Diagonal (random)");
+                    return new DiagonalPattern(boss, DIAGONAL_X_SPEED, DIAGONAL_Y_SPEED, DIAGONAL_COLOR);
                 } else {
-                    this.activePattern = new ZigZagAngryPattern(boss, SCREEN_WIDTH, SCREEN_HEIGHT);
-                    logger.info("ZetaBossPattern: Movement Pattern - ZigZag Angry (random)");
+                    logger.info("ZetaBossPattern: Movement - ZigZag Angry (random)");
+                    return new ZigZagAngryPattern(boss, SCREEN_WIDTH, SCREEN_HEIGHT);
                 }
-                break;
+            default:
+                return new DiagonalPattern(boss, DIAGONAL_X_SPEED, DIAGONAL_Y_SPEED, DIAGONAL_COLOR);
+        }
+    }
+
+    /**
+     * Stops movement (during Apocalypse)
+     */
+    private void stopMovement() {
+        // Movement is handled by not calling movementPattern.move()
+    }
+
+    /**
+     * Updates movement pattern
+     */
+    private void updateMovement() {
+        if (movementPattern != null) {
+            movementPattern.move();
+            movementPattern.attack();
         }
     }
 
     @Override
     public void attack() {
-        if (activePattern != null) {
-            activePattern.attack();
+        // Attack is handled in update() for each pattern
+        if (blackHoleState == BlackHoleState.ACTIVE && currentBlackHole != null) {
+            currentBlackHole.attack();
         }
     }
 
     @Override
     public void move() {
-        if (activePattern != null) {
-            activePattern.move();
-            // Update boss position from active pattern
-            this.bossPosition.x = activePattern.getBossPosition().x;
-            this.bossPosition.y = activePattern.getBossPosition().y;
+        // Movement handled in update()
+        // During Apocalypse, don't move
+        if (apocalypseState == ApocalypseState.CHARGING || apocalypseState == ApocalypseState.FIRING) {
+            // Boss doesn't move during Apocalypse
+            return;
+        }
+
+        // Update position from movement pattern
+        if (movementPattern != null) {
+            this.bossPosition.x = movementPattern.getBossPosition().x;
+            this.bossPosition.y = movementPattern.getBossPosition().y;
         }
     }
 
@@ -319,8 +392,8 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
 
     @Override
     public Set<Bullet> getBullets() {
-        if (activePattern != null) {
-            return activePattern.getBullets();
+        if (movementPattern != null) {
+            return movementPattern.getBullets();
         }
         return this.bullets;
     }
@@ -353,8 +426,12 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
 
     /**
      * Get the currently active pattern for rendering
+     * Returns movement pattern or apocalypse pattern depending on state
      */
     public BossPattern getActivePattern() {
-        return activePattern;
+        if (apocalypseState == ApocalypseState.CHARGING || apocalypseState == ApocalypseState.FIRING) {
+            return apocalypsePattern;
+        }
+        return movementPattern;
     }
 }
