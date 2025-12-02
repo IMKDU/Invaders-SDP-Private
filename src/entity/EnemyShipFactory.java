@@ -134,10 +134,10 @@ public class EnemyShipFactory {
 		return columnMajor;
 	}
 
-	public List<List<List<EnemyShip>>> splitGroup(List<List<EnemyShip>> enemyships, int split){
+	public List<List<List<EnemyShip>>> splitGroup(List<List<EnemyShip>> enemyShips, int split){
 		List<List<List<EnemyShip>>> partition = new ArrayList<>();
-		if(enemyships == null || enemyships.size() < split){ return partition; }
-		int totalSize = enemyships.size();
+		if(enemyShips == null || enemyShips.size() < split){ return partition; }
+		int totalSize = enemyShips.size();
 		int chunkSize = totalSize / split;
 		int remainder = totalSize % split;
 
@@ -145,9 +145,13 @@ public class EnemyShipFactory {
 		for (int i = 0; i < split; i++) {
 			int count = chunkSize + (i < remainder ? 1 : 0);
 			int nextIndex = Math.min(index + count, totalSize);
-			partition.add(new ArrayList<>(enemyships.subList(index, nextIndex)));
+			partition.add(new ArrayList<>(enemyShips.subList(index, nextIndex)));
 			index = nextIndex;
 		}
 		return partition;
 	}
+
+    public final int getSeparationDistance(){
+        return SEPARATION_DISTANCE;
+    }
 }

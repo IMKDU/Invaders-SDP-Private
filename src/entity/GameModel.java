@@ -135,8 +135,6 @@ public class GameModel {
     private int blackHoleCX;
     private int blackHoleCY;
     private int blackHoleRadius;
-    private Cooldown blackHoleCooldown;
-    private int lastHp;
     private static final int BLACK_HOLE_DURATION_MS = 7000;
     private Explosion explosionEntity = null;
     private static boolean usedOrigin = false;
