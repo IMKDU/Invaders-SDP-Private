@@ -81,7 +81,7 @@ public class Ship extends Entity implements Collidable {
             this.spriteType = SpriteType.ShipP2;
             this.isP1Ship = false;
         }
-		this.shootingCooldown = new Cooldown(ShopItem.getShootingInterval());
+		this.shootingCooldown = new Cooldown(100);
 		this.destructionCooldown = new Cooldown(1000);
 		this.shieldCooldown = new Cooldown(0);
 		this.isInvincible = false;
@@ -190,7 +190,7 @@ public class Ship extends Entity implements Collidable {
 				bombShotsRemaining--;
 				return true;
 			}
-
+            centerY = positionY;
 			if (bulletCount == 1) {
 				// Normal shot (when Spread Shot is not purchased)
 				Bullet b = BulletPool.getBullet(centerX, centerY, speed);
