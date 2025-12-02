@@ -41,9 +41,8 @@ public class Bullet extends Entity implements Collidable {
 	 *            Speed of the bullet, positive or negative depending on
 	 *            direction - positive is down.
 	 */
-	public Bullet(final int positionX, final int positionY, final int speed, final Color color) {
-		super(positionX, positionY, 5 * 2, 10 * 2, color);
-
+	public Bullet(final int positionX, final int positionY, final int speed, final int width, final int height) {
+		super(positionX, positionY, width, height,null);
 		this.speed = speed;
 		this.penetrationCount = 0;
 		this.maxPenetration = ShopItem.getPenetrationCount();
@@ -57,10 +56,14 @@ public class Bullet extends Entity implements Collidable {
 	public final void setSprite() {
 		if (speed < 0){
             this.spriteType = SpriteType.Bullet;
+            super.height = 10;
+            super.width = 5;
         }
 
 		else{
             this.spriteType = SpriteType.EnemyBullet;
+            super.height = 15;
+            super.width = 5;
         }
 
 	}
@@ -78,7 +81,7 @@ public class Bullet extends Entity implements Collidable {
 	 * @param speed
 	 *            New speed of the bullet.
 	 */
-	public final void setSpeed(final int speed) {
+	public void setSpeed(final int speed) {
 		this.speed = speed;
 	}
 
@@ -118,6 +121,14 @@ public class Bullet extends Entity implements Collidable {
 		this.penetrationCount = 0;
 		this.maxPenetration = ShopItem.getPenetrationCount();
 	}
+
+    /**
+     * Manually sets the maximum penetration count of the bullet.
+     * (Used when the sub-ship adjusts penetration based on its own level)
+     */
+    public void setMaxPenetration(int maxPenetration) {
+        this.maxPenetration = maxPenetration;
+    }
 
 	/**
 	 * does the bullet go off the screen

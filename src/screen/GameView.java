@@ -50,6 +50,9 @@ public class GameView {
                         model.getBlackHoleRadius()
                 );
             }
+            drawManager.getEntityRenderer().drawTeleport(model.getTeleportFromP1X(), dto.getShipP1().getWidth(), model.getTeleportFromP1Y(), dto.getShipP1().getHeight(), model.getIsTeleportP1(),1,model.getAfterTeleportFromP1X(),model.getAfterTeleportFromP1Y());
+            drawManager.getEntityRenderer().drawTeleport(model.getTeleportFromP2X(), dto.getShipP2().getWidth(), model.getTeleportFromP2Y(), dto.getShipP2().getHeight(), model.getIsTeleportP2(),2,model.getAfterTeleportFromP2X(),model.getAfterTeleportFromP2Y());
+
             if (dto.getShipP1().isInvincible()) {
                 drawManager.getEntityRenderer().drawShield(dto.getShipP1().getPositionX(), dto.getShipP1().getWidth(), dto.getShipP1().getPositionY(), dto.getShipP1().getHeight(), dto.getShipP1().getInvincibilityRatio());
             }
@@ -89,6 +92,11 @@ public class GameView {
         if (model.getZetaBoss() != null) {
             drawManager.getEntityRenderer().drawHealthBarWithHP(model.getZetaBoss());
             drawManager.getUIRenderer().drawBossName("Zeta");
+        }
+        if (model.getGammaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getGammaBoss());
+            drawManager.getEntityRenderer().drawGammaBoss((GammaBoss) model.getGammaBoss());
+            drawManager.getUIRenderer().drawBossName("Gamma");
         }
 		if (model.getBossLasers() != null) {
 			for (LaserBeam laser : model.getBossLasers()) {

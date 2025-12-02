@@ -1,5 +1,6 @@
 package entity;
 
+import audio.SoundManager;
 import engine.*;
 import engine.level.Level;
 
@@ -67,10 +68,14 @@ public class GameModel {
     private MidBoss omegaBoss;
     /** ZetaBoss */
     private MidBoss zetaBoss;
+    /** GammaBoss */
+    private MidBoss gammaBoss;
     /** Set of all bullets fired by on-screen ships. */
     private Set<Bullet> bullets;
     /** Set of all dropItems dropped by on screen ships. */
     private Set<DropItem> dropItems;
+    /** List of subship */
+    private List<SubShip> subShips;
     /** Current score. */
     private int score;
     // === [ADD] Independent scores for two players ===
@@ -106,6 +111,8 @@ public class GameModel {
     // Achievement popup
     private String achievementText;
     private Cooldown achievementPopupCooldown;
+    private boolean isTeleportP1;
+    private boolean isTeleportP2;
     private enum StagePhase{wave, boss_wave};
     private StagePhase currentPhase;
     /** Health change popup. */
@@ -133,6 +140,14 @@ public class GameModel {
     private Explosion explosionEntity = null;
     private static boolean usedOrigin = false;
     private boolean originSkillActivated = false;
+    private int teleportFromP1X;
+    private int teleportFromP1Y;
+    private int afterTeleportFromP1X;
+    private int afterTeleportFromP1Y;
+    private int teleportFromP2X;
+    private int teleportFromP2Y;
+    private int afterTeleportFromP2X;
+    private int afterTeleportFromP2Y;
 
 
     public GameModel(GameState gameState, Level level, boolean bonusLife, int maxLives, int width, int height) {
@@ -174,6 +189,8 @@ public class GameModel {
         this.shipP2.setPlayerId(2); // === [ADD] Player2 ===
         // special enemy initial
 
+        this.subShips = new ArrayList<>();
+
         GameSettings specialSettings = new GameSettings(
 				currentLevel.getFormationWidth(),
 		        currentLevel.getFormationHeight(),
@@ -201,6 +218,7 @@ public class GameModel {
         this.omegaBoss = null;
         this.midBossChilds = null;
         this.zetaBoss = null;
+        this.gammaBoss = null;
         this.currentPhase = StagePhase.wave;
 
 //        bossPattern = new BossPattern();
@@ -208,8 +226,8 @@ public class GameModel {
 //        lastHp = Integer.MAX_VALUE;
         /** ships list for boss argument */
         this.ships = new ArrayList<>();
-        if (this.ship != null) ships.add(this.ship);
-        if (this.shipP2 != null) ships.add(this.shipP2);
+        if (this.ship != null && this.livesP1 > 0) ships.add(this.ship);
+        if (this.shipP2 != null && this.livesP2 > 0) ships.add(this.shipP2);
 
         this.ship.setModel(this);
         this.shipP2.setModel(this);
@@ -237,11 +255,25 @@ public class GameModel {
 	public void playerMoveOrTeleport(int playerNum, String direction, boolean teleport) {
 		Ship ship = (playerNum == 1) ? this.ship : this.shipP2;
 		if (ship == null || ship.isDestroyed()) return;
-
-		if (teleport && ship.canTeleport()) {
+		if (teleport && ship.canTeleport() && ship.getPlayerId() == 1) {
+            this.teleportFromP1X = ship.positionX;
+            this.teleportFromP1Y = ship.positionY;
+            this.isTeleportP1 = true;
 			ship.teleport(direction, width, height);
-		} else {
+            this.afterTeleportFromP1X = ship.positionX;
+            this.afterTeleportFromP1Y = ship.positionY;
+		}
+        else if (teleport && ship.canTeleport() && ship.getPlayerId() == 2){
+            this.teleportFromP2X = ship.positionX;
+            this.teleportFromP2Y = ship.positionY;
+            this.isTeleportP2 = true;
+            ship.teleport(direction, width, height);
+            this.afterTeleportFromP2X = ship.positionX;
+            this.afterTeleportFromP2Y = ship.positionY;
+        }
+        else {
 			ship.move(direction, this.width, this.height);
+
 		}
 	}
 
@@ -259,6 +291,16 @@ public class GameModel {
         if (ship.shoot(this.bullets)) {
             this.bulletsShot++;
             AchievementManager.getInstance().onShotFired();
+
+            // Sub-ships fire together
+            if (this.subShips != null) {
+                for (SubShip sub : subShips) {
+                    // Fire only if the sub-ship is not destroyed and belongs to the player firing
+                    if (!sub.isDestroyed() && sub.getOwner().getPlayerId() == playerNum) {
+                        sub.shoot(this.bullets);
+                    }
+                }
+            }
         }
     }
 
@@ -307,7 +349,7 @@ public class GameModel {
                 }
                 break;
             case boss_wave:
-                if (this.finalBoss == null && this.omegaBoss == null && this.zetaBoss == null){
+                if (this.finalBoss == null && this.omegaBoss == null && this.zetaBoss == null && this.gammaBoss == null){
                     bossReveal();
                     this.enemyShipFormationModel.clear();
                 }
@@ -317,16 +359,7 @@ public class GameModel {
                 if (this.omegaBoss != null){
                     this.omegaBoss.update();
                     if (this.omegaBoss instanceof OmegaBoss omega) {
-                        midBossChilds = omega.getSpawnMobs();
-                        this.explosionEntity = omega.getBoom();
-
-                        if (omega.getBossPattern() != null) {
-                            bossBullets.addAll(omega.getBossPattern().getBullets());
-                        }
-
-                        if (omega.getGuidedMissilePattern() != null) {
-                            this.bossBullets.addAll(omega.getGuidedMissilePattern().getBullets());
-                        }
+                        bossBullets.addAll(omega.getBullets());
                     }
 					updateBossBullets();
 
@@ -363,11 +396,26 @@ public class GameModel {
                     }
                 }
 
+                // GammaBoss logic added
+                if (this.gammaBoss != null) {
+                    this.gammaBoss.update();
+                    if (this.gammaBoss instanceof GammaBoss gamma) {
+                        this.explosionEntity = gamma.getBoom();
+                        bossBullets.addAll(gamma.getBossPattern().getBullets());
+                    }
+                    updateBossBullets();
+
+                    if (this.gammaBoss.isDestroyed()) {
+                        this.logger.info("Gamma Boss destroyed!");
+                    }
+                }
+
                 boolean isFinalBossAlive = (this.finalBoss != null && !this.finalBoss.isDestroyed());
                 boolean isOmegaBossAlive = (this.omegaBoss != null && !this.omegaBoss.isDestroyed());
                 boolean isZetaBossAlive = (this.zetaBoss != null && !this.zetaBoss.isDestroyed());
+                boolean isGammaBossAlive = (this.gammaBoss != null && !this.gammaBoss.isDestroyed());
                 if (!originSkillActivated) {
-                    if (!isFinalBossAlive && !isOmegaBossAlive && !isZetaBossAlive) {
+                    if (!isFinalBossAlive && !isOmegaBossAlive && !isZetaBossAlive && !isGammaBossAlive) {
                         if (!this.levelFinished) {
                             this.levelFinished = true;
                             this.screenFinishedCooldown.reset();
@@ -380,6 +428,16 @@ public class GameModel {
         if (this.shipP2 != null) {
             this.shipP2.update();
         }
+
+        // Update SubShips
+        if (this.subShips != null) {
+            for (SubShip subShip : subShips) {
+                subShip.update();
+            }
+            // Remove destroyed or expired sub-ships
+            subShips.removeIf(SubShip::isDestroyed);
+        }
+
         // special enemy update
         this.enemyShipSpecialFormation.update();
 
@@ -422,6 +480,11 @@ public class GameModel {
 			entities.add(shipP2);
 		}
 
+        // Add sub-ships to collision check targets
+        for (SubShip sub : subShips) {
+            if (!sub.isDestroyed()) entities.add(sub);
+        }
+
 		for (EnemyShip e : enemyShipFormationModel) {
 			if (e != null && !e.isDestroyed()) entities.add(e);
 		}
@@ -433,6 +496,7 @@ public class GameModel {
 		if (finalBoss != null && !finalBoss.isDestroyed()) entities.add(finalBoss);
 		if (omegaBoss != null && !omegaBoss.isDestroyed()) entities.add(omegaBoss);
         if (zetaBoss != null && !zetaBoss.isDestroyed()) entities.add(zetaBoss);
+        if (gammaBoss != null && !gammaBoss.isDestroyed()) entities.add(gammaBoss);
 
         if (midBossChilds != null){
             for(MidBossMob mb : midBossChilds){ entities.add(mb); }
@@ -528,6 +592,17 @@ public class GameModel {
                 omegaBoss.takeDamage(1);
                 if (omegaBoss.isDestroyed()) {
                     handleAnyBossDestruction(omegaBoss, playerNum);
+                }
+            }
+        }
+
+        // Check collision with gamma boss
+        if (gammaBoss != null && !gammaBoss.isDestroyed()) {
+            if (checkLaserEntityCollision(gammaBoss, laserLeft, laserRight, laserTop, laserBottom)) {
+                // Deal damage to gamma boss (laser deals 1 damage per frame it's active)
+                gammaBoss.takeDamage(1);
+                if (gammaBoss.isDestroyed()) {
+                    handleAnyBossDestruction(gammaBoss, playerNum);
                 }
             }
         }
@@ -788,20 +863,18 @@ public class GameModel {
 				DropItem.applyTimeFreezeItem(3000);
 				break;
 
-			case Push:
-				pushEnemiesBack();
+			case Bomb:
+				ship.enableBomb(GameConstant.BOMB_ITEM_SHOTS);
 				break;
 
-			case Explode:
-				int destroyed = enemyShipFormationModel.destroyAll();
-				int pts = destroyed * 5;
-				if (ship.getPlayerId() == 2) scoreP2 += pts;
-				else scoreP1 += pts;
+			case Coin:
+				this.coin += GameConstant.COIN_ITEM_VALUE;
 				break;
 
-			case Slow:
-				enemyShipFormationModel.activateSlowdown();
-				break;
+			case SubShip:
+                DropItem.activateSubShip(ship, this.subShips);
+                break;
+
 		}
 
 		dropItems.remove(item);
@@ -846,16 +919,6 @@ public class GameModel {
 	}
 
 
-	/**
-	 * Pushes all enemy ships upward (used by Push-type item).
-	 */
-	public void pushEnemiesBack() {
-		for (EnemyShip enemy : enemyShipFormationModel) {
-			if (enemy != null && !enemy.isDestroyed()) {
-				enemy.move(0, -20,false);
-			}
-		}
-	}
 
     private void cleanupAllEntities() {
         cleanBullets();
@@ -923,6 +986,28 @@ public class GameModel {
                 this.logger.info("P2 Hit by Apocalypse, " + this.livesP2 + " lives remaining.");
             }
         }
+
+        // 3. SubShip Check
+        if (this.subShips != null) {
+            for (SubShip sub : this.subShips) {
+                if (!sub.isDestroyed()) {
+                    int subX = sub.getPositionX();
+                    int subY = sub.getPositionY();
+                    int subRightX = subX + sub.getWidth() - 1;
+
+                    int leftColumn = subX / columnWidth;
+                    int rightColumn = subRightX / columnWidth;
+
+                    boolean isInRedZone = (leftColumn != safeZoneColumn || rightColumn != safeZoneColumn);
+                    boolean isHitByAnimation = (currentAttackHeight >= subY);
+
+                    if (isInRedZone && isHitByAnimation) {
+                        sub.destroy();
+                        this.logger.info("SubShip destroyed by Apocalypse!");
+                    }
+                }
+            }
+        }
     }
 
 
@@ -955,8 +1040,101 @@ public class GameModel {
         ItemPool.recycle(recyclable);
     }
 
+	private boolean inRange(Entity e, int cx, int cy, int radius) {
 
-    /**
+		int ex = e.getPositionX() + e.getWidth() / 2;
+		int ey = e.getPositionY() + e.getHeight() / 2;
+
+		int dx = ex - cx;
+		int dy = ey - cy;
+
+		return dx * dx + dy * dy <= radius * radius;
+	}
+
+	private void applyBombDamageToEnemy(Bullet source, EnemyShip enemy) {
+		if (enemy == null || enemy.isDestroyed()) return;
+
+		int pts = enemy.getPointValue();
+		addPointsFor(source, pts);
+		this.coin += pts / GameConstant.POINTS_TO_COIN_CONVERSION;
+		AchievementManager.getInstance().onEnemyDefeated();
+
+		attemptItemDrop(enemy);
+
+		String type = enemy.getEnemyType();
+		if ("enemySpecial".equals(type)) {
+			if (enemyShipSpecialFormation != null) {
+				enemyShipSpecialFormation.destroy(enemy);
+			}
+		} else {
+			if (enemyShipFormationModel != null) {
+				enemyShipFormationModel.destroy(enemy);
+			}
+		}
+	}
+
+	private void applyBombDamageToBoss(Bullet source, BossEntity boss) {
+		if (boss == null || boss.isDestroyed()) return;
+
+		boss.takeDamage(GameConstant.BOMB_DAMAGE_TO_BOSS);
+
+		if (boss.getHealPoint() <= 0) {
+			boss.destroy();
+			int pts = boss.getPointValue();
+			addPointsFor(source, pts);
+			this.coin += pts / 10;
+			AchievementManager.getInstance().unlockAchievement("Boss Slayer");
+		}
+	}
+
+	public void requestBombAoEDamage(Bullet source) {
+		if (source == null) return;
+
+		int cx = source.getPositionX() + source.getWidth() / 2;
+		int cy = source.getPositionY() + source.getHeight() / 2;
+		final int radius = GameConstant.BOMB_AOE_RADIUS;
+
+        List<Iterable<EnemyShip>> enemyFormations = new java.util.ArrayList<>();
+		if (enemyShipFormationModel != null) {
+			enemyFormations.add(enemyShipFormationModel);
+		}
+		if (enemyShipSpecialFormation != null) {
+			enemyFormations.add(enemyShipSpecialFormation);
+		}
+
+		for (Iterable<EnemyShip> formation : enemyFormations) {
+			for (EnemyShip e : formation) {
+				if (e != null && !e.isDestroyed() && inRange(e, cx, cy, radius)) {
+					applyBombDamageToEnemy(source, e);
+				}
+			}
+		}
+
+        List<BossEntity> allBosses = new java.util.ArrayList<>();
+		if (omegaBoss != null) {
+			allBosses.add(omegaBoss);
+		}
+		if (zetaBoss != null) {
+			allBosses.add(zetaBoss);
+		}
+		if (finalBoss != null) {
+			allBosses.add(finalBoss);
+		}
+		if (midBossChilds != null) {
+			allBosses.addAll(midBossChilds);
+		}
+
+		for (BossEntity boss : allBosses) {
+			if (!boss.isDestroyed() && inRange((Entity) boss, cx, cy, radius)) {
+				applyBombDamageToBoss(source, boss);
+			}
+		}
+
+		requestRemoveBullet(source);
+	}
+
+
+	/**
      * Checks if two entities are colliding.
      *
      * @param a
@@ -1047,19 +1225,19 @@ public class GameModel {
                 this.finalBoss = new FinalBoss(this.width / 2 - 150, 80,  ships, this.width, this.height);
                 this.logger.info("Final Boss has spawned!");
                 break;
-            case "omegaBoss":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, ships);
+            case "omegaBoss", "omegaAndZetaAndFinal":
+                this.omegaBoss = new OmegaBoss(ship);
                 this.logger.info("Omega Boss has spawned!");
                 break;
             case "ZetaBoss":
                 this.zetaBoss = new ZetaBoss(Color.ORANGE, ship);
                 this.logger.info("Zeta Boss has spawned!");
                 break;
-            case "omegaAndZetaAndFinal":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, ships);
-                this.logger.info("Omega Boss has spawned!");
+            case "gammaBoss":
+                this.gammaBoss = new GammaBoss(Color.CYAN, ships, this.width, this.height);
+                this.logger.info("Gamma Boss has spawned!");
                 break;
-            default:
+	        default:
                 this.logger.warning("Unknown bossId: " + bossName);
                 break;
         }
@@ -1218,6 +1396,7 @@ public class GameModel {
     public EnemyShipFormationModel getEnemyShipFormationModel() { return enemyShipFormationModel; }
     public MidBoss getOmegaBoss() { return omegaBoss; }
     public MidBoss getZetaBoss() { return zetaBoss; }
+    public MidBoss getGammaBoss() { return gammaBoss; }
     public List<MidBossMob> getMidBossChilds() { return midBossChilds; }
     public Set<Bullet> getBullets() { return bullets; }
     public Set<DropItem> getDropItems() { return dropItems; }
@@ -1238,6 +1417,22 @@ public class GameModel {
     public int getBlackHoleCX() { return blackHoleCX; }
     public int getBlackHoleCY() { return blackHoleCY; }
     public int getBlackHoleRadius() { return blackHoleRadius; }
+    public boolean getIsTeleportP1(){ return this.isTeleportP1;}
+    public int getTeleportFromP1X() { return teleportFromP1X; }
+    public int getTeleportFromP1Y() { return teleportFromP1Y; }
+    public boolean getIsTeleportP2(){ return this.isTeleportP2;}
+    public int getTeleportFromP2X() { return teleportFromP2X; }
+    public int getTeleportFromP2Y() { return teleportFromP2Y; }
+    public int getAfterTeleportFromP1X() { return afterTeleportFromP1X; }
+    public int getAfterTeleportFromP1Y() { return afterTeleportFromP1Y; }
+    public int getAfterTeleportFromP2Y() { return afterTeleportFromP2Y; }
+    public int getAfterTeleportFromP2X() { return afterTeleportFromP2X; }
+    public void setIsTelportP1(boolean isTeleportP1){
+        this.isTeleportP1 = isTeleportP1;
+    }
+    public void setIsTelportP2(boolean isTeleportP2){
+        this.isTeleportP2 = isTeleportP2;
+    }
     public int getFinalSkillCnt(){
         return FinalSkillCnt;
     }
@@ -1261,6 +1456,11 @@ public class GameModel {
         }
         if (getShipP2() != null && getLivesP2() > 0) {
             renderList.add(getShipP2());
+        }
+
+        // added subships
+        if (this.subShips != null) {
+            renderList.addAll(this.subShips);
         }
 
         // 2. added special enemyship
@@ -1289,6 +1489,11 @@ public class GameModel {
         // [추가] ZetaBoss 렌더링 리스트 추가
         if (getZetaBoss() != null) {
             renderList.add(getZetaBoss());
+        }
+
+        // [add] GammaBoss Rendering List
+        if (getGammaBoss() != null) {
+            renderList.add(getGammaBoss());
         }
 
         if (getFinalBoss() != null && !getFinalBoss().isDestroyed()) {
