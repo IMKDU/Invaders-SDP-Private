@@ -117,6 +117,13 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
             SideLoopFormationMovement sideLoop2 = new SideLoopFormationMovement(partitionGroup.get(1));
             addMovementStrategy(sideLoop2);
         }
+        if(level.getLevel() == 2){
+            List<List<List<EnemyShip>>> partitionGroup = builder.splitGroup(enemyShips,2);
+            CrossFormationMovement cross1 = new CrossFormationMovement(partitionGroup.getFirst());
+            addMovementStrategy(cross1);
+            CrossFormationMovement cross2 = new CrossFormationMovement(partitionGroup.get(1));
+            addMovementStrategy(cross2);
+        }
     }
 
     /**
