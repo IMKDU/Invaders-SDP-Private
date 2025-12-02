@@ -1,4 +1,4 @@
-package entity;
+package entity.movements;
 
 /**
  * Defines a contract for enemy formation movement strategies.
