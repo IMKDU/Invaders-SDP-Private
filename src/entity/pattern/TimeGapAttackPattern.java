@@ -20,7 +20,6 @@ public class TimeGapAttackPattern extends BossPattern {
 	private HasBounds boss;
 	private HasBounds target;
 	private Point targetPosition;
-	private LaserBeam laser;
 
 	private boolean isUpdated=false;
 
@@ -56,8 +55,8 @@ public class TimeGapAttackPattern extends BossPattern {
 			int randomX = (int) (Math.random() * screenWidth);
 			int randomY = (int) (Math.random() * screenHeight);
 			Point initBulletPosition = new Point(randomX,randomY);
-			this.laser = new LaserBeam(initBulletPosition, targetPosition, chargeCooldownMilli, remainCooldownMilli);
-			this.lasers.add(laser);
+			LaserBeam laserBeam = new LaserBeam(initBulletPosition, targetPosition, chargeCooldownMilli, remainCooldownMilli);
+			this.lasers.add(laserBeam);
 		}
 	}
 
