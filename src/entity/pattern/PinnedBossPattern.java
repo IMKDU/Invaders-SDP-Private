@@ -10,6 +10,7 @@ import java.util.Set;
 
 public class PinnedBossPattern extends BossPattern {
 
+
 	protected HasBounds boss;
 
 	/** for move pattern */
