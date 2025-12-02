@@ -16,6 +16,8 @@ public class SoundManager {
     private static volatile String currentLooping = null;
     private static final Map<String, java.util.List<Clip>> PLAY_MAP = new ConcurrentHashMap<>();
     private static final Map<String, Clip> SINGLE_LOOP_MAP = new ConcurrentHashMap<>();
+    private static final int MAX_SIMULTANEOUS = 8;
+    private static final Map<String, List<Clip>> POOL = new ConcurrentHashMap<>();
 
     public static void play(String resourcePath) {
         if (muted) return;
@@ -189,6 +191,32 @@ public class SoundManager {
             c.stop();
             c.flush();
             c.setFramePosition(0);
+        }
+    }
+    public static void playPooled(String path) {
+        if (muted) return;
+
+        try {
+            List<Clip> list = POOL.computeIfAbsent(path, k -> new java.util.ArrayList<>());
+            Clip target = null;
+            for (Clip c : list) {
+                if (!c.isRunning()) {
+                    target = c;
+                    break;
+                }
+            }
+            if (target == null && list.size() < MAX_SIMULTANEOUS) {
+                target = loadClip(path);
+                if (target != null) list.add(target);
+            }
+
+            if (target != null) {
+                target.setFramePosition(0);
+                target.start();
+            }
+
+        } catch (Exception e) {
+            System.err.println("[Sound] playPooled fail : " + e);
         }
     }
 }
