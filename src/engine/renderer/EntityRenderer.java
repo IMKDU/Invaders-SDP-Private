@@ -200,11 +200,7 @@ public final class EntityRenderer {
 			LaserBullet laser = (LaserBullet) entity;
 			drawLaserRotated(laser, laser.getTargetPosition().x, laser.getTargetPosition().y);
 		}
-		else if (entity instanceof OmegaBoss) {
-			OmegaBoss omegaBoss = (OmegaBoss) entity;
-			drawOmegaBoss(omegaBoss);
-		}
-        else if (entity instanceof ZetaBoss) {
+		else if (entity instanceof ZetaBoss) {
            ZetaBoss zetaBoss = (ZetaBoss) entity;
            drawZetaBoss(zetaBoss);
         }
@@ -223,12 +219,6 @@ public final class EntityRenderer {
 	private void drawOmegaBoss(OmegaBoss omegaBoss) {
 		// Draw boss sprite
 		drawEntity(omegaBoss, omegaBoss.getPositionX(), omegaBoss.getPositionY());
-
-		// Draw pattern-specific visuals
-		BossPattern currentPattern = omegaBoss.getBossPattern();
-		if (currentPattern != null) {
-			drawBossPattern(omegaBoss, currentPattern);
-		}
 	}
 
     private void drawZetaBoss(ZetaBoss zetaBoss) {
@@ -317,9 +307,7 @@ public final class EntityRenderer {
 		}
 
         int[] targetPoint;
-        if (boss instanceof OmegaBoss) {
-            targetPoint = ((OmegaBoss) boss).getDashEndPoint();
-        } else if (boss instanceof ZetaBoss) {
+		if (boss instanceof ZetaBoss) {
             targetPoint = ((ZetaBoss) boss).getDashEndPoint();
         } else {
             return;

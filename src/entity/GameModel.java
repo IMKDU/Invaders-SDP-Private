@@ -356,16 +356,7 @@ public class GameModel {
                 if (this.omegaBoss != null){
                     this.omegaBoss.update();
                     if (this.omegaBoss instanceof OmegaBoss omega) {
-                        midBossChilds = omega.getSpawnMobs();
-                        this.explosionEntity = omega.getBoom();
-
-                        if (omega.getBossPattern() != null) {
-                            bossBullets.addAll(omega.getBossPattern().getBullets());
-                        }
-
-                        if (omega.getGuidedMissilePattern() != null) {
-                            this.bossBullets.addAll(omega.getGuidedMissilePattern().getBullets());
-                        }
+                        bossBullets.addAll(omega.getBullets());
                     }
 					updateBossBullets();
 
@@ -1024,7 +1015,7 @@ public class GameModel {
 		int cy = source.getPositionY() + source.getHeight() / 2;
 		final int radius = GameConstant.BOMB_AOE_RADIUS;
 
-		java.util.List<Iterable<EnemyShip>> enemyFormations = new java.util.ArrayList<>();
+        List<Iterable<EnemyShip>> enemyFormations = new java.util.ArrayList<>();
 		if (enemyShipFormationModel != null) {
 			enemyFormations.add(enemyShipFormationModel);
 		}
@@ -1040,7 +1031,7 @@ public class GameModel {
 			}
 		}
 
-		java.util.List<BossEntity> allBosses = new java.util.ArrayList<>();
+        List<BossEntity> allBosses = new java.util.ArrayList<>();
 		if (omegaBoss != null) {
 			allBosses.add(omegaBoss);
 		}
@@ -1155,19 +1146,15 @@ public class GameModel {
                 this.finalBoss = new FinalBoss(this.width / 2 - 150, 80,  ships, this.width, this.height);
                 this.logger.info("Final Boss has spawned!");
                 break;
-            case "omegaBoss":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, ships);
+            case "omegaBoss", "omegaAndZetaAndFinal":
+                this.omegaBoss = new OmegaBoss(ship);
                 this.logger.info("Omega Boss has spawned!");
                 break;
             case "ZetaBoss":
                 this.zetaBoss = new ZetaBoss(Color.ORANGE, ship);
                 this.logger.info("Zeta Boss has spawned!");
                 break;
-            case "omegaAndZetaAndFinal":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, ships);
-                this.logger.info("Omega Boss has spawned!");
-                break;
-            default:
+	        default:
                 this.logger.warning("Unknown bossId: " + bossName);
                 break;
         }
