@@ -457,7 +457,7 @@ public class GameModel {
 		for (LaserBeam laser : bossLasers){
 			for (Entity a : entities) {
 				if(laser.isActive() && checkLaserRotatedCollision(a, laser)){
-					laser.onCollision(a, this);
+					a.onCollision(laser, this);
 				}
 			}
 		}

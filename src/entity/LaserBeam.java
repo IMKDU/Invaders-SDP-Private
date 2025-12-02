@@ -90,7 +90,7 @@ public class LaserBeam extends Entity implements LaserInfo {
 
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
-		other.onHitByLaserBeam(this, model);
+		// The laser is not affected by collisions; the other entity handles it.
 	}
 
 	@Override
