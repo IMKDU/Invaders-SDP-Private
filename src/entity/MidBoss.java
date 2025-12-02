@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  * @author <a href="developer.ksb@gmail.com">Seungbeom Kim</a>
  *
  */
-public abstract class MidBoss extends Entity implements BossEntity {
+public abstract class MidBoss extends Entity implements BossEntity, BossInfo {
 
 	protected int healPoint = 10;
 	protected int maxHp = healPoint;
@@ -90,4 +90,7 @@ public abstract class MidBoss extends Entity implements BossEntity {
 	public void onHitByPlayerBullet(Bullet bullet, GameModel model) {
 		model.requestBossHitByPlayerBullet(bullet, this);
 	}
+
+	@Override
+	public int getMaxHealPoint() { return this.maxHp; }
 }

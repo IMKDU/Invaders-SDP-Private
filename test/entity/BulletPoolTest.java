@@ -40,7 +40,7 @@ class BulletPoolTest {
     @Test
     void testRecycleAndReuse() {
         // 1. Given a manually created Bullet,
-        Bullet b1 = new Bullet(100, 100, 100, Color.WHITE);
+        Bullet b1 = new Bullet(100, 100, 100,1,1);
         Set<Bullet> bulletsToRecycle = new HashSet<>();
         bulletsToRecycle.add(b1);
 
@@ -63,7 +63,7 @@ class BulletPoolTest {
     void testPoolEmptiesAfterGet() throws Exception {
         // 1. Given an object recycled into the pool.
         Set<Bullet> bulletsToRecycle = new HashSet<>();
-        bulletsToRecycle.add(new Bullet(1, 1, 1, Color.WHITE));
+        bulletsToRecycle.add(new Bullet(1, 1, 1,1,1));
         BulletPool.recycle(bulletsToRecycle);
         assertEquals(1, getInternalPool().size(), "Pool should contain one object.");
 
