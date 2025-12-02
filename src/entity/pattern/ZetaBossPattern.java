@@ -49,6 +49,9 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
     private int SCREEN_WIDTH = GameConstant.SCREEN_WIDTH;
     private int SCREEN_HEIGHT = GameConstant.SCREEN_HEIGHT;
 
+    /** Variable for Guided Missile Pattern */
+    private GuidedMissilePattern guidedMissilePattern;
+
     /** BlackHole states */
     private enum BlackHoleState {
         ACTIVE,         // BlackHole is pulling players
@@ -109,6 +112,7 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
         // Initialize Apocalypse Pattern
         this.apocalypsePattern = new ApocalypseAttackPattern(boss);
 
+        this.guidedMissilePattern = new GuidedMissilePattern(this.boss, ships);
         // Initialize timers for phase 1
         updateTimersForPhase();
 
@@ -155,6 +159,10 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
 
         // Priority 4: Update movement (always except during Apocalypse)
         updateMovement();
+
+        if (guidedMissilePattern != null) {
+            guidedMissilePattern.attack();
+        }
     }
 
     /**
@@ -389,10 +397,25 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
 
     @Override
     public Set<Bullet> getBullets() {
+        Set<Bullet> allBullets = new java.util.HashSet<>();
+
         if (movementPattern != null) {
-            return movementPattern.getBullets();
+            allBullets.addAll(movementPattern.getBullets());
         }
-        return this.bullets;
+
+        if (guidedMissilePattern != null) {
+            allBullets.addAll(guidedMissilePattern.getBullets());
+        }
+
+        if (apocalypsePattern != null) {
+            allBullets.addAll(apocalypsePattern.getBullets());
+        }
+
+        if (currentBlackHole != null) {
+            allBullets.addAll(currentBlackHole.getBullets());
+        }
+
+        return allBullets;
     }
 
     @Override
@@ -430,5 +453,9 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
             return apocalypsePattern;
         }
         return movementPattern;
+    }
+
+    public GuidedMissilePattern getGuidedMissilePattern() {
+        return this.guidedMissilePattern;
     }
 }
