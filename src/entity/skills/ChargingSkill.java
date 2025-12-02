@@ -66,6 +66,8 @@ public class ChargingSkill implements ISkill {
      * Should be called when the player presses and holds the C key.
      */
     public void startCharging() {
+        if (ship == null)
+            return;
         long currentTime = System.currentTimeMillis();
 
         // Check if skill is on cooldown
@@ -82,6 +84,7 @@ public class ChargingSkill implements ISkill {
         if (!isCharging) {
             isCharging = true;
             chargeStartTime = currentTime;
+            SoundManager.playSingleLoopChannel("sfx/ChargingLaser.wav", channel());
         }
     }
 
@@ -93,6 +96,7 @@ public class ChargingSkill implements ISkill {
         if (isCharging) {
             isCharging = false;
             chargeStartTime = 0;
+            SoundManager.stopSingleLoopChannel("sfx/ChargingLaser.wav", channel());
         }
     }
 
@@ -112,8 +116,8 @@ public class ChargingSkill implements ISkill {
         lastChargingSkillUse = laserStartTime;
 
         // Play sound effect
-        SoundManager.stop("sfx/laser.wav");
-        SoundManager.play("sfx/laser.wav");
+        SoundManager.stopSingleLoopChannel("sfx/ChargingLaser.wav", channel());
+        SoundManager.play("sfx/FireChargingLaser.wav");
     }
 
     /**
@@ -179,5 +183,8 @@ public class ChargingSkill implements ISkill {
      */
     public Ship getShip() {
         return ship;
+    }
+    private String channel() {
+        return "P" + ship.getPlayerId();
     }
 }

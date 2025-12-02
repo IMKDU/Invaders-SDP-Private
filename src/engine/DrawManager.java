@@ -40,17 +40,17 @@ public final class DrawManager {
     private SpecialAnimationRenderer specialAnimationRenderer;
 	private double scale;
     private final AnimationLoader loader;
-	/** Sprite types mapped to their images. */
+    /** Sprite types mapped to their images. */
 	private static Map<SpriteType, BufferedImage> spriteMap;
 
 	/** Sprite types. */
     public static enum SpriteType {
         ShipP1,ShipP2,ShipP1Move,ShipP2Move,ShipP2Explosion1,ShipP2Explosion2, ShipP2Explosion3,Life, ShipP1Explosion1,ShipP1Explosion2,ShipP1Explosion3,
-        Bullet, EnemyBullet, EnemyShipA1, EnemyShipA2, Laser,
+        Bullet, EnemyBullet, EnemyShipA1, EnemyShipA2, Laser, Teleport, TeleportCool,BombExplosion,
         EnemyShipB1, EnemyShipB2, EnemyShipC1, EnemyShipC2, EnemyShipSpecial, EnemyShipSpecialLeft, EnemySpecialExplosion,
         FinalBoss1, FinalBoss2,FinalBossBullet,FinalBossDeath,OmegaBoss1, OmegaBoss2,OmegaBossHitting,OmegaBossMoving1,OmegaBossMoving2,OmegaBossMoving3,OmegaBossMoving4,OmegaBossDeath, Explosion, SoundOn, SoundOff, Item_MultiShot,
-        Item_Atkspeed, Item_Penetrate, Item_Explode, Item_Slow, Item_Stop, Shield,
-        Item_Push, Item_Shield, Item_Heal, BlackHole1,BlackHole2, OmegaBossDash1, OmegaBossDash2, OmegaBossDash3, OmegaBossDash4, OmegaBossBullet,
+        Item_Atkspeed, Item_Penetrate, Item_SubShip, Item_Stop, Shield, Item_Bomb, Item_Coin, BombBullet,Bomb1,Bomb2,
+		Item_Shield, Item_Heal, BlackHole1,BlackHole2, OmegaBossDash1, OmegaBossDash2, OmegaBossDash3, OmegaBossDash4, OmegaBossBullet,
         ZetaBoss1, ZetaBoss2,ZetaBossRight1,ZetaBossRight2, ZetaBossMoving1, ZetaBossMoving2, ZetaBossMovingRight1, ZetaBossMovingRight2, ZetaBossDash1,ZetaBossDash2,ZetaBossDashRight1,ZetaBossDashRight2
     }
 
@@ -97,7 +97,7 @@ public final class DrawManager {
             fontPack = new FontPack(backBuffer.getGraphics(), fileManager);
             entityRenderer = new EntityRenderer(spriteAtlas.getSpriteMap(),backBuffer,this.scale, this.loader);
 			itemRenderer = new ItemRenderer(backBuffer, spriteAtlas.getSpriteMap(), this.scale);
-			hudRenderer = new HUDRenderer(backBuffer, fontPack, entityRenderer);
+			hudRenderer = new HUDRenderer(backBuffer, fontPack, entityRenderer,spriteAtlas.getSpriteMap().get(SpriteType.TeleportCool));
             shopRenderer = new ShopRenderer(backBuffer,fontPack);
             uiRenderer = new UIRenderer(backBuffer,fontPack);
             specialAnimationRenderer = new SpecialAnimationRenderer(backBuffer);
@@ -114,6 +114,11 @@ public final class DrawManager {
         }
         backBuffer.end();
 	}
+
+    public void startShake(int duration, int intensity) {
+        backBuffer.setShake(duration, intensity);
+    }
+
 	/**
 	 * Draws the starfield background.
 	 *

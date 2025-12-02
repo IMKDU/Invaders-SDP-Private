@@ -46,9 +46,10 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 
 	/** Attack cooldown values for each phase. */
 	private final int[][] attackCooldownMillis = {
+			{2000},
 			{8000},
-			{8000},
-			{5000}
+			{5000},
+			{1500}
 	};
 	/** Movement cooldown value shared across phases. */
 	private final int moveCooldownMillis = 8000;
@@ -163,17 +164,22 @@ public class OmegaBossPattern extends BossPattern implements IBossPattern {
 		currentPhase=3;
 		boolean isPinnedAttack = Math.random()<PHASE3_ATTACK_SELECT_RATIO;
 		if(isInit){
+			Cooldown crazyAttackCooldown = new Cooldown(attackCooldownMillis[3][0]);
 			movePattern=patterns.getFirst();
 			attackPattern = patterns.get(1);
 			attackCooldown.setMilliseconds(attackCooldownMillis[2][0]);
 			resetCooldown();
-			attackPattern.setCooldown(attackCooldown);
+			attackPattern.setCooldown(crazyAttackCooldown);
 			Core.getLogger().info("OmegaBossPattern: phase3 start");
 		}
 		if(attackCooldown.checkFinished()){
 			movePattern = isPinnedAttack ? patterns.getFirst() : patterns.getLast();
 			attackPattern = isPinnedAttack ? patterns.get(1) : patterns.getLast();
-			if(isPinnedAttack) resetCooldown();
+			if(isPinnedAttack){
+				Cooldown crazyAttackCooldown = new Cooldown(attackCooldownMillis[3][0]);
+				attackPattern.setCooldown(crazyAttackCooldown);
+				resetCooldown();
+			}
 		}
 	}
 

@@ -7,6 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
+import audio.SoundManager;
 import engine.*;
 import entity.*;
 import engine.DrawManager.SpriteType;
@@ -24,6 +25,9 @@ public final class EntityRenderer {
     private final BackBuffer backBuffer;
     private final double scale;
     private final Cooldown blackholeAnimationCooldown = new Cooldown(100);
+    private final Cooldown TeleportCooldownP1 = new Cooldown(600);
+    private final Cooldown TeleportCooldownP2 = new Cooldown(600);
+    private final Cooldown BombImageCooldown = new Cooldown(200);
     private SpriteType blackHoleType = SpriteType.BlackHole1;
     private final Cooldown frameCooldown;
     private BufferedImage[] apo;
@@ -31,6 +35,15 @@ public final class EntityRenderer {
     private static final double RED_YELLOW_THRESHOLD = 1.0 / 3.0;
     private static final double YELLOW_GREEN_THRESHOLD = 2.0 / 3.0;
     private int EXPLOSION_SIZE_CHANGE = 10;
+    private boolean bombToggle;
+    private static final int SPARKLE_COUNT = 10;
+
+    private double[] sparkleX = new double[SPARKLE_COUNT];
+    private double[] sparkleY = new double[SPARKLE_COUNT];
+    private double[] sparkleVX = new double[SPARKLE_COUNT];
+    private double[] sparkleVY = new double[SPARKLE_COUNT];
+
+    private boolean sparkleInitialized = false;
     private Color[] colorPalette = {
             new Color( 0xFF4081),
             new Color( 0xFCDD8A),
@@ -62,10 +75,13 @@ public final class EntityRenderer {
         if (img == null) {
             return;
         }
+        boolean isSubShip = (entity instanceof entity.SubShip);
+        double currentScale = isSubShip ? this.scale * 0.5 : this.scale;
+
         int originalW = img.getWidth();
         int originalH = img.getHeight();
-        int scaledW = (int) (originalW * scale * 2);
-        int scaledH = (int) (originalH * scale * 2);
+        int scaledW = (int) (originalW * currentScale * 2);
+        int scaledH = (int) (originalH * currentScale * 2);
 
         if (entity.getSpriteType() == SpriteType.SoundOn ||
                 entity.getSpriteType() == SpriteType.SoundOff) {
@@ -206,11 +222,50 @@ public final class EntityRenderer {
 	}
 
     private void drawZetaBoss(ZetaBoss zetaBoss) {
+        // 1. Draw boss body
+        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
+
+        // 2. Draw pattern effects
         BossPattern currentPattern = zetaBoss.getBossPattern();
         if (currentPattern != null) {
             drawBossPattern(zetaBoss, currentPattern);
         }
-        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
+    }
+
+    /**
+     * Draws GammaBoss entity with pattern-specific visualizations.
+     */
+    public void drawGammaBoss(GammaBoss gammaBoss) {
+        // Check if showing dash path and draw it
+        if (gammaBoss.isShowingPath()) {
+            int[] targetPoint = gammaBoss.getDashEndPoint();
+            int bossWidth = gammaBoss.getWidth();
+            int bossHeight = gammaBoss.getHeight();
+            int startX = gammaBoss.getPositionX() + bossWidth / 2;
+            int startY = gammaBoss.getPositionY() + bossHeight / 2;
+            int targetX = targetPoint[0];
+            int targetY = targetPoint[1];
+
+            // Calculate direction vector and extend to long endpoint
+            double dx = targetX - startX;
+            double dy = targetY - startY;
+            double len = Math.sqrt(dx * dx + dy * dy);
+
+            if (len > 0) {
+                dx /= len;
+                dy /= len;
+
+                // Extend to sufficient distance (beyond screen)
+                double extendDistance = 2000.0;
+                int endX = (int) Math.round(startX + dx * extendDistance);
+                int endY = (int) Math.round(startY + dy * extendDistance);
+
+                // Draw path
+                drawDashPath(startX, startY, endX, endY);
+            }
+        }
+
+        drawEntity(gammaBoss, gammaBoss.getPositionX(), gammaBoss.getPositionY());
     }
 
 	private void drawMidBossMob(MidBossMob midBossMob) {
@@ -290,6 +345,8 @@ public final class EntityRenderer {
         int[] targetPoint;
 		if (boss instanceof ZetaBoss) {
             targetPoint = ((ZetaBoss) boss).getDashEndPoint();
+        } else if (boss instanceof GammaBoss) {
+        targetPoint = ((GammaBoss) boss).getDashEndPoint();
         } else {
             return;
         }
@@ -494,23 +551,52 @@ public final class EntityRenderer {
 	public void drawExplosion(boolean isBoom, HasBounds boom, double time) {
 		Graphics g = backBuffer.getGraphics();
 		if (!isBoom) {
+            g.setColor(new Color(255,0,0,100));
+            g.drawOval(boom.getPositionX(),boom.getPositionY(),boom.getWidth(),boom.getHeight());
+            int currentWidth = (int) (boom.getWidth() * time);
+            int currentHeight = (int) (boom.getHeight() * time);
+            int offsetX = (boom.getWidth() - currentWidth) / 2;
+            int offsetY = (boom.getHeight() - currentHeight) / 2;
 
-			g.setColor(new Color(255,0,0,100));
-			g.drawOval(boom.getPositionX(),boom.getPositionY(),boom.getWidth(),boom.getHeight());
-			int currentWidth = (int) (boom.getWidth() * time);
-			int currentHeight = (int) (boom.getHeight() * time);
-			int offsetX = (boom.getWidth() - currentWidth) / 2;
-			int offsetY = (boom.getHeight() - currentHeight) / 2;
-			g.fillOval(boom.getPositionX() + offsetX, boom.getPositionY() + offsetY, currentWidth, currentHeight);
+            g.fillOval(boom.getPositionX() + offsetX, boom.getPositionY() + offsetY, currentWidth, currentHeight);
+
+            BufferedImage bomb1 = spriteMap.get(SpriteType.Bomb1);
+            BufferedImage bomb2 = spriteMap.get(SpriteType.Bomb2);
+            int sw = bomb1.getWidth();
+            int sh = bomb1.getHeight();
+
+            int scaledW = (int) (sw * scale * 2);
+            int scaledH = (int) (sh * scale * 2);
+
+            int centerX = boom.getPositionX() + boom.getWidth() / 2;
+            int centerY = boom.getPositionY() + boom.getHeight() / 2;
+
+            int drawX = centerX - scaledW / 2;
+            int drawY = centerY - scaledH / 2;
+
+            if (this.BombImageCooldown.checkFinished()) {
+                this.BombImageCooldown.reset();
+                bombToggle = !bombToggle;
+            }
+
+            g.drawImage(bombToggle ? bomb1 : bomb2, drawX, drawY, scaledW, scaledH, null);
+
 		}
 		else {
-			g.setColor(new Color(255,200,0,170));
-            g.fillOval(boom.getPositionX() - EXPLOSION_SIZE_CHANGE,
-					boom.getPositionY() - EXPLOSION_SIZE_CHANGE,
-					boom.getWidth() + EXPLOSION_SIZE_CHANGE * 2,
-					boom.getHeight() + EXPLOSION_SIZE_CHANGE * 2);
+            BufferedImage bombexplosion = spriteMap.get(SpriteType.BombExplosion);
+            int sw = bombexplosion.getWidth();
+            int sh = bombexplosion.getHeight();
+            int scaledW = (int) (sw * scale * 2);
+            int scaledH = (int) (sh * scale * 2);
+            int centerX = boom.getPositionX() + boom.getWidth() / 2;
+            int centerY = boom.getPositionY() + boom.getHeight() / 2;
+            int drawX = centerX - scaledW / 2;
+            int drawY = centerY - scaledH / 2;
+            g.drawImage(bombexplosion, drawX, drawY, scaledW, scaledH, null);
+            SoundManager.play("sfx/BombExplosion.wav");
 		}
 	}
+
 
 
 	/**
@@ -634,5 +720,125 @@ public final class EntityRenderer {
 			g2d.fillOval(particleX, particleY, particleSize, particleSize);
 		}
 	}
+    public void drawTeleport(int positionX, int width, int positionY, int height, boolean isTeleport, int playerId, int afterPositionX, int afterPositionY){
+        Cooldown cd = (playerId == 1) ? TeleportCooldownP1 : TeleportCooldownP2;
+
+        if (isTeleport)
+            cd.reset();
+
+        if (!cd.checkFinished()) {
+            Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
+
+            BufferedImage hole = spriteMap.get(SpriteType.Teleport);
+            int drawW = (int) (hole.getWidth() * scale * 2);
+            int drawH = (int) (hole.getHeight() * scale * 2);
+
+            // --- BEFORE position (centered)
+            int cx = positionX + width / 2;
+            int cy = positionY + height / 2;
+
+            int drawX = cx - drawW / 2;
+            int drawY = cy - drawH / 2;
+
+            // --- AFTER position (centered)
+            int acx = afterPositionX + width / 2;
+            int acy = afterPositionY + height / 2;
+
+            int drawAfterX = acx - drawW / 2;
+            int drawAfterY = acy - drawH / 2;
+
+            double fade = cd.getTotal() == 0
+                    ? 0.0
+                    : (double) cd.getRemaining() / cd.getTotal();   // 1 -> 0
+
+            int alpha = (int)(255 * fade);
+            if (alpha < 0) alpha = 0;
+
+            BufferedImage tinted = tintAlpha(hole, alpha);
+            g2d.drawImage(tinted, drawX, drawY, drawW, drawH, null);
+            drawFlashDust(g2d, cx, cy, drawW, fade);
+            drawFlashDust(g2d, acx, acy, drawW, fade);
+
+        }
+    }
+    private void drawFlashDust(Graphics2D g2d,
+                               int cx,
+                               int cy,
+                               int size,
+                               double fade) {
+
+        int spawnRadius = size / 3;
+        int riseHeight = size / 2;
+
+        // ----------------------------
+        // 초기화 : 중심 기준 offset 생성
+        // ----------------------------
+        if (!sparkleInitialized) {
+
+            for (int i = 0; i < SPARKLE_COUNT; i++) {
+
+                double ang = Math.random() * Math.PI * 2;
+                double dist = Math.random() * spawnRadius;
+
+                sparkleX[i] = Math.cos(ang) * dist;   // 상대좌표
+                sparkleY[i] = Math.sin(ang) * dist;
+
+                // 위로 올라가는 속도
+                sparkleVX[i] = (Math.random() - 0.5) * 0.25;
+                sparkleVY[i] = -(0.3 + Math.random() * 0.5);
+            }
+
+            sparkleInitialized = true;
+        }
+
+        // ----------------------------
+        // 페이드
+        // ----------------------------
+        int alpha = (int)(200 * fade);
+        if (alpha < 0) alpha = 0;
+
+        // ----------------------------
+        // 이동 + 리스폰
+        // ----------------------------
+        for (int i = 0; i < SPARKLE_COUNT; i++) {
+
+            sparkleX[i] += sparkleVX[i];
+            sparkleY[i] += sparkleVY[i];
+
+            // 너무 멀어지면 재생성
+            if (-sparkleY[i] > riseHeight) {
+
+                double ang = Math.random() * Math.PI * 2;
+                double dist = Math.random() * spawnRadius;
+
+                sparkleX[i] = Math.cos(ang) * dist;
+                sparkleY[i] = Math.sin(ang) * dist;
+
+                sparkleVX[i] = (Math.random() - 0.5) * 0.25;
+                sparkleVY[i] = -(0.3 + Math.random() * 0.5);
+            }
+
+            // ----------------------------
+            // 실제 위치 계산 (중심 기준)
+            // ----------------------------
+            int px = cx + (int) sparkleX[i];
+            int py = cy + (int) sparkleY[i];
+
+            int s = 2;
+
+            Polygon p = new Polygon(
+                    new int[]{ px, px + s, px - s },
+                    new int[]{ py - s, py + s, py + s },
+                    3
+            );
+
+            g2d.setColor(new Color(255, 255, 0, alpha));
+            g2d.fillPolygon(p);
+        }
+    }
+
+
+
+
 
 }

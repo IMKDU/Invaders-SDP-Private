@@ -46,7 +46,7 @@ public class LevelManager {
             this.levels.add(new Level(4, 6, 6, 30, 1500));
             this.levels.add(new Level(5, 7, 6, 20, 1000));
             this.levels.add(new Level(6, 7, 7, 10, 1000));
-            this.levels.add(new Level(7, 8, 7, 2, 500));
+            this.levels.add(new Level(7, 6, 4, 2, 500));
         }
     }
     
