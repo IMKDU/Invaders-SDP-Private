@@ -454,6 +454,7 @@ public class GameModel {
 					a.onCollision(b, this);
 					b.onCollision(a, this);
 				}
+//				if (checkLaserEntityCollision()) TODO
 			}
 		}
 		entities.clear();
@@ -1041,34 +1042,8 @@ public class GameModel {
 			bossBullets.addAll(this.finalBoss.getBullets());
 			bossLasers.addAll(this.finalBoss.getLasers());
 
-            /** bullets to erase */
-            Set<Bullet> bulletsToRemove = new HashSet<>();
-
-            for (Bullet b : bossBullets) {
-                b.update();
-                /** If the bullet goes off the screen */
-                if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
-                    /** bulletsToRemove carry bullet */
-                    bulletsToRemove.add(b);
-                }
-                /** If the bullet collides with ship */
-                else if (this.livesP1 > 0 && this.checkCollision(b, this.ship) && !this.ship.isInvincible()) {
-                    if (!this.ship.isDestroyed()) {
-						requestShipDamage(this.ship, 1);
-                        this.logger.info("Hit on player ship, " + this.livesP1 + " lives remaining.");
-                    }
-                    bulletsToRemove.add(b);
-                }
-                else if (this.shipP2 != null && this.livesP2 > 0 && !this.shipP2.isDestroyed() && this.checkCollision(b, this.shipP2) && !this.ship.isInvincible()) {
-                    if (!this.shipP2.isDestroyed()) {
-						requestShipDamage(this.shipP2, 1);
-                        this.logger.info("Hit on player ship2, " + this.livesP2 + " lives remaining.");
-                    }
-                    bulletsToRemove.add(b);
-                }
-            }
-            /** all bullets are removed */
-            bossBullets.removeAll(bulletsToRemove);
+			removeInvalidateBossBullets();
+			removeInvalidateBossLasers();
 
         }
         if (this.finalBoss != null && this.finalBoss.isDestroyed()) {
@@ -1077,7 +1052,52 @@ public class GameModel {
         }
     }
 
-    // --- Timer and State Management Methods for Controller ---
+	private void removeInvalidateBossBullets() {
+		/** bullets to erase */
+		Set<Bullet> bulletsToRemove = new HashSet<>();
+
+		for (Bullet b : bossBullets) {
+			b.update();
+			/** If the bullet goes off the screen */
+			if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
+				/** bulletsToRemove carry bullet */
+				bulletsToRemove.add(b);
+			}
+			/** If the bullet collides with ship */
+			else if (this.livesP1 > 0 && this.checkCollision(b, this.ship) && !this.ship.isInvincible()) {
+				if (!this.ship.isDestroyed()) {
+					requestShipDamage(this.ship, 1);
+					this.logger.info("Hit on player ship, " + this.livesP1 + " lives remaining.");
+				}
+				bulletsToRemove.add(b);
+			}
+			else if (this.shipP2 != null && this.livesP2 > 0 && !this.shipP2.isDestroyed() && this.checkCollision(b, this.shipP2) && !this.ship.isInvincible()) {
+				if (!this.shipP2.isDestroyed()) {
+					requestShipDamage(this.shipP2, 1);
+					this.logger.info("Hit on player ship2, " + this.livesP2 + " lives remaining.");
+				}
+				bulletsToRemove.add(b);
+			}
+		}
+		/** all bullets are removed */
+		bossBullets.removeAll(bulletsToRemove);
+	}
+
+	private void removeInvalidateBossLasers() {
+		/** bullets to erase */
+		Set<LaserBeam> lasersToRemove = new HashSet<>();
+
+		for(LaserBeam laser : bossLasers) {
+			laser.update();
+			if(laser.shouldBeRemoved()){
+				lasersToRemove.add(laser);
+			}
+		}
+		bossLasers.removeAll(lasersToRemove);
+
+	}
+
+		// --- Timer and State Management Methods for Controller ---
 
     public boolean isTimerRunning() {
         return this.gameTimer.isRunning();
