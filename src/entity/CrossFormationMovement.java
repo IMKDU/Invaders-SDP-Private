@@ -267,8 +267,6 @@ public class CrossFormationMovement implements IMovementStrategy {
         phaseCooldown.reset();
     }
 
-    @Override
-    public void activateSlowdown() { }
 
     /**
      * Indicates this strategy requires per-frame updates.
