@@ -132,14 +132,14 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
             addMovementStrategy(cross2);
         }
         if(level.getLevel() == 3){
-            List<EnemyShip> verticalEnemy = EnemyFlatten(enemyShips);
+            List<EnemyShip> verticalEnemy = enemyFlatten(enemyShips);
             VerticalLoopFormationMovement verticalLoop = new VerticalLoopFormationMovement(verticalEnemy, SEPARATION_DISTANCE);
 
             addMovementStrategy(verticalLoop);
         }
     }
 
-    public List<EnemyShip> EnemyFlatten(List<List<EnemyShip>> enemyShips){
+    public List<EnemyShip> enemyFlatten(List<List<EnemyShip>> enemyShips){
         int maxCnt = GameConstant.SCREEN_WIDTH/(enemySeparation/2+shipWidth);
 
         int cnt = 0;
