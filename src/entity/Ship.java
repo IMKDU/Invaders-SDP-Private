@@ -185,7 +185,7 @@ public class Ship extends Entity implements Collidable {
 				b.setOwnerId(this.playerId);
 				bullets.add(b);
 
-				SoundManager.play("sfx/laser.wav");
+				SoundManager.playPooled("sfx/laser.wav");
 
 				bombShotsRemaining--;
 				return true;
