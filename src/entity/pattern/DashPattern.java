@@ -107,6 +107,12 @@ public class DashPattern extends BossPattern {
 
         // End dash when hitting wall
         if (hitBoundary) {
+            // ============================================================
+            // TODO: 여기에 벽 충돌 시 화면 흔들림 이펙트 추가
+            // 다른 팀원이 구현한 화면 흔들림 이펙트를 여기서 호출하세요.
+            // 예: ScreenShakeEffect.trigger() 또는 유사한 메서드
+            // ============================================================
+
             logger.info("OMEGA : Dash completed, hit the wall");
             isDashing = false;
         }
