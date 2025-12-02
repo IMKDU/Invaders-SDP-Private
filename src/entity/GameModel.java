@@ -1109,21 +1109,6 @@ public class GameModel {
 				/** bulletsToRemove carry bullet */
 				bulletsToRemove.add(b);
 			}
-			/** If the bullet collides with ship */
-			else if (this.livesP1 > 0 && this.checkCollision(b, this.ship) && !this.ship.isInvincible()) {
-				if (!this.ship.isDestroyed()) {
-					requestShipDamage(this.ship, 1);
-					this.logger.info("Hit on player ship, " + this.livesP1 + " lives remaining.");
-				}
-				bulletsToRemove.add(b);
-			}
-			else if (this.shipP2 != null && this.livesP2 > 0 && !this.shipP2.isDestroyed() && this.checkCollision(b, this.shipP2) && !this.ship.isInvincible()) {
-				if (!this.shipP2.isDestroyed()) {
-					requestShipDamage(this.shipP2, 1);
-					this.logger.info("Hit on player ship2, " + this.livesP2 + " lives remaining.");
-				}
-				bulletsToRemove.add(b);
-			}
 		}
 		/** all bullets are removed */
 		bossBullets.removeAll(bulletsToRemove);
