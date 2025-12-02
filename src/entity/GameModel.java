@@ -378,9 +378,11 @@ public class GameModel {
                 if (this.zetaBoss != null) {
                     this.zetaBoss.update();
 
-                    // Add bullets from ZetaBoss pattern
-                    if (this.zetaBoss.getBossPattern() != null) {
-                        bossBullets.addAll(this.zetaBoss.getBossPattern().getBullets());
+                    // ✅ ZetaBoss를 캐스팅해서 접근
+                    if (this.zetaBoss instanceof ZetaBoss zeta) {
+                        if (zeta.getBossPattern() != null) {
+                            bossBullets.addAll(zeta.getBossPattern().getBullets());
+                        }
                     }
 					updateBossBullets();
 
