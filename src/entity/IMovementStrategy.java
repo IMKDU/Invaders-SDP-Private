@@ -10,8 +10,5 @@ public interface IMovementStrategy {
 	 */
 	void updateMovement();
 
-	/**
-	 * Activates the slowdown status effect on this movement strategy.
-	 */
-	void activateSlowdown();
+
 }

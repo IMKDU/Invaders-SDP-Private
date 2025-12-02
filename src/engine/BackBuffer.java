@@ -10,6 +10,8 @@ public final class BackBuffer {
     private BufferedImage buffer;
     private Graphics graphics;
     private Graphics backGraphics;
+    private int shakeDuration;
+    private int shakeIntensity;
 
     public BackBuffer(Frame frame) {
         this.frame = frame;
@@ -23,9 +25,21 @@ public final class BackBuffer {
         backGraphics.setColor(Color.BLACK);
         backGraphics.fillRect(0, 0, screenWidth, screenHeight);
     }
+    public void setShake(int shakeDuration, int shakeIntensity){
+        this.shakeDuration = shakeDuration;
+        this.shakeIntensity = shakeIntensity;
+    }
 
     public void end() {
-        graphics.drawImage(buffer, frame.getInsets().left, frame.getInsets().top, frame);
+        int offsetX = 0;
+        int offsetY = 0;
+
+        if (shakeDuration > 0) {
+            offsetX = (int)(Math.random() * shakeIntensity * 2 - shakeIntensity);
+            offsetY = (int)(Math.random() * shakeIntensity * 2 - shakeIntensity);
+            shakeDuration--;
+        }
+        graphics.drawImage(buffer, frame.getInsets().left + offsetX, frame.getInsets().top + offsetY, frame);
     }
 
     public Graphics getGraphics() {

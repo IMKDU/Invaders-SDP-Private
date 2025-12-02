@@ -295,18 +295,18 @@ public class ItemHUDManager {
      */
     private String getDroppedItemLetter(DropItem.ItemType itemType) {
         switch (itemType) {
-            case Explode:
-                return "E";
-            case Slow:
-                return "L";
+            case SubShip:
+                return "S";
             case Stop:
                 return "T";
-            case Push:
-                return "U";
             case Shield:
                 return "H";
             case Heal:
                 return "A";
+			case Bomb:
+				return "B";
+			case Coin:
+				return "C";
             default:
                 return "?";
         }
@@ -317,18 +317,18 @@ public class ItemHUDManager {
      */
     private Color getDroppedItemColor(DropItem.ItemType itemType) {
         switch (itemType) {
-            case Explode:
+            case SubShip:
                 return Color.RED;
-            case Slow:
-                return Color.BLUE;
             case Stop:
-                return Color.BLUE;
-            case Push:
                 return Color.BLUE;
             case Shield:
                 return Color.CYAN;
             case Heal:
                 return Color.GREEN;
+			case Coin:
+				return Color.YELLOW;
+			case Bomb:
+				return Color.ORANGE;
             default:
                 return Color.GRAY;
         }
