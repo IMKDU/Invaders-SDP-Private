@@ -226,9 +226,11 @@ public final class EntityRenderer {
         drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
 
         // 2. Draw pattern effects
-        BossPattern currentPattern = zetaBoss.getBossPattern();
-        if (currentPattern != null) {
-            drawBossPattern(zetaBoss, currentPattern);
+        if (zetaBoss.getBossPattern() != null) {
+            BossPattern activePattern = zetaBoss.getBossPattern().getActivePattern();
+            if (activePattern != null) {
+                drawBossPattern(zetaBoss, activePattern);
+            }
         }
     }
 

@@ -377,20 +377,25 @@ public class GameModel {
                 // ZetaBoss logic added
                 if (this.zetaBoss != null) {
                     this.zetaBoss.update();
+
+                    // Add bullets from ZetaBoss pattern
+                    if (this.zetaBoss.getBossPattern() != null) {
+                        bossBullets.addAll(this.zetaBoss.getBossPattern().getBullets());
+                    }
 					updateBossBullets();
 
-                    // Handle BlackHole pattern
+                    // Handle BlackHole pattern for visualization
                     BlackHolePattern zetaBlackHole = this.zetaBoss.getCurrentBlackHole();
                     if (zetaBlackHole != null && zetaBlackHole.isActive()) {
                         blackHoleActive = true;
                         blackHoleCX = zetaBlackHole.getCenterX();
                         blackHoleCY = zetaBlackHole.getCenterY();
                         blackHoleRadius = zetaBlackHole.getRadius();
-                        zetaBlackHole.attack();
                     } else if (blackHoleActive) {
                         blackHoleActive = false;
                     }
 
+                    // Handle Apocalypse pattern damage
                     ApocalypseAttackPattern pattern = this.zetaBoss.getApocalypsePattern();
                     if (pattern != null && pattern.isAttacking()) {
                         float progress = pattern.getAttackAnimationProgress();
