@@ -1,6 +1,5 @@
 package entity;
 
-import java.awt.Color;
 import engine.DrawManager.SpriteType;
 
 public class BombBullet extends Bullet {
