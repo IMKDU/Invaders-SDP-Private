@@ -74,6 +74,8 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.Item_Bomb, new BufferedImage(20,20 ,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.BombBullet, new BufferedImage(15,40,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Item_Coin, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.GuidedBullet1, new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.GuidedBullet2, new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB));
             fileManager.loadSprite(spriteMap);
             //symatric sprite
             spriteMap.put(SpriteType.OmegaBossDash3, mirrorSprite(spriteMap.get(SpriteType.OmegaBossDash1)));

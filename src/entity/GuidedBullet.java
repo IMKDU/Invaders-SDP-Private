@@ -1,5 +1,6 @@
 package entity;
 
+import engine.Cooldown;
 import engine.DrawManager;
 import entity.GameModel;
 
@@ -11,6 +12,8 @@ public class GuidedBullet extends BossBullet {
     private double preciseX;
     private double preciseY;
     private double speedValue;
+    private Cooldown animationCooldown;
+    private double angle;
 
     /**
      * Constructor for GuidedBullet
@@ -20,14 +23,14 @@ public class GuidedBullet extends BossBullet {
      */
     public GuidedBullet(int x, int y, Ship target) {
         // dx, dy are calculated every frame, so initial values are 0. Size is 8x8, color is RED.
-        super(x, y, 0, 0, 8, 8, "OmegaBoss");
-
+        super(x, y, 0, 0, 30, 30, "OmegaBoss");
+        this.animationCooldown = new Cooldown(200);
         this.setColor(Color.RED);
         this.target = target;
         this.preciseX = x;
         this.preciseY = y;
         this.speedValue = 3.0; // Speed of guided missile
-        this.spriteType = DrawManager.SpriteType.EnemyBullet; // Use enemy bullet sprite (or change to desired shape)
+        this.spriteType = DrawManager.SpriteType.GuidedBullet1; // Use enemy bullet sprite (or change to desired shape)
     }
 
     public Ship getTarget() {
@@ -40,6 +43,8 @@ public class GuidedBullet extends BossBullet {
 
     @Override
     public void update() {
+        chooseSprite();
+
         if (target != null && !target.isDestroyed()) {
             // Calculate target direction
             double targetX = target.getPositionX() + target.getWidth() / 2.0;
@@ -54,7 +59,8 @@ public class GuidedBullet extends BossBullet {
                 // Normalize direction and apply speed
                 double moveX = (dx / distance) * speedValue;
                 double moveY = (dy / distance) * speedValue;
-
+                double targetAngle = Math.atan2(dy, dx);
+                this.angle += (targetAngle - this.angle) * 0.15;
                 this.preciseX += moveX;
                 this.preciseY += moveY;
             }
@@ -66,6 +72,23 @@ public class GuidedBullet extends BossBullet {
         // Update actual integer coordinates
         this.positionX = (int) this.preciseX;
         this.positionY = (int) this.preciseY;
+
+
+
+    }
+    private void chooseSprite() {
+        if (this.animationCooldown.checkFinished()) {
+            this.animationCooldown.reset();
+            if (this.spriteType == DrawManager.SpriteType.GuidedBullet1){
+                this.spriteType = DrawManager.SpriteType.GuidedBullet2;
+            }
+            else {
+                this.spriteType = DrawManager.SpriteType.GuidedBullet1;
+            }
+        }
+    }
+    public double getAngle() {
+        return angle;
     }
 
     @Override
