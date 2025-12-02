@@ -13,7 +13,8 @@
         { "type": "enemyA", "count": 20 }
       ],
       "itemDrops": [
-        { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 }
+        { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
+        { "enemyType": "enemyA", "itemId": "Bomb", "dropChance": 0.05 }
       ],
 
       "completionBonus": { "currency": 10 }
@@ -35,7 +36,9 @@
         { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyA", "itemId": "Heal", "dropChance": 0.1 },
         { "enemyType": "enemyA", "itemId": "Shield", "dropChance": 0.05 },
+        { "enemyType": "enemyA", "itemId": "Bomb", "dropChance": 0.1 },
         { "enemyType": "enemyB", "itemId": "Shield", "dropChance": 0.1 },
+        { "enemyType": "enemyB", "itemId": "Coin", "dropChance": 0.05 },
         { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 }
       ],
       "bossId": "gammaBoss",
@@ -56,13 +59,13 @@
       ],
       "itemDrops": [
         { "enemyType": "enemyA", "itemId": "Heal", "dropChance": 0.1 },
-        { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
-        { "enemyType": "enemyA", "itemId": "Push", "dropChance": 0.05 },
+        { "enemyType": "enemyA", "itemId": "Bomb", "dropChance": 0.05 },
         { "enemyType": "enemyB", "itemId": "Shield", "dropChance": 0.15 },
-        { "enemyType": "enemyB", "itemId": "Slow", "dropChance": 0.05 },
+        { "enemyType": "enemyB", "itemId": "Coin", "dropChance": 0.05 },
+        { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 }
       ],
-      "bossId": "ZetaBoss",
+      "bossId": "omegaBoss",
       "completionBonus": { "currency": 30 }
     },
     {
@@ -81,9 +84,8 @@
       "itemDrops": [
         { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyA", "itemId": "Shield", "dropChance": 0.15 },
-        { "enemyType": "enemyA", "itemId": "Slow", "dropChance": 0.05 },
-        { "enemyType": "enemyB", "itemId": "Slow", "dropChance": 0.1 },
-        { "enemyType": "enemyB", "itemId": "Push", "dropChance": 0.05 },
+        { "enemyType": "enemyA", "itemId": "Bomb", "dropChance": 0.05 },
+        { "enemyType": "enemyB", "itemId": "Coin", "dropChance": 0.05 },
         { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 }
       ],
       "bossId": "finalBoss",
@@ -104,12 +106,11 @@
         { "type": "enemyC", "count": 14 }
       ],
       "itemDrops": [
+        { "enemyType": "enemyB", "itemId": "Bomb", "dropChance": 0.05 },
         { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
-        { "enemyType": "enemyB", "itemId": "Slow", "dropChance": 0.15 },
         { "enemyType": "enemyB", "itemId": "Stop", "dropChance": 0.05 },
         { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyC", "itemId": "Stop", "dropChance": 0.1 },
-        { "enemyType": "enemyC", "itemId": "Push", "dropChance": 0.05 },
         { "enemyType": "enemyC", "itemId": "SubShip", "dropChance": 0.1 }
       ],
       "bossId": "omegaBoss",

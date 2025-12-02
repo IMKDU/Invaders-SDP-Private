@@ -39,12 +39,9 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.Explosion, new BufferedImage(25,25,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.SoundOn, new BufferedImage(15,15,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.SoundOff, new BufferedImage(15,15,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.Item_SubShip, new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.Item_Slow, new BufferedImage(13,8,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.Item_Stop, new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.Item_Push, new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.Item_Shield, new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.Item_Heal, new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Item_Stop, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Item_Shield, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Item_Heal, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Shield, new BufferedImage(61,61,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.FinalBoss1, new BufferedImage(50,40,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.FinalBoss2, new BufferedImage(50,40,BufferedImage.TYPE_INT_ARGB));
@@ -69,8 +66,16 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.ZetaBossMoving2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.ZetaBossDash1, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.ZetaBossDash2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Teleport, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.TeleportCool, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Bomb1, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Bomb2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.BombExplosion, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Item_Bomb, new BufferedImage(20,20 ,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.BombBullet, new BufferedImage(15,40,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Item_Coin, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
             fileManager.loadSprite(spriteMap);
-            //여기서부터는 대칭 스프라이트
+            //symatric sprite
             spriteMap.put(SpriteType.OmegaBossDash3, mirrorSprite(spriteMap.get(SpriteType.OmegaBossDash1)));
             spriteMap.put(SpriteType.OmegaBossDash4, mirrorSprite(spriteMap.get(SpriteType.OmegaBossDash2)));
             spriteMap.put(SpriteType.EnemyShipSpecialLeft, mirrorSprite(spriteMap.get(SpriteType.EnemyShipSpecial)));
@@ -101,11 +106,9 @@ public final class SpriteAtlas {
 
         BufferedImage mirrored = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = mirrored.createGraphics();
-
-        // srcX1, srcY1, srcX2, srcY2 순서로 반전됨
         g.drawImage(original,
-                0, 0, w, h,   // destination (그릴 위치)
-                w, 0, 0, h,   // source (원본 픽셀 what to draw)
+                0, 0, w, h,
+                w, 0, 0, h,
                 null);
 
         g.dispose();

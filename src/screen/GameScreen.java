@@ -133,6 +133,8 @@ public class GameScreen extends Screen {
     }
 	private void handlePlayerMovementInput() {
 		// Player 1 Input
+        model.setIsTelportP1(false);
+        model.setIsTelportP2(false);
 		if (model.getLivesP1() > 0 && model.getShip() != null && !model.getShip().isDestroyed()) {
 
 			boolean shift1 = inputManager.isP1ShiftDown();
