@@ -425,10 +425,21 @@ public final class EntityRenderer {
 		int sy = (int) Math.round(y1 - dy * big);
 		int ex = (int) Math.round(x1 + dx * big);
 		int ey = (int) Math.round(y1 + dy * big);
-        if (entity.getColor() == Color.GREEN){
-            g.drawLine(sx, sy, ex, ey);
+
+        // 예고 경로 (초록색) 또는 활성 레이저 (빨간색) 렌더링
+        if (entity.getColor() != null && (entity.getColor().equals(Color.GREEN) || entity.getColor() == Color.GREEN)){
+            // 초록색 예고 경로 - 점선으로 표시
+            Graphics2D g2d = (Graphics2D) g;
+            java.awt.Stroke originalStroke = g2d.getStroke();
+            float[] dashPattern = {10.0f, 5.0f};
+            g2d.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_BUTT,
+                    BasicStroke.JOIN_MITER, 10.0f, dashPattern, 0.0f));
+            g2d.setColor(new Color(0, 255, 0, 150)); // 반투명 초록색
+            g2d.drawLine(sx, sy, ex, ey);
+            g2d.setStroke(originalStroke);
         }
-        else {
+        else if (entity.getColor() != null) {
+            // 빨간색 활성 레이저 - 레이저 스프라이트로 표시
             BufferedImage laserImg = spriteMap.get(SpriteType.Laser);
             Graphics2D g2 = (Graphics2D) g;
             double angle = Math.atan2(ey - sy, ex - sx);
