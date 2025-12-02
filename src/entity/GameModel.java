@@ -1,6 +1,5 @@
 package entity;
 
-import audio.SoundManager;
 import engine.*;
 import engine.level.Level;
 
@@ -318,22 +317,6 @@ public class GameModel {
         this.cleanupAllEntities();
     }
 
-	private void updateBossBullets() {
-		if (bossBullets.isEmpty()) return;
-
-		Iterator<Bullet> iterator = bossBullets.iterator();
-
-		while (iterator.hasNext()) {
-			Bullet b = iterator.next();
-			b.update();
-
-			if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
-				iterator.remove();
-			}
-		}
-	}
-
-
     /**
      * Updates all non-player-controlled game logic.
      */
@@ -361,7 +344,6 @@ public class GameModel {
                     if (this.omegaBoss instanceof OmegaBoss omega) {
                         bossBullets.addAll(omega.getBullets());
                     }
-					updateBossBullets();
 
                     if (this.omegaBoss.isDestroyed()) {
                         if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
@@ -377,7 +359,6 @@ public class GameModel {
                 // ZetaBoss logic added
                 if (this.zetaBoss != null) {
                     this.zetaBoss.update();
-					updateBossBullets();
 
                     ApocalypseAttackPattern pattern = this.zetaBoss.getApocalypsePattern();
                     if (pattern != null && pattern.isAttacking()) {
@@ -402,13 +383,16 @@ public class GameModel {
                     if (this.gammaBoss instanceof GammaBoss gamma) {
                         this.explosionEntity = gamma.getBoom();
                         bossBullets.addAll(gamma.getBossPattern().getBullets());
+						bossLasers.addAll(gamma.getBossPattern().getLasers());
                     }
-                    updateBossBullets();
 
                     if (this.gammaBoss.isDestroyed()) {
                         this.logger.info("Gamma Boss destroyed!");
                     }
                 }
+
+	            updateBossBullets();
+	            updateBossLasers();
 
                 boolean isFinalBossAlive = (this.finalBoss != null && !this.finalBoss.isDestroyed());
                 boolean isOmegaBossAlive = (this.omegaBoss != null && !this.omegaBoss.isDestroyed());
@@ -1266,9 +1250,6 @@ public class GameModel {
 			bossBullets.addAll(this.finalBoss.getBullets());
 			bossLasers.addAll(this.finalBoss.getLasers());
 
-			removeInvalidateBossBullets();
-			removeInvalidateBossLasers();
-
         }
         if (this.finalBoss != null && this.finalBoss.isDestroyed()) {
             this.levelFinished = true;
@@ -1276,7 +1257,7 @@ public class GameModel {
         }
     }
 
-	private void removeInvalidateBossBullets() {
+	private void updateBossBullets() {
 		/** bullets to erase */
 		Set<Bullet> bulletsToRemove = new HashSet<>();
 
@@ -1292,7 +1273,7 @@ public class GameModel {
 		bossBullets.removeAll(bulletsToRemove);
 	}
 
-	private void removeInvalidateBossLasers() {
+	private void updateBossLasers() {
 		/** bullets to erase */
 		Set<LaserBeam> lasersToRemove = new HashSet<>();
 

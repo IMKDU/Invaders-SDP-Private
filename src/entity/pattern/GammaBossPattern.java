@@ -2,14 +2,11 @@ package entity.pattern;
 
 import engine.Cooldown;
 import engine.Core;
-import entity.Bullet;
-import entity.GameConstant;
-import entity.HasBounds;
-import entity.MidBoss;
-import entity.Ship;
+import entity.*;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -491,15 +488,24 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
             return java.util.Collections.emptySet();
         }
 
-        Set<Bullet> bullets = this.attackPattern.getBullets();
-
-        // Track laser count for TimeGapAttackPattern (when in ATTACK state and using TimeGap)
-        if (cycleState == PatternCycleState.ATTACK && !usingZigZag && !bullets.isEmpty()) {
-            lasersFired += bullets.size();
-        }
-
-        return bullets;
+	    return new HashSet<>(this.attackPattern.getBullets());
     }
+
+	@Override
+	public Set<LaserBeam> getLasers() {
+		if (this.attackPattern==null) {
+			return java.util.Collections.emptySet();
+		}
+		Set<LaserBeam> returnLasers = this.attackPattern.getLasers();
+
+		// Track laser count for TimeGapAttackPattern (when in ATTACK state and using TimeGap)
+		if (cycleState == PatternCycleState.ATTACK && !usingZigZag) {
+			lasersFired += returnLasers.size();
+		}
+
+		this.attackPattern.lasers = new HashSet<LaserBeam>();
+		return returnLasers;
+	}
 
     @Override
     public void setTarget(HasBounds target) {
