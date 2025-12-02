@@ -149,7 +149,7 @@ public class EnemyShipFormationMovement implements IMovementStrategy {
 		}
 	}
 	@Override
-	public boolean needsSmoothMovement() {
+	public boolean needsSmoothMovement(){
 		return false;
 	}
 }

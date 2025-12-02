@@ -110,6 +110,13 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 
         this.width = (this.nShipsWide - 1) * SEPARATION_DISTANCE + this.shipWidth;
         this.height = (this.nShipsHigh - 1) * SEPARATION_DISTANCE + this.shipHeight;
+        if(level.getLevel() == 1){
+            List<List<List<EnemyShip>>> partitionGroup = builder.splitGroup(enemyShips,2);
+            SideLoopFormationMovement sideLoop = new SideLoopFormationMovement(partitionGroup.getFirst());
+            addMovementStrategy(sideLoop);
+            SideLoopFormationMovement sideLoop2 = new SideLoopFormationMovement(partitionGroup.get(1));
+            addMovementStrategy(sideLoop2);
+        }
         if(level.getLevel() == 2){
             List<List<List<EnemyShip>>> partitionGroup = builder.splitGroup(enemyShips,2);
             CrossFormationMovement cross1 = new CrossFormationMovement(partitionGroup.getFirst());
