@@ -69,8 +69,8 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.ZetaBossMoving2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.ZetaBossDash1, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.ZetaBossDash2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.SubShipP1, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.SubShipP2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.SubShipP1, new BufferedImage(50,31,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.SubShipP2, new BufferedImage(50,31,BufferedImage.TYPE_INT_ARGB));
             fileManager.loadSprite(spriteMap);
             //여기서부터는 대칭 스프라이트
             spriteMap.put(SpriteType.OmegaBossDash3, mirrorSprite(spriteMap.get(SpriteType.OmegaBossDash1)));
