@@ -196,11 +196,7 @@ public final class EntityRenderer {
     }
 
 	public void drawEntity(final Entity entity) {
-		if (entity instanceof LaserBullet) {
-			LaserBullet laser = (LaserBullet) entity;
-			drawLaserRotated(laser, laser.getTargetPosition().x, laser.getTargetPosition().y);
-		}
-		else if (entity instanceof ZetaBoss) {
+		if (entity instanceof ZetaBoss) {
            ZetaBoss zetaBoss = (ZetaBoss) entity;
            drawZetaBoss(zetaBoss);
         }
@@ -211,14 +207,6 @@ public final class EntityRenderer {
 		else {
 			drawEntity(entity, entity.getPositionX(), entity.getPositionY());
 		}
-	}
-
-	/**
-	 * Draws OmegaBoss entity with pattern-specific visualizations.
-	 */
-	private void drawOmegaBoss(OmegaBoss omegaBoss) {
-		// Draw boss sprite
-		drawEntity(omegaBoss, omegaBoss.getPositionX(), omegaBoss.getPositionY());
 	}
 
     private void drawZetaBoss(ZetaBoss zetaBoss) {
@@ -401,31 +389,21 @@ public final class EntityRenderer {
 	//     // Implement Ex3 pattern visualization here
 	// }
 
-	public void drawLaserRotated(Entity entity, int posX, int posY) {
+	public void drawLaser(LaserInfo laser) {
 		Graphics g = backBuffer.getGraphics();
-		g.setColor(entity.getColor());
-		int x1 = posX;
-		int y1 = posY;
-		int x2 = entity.getPositionX();
-		int y2 = entity.getPositionY();
+		g.setColor(Color.green);
 
-		double dx = x2 - x1;
-		double dy = y2 - y1;
-		double len = Math.sqrt(dx * dx + dy * dy);
+		int sx = laser.getStartPosition().x;
+		int sy = laser.getStartPosition().y;
+		int ex = laser.getEndPosition().x;
+		int ey = laser.getEndPosition().y;
+
+		double len = Math.sqrt((ex-sx)*(ex-sx) + (ey-sy)*(ey-sy));
 		if (len == 0) {
 			return;
 		}
 
-		dx /= len;
-		dy /= len;
-
-		double big = 2000.0;
-
-		int sx = (int) Math.round(x1 - dx * big);
-		int sy = (int) Math.round(y1 - dy * big);
-		int ex = (int) Math.round(x1 + dx * big);
-		int ey = (int) Math.round(y1 + dy * big);
-        if (entity.getColor() == Color.GREEN){
+        if (laser.getColor() == Color.GREEN){
             g.drawLine(sx, sy, ex, ey);
         }
         else {
@@ -596,7 +574,6 @@ public final class EntityRenderer {
             SoundManager.play("sfx/BombExplosion.wav");
 		}
 	}
-
 
 
 	/**

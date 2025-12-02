@@ -98,6 +98,11 @@ public class GameView {
             drawManager.getEntityRenderer().drawGammaBoss((GammaBoss) model.getGammaBoss());
             drawManager.getUIRenderer().drawBossName("Gamma");
         }
+		if (model.getBossLasers() != null) {
+			for (LaserBeam laser : model.getBossLasers()) {
+				drawManager.getEntityRenderer().drawLaser(laser);
+			}
+		}
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50, 2);
         drawManager.getHUDRenderer().drawCoin(dto.getWidth(), dto.getHeight(), dto.getCoin());
