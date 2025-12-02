@@ -1,4 +1,4 @@
-package entity.movements;
+package entity.formations;
 
 import java.awt.Point;
 import java.util.HashMap;

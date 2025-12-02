@@ -1,4 +1,4 @@
-package entity.movements;
+package entity.formations;
 
 import engine.Cooldown;
 import entity.EnemyShip;

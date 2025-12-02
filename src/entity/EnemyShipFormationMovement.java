@@ -2,7 +2,7 @@ package entity;
 
 import java.util.logging.Logger;
 import engine.Core;
-import entity.movements.IMovementStrategy;
+import entity.formations.IMovementStrategy;
 
 /**
  * Diagonal movement pattern with slowdown effect and screen-boundary bouncing.

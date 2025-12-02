@@ -9,10 +9,10 @@ import java.util.logging.Logger;
 
 import engine.Core;
 import engine.level.Level;
-import entity.movements.CrossFormationMovement;
-import entity.movements.IMovementStrategy;
-import entity.movements.SideLoopFormationMovement;
-import entity.movements.VerticalLoopFormationMovement;
+import entity.formations.CrossFormationMovement;
+import entity.formations.IMovementStrategy;
+import entity.formations.SideLoopFormationMovement;
+import entity.formations.VerticalLoopFormationMovement;
 
 /**
  * Groups enemy ships into a formation.
