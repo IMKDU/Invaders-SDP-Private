@@ -6,9 +6,12 @@ import engine.Core;
 import engine.DrawManager;
 import entity.pattern.*;
 import entity.Ship;
+
+import java.util.HashSet;
 import java.util.List;
 
 import java.awt.*;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class FinalBoss extends Entity implements BossEntity, Collidable{
@@ -185,8 +188,8 @@ public class FinalBoss extends Entity implements BossEntity, Collidable{
 		return this.pointValue;
 	}
 
-	public BossPattern getBossPattern() { return bossPattern; }
-
+	public Set<Bullet> getBullets() { return this.bossPattern.getBullets(); }
+	public Set<LaserBeam> getLasers() { return this.bossPattern.getLasers(); }
 	public int getBossPhase() { return bossPhase; }
 
 	public void setTarget(HasBounds target){

@@ -484,6 +484,13 @@ public class Ship extends Entity implements Collidable {
 	}
 
 	@Override
+	public void onHitByLaserBeam(LaserBeam beam, GameModel model) {
+		if (!this.isInvincible()) {
+			model.requestShipDamage(this, 2);
+		}
+	}
+
+	@Override
 	public void onCollideWithEnemyShip(EnemyShip enemy, GameModel model) {
 		model.requestPlayerCrash(this, enemy);
 	}

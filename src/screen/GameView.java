@@ -90,6 +90,11 @@ public class GameView {
             drawManager.getEntityRenderer().drawHealthBarWithHP(model.getZetaBoss());
             drawManager.getUIRenderer().drawBossName("Zeta");
         }
+		if (model.getBossLasers() != null) {
+			for (LaserBeam laser : model.getBossLasers()) {
+				drawManager.getEntityRenderer().drawLaser(laser, laser.getTargetPosition().x, laser.getTargetPosition().y);
+			}
+		}
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50, 2);
         drawManager.getHUDRenderer().drawCoin(dto.getWidth(), dto.getHeight(), dto.getCoin());

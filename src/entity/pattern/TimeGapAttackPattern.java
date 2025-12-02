@@ -3,11 +3,13 @@ package entity.pattern;
 import engine.Cooldown;
 import entity.Bullet;
 import entity.HasBounds;
-import entity.LaserBullet;
+import entity.LaserBeam;
 import entity.Ship;
 
+import java.util.HashSet;
 import java.util.List;
 import java.awt.*;
+import java.util.Set;
 
 public class TimeGapAttackPattern extends BossPattern {
 
@@ -19,7 +21,8 @@ public class TimeGapAttackPattern extends BossPattern {
 	private HasBounds boss;
 	private HasBounds target;
 	private Point targetPosition;
-	private Bullet bullet;
+	private LaserBeam laser;
+
 	private boolean isUpdated=false;
 
     private List<Ship> ships;
@@ -33,6 +36,7 @@ public class TimeGapAttackPattern extends BossPattern {
         this.ships = ships;
 		this.screenWidth = screenWidth;
 		this.screenHeight = screenHeight;
+		this.lasers = new HashSet<LaserBeam>();
 	}
 
 	@Override
@@ -53,8 +57,8 @@ public class TimeGapAttackPattern extends BossPattern {
 			int randomX = (int) (Math.random() * screenWidth);
 			int randomY = (int) (Math.random() * screenHeight);
 			Point initBulletPosition = new Point(randomX,randomY);
-			this.bullet = new LaserBullet(initBulletPosition, targetPosition, chargeCooldownMilli, remainCooldownMilli);
-			this.bullets.add(bullet);
+			this.laser = new LaserBeam(initBulletPosition, targetPosition, chargeCooldownMilli, remainCooldownMilli);
+			this.lasers.add(laser);
 		}
 	}
 

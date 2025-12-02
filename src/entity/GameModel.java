@@ -98,6 +98,7 @@ public class GameModel {
 
     /** bossBullets carry bullets which Boss fires */
     private Set<Bullet> bossBullets;
+	private Set<LaserBeam> bossLasers;
     /** Is the bullet on the screen erased */
     private boolean is_cleared = false;
     /** Timer to track elapsed time. */
@@ -165,6 +166,7 @@ public class GameModel {
     public final void initialize() {
         /** Initialize the bullet Boss fired */
         this.bossBullets = new HashSet<>();
+		this.bossLasers = new HashSet<>();
         enemyShipFormationModel = new EnemyShipFormationModel(this.currentLevel, width);
         this.enemyShipFormationModel.applyEnemyColor(this.currentLevel.getColorForLevel());
         this.ship = new Ship(this.width / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 13 / 15,Color.GREEN,true);
@@ -1036,7 +1038,8 @@ public class GameModel {
 				is_cleared = true;
 				logger.info("boss is angry");
 			}
-			bossBullets.addAll(this.finalBoss.getBossPattern().getBullets());
+			bossBullets.addAll(this.finalBoss.getBullets());
+			bossLasers.addAll(this.finalBoss.getLasers());
 
             /** bullets to erase */
             Set<Bullet> bulletsToRemove = new HashSet<>();
@@ -1160,6 +1163,7 @@ public class GameModel {
     public EnemyShipSpecialFormation getEnemyShipSpecialFormation() { return enemyShipSpecialFormation; }
     public FinalBoss getFinalBoss() { return finalBoss; }
     public Set<Bullet> getBossBullets() { return bossBullets; }
+	public Set<LaserBeam> getBossLasers() { return bossLasers; }
     public EnemyShipFormationModel getEnemyShipFormationModel() { return enemyShipFormationModel; }
     public MidBoss getOmegaBoss() { return omegaBoss; }
     public MidBoss getZetaBoss() { return zetaBoss; }

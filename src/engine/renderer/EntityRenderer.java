@@ -180,11 +180,7 @@ public final class EntityRenderer {
     }
 
 	public void drawEntity(final Entity entity) {
-		if (entity instanceof LaserBullet) {
-			LaserBullet laser = (LaserBullet) entity;
-			drawLaserRotated(laser, laser.getTargetPosition().x, laser.getTargetPosition().y);
-		}
-		else if (entity instanceof OmegaBoss) {
+		if (entity instanceof OmegaBoss) {
 			OmegaBoss omegaBoss = (OmegaBoss) entity;
 			drawOmegaBoss(omegaBoss);
 		}
@@ -356,11 +352,11 @@ public final class EntityRenderer {
 	//     // Implement Ex3 pattern visualization here
 	// }
 
-	public void drawLaserRotated(Entity entity, int posX, int posY) {
+	public void drawLaser(Entity entity, int targetX, int targetY) {
 		Graphics g = backBuffer.getGraphics();
 		g.setColor(entity.getColor());
-		int x1 = posX;
-		int y1 = posY;
+		int x1 = targetX;
+		int y1 = targetY;
 		int x2 = entity.getPositionX();
 		int y2 = entity.getPositionY();
 

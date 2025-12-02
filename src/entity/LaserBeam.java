@@ -3,7 +3,7 @@ package entity;
 import engine.Cooldown;
 import java.awt.*;
 
-public class LaserBullet extends Bullet {
+public class LaserBeam extends Entity {
 	private Point targetPosition;
 	private Cooldown chargeCooldown;
 	private Cooldown remainCooldown;
@@ -11,14 +11,13 @@ public class LaserBullet extends Bullet {
 	private final int remainCooldownMilli;
 	private boolean shouldBeRemoved =false;
 
-	public LaserBullet(Point startPosition, Point targetPosition, int chargeCooldownMilli, int remainCooldownMilli) {
-		super(startPosition.x, startPosition.y, 0, Color.green);
+	public LaserBeam(Point startPosition, Point targetPosition, int chargeCooldownMilli, int remainCooldownMilli) {
+		super(startPosition.x, startPosition.y, 0, 0, null);
 		this.targetPosition=targetPosition;
 		this.chargeCooldownMilli=chargeCooldownMilli;
 		this.remainCooldownMilli=remainCooldownMilli;
 	}
 
-	@Override
 	public void update(){
 		if(this.chargeCooldown==null){
 			this.chargeCooldown = new Cooldown(chargeCooldownMilli);
@@ -38,9 +37,18 @@ public class LaserBullet extends Bullet {
 	public Point getTargetPosition() {
 		return targetPosition;
 	}
-	@Override
+
 	public boolean shouldBeRemoved() {
 		return shouldBeRemoved;
 	}
 
+	@Override
+	public void onCollision(Collidable other, GameModel model) {
+		other.onHitByLaserBeam(this, model);
+	}
+
+	@Override
+	public void onCollideWithShip(Ship ship, GameModel model) {
+		ship.onHitByLaserBeam(this, model);
+	}
 }
