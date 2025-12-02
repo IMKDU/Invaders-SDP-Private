@@ -444,17 +444,20 @@ public class GameModel {
 		entities.addAll(bossBullets);
 		entities.addAll(dropItems);
 
-		for (int i = 0; i < entities.size(); i++) {
-			Entity a = entities.get(i);
-
-			for (int j = i + 1; j < entities.size(); j++) {
-				Entity b = entities.get(j);
-
+		for (Entity a : entities) {
+			for (Entity b : entities) {
 				if (checkCollision(a, b)) {
 					a.onCollision(b, this);
 					b.onCollision(a, this);
 				}
-//				if (checkLaserEntityCollision()) TODO
+			}
+		}
+		for (LaserBeam laser : bossLasers){
+			for (Entity a : entities) {
+				if(checkLaserRotatedCollision(a, laser)){
+					a.onCollision(laser, this);
+					laser.onCollision(laser, this);
+				}
 			}
 		}
 		entities.clear();
@@ -550,6 +553,48 @@ public class GameModel {
 
         return horizontalOverlap && verticalOverlap;
     }
+
+	/**
+	 * Checks if an entity collides with the laser beam area.
+	 * @param entityBounds The entity to check collision with
+	 * @param laserBounds Bottom boundary of the laser beam
+	 * @return True if the entity collides with the laser beam area
+	 */
+	private boolean checkLaserRotatedCollision(HasBounds entityBounds, HasLaserBounds laserBounds) {
+		Point p1 = laserBounds.getStartPoint();
+		Point p2 = laserBounds.getEndPoint();
+
+		// except if p1 or p2 are not valid
+		if (p1 == null || p2 == null) return false;
+
+		// calculate points
+		int rX = entityBounds.getPositionX();
+		int rY = entityBounds.getPositionY();
+		int rW = entityBounds.getWidth();
+		int rH = entityBounds.getHeight();
+		int rRight = rX + rW;
+		int rBottom = rY + rH;
+
+		// check if the laser's startPoint and endPoint is included in the bounding box
+		boolean p1Inside = (p1.x >= rX && p1.x <= rRight && p1.y >= rY && p1.y <= rBottom);
+		boolean p2Inside = (p2.x >= rX && p2.x <= rRight && p2.y >= rY && p2.y <= rBottom);
+
+		if (p1Inside || p2Inside) {
+			return true;
+		}
+
+		// check laser passes across one of the (Top, Bottom, Left, Right)
+		// Top Edge
+		if (java.awt.geom.Line2D.linesIntersect(p1.x, p1.y, p2.x, p2.y, rX, rY, rRight, rY)) return true;
+		// Bottom Edge
+		if (java.awt.geom.Line2D.linesIntersect(p1.x, p1.y, p2.x, p2.y, rX, rBottom, rRight, rBottom)) return true;
+		// Left Edge
+		if (java.awt.geom.Line2D.linesIntersect(p1.x, p1.y, p2.x, p2.y, rX, rY, rX, rBottom)) return true;
+		// Right Edge
+		if (java.awt.geom.Line2D.linesIntersect(p1.x, p1.y, p2.x, p2.y, rRight, rY, rRight, rBottom)) return true;
+
+		return false;
+	}
 
     /**
      * Destroys an enemy hit by the laser and awards points.

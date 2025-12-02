@@ -1,9 +1,11 @@
 package entity;
 
 import engine.Cooldown;
+import engine.Core;
+
 import java.awt.*;
 
-public class LaserBeam extends Entity {
+public class LaserBeam extends Entity implements HasLaserBounds {
 	private Point targetPosition;
 	private Cooldown chargeCooldown;
 	private Cooldown remainCooldown;
@@ -16,6 +18,42 @@ public class LaserBeam extends Entity {
 		this.targetPosition=targetPosition;
 		this.chargeCooldownMilli=chargeCooldownMilli;
 		this.remainCooldownMilli=remainCooldownMilli;
+
+		extendLaserPoint(startPosition, targetPosition);
+	}
+
+	/**
+	 * Extend Laser from end to end of the screen.
+	 */
+	private void extendLaserPoint(Point startPoint, Point targetPoint) {
+
+		double dx = targetPoint.x - startPoint.x;
+		double dy = targetPoint.y - startPoint.y;
+
+		double distance = Math.sqrt(dx * dx + dy * dy);
+
+		if (distance == 0) {
+			return;
+		}
+
+		double unitX = dx / distance;
+		double unitY = dy / distance;
+
+		// Calculate enough length
+		int screenDiag = (int) Math.sqrt(
+				Math.pow(GameConstant.SCREEN_WIDTH, 2) +
+						Math.pow(GameConstant.SCREEN_HEIGHT, 2)
+		) + 100;
+
+		// Extend backward
+		this.positionX = (int) (startPoint.x - unitX * screenDiag);
+		this.positionY = (int) (startPoint.y - unitY * screenDiag);
+
+		// Extend forward
+		this.targetPosition = new Point(
+				(int) (startPoint.x + unitX * screenDiag),
+				(int) (startPoint.y + unitY * screenDiag)
+		);
 	}
 
 	public void update(){
@@ -50,5 +88,15 @@ public class LaserBeam extends Entity {
 	@Override
 	public void onCollideWithShip(Ship ship, GameModel model) {
 		ship.onHitByLaserBeam(this, model);
+	}
+
+	@Override
+	public Point getStartPoint() {
+		return new Point(this.positionX, this.positionY);
+	}
+
+	@Override
+	public Point getEndPoint() {
+		return new Point(targetPosition);
 	}
 }
