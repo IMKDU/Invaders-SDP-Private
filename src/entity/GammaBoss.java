@@ -68,7 +68,7 @@ public class GammaBoss extends MidBoss {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
         this.logger = Core.getLogger();
-        this.spriteType = DrawManager.SpriteType.OmegaBoss1; // Using OmegaBoss sprite temporarily
+        this.spriteType = DrawManager.SpriteType.GammaBoss1; // Using OmegaBoss sprite temporarily
         this.animationCooldown = new Cooldown(200);
 
         // Initialize pattern coordinator
@@ -116,16 +116,29 @@ public class GammaBoss extends MidBoss {
      * Shows hitting sprite when boss is hit.
      */
     private void updateSprite() {
-        if (this.ishit) {
-            this.spriteType = DrawManager.SpriteType.OmegaBossHitting;
-            this.ishit = false;
-        } else {
-            if (this.spriteType == DrawManager.SpriteType.OmegaBoss1) {
-                this.spriteType = DrawManager.SpriteType.OmegaBoss2;
-            } else {
-                this.spriteType = DrawManager.SpriteType.OmegaBoss1;
+//        if (this.ishit) {
+//            this.spriteType = DrawManager.SpriteType.OmegaBossHitting;
+//            this.ishit = false;
+//        }
+//        else {
+            if (bossPattern.getIsRight()){
+                if (this.spriteType == DrawManager.SpriteType.GammaBoss1) {
+                    this.spriteType = DrawManager.SpriteType.GammaBoss2;
+                }
+                else {
+                    this.spriteType = DrawManager.SpriteType.GammaBoss1;
+                }
             }
-        }
+            else{
+                if (this.spriteType == DrawManager.SpriteType.GammaBoss1Left) {
+                    this.spriteType = DrawManager.SpriteType.GammaBoss2Left;
+                }
+                else {
+                    this.spriteType = DrawManager.SpriteType.GammaBoss1Left;
+                }
+            }
+
+//        }
     }
 
     /** Simple movement method */

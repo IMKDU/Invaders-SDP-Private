@@ -51,7 +51,8 @@ public final class DrawManager {
         FinalBoss1, FinalBoss2,FinalBossBullet,FinalBossDeath,OmegaBoss1, OmegaBoss2,OmegaBossHitting,OmegaBossMoving1,OmegaBossMoving2,OmegaBossMoving3,OmegaBossMoving4,OmegaBossDeath, Explosion, SoundOn, SoundOff, Item_MultiShot,
         Item_SubShip, Item_Stop, Shield, Item_Bomb, Item_Coin, BombBullet,Bomb1,Bomb2,
 		Item_Shield, Item_Heal, BlackHole1,BlackHole2, OmegaBossDash1, OmegaBossDash2, OmegaBossDash3, OmegaBossDash4, OmegaBossBullet,
-        ZetaBoss1, ZetaBoss2,ZetaBossRight1,ZetaBossRight2, ZetaBossMoving1, ZetaBossMoving2, ZetaBossMovingRight1, ZetaBossMovingRight2, ZetaBossDash1,ZetaBossDash2,ZetaBossDashRight1,ZetaBossDashRight2
+        ZetaBoss1, ZetaBoss2,ZetaBossRight1,ZetaBossRight2, ZetaBossMoving1, ZetaBossMoving2, ZetaBossMovingRight1, ZetaBossMovingRight2, ZetaBossDash1,ZetaBossDash2,ZetaBossDashRight1,ZetaBossDashRight2,
+        GammaBoss1,GammaBoss2, GammaBoss1Left, GammaBoss2Left
     }
 
 	/**
