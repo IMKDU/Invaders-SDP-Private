@@ -29,7 +29,7 @@ public class Explosion extends Entity {
         }
         else if (timer > warningTime + explodeTime) {
             isBoom = false;
-            SoundManager.play("sfx/impact.wav");
+            SoundManager.play("sfx/BombExplosion.wav");
             this.destroy();
         }
     }
