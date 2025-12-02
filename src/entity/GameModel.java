@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import engine.*;
 import engine.level.ItemDrop;
+import entity.pattern.BackgroundExplosionPattern;
 import entity.pattern.BlackHolePattern;
 import entity.pattern.ISkill;
 import entity.skills.OriginSkill;
@@ -72,6 +73,8 @@ public class GameModel {
     private Set<Bullet> bullets;
     /** Set of all dropItems dropped by on screen ships. */
     private Set<DropItem> dropItems;
+    /** List of subship */
+    private List<SubShip> subShips;
     /** Current score. */
     private int score;
     // === [ADD] Independent scores for two players ===
@@ -130,6 +133,7 @@ public class GameModel {
     private Cooldown blackHoleCooldown;
     private int lastHp;
     private static final int BLACK_HOLE_DURATION_MS = 7000;
+    private Explosion explosionEntity = null;
     private static boolean usedOrigin = false;
     private boolean originSkillActivated = false;
 
@@ -172,6 +176,8 @@ public class GameModel {
         this.shipP2.setPlayerId(2); // === [ADD] Player2 ===
         // special enemy initial
 
+        this.subShips = new ArrayList<>();
+
         GameSettings specialSettings = new GameSettings(
 				currentLevel.getFormationWidth(),
 		        currentLevel.getFormationHeight(),
@@ -206,8 +212,8 @@ public class GameModel {
 //        lastHp = Integer.MAX_VALUE;
         /** ships list for boss argument */
         this.ships = new ArrayList<>();
-        if (this.ship != null) ships.add(this.ship);
-        if (this.shipP2 != null) ships.add(this.shipP2);
+        if (this.ship != null && this.livesP1 > 0) ships.add(this.ship);
+        if (this.shipP2 != null && this.livesP2 > 0) ships.add(this.shipP2);
 
         this.ship.setModel(this);
         this.shipP2.setModel(this);
@@ -232,31 +238,16 @@ public class GameModel {
      * @param playerNum (1 or 2)
      * @param direction ("RIGHT", "LEFT", "UP", "DOWN")
      */
-    public void playerMove(int playerNum, String direction) {
-        Ship ship = (playerNum == 1) ? this.ship : this.shipP2;
-        // If the ship doesn't exist or is destroyed, do nothing
-        if (ship == null || ship.isDestroyed()) return;
+	public void playerMoveOrTeleport(int playerNum, String direction, boolean teleport) {
+		Ship ship = (playerNum == 1) ? this.ship : this.shipP2;
+		if (ship == null || ship.isDestroyed()) return;
 
-        // Boundary logic brought over from the original processPlayerInput
-        switch (direction) {
-            case "RIGHT":
-                boolean isRightBorder = ship.getPositionX() + ship.getWidth() + ship.getSpeed() > this.width - 1;
-                if (!isRightBorder) ship.moveRight();
-                break;
-            case "LEFT":
-                boolean isLeftBorder = ship.getPositionX() - ship.getSpeed() < 1;
-                if (!isLeftBorder) ship.moveLeft();
-                break;
-            case "UP":
-                boolean isUpBorder = ship.getPositionY() - ship.getSpeed() < GameConstant.STAT_SEPARATION_LINE_HEIGHT;
-                if (!isUpBorder) ship.moveUp();
-                break;
-            case "DOWN":
-                boolean isDownBorder = ship.getPositionY() + ship.getHeight() + ship.getSpeed() > GameConstant.ITEMS_SEPARATION_LINE_HEIGHT;
-                if (!isDownBorder) ship.moveDown();
-                break;
-        }
-    }
+		if (teleport && ship.canTeleport()) {
+			ship.teleport(direction, width, height);
+		} else {
+			ship.move(direction, this.width, this.height);
+		}
+	}
 
     /**
      * Processes a player fire command received from the Controller.
@@ -272,6 +263,16 @@ public class GameModel {
         if (ship.shoot(this.bullets)) {
             this.bulletsShot++;
             AchievementManager.getInstance().onShotFired();
+
+            // Sub-ships fire together
+            if (this.subShips != null) {
+                for (SubShip sub : subShips) {
+                    // Fire only if the sub-ship is not destroyed and belongs to the player firing
+                    if (!sub.isDestroyed() && sub.getOwner().getPlayerId() == playerNum) {
+                        sub.shoot(this.bullets);
+                    }
+                }
+            }
         }
     }
 
@@ -331,7 +332,15 @@ public class GameModel {
                     this.omegaBoss.update();
                     if (this.omegaBoss instanceof OmegaBoss omega) {
                         midBossChilds = omega.getSpawnMobs();
-                        bossBullets.addAll(omega.getBossPattern().getBullets());
+                        this.explosionEntity = omega.getBoom();
+
+                        if (omega.getBossPattern() != null) {
+                            bossBullets.addAll(omega.getBossPattern().getBullets());
+                        }
+
+                        if (omega.getGuidedMissilePattern() != null) {
+                            this.bossBullets.addAll(omega.getGuidedMissilePattern().getBullets());
+                        }
                     }
 					updateBossBullets();
 
@@ -385,6 +394,16 @@ public class GameModel {
         if (this.shipP2 != null) {
             this.shipP2.update();
         }
+
+        // Update SubShips
+        if (this.subShips != null) {
+            for (SubShip subShip : subShips) {
+                subShip.update();
+            }
+            // Remove destroyed or expired sub-ships
+            subShips.removeIf(SubShip::isDestroyed);
+        }
+
         // special enemy update
         this.enemyShipSpecialFormation.update();
 
@@ -427,6 +446,11 @@ public class GameModel {
 			entities.add(shipP2);
 		}
 
+        // Add sub-ships to collision check targets
+        for (SubShip sub : subShips) {
+            if (!sub.isDestroyed()) entities.add(sub);
+        }
+
 		for (EnemyShip e : enemyShipFormationModel) {
 			if (e != null && !e.isDestroyed()) entities.add(e);
 		}
@@ -442,6 +466,7 @@ public class GameModel {
         if (midBossChilds != null){
             for(MidBossMob mb : midBossChilds){ entities.add(mb); }
         }
+        if (explosionEntity != null) entities.add(explosionEntity);
 		entities.addAll(bullets);
 		entities.addAll(bossBullets);
 		entities.addAll(dropItems);
@@ -648,6 +673,19 @@ public class GameModel {
                 (ship.getPlayerId() == 2 && livesP2 == 0)) {
 
             ships.remove(ship);
+
+            if (this.bossBullets != null) {
+                for (Bullet b : this.bossBullets) {
+                    // Check if bullet is guided missile
+                    if (b instanceof GuidedBullet) {
+                        GuidedBullet gb = (GuidedBullet) b;
+                        // if the target died
+                        if (gb.getTarget() == ship) {
+                            gb.setTarget(null);
+                        }
+                    }
+                }
+            }
         }
 		if (this.isGameOver()) {
 			this.setGameOver();
@@ -738,12 +776,9 @@ public class GameModel {
 				this.coin += GameConstant.COIN_ITEM_VALUE;
 				break;
 
-			case Explode:
-				int destroyed = enemyShipFormationModel.destroyAll();
-				int pts = destroyed * 5;
-				if (ship.getPlayerId() == 2) scoreP2 += pts;
-				else scoreP1 += pts;
-				break;
+			case SubShip:
+                DropItem.activateSubShip(ship, this.subShips);
+                break;
 
 		}
 
@@ -854,6 +889,28 @@ public class GameModel {
                 this.livesP2--;
                 showHealthPopup("-1 Life (Apocalypse!)");
                 this.logger.info("P2 Hit by Apocalypse, " + this.livesP2 + " lives remaining.");
+            }
+        }
+
+        // 3. SubShip Check
+        if (this.subShips != null) {
+            for (SubShip sub : this.subShips) {
+                if (!sub.isDestroyed()) {
+                    int subX = sub.getPositionX();
+                    int subY = sub.getPositionY();
+                    int subRightX = subX + sub.getWidth() - 1;
+
+                    int leftColumn = subX / columnWidth;
+                    int rightColumn = subRightX / columnWidth;
+
+                    boolean isInRedZone = (leftColumn != safeZoneColumn || rightColumn != safeZoneColumn);
+                    boolean isHitByAnimation = (currentAttackHeight >= subY);
+
+                    if (isInRedZone && isHitByAnimation) {
+                        sub.destroy();
+                        this.logger.info("SubShip destroyed by Apocalypse!");
+                    }
+                }
             }
         }
     }
@@ -1074,7 +1131,7 @@ public class GameModel {
                 this.logger.info("Final Boss has spawned!");
                 break;
             case "omegaBoss":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
+                this.omegaBoss = new OmegaBoss(Color.ORANGE, ships);
                 this.logger.info("Omega Boss has spawned!");
                 break;
             case "ZetaBoss":
@@ -1082,7 +1139,7 @@ public class GameModel {
                 this.logger.info("Zeta Boss has spawned!");
                 break;
             case "omegaAndZetaAndFinal":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, ship);
+                this.omegaBoss = new OmegaBoss(Color.ORANGE, ships);
                 this.logger.info("Omega Boss has spawned!");
                 break;
             default:
@@ -1268,6 +1325,9 @@ public class GameModel {
         return ships;
     }
 
+    public boolean isExplosionBoom() { return explosionEntity.isBoom(); }
+    public Explosion getExplosionEntity() { return explosionEntity; }
+    public double getWarningExplosion() { return explosionEntity.getWarningProgress(); }
 
     public List<Entity> getEntitiesToRender() {
         List<Entity> renderList = new ArrayList<>();
@@ -1278,6 +1338,11 @@ public class GameModel {
         }
         if (getShipP2() != null && getLivesP2() > 0) {
             renderList.add(getShipP2());
+        }
+
+        // added subships
+        if (this.subShips != null) {
+            renderList.addAll(this.subShips);
         }
 
         // 2. added special enemyship
@@ -1311,14 +1376,15 @@ public class GameModel {
         if (getFinalBoss() != null && !getFinalBoss().isDestroyed()) {
             renderList.add(getFinalBoss());
         }
-
         // 5. added items and bullets
         if (getBullets() != null) {
             renderList.addAll(getBullets());
         }
+
 		if (getBossBullets() != null && !getBossBullets().isEmpty()) {
 			renderList.addAll(getBossBullets());
 		}
+
         if (getDropItems() != null) {
             renderList.addAll(getDropItems());
         }

@@ -22,8 +22,6 @@ public class Ship extends Entity implements Collidable {
 	// === Constants ===
 	/** Time between shots. */
 	private static final int SHOOTING_INTERVAL = 750;
-	/** Speed of the bullets shot by the ship. */
-	private static final int BULLET_SPEED = -6;
 	/** Movement of the ship for each unit of time. */
 	private static final int SPEED = 2;
 	/** Y-offset from the ship position to the bullet spawn position */
@@ -37,7 +35,8 @@ public class Ship extends Entity implements Collidable {
 	private Cooldown shieldCooldown;
 	/** Checks if the ship is invincible. */
 	private boolean isInvincible;
-    // === [ADD] Which player: 1 = P1, 2 = P2 (default 1 for single-player compatibility) ===
+	private static final int TELEPORT_COOLDOWN_MS = 5000;
+	// === [ADD] Which player: 1 = P1, 2 = P2 (default 1 for single-player compatibility) ===
     private int playerId = 1;
     private boolean isP1Ship;
     private boolean isMove;
@@ -91,6 +90,74 @@ public class Ship extends Entity implements Collidable {
 		this.skills = new HashMap<SkillType, ISkill>();
 		registerSkills();
 	}
+
+
+	public void move(String direction, int screenWidth, int screenHeight) {
+		switch (direction) {
+			case "RIGHT":
+				if (positionX + width + SPEED <= screenWidth - 1)
+					moveRight();
+				break;
+
+			case "LEFT":
+				if (positionX - SPEED >= 1)
+					moveLeft();
+				break;
+
+			case "UP":
+				if (positionY - SPEED >= GameConstant.STAT_SEPARATION_LINE_HEIGHT)
+					moveUp();
+				break;
+
+			case "DOWN":
+				if (positionY + height + SPEED <= screenHeight)
+					moveDown();
+				break;
+		}
+	}
+
+	public float getTeleportCooldownProgress() {
+		if (teleportCooldown == null) return 1f;
+
+		if (teleportCooldown.checkFinished()) return 1f;
+
+		long now = System.currentTimeMillis();
+		long passed = now - teleportCooldown.getStartTime();
+		float ratio = (float) passed / teleportCooldown.getDuration();
+
+		return Math.max(0f, Math.min(1f, ratio));
+	}
+
+	private Cooldown teleportCooldown = new Cooldown(TELEPORT_COOLDOWN_MS);
+	private static final int TELEPORT_DISTANCE = 100;
+
+	public boolean canTeleport() {
+		return teleportCooldown.checkFinished();
+	}
+
+	public void teleport(String direction, int screenWidth, int screenHeight) {
+		if (!canTeleport()) return;
+
+		switch (direction) {
+			case "RIGHT":
+				this.positionX = Math.min(this.positionX + TELEPORT_DISTANCE, screenWidth - this.width - 1);
+				break;
+
+			case "LEFT":
+				this.positionX = Math.max(this.positionX - TELEPORT_DISTANCE, 1);
+				break;
+
+			case "UP":
+				this.positionY = Math.max(this.positionY - TELEPORT_DISTANCE, GameConstant.STAT_SEPARATION_LINE_HEIGHT);
+				break;
+
+			case "DOWN":
+				this.positionY = Math.min(this.positionY + TELEPORT_DISTANCE, screenHeight - this.height - 1);
+				break;
+		}
+		teleportCooldown.reset();
+
+	}
 	/**
 	 * Shoots a bullet upwards.
 	 *
@@ -107,6 +174,8 @@ public class Ship extends Entity implements Collidable {
 			// Get Spread Shot information from the DropItem class
 			int bulletCount = ShopItem.getMultiShotBulletCount();
 			int spacing = ShopItem.getMultiShotSpacing();
+
+            int speed = ShopItem.getBulletSpeed();
 
 			int centerX = positionX + this.width / 2;
 
@@ -126,9 +195,10 @@ public class Ship extends Entity implements Collidable {
 
 			if (bulletCount == 1) {
 				// Normal shot (when Spread Shot is not purchased)
-				Bullet b = BulletPool.getBullet(centerX, centerY, BULLET_SPEED);
-                SoundManager.play("sfx/laser.wav");
-                b.setOwnerId(this.playerId);  // === [ADD] Ownership flag: 1 = P1, 2 = P2, null for legacy logic ===
+				Bullet b = BulletPool.getBullet(centerX, centerY, speed);
+				SoundManager.stop("sfx/laser.wav");
+				SoundManager.playPooled("sfx/laser.wav");
+				b.setOwnerId(this.playerId);  // === [ADD] Ownership flag: 1 = P1, 2 = P2, null for legacy logic ===
 
 				bullets.add(b);
 			} else {
@@ -137,13 +207,13 @@ public class Ship extends Entity implements Collidable {
 
 				for (int i = 0; i < bulletCount; i++) {
 					int offsetX = startOffset + (i * spacing);
-					Bullet b = BulletPool.getBullet(centerX + offsetX, centerY, BULLET_SPEED);
+					Bullet b = BulletPool.getBullet(centerX + offsetX, centerY, speed);
 					b.setOwnerId(this.playerId);   // Ownership flag
 
 					bullets.add(b);
 
                     // might consider putting a different sound
-                    SoundManager.play("sfx/laser.wav");
+                    SoundManager.playPooled("sfx/laser.wav");
                 }
 			}
 			return true;
@@ -190,6 +260,8 @@ public class Ship extends Entity implements Collidable {
                 }
             }
         }
+		// Update charging skill state
+		this.chargingSkill.update();
     }
     /**
      * Register user skills into skill map.

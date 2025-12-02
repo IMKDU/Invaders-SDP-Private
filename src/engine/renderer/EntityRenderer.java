@@ -30,6 +30,7 @@ public final class EntityRenderer {
     private int apoFrameIndex = 0;
     private static final double RED_YELLOW_THRESHOLD = 1.0 / 3.0;
     private static final double YELLOW_GREEN_THRESHOLD = 2.0 / 3.0;
+    private int EXPLOSION_SIZE_CHANGE = 10;
     private Color[] colorPalette = {
             new Color( 0xFF4081),
             new Color( 0xFCDD8A),
@@ -61,10 +62,13 @@ public final class EntityRenderer {
         if (img == null) {
             return;
         }
+        boolean isSubShip = (entity instanceof entity.SubShip);
+        double currentScale = isSubShip ? this.scale * 0.5 : this.scale;
+
         int originalW = img.getWidth();
         int originalH = img.getHeight();
-        int scaledW = (int) (originalW * scale * 2);
-        int scaledH = (int) (originalH * scale * 2);
+        int scaledW = (int) (originalW * currentScale * 2);
+        int scaledH = (int) (originalH * currentScale * 2);
 
         if (entity.getSpriteType() == SpriteType.SoundOn ||
                 entity.getSpriteType() == SpriteType.SoundOff) {
@@ -215,11 +219,14 @@ public final class EntityRenderer {
 	}
 
     private void drawZetaBoss(ZetaBoss zetaBoss) {
+        // 1. Draw boss body
+        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
+
+        // 2. Draw pattern effects
         BossPattern currentPattern = zetaBoss.getBossPattern();
         if (currentPattern != null) {
             drawBossPattern(zetaBoss, currentPattern);
         }
-        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
     }
 
 	private void drawMidBossMob(MidBossMob midBossMob) {
@@ -498,6 +505,31 @@ public final class EntityRenderer {
 
         g2d.setClip(oldClip);
     }
+
+	/**
+	 * Renders the explosion visual, displaying either an expanding warning circle or the final blast.
+	 * */
+	public void drawExplosion(boolean isBoom, HasBounds boom, double time) {
+		Graphics g = backBuffer.getGraphics();
+		if (!isBoom) {
+
+			g.setColor(new Color(255,0,0,100));
+			g.drawOval(boom.getPositionX(),boom.getPositionY(),boom.getWidth(),boom.getHeight());
+			int currentWidth = (int) (boom.getWidth() * time);
+			int currentHeight = (int) (boom.getHeight() * time);
+			int offsetX = (boom.getWidth() - currentWidth) / 2;
+			int offsetY = (boom.getHeight() - currentHeight) / 2;
+			g.fillOval(boom.getPositionX() + offsetX, boom.getPositionY() + offsetY, currentWidth, currentHeight);
+		}
+		else {
+			g.setColor(new Color(255,200,0,170));
+            g.fillOval(boom.getPositionX() - EXPLOSION_SIZE_CHANGE,
+					boom.getPositionY() - EXPLOSION_SIZE_CHANGE,
+					boom.getWidth() + EXPLOSION_SIZE_CHANGE * 2,
+					boom.getHeight() + EXPLOSION_SIZE_CHANGE * 2);
+		}
+	}
+
 
 	/**
 	 * Draws a charging progress bar above the ship.
