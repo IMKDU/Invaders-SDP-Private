@@ -297,16 +297,16 @@ public class ItemHUDManager {
         switch (itemType) {
             case SubShip:
                 return "S";
-            case Slow:
-                return "L";
             case Stop:
                 return "T";
-            case Push:
-                return "U";
             case Shield:
                 return "H";
             case Heal:
                 return "A";
+			case Bomb:
+				return "B";
+			case Coin:
+				return "C";
             default:
                 return "?";
         }
@@ -319,16 +319,16 @@ public class ItemHUDManager {
         switch (itemType) {
             case SubShip:
                 return Color.RED;
-            case Slow:
-                return Color.BLUE;
             case Stop:
-                return Color.BLUE;
-            case Push:
                 return Color.BLUE;
             case Shield:
                 return Color.CYAN;
             case Heal:
                 return Color.GREEN;
+			case Coin:
+				return Color.YELLOW;
+			case Bomb:
+				return Color.ORANGE;
             default:
                 return Color.GRAY;
         }

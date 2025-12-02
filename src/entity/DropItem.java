@@ -11,11 +11,11 @@ import engine.Core;
 public class DropItem extends Entity implements Collidable {
 	public enum ItemType {
         SubShip(2),
-		Slow(10),
 		Stop(10),
-		Push(5),
+		Bomb(5),
 		Shield(5),
-		Heal(5);
+		Heal(5),
+		Coin(5);
 
 		private final int weight;
 
