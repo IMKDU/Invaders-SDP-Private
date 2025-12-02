@@ -990,7 +990,7 @@ public class GameModel {
 		int cy = source.getPositionY() + source.getHeight() / 2;
 		final int radius = GameConstant.BOMB_AOE_RADIUS;
 
-		java.util.List<Iterable<EnemyShip>> enemyFormations = new java.util.ArrayList<>();
+        List<Iterable<EnemyShip>> enemyFormations = new java.util.ArrayList<>();
 		if (enemyShipFormationModel != null) {
 			enemyFormations.add(enemyShipFormationModel);
 		}
@@ -1006,7 +1006,7 @@ public class GameModel {
 			}
 		}
 
-		java.util.List<BossEntity> allBosses = new java.util.ArrayList<>();
+        List<BossEntity> allBosses = new java.util.ArrayList<>();
 		if (omegaBoss != null) {
 			allBosses.add(omegaBoss);
 		}

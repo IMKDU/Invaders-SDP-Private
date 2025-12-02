@@ -21,33 +21,10 @@ public class ItemRenderer {
 		this.scale = scale;
 	}
 
-	private void drawItemPlaceholder(Graphics2D g2d, DropItem item,
-									 Color fill, Color border) {
-		int size = (int) (20 * scale * 1.5);
-		int x = item.getPositionX();
-		int y = item.getPositionY();
-
-		g2d.setColor(fill);
-		g2d.fillOval(x, y, size, size);
-
-		g2d.setColor(border);
-		g2d.drawOval(x, y, size, size);
-	}
-
 	public void render(DropItem item) {
 		Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
 
-		// === Bomb ===
-		if (item.getItemType() == DropItem.ItemType.Bomb) {
-			drawItemPlaceholder(g2d, item, Color.GRAY, Color.WHITE);
-			return;
-		}
 
-		// === Coin ===
-		if (item.getItemType() == DropItem.ItemType.Coin) {
-			drawItemPlaceholder(g2d, item, Color.YELLOW, Color.ORANGE);
-			return;
-		}
 
 		BufferedImage img = spriteMap.get(this.getSprite(item.getItemType()));
 		if (img == null) {
