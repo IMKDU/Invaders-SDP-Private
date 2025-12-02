@@ -13,9 +13,9 @@ public class VerticalLoopFormationMovement implements IMovementStrategy{
     private final int SPAWN_HEIGHT;
     private final int BOTTOM_LIMITS;
     private final int RESPAWN_DELAY_MS;
-    private final int FALL_SPPED_START;
+    private final int FALL_SPEED_START;
     private final int FALL_SPEED;
-    private final int SEPATATION;
+    private final int SEPARATION;
 
     private List<EnemyShip> row;
     private Map<EnemyShip, EnemyState> states = new HashMap<>();
@@ -31,15 +31,15 @@ public class VerticalLoopFormationMovement implements IMovementStrategy{
         this.SPAWN_HEIGHT = GameConstant.STAT_SEPARATION_LINE_HEIGHT-enemyShips.getFirst().getHeight()*5/2;
         this.BOTTOM_LIMITS = GameConstant.ITEMS_SEPARATION_LINE_HEIGHT-GameConstant.STAT_SEPARATION_LINE_HEIGHT;
         this.RESPAWN_DELAY_MS = 200;
-        this.FALL_SPPED_START = 15;
+        this.FALL_SPEED_START = 15;
         this.FALL_SPEED = 2;
-        this.SEPATATION = separation;
+        this.SEPARATION = separation;
         initRow();
     }
 
     public void initRow(){
 
-        int setX = SEPATATION;
+        int setX = SEPARATION;
         for(EnemyShip enemy:row){
             EnemyState s = new EnemyState();
             states.put(enemy,s);
@@ -47,7 +47,7 @@ public class VerticalLoopFormationMovement implements IMovementStrategy{
             enemy.setPositionX(setX);
             enemy.setPositionY(SPAWN_HEIGHT);
 
-            setX += (SEPATATION+enemy.getWidth());
+            setX += (SEPARATION +enemy.getWidth());
         }
     }
 
@@ -68,7 +68,7 @@ public class VerticalLoopFormationMovement implements IMovementStrategy{
 
     private void updateFalling(EnemyShip enemy, EnemyState es){
         int fastDownLimit = SPAWN_HEIGHT + (BOTTOM_LIMITS - SPAWN_HEIGHT) / 6;
-        int speed = (enemy.getPositionY() < fastDownLimit) ? FALL_SPPED_START : FALL_SPEED;
+        int speed = (enemy.getPositionY() < fastDownLimit) ? FALL_SPEED_START : FALL_SPEED;
 
         enemy.move(0,speed,false);
         if(enemy.getPositionY() > BOTTOM_LIMITS){
