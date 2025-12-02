@@ -12,10 +12,10 @@ import java.util.Random;
  * This class is part of the Model layer in MVC.
  */
 public class ApocalypseAttackPattern extends BossPattern {
-    /** 2-second warning cooldown */
+    /** 3-second warning cooldown */
     private Cooldown warningCooldown;
     /** attack animation cooldown */
-    private static final int ATTACK_ANIMATION_DURATION = 1000; // 0.5 sec
+    private static final int ATTACK_ANIMATION_DURATION = 2000; // 2 sec
     private Cooldown attackAnimationCooldown;
     private long attackAnimationStartTime; // For calculating animation progress
     private boolean isAttacking = false; // Whether the attack animation is active
@@ -37,8 +37,8 @@ public class ApocalypseAttackPattern extends BossPattern {
         // Calls the BossPattern constructor.
         super(new Point(boss.getPositionX(), boss.getPositionY()));
         this.boss = boss;
-        this.warningCooldown = Core.getVariableCooldown(2000, 0); // 2 second
-        this.attackAnimationCooldown = Core.getVariableCooldown(ATTACK_ANIMATION_DURATION, 0); // 1 second
+        this.warningCooldown = Core.getVariableCooldown(3000, 0); // 3 second
+        this.attackAnimationCooldown = Core.getVariableCooldown(ATTACK_ANIMATION_DURATION, 0); // 2 second
         this.random = new Random();
     }
 
