@@ -204,10 +204,6 @@ public final class EntityRenderer {
            ZetaBoss zetaBoss = (ZetaBoss) entity;
            drawZetaBoss(zetaBoss);
         }
-        else if (entity instanceof GammaBoss) {
-            GammaBoss gammaBoss = (GammaBoss) entity;
-            drawGammaBoss(gammaBoss);
-        }
 		else if (entity instanceof MidBossMob) {
 			MidBossMob midBossMob = (MidBossMob) entity;
 			drawMidBossMob(midBossMob);
@@ -239,7 +235,7 @@ public final class EntityRenderer {
     /**
      * Draws GammaBoss entity with pattern-specific visualizations.
      */
-    private void drawGammaBoss(GammaBoss gammaBoss) {
+    public void drawGammaBoss(GammaBoss gammaBoss) {
         // Check if showing dash path and draw it
         if (gammaBoss.isShowingPath()) {
             int[] targetPoint = gammaBoss.getDashEndPoint();

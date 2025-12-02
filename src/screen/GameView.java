@@ -95,6 +95,7 @@ public class GameView {
         }
         if (model.getGammaBoss() != null) {
             drawManager.getEntityRenderer().drawHealthBarWithHP(model.getGammaBoss());
+            drawManager.getEntityRenderer().drawGammaBoss((GammaBoss) model.getGammaBoss());
             drawManager.getUIRenderer().drawBossName("Gamma");
         }
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);
