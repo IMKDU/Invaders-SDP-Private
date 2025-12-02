@@ -442,8 +442,12 @@ public class GameModel {
 		entities.addAll(bossBullets);
 		entities.addAll(dropItems);
 
-		for (Entity a : entities) {
-			for (Entity b : entities) {
+		for (int i = 0; i < entities.size(); i++) {
+			Entity a = entities.get(i);
+
+			for (int j = i + 1; j < entities.size(); j++) {
+				Entity b = entities.get(j);
+
 				if (checkCollision(a, b)) {
 					a.onCollision(b, this);
 					b.onCollision(a, this);
@@ -453,8 +457,7 @@ public class GameModel {
 		for (LaserBeam laser : bossLasers){
 			for (Entity a : entities) {
 				if(laser.isActive() && checkLaserRotatedCollision(a, laser)){
-					a.onCollision(laser, this);
-					laser.onCollision(laser, this);
+					laser.onCollision(a, this);
 				}
 			}
 		}
