@@ -16,6 +16,8 @@ public class LaserBullet extends Bullet {
 		this.targetPosition=targetPosition;
 		this.chargeCooldownMilli=chargeCooldownMilli;
 		this.remainCooldownMilli=remainCooldownMilli;
+		// 초기 예고 색상을 초록색으로 설정
+		this.color = Color.GREEN;
 	}
 
 	@Override
