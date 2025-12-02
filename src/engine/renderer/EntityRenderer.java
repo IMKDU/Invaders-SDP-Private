@@ -352,31 +352,21 @@ public final class EntityRenderer {
 	//     // Implement Ex3 pattern visualization here
 	// }
 
-	public void drawLaser(Entity entity, int targetX, int targetY) {
+	public void drawLaser(LaserInfo laser) {
 		Graphics g = backBuffer.getGraphics();
-		g.setColor(entity.getColor());
-		int x1 = targetX;
-		int y1 = targetY;
-		int x2 = entity.getPositionX();
-		int y2 = entity.getPositionY();
+		g.setColor(Color.green);
 
-		double dx = x2 - x1;
-		double dy = y2 - y1;
-		double len = Math.sqrt(dx * dx + dy * dy);
+		int sx = laser.getStartPosition().x;
+		int sy = laser.getStartPosition().y;
+		int ex = laser.getEndPosition().x;
+		int ey = laser.getEndPosition().y;
+
+		double len = Math.sqrt((ex-sx)*(ex-sx) + (ey-sy)*(ey-sy));
 		if (len == 0) {
 			return;
 		}
 
-		dx /= len;
-		dy /= len;
-
-		double big = 2000.0;
-
-		int sx = (int) Math.round(x1 - dx * big);
-		int sy = (int) Math.round(y1 - dy * big);
-		int ex = (int) Math.round(x1 + dx * big);
-		int ey = (int) Math.round(y1 + dy * big);
-        if (entity.getColor() == Color.GREEN){
+        if (laser.getColor() == Color.GREEN){
             g.drawLine(sx, sy, ex, ey);
         }
         else {

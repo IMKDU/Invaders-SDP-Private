@@ -92,7 +92,7 @@ public class GameView {
         }
 		if (model.getBossLasers() != null) {
 			for (LaserBeam laser : model.getBossLasers()) {
-				drawManager.getEntityRenderer().drawLaser(laser, laser.getTargetPosition().x, laser.getTargetPosition().y);
+				drawManager.getEntityRenderer().drawLaser(laser);
 			}
 		}
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);

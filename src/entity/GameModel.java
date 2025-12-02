@@ -11,9 +11,7 @@ import entity.pattern.ApocalypseAttackPattern;
 import java.util.List;
 import java.util.logging.Logger;
 
-import engine.*;
 import engine.level.ItemDrop;
-import entity.pattern.BackgroundExplosionPattern;
 import entity.pattern.BlackHolePattern;
 import entity.pattern.ISkill;
 import entity.skills.OriginSkill;
@@ -454,7 +452,7 @@ public class GameModel {
 		}
 		for (LaserBeam laser : bossLasers){
 			for (Entity a : entities) {
-				if(checkLaserRotatedCollision(a, laser)){
+				if(laser.isActive() && checkLaserRotatedCollision(a, laser)){
 					a.onCollision(laser, this);
 					laser.onCollision(laser, this);
 				}
@@ -560,9 +558,9 @@ public class GameModel {
 	 * @param laserBounds Bottom boundary of the laser beam
 	 * @return True if the entity collides with the laser beam area
 	 */
-	private boolean checkLaserRotatedCollision(HasBounds entityBounds, HasLaserBounds laserBounds) {
-		Point p1 = laserBounds.getStartPoint();
-		Point p2 = laserBounds.getEndPoint();
+	private boolean checkLaserRotatedCollision(HasBounds entityBounds, LaserInfo laserBounds) {
+		Point p1 = laserBounds.getStartPosition();
+		Point p2 = laserBounds.getEndPosition();
 
 		// except if p1 or p2 are not valid
 		if (p1 == null || p2 == null) return false;

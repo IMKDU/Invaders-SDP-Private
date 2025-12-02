@@ -13,9 +13,9 @@ import java.util.Set;
 
 public class TimeGapAttackPattern extends BossPattern {
 
-	private final int shootCooldownMilli = 400;
-	private final int chargeCooldownMilli = 200;
-	private final int remainCooldownMilli = 1000;
+	private final int shootCooldownMilli = 500;
+	private final int chargeCooldownMilli = 600;
+	private final int remainCooldownMilli = 400;
 	private final int movingSmoothRatio = 10;
 	private HasBounds boss;
 	private HasBounds target;

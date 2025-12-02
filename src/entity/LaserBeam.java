@@ -1,20 +1,22 @@
 package entity;
 
 import engine.Cooldown;
-import engine.Core;
 
 import java.awt.*;
 
-public class LaserBeam extends Entity implements HasLaserBounds {
+public class LaserBeam extends Entity implements LaserInfo {
+	private Point startPosition;
+	private Point endPosition;
 	private Point targetPosition;
 	private Cooldown chargeCooldown;
 	private Cooldown remainCooldown;
 	private final int chargeCooldownMilli;
 	private final int remainCooldownMilli;
 	private boolean shouldBeRemoved =false;
+	private boolean isActive=false;
 
 	public LaserBeam(Point startPosition, Point targetPosition, int chargeCooldownMilli, int remainCooldownMilli) {
-		super(startPosition.x, startPosition.y, 0, 0, null);
+		super(startPosition.x, startPosition.y, 0, 0, Color.green);
 		this.targetPosition=targetPosition;
 		this.chargeCooldownMilli=chargeCooldownMilli;
 		this.remainCooldownMilli=remainCooldownMilli;
@@ -46,11 +48,13 @@ public class LaserBeam extends Entity implements HasLaserBounds {
 		) + 100;
 
 		// Extend backward
-		this.positionX = (int) (startPoint.x - unitX * screenDiag);
-		this.positionY = (int) (startPoint.y - unitY * screenDiag);
+		this.startPosition = new Point(
+				(int) (startPoint.x - unitX * screenDiag),
+				(int) (startPoint.y - unitY * screenDiag)
+		);
 
 		// Extend forward
-		this.targetPosition = new Point(
+		this.endPosition = new Point(
 				(int) (startPoint.x + unitX * screenDiag),
 				(int) (startPoint.y + unitY * screenDiag)
 		);
@@ -62,7 +66,8 @@ public class LaserBeam extends Entity implements HasLaserBounds {
 			chargeCooldown.reset();
 		}
 		if(this.chargeCooldown.checkFinished()){
-			color = Color.red;
+			this.color = Color.red;
+			this.isActive=true;
 			if(this.remainCooldown==null){
 				this.remainCooldown = new Cooldown(remainCooldownMilli);
 				remainCooldown.reset();
@@ -73,12 +78,15 @@ public class LaserBeam extends Entity implements HasLaserBounds {
 		}
 	}
 	public Point getTargetPosition() {
-		return targetPosition;
+		return new Point(targetPosition);
 	}
 
 	public boolean shouldBeRemoved() {
 		return shouldBeRemoved;
 	}
+
+	@Override
+	public boolean isActive() { return isActive; }
 
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
@@ -91,12 +99,12 @@ public class LaserBeam extends Entity implements HasLaserBounds {
 	}
 
 	@Override
-	public Point getStartPoint() {
-		return new Point(this.positionX, this.positionY);
+	public Point getStartPosition() {
+		return new Point(this.startPosition);
 	}
 
 	@Override
-	public Point getEndPoint() {
-		return new Point(targetPosition);
+	public Point getEndPosition() {
+		return new Point(this.endPosition);
 	}
 }
