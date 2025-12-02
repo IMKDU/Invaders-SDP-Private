@@ -15,7 +15,8 @@ public class BombBullet extends Bullet {
 		if (other instanceof DropItem) {
 			return;
 		}
-		model.requestBombAoEDamage(this);
+        super.onCollision(other, model);
+        model.requestBombAoEDamage(this);
 
 	}
 }

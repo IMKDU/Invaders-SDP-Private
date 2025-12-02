@@ -81,7 +81,7 @@ public class Bullet extends Entity implements Collidable {
 	 * @param speed
 	 *            New speed of the bullet.
 	 */
-	public final void setSpeed(final int speed) {
+	public void setSpeed(final int speed) {
 		this.speed = speed;
 	}
 
