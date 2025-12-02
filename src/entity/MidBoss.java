@@ -47,6 +47,10 @@ public abstract class MidBoss extends Entity implements BossEntity, BossInfo {
 		return this.healPoint;
 	}
 
+	public int getMaxHealPoint() {
+		return this.maxHp;
+	}
+
 	@Override
 	public int getPointValue() {
 		return this.pointValue;
@@ -91,6 +95,4 @@ public abstract class MidBoss extends Entity implements BossEntity, BossInfo {
 		model.requestBossHitByPlayerBullet(bullet, this);
 	}
 
-	@Override
-	public int getMaxHealPoint() { return this.maxHp; }
 }

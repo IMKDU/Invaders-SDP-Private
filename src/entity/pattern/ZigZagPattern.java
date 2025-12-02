@@ -1,6 +1,7 @@
 package entity.pattern;
 
 import engine.Cooldown;
+import entity.GameConstant;
 import entity.HasBounds;
 
 public class ZigZagPattern extends PinnedBossPattern {
@@ -28,7 +29,8 @@ public class ZigZagPattern extends PinnedBossPattern {
 		}
 		else{
 			this.bossPosition.y -= vertSpeed;
-			if(this.bossPosition.y <= 0){ goingDown = true; }
+			if(this.bossPosition.y <= GameConstant.STAT_SEPARATION_LINE_HEIGHT) {
+				goingDown = true; }
+			}
 		}
 	}
-}
