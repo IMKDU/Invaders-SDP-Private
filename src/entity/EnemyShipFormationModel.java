@@ -1,11 +1,11 @@
 package entity;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.awt.Color;
 
 import engine.Core;
 import engine.level.Level;
@@ -60,6 +60,7 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 
     /** The logic component responsible for movement. */
     private IMovementStrategy movementStrategy;
+    private List<IMovementStrategy> movementStrategies = new ArrayList<>();
     /** The logic component responsible for shooting. */
     private FormationShootingManager shootingManager;
 
@@ -110,14 +111,19 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 
         this.width = (this.nShipsWide - 1) * SEPARATION_DISTANCE + this.shipWidth;
         this.height = (this.nShipsHigh - 1) * SEPARATION_DISTANCE + this.shipHeight;
-
-        if(level.getLevel() == 2){
-            CrossFormationMovement cross = new CrossFormationMovement(enemyShips);
-            setMovementStrategy(cross);
-        }
         if(level.getLevel() == 1){
-            SideLoopFormationMovement sideLoop = new SideLoopFormationMovement(enemyShips);
-            setMovementStrategy(sideLoop);
+            List<List<List<EnemyShip>>> partitionGroup = builder.splitGroup(enemyShips,2);
+            SideLoopFormationMovement sideLoop = new SideLoopFormationMovement(partitionGroup.getFirst());
+            addMovementStrategy(sideLoop);
+            SideLoopFormationMovement sideLoop2 = new SideLoopFormationMovement(partitionGroup.get(1));
+            addMovementStrategy(sideLoop2);
+        }
+        if(level.getLevel() == 2){
+            List<List<List<EnemyShip>>> partitionGroup = builder.splitGroup(enemyShips,2);
+            CrossFormationMovement cross1 = new CrossFormationMovement(partitionGroup.getFirst());
+            addMovementStrategy(cross1);
+            CrossFormationMovement cross2 = new CrossFormationMovement(partitionGroup.get(1));
+            addMovementStrategy(cross2);
         }
     }
 
@@ -140,14 +146,16 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
         this.movementSpeed = (int) (Math.pow(remainingProportion, 2)
                 * this.baseSpeed);
         this.movementSpeed += MINIMUM_SPEED;
-        if (this.movementStrategy.needsSmoothMovement()) {
-            this.movementStrategy.updateMovement();
+        if (this.movementStrategies != null) {
+            for(IMovementStrategy movement : movementStrategies){
+                movement.updateMovement();
+            }
         }
         movementInterval++;
         if (movementInterval >= this.movementSpeed) {
             movementInterval = 0;
 
-            if (!this.movementStrategy.needsSmoothMovement()) {
+            if (this.movementStrategies == null && !this.movementStrategy.needsSmoothMovement()) {
                 this.movementStrategy.updateMovement();
             }
 
@@ -399,9 +407,8 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 			default: return Color.WHITE;
 		}
 	}
-
-    public void setMovementStrategy(IMovementStrategy strategy) {
-        this.movementStrategy = strategy;
-        this.logger.info("Movement Strategy switched to: " + strategy.getClass().getSimpleName());
+    public void addMovementStrategy(IMovementStrategy strategy) {
+        movementStrategies.add(strategy);
+        this.logger.info("Movement Strategy add: " + strategy.getClass().getSimpleName());
     }
 }

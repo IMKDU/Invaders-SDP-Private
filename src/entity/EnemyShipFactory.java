@@ -1,6 +1,7 @@
 package entity;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 
 import engine.DrawManager.SpriteType;
@@ -131,5 +132,22 @@ public class EnemyShipFactory {
 			}
 		}
 		return columnMajor;
+	}
+
+	public List<List<List<EnemyShip>>> splitGroup(List<List<EnemyShip>> enemyships, int split){
+		List<List<List<EnemyShip>>> partition = new ArrayList<>();
+		if(enemyships == null || enemyships.size() < split){ return partition; }
+		int totalSize = enemyships.size();
+		int chunkSize = totalSize / split;
+		int remainder = totalSize % split;
+
+		int index = 0;
+		for (int i = 0; i < split; i++) {
+			int count = chunkSize + (i < remainder ? 1 : 0);
+			int nextIndex = Math.min(index + count, totalSize);
+			partition.add(new ArrayList<>(enemyships.subList(index, nextIndex)));
+			index = nextIndex;
+		}
+		return partition;
 	}
 }
