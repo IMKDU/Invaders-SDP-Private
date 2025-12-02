@@ -39,7 +39,6 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.Explosion, new BufferedImage(25,25,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.SoundOn, new BufferedImage(15,15,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.SoundOff, new BufferedImage(15,15,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.Item_Explode, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Item_Stop, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Item_Shield, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Item_Heal, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
@@ -67,6 +66,11 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.ZetaBossMoving2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.ZetaBossDash1, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.ZetaBossDash2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Teleport, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.TeleportCool, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Bomb1, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.Bomb2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.BombExplosion, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Item_Bomb, new BufferedImage(20,20 ,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.BombBullet, new BufferedImage(15,40,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Item_Coin, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
