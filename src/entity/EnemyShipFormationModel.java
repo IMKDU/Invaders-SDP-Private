@@ -9,6 +9,10 @@ import java.util.logging.Logger;
 
 import engine.Core;
 import engine.level.Level;
+import entity.formations.CrossFormationMovement;
+import entity.formations.IMovementStrategy;
+import entity.formations.SideLoopFormationMovement;
+import entity.formations.VerticalLoopFormationMovement;
 
 /**
  * Groups enemy ships into a formation.
@@ -63,6 +67,7 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
     private List<IMovementStrategy> movementStrategies = new ArrayList<>();
     /** The logic component responsible for shooting. */
     private FormationShootingManager shootingManager;
+    private int enemySeparation;
 
     /**
      * Constructor
@@ -111,6 +116,7 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 
         this.width = (this.nShipsWide - 1) * SEPARATION_DISTANCE + this.shipWidth;
         this.height = (this.nShipsHigh - 1) * SEPARATION_DISTANCE + this.shipHeight;
+        this.enemySeparation = builder.getSeparationDistance();
         if(level.getLevel() == 1){
             List<List<List<EnemyShip>>> partitionGroup = builder.splitGroup(enemyShips,2);
             SideLoopFormationMovement sideLoop = new SideLoopFormationMovement(partitionGroup.getFirst());
@@ -125,6 +131,38 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
             CrossFormationMovement cross2 = new CrossFormationMovement(partitionGroup.get(1));
             addMovementStrategy(cross2);
         }
+        if(level.getLevel() == 3){
+            List<EnemyShip> verticalEnemy = enemyFlatten(enemyShips);
+            VerticalLoopFormationMovement verticalLoop = new VerticalLoopFormationMovement(verticalEnemy, SEPARATION_DISTANCE);
+
+            addMovementStrategy(verticalLoop);
+        }
+    }
+
+    public List<EnemyShip> enemyFlatten(List<List<EnemyShip>> enemyShips){
+        int maxCnt = GameConstant.SCREEN_WIDTH/(enemySeparation/2+shipWidth);
+
+        int cnt = 0;
+        List<EnemyShip> flattenedEnemy = new ArrayList<>();
+        outerLoop:
+        for(List<EnemyShip> col:enemyShips){
+            for(EnemyShip enemy:col){
+                flattenedEnemy.add(enemy);
+                cnt++;
+                if(cnt >= maxCnt) break outerLoop;
+            }
+        }
+
+        for (List<EnemyShip> col : enemyShips) {
+            int before = col.size();
+            col.removeIf(enemy -> !flattenedEnemy.contains(enemy));
+            int after = col.size();
+            this.shipCount -= (before-after);
+        }
+
+        enemyShips.removeIf(col -> col.isEmpty());
+
+        return flattenedEnemy;
     }
 
     /**
