@@ -383,6 +383,9 @@ public class GameModel {
                     BlackHolePattern zetaBlackHole = this.zetaBoss.getCurrentBlackHole();
                     if (zetaBlackHole != null && zetaBlackHole.isActive()) {
                         blackHoleActive = true;
+                        blackHoleCX = zetaBlackHole.getCenterX();
+                        blackHoleCY = zetaBlackHole.getCenterY();
+                        blackHoleRadius = zetaBlackHole.getRadius();
                         zetaBlackHole.attack();
                     } else if (blackHoleActive) {
                         blackHoleActive = false;
