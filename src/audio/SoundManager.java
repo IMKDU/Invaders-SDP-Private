@@ -18,6 +18,8 @@ public class SoundManager {
     private static final Map<String, Clip> SINGLE_LOOP_MAP = new ConcurrentHashMap<>();
     private static final int MAX_SIMULTANEOUS = 8;
     private static final Map<String, List<Clip>> POOL = new ConcurrentHashMap<>();
+    private static final Map<String, Clip> SINGLE_LOOP_CHANNEL_MAP =
+            new ConcurrentHashMap<>();
 
     public static void play(String resourcePath) {
         if (muted) return;
@@ -219,4 +221,43 @@ public class SoundManager {
             System.err.println("[Sound] playPooled fail : " + e);
         }
     }
+    public static void playSingleLoopChannel(String path, String channel) {
+        if (muted) return;
+
+        try {
+            String key = path + "#" + channel;
+
+            Clip c = SINGLE_LOOP_CHANNEL_MAP.get(key);
+
+            if (c == null) {
+                c = loadClip(path);
+                if (c == null) return;
+
+                SINGLE_LOOP_CHANNEL_MAP.put(key, c);
+            }
+
+            if (!c.isRunning()) {
+                c.setFramePosition(0);
+                c.loop(Clip.LOOP_CONTINUOUSLY);
+                c.start();
+            }
+
+        } catch (Exception e) {
+            System.err.println("[Sound] playSingleLoopChannel fail: " + e);
+        }
+    }
+
+    public static void stopSingleLoopChannel(String path, String channel) {
+
+        String key = path + "#" + channel;
+
+        Clip c = SINGLE_LOOP_CHANNEL_MAP.get(key);
+
+        if (c != null && c.isRunning()) {
+            c.stop();
+            c.flush();
+            c.setFramePosition(0);
+        }
+    }
+
 }

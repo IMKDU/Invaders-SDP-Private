@@ -1,5 +1,6 @@
 package entity;
 
+import audio.SoundManager;
 import engine.*;
 import engine.level.Level;
 
@@ -109,6 +110,8 @@ public class GameModel {
     // Achievement popup
     private String achievementText;
     private Cooldown achievementPopupCooldown;
+    private boolean isTeleportP1;
+    private boolean isTeleportP2;
     private enum StagePhase{wave, boss_wave};
     private StagePhase currentPhase;
     /** Health change popup. */
@@ -136,6 +139,14 @@ public class GameModel {
     private Explosion explosionEntity = null;
     private static boolean usedOrigin = false;
     private boolean originSkillActivated = false;
+    private int teleportFromP1X;
+    private int teleportFromP1Y;
+    private int afterTeleportFromP1X;
+    private int afterTeleportFromP1Y;
+    private int teleportFromP2X;
+    private int teleportFromP2Y;
+    private int afterTeleportFromP2X;
+    private int afterTeleportFromP2Y;
 
 
     public GameModel(GameState gameState, Level level, boolean bonusLife, int maxLives, int width, int height) {
@@ -241,11 +252,25 @@ public class GameModel {
 	public void playerMoveOrTeleport(int playerNum, String direction, boolean teleport) {
 		Ship ship = (playerNum == 1) ? this.ship : this.shipP2;
 		if (ship == null || ship.isDestroyed()) return;
-
-		if (teleport && ship.canTeleport()) {
+		if (teleport && ship.canTeleport() && ship.getPlayerId() == 1) {
+            this.teleportFromP1X = ship.positionX;
+            this.teleportFromP1Y = ship.positionY;
+            this.isTeleportP1 = true;
 			ship.teleport(direction, width, height);
-		} else {
+            this.afterTeleportFromP1X = ship.positionX;
+            this.afterTeleportFromP1Y = ship.positionY;
+		}
+        else if (teleport && ship.canTeleport() && ship.getPlayerId() == 2){
+            this.teleportFromP2X = ship.positionX;
+            this.teleportFromP2Y = ship.positionY;
+            this.isTeleportP2 = true;
+            ship.teleport(direction, width, height);
+            this.afterTeleportFromP2X = ship.positionX;
+            this.afterTeleportFromP2Y = ship.positionY;
+        }
+        else {
 			ship.move(direction, this.width, this.height);
+
 		}
 	}
 
@@ -331,16 +356,7 @@ public class GameModel {
                 if (this.omegaBoss != null){
                     this.omegaBoss.update();
                     if (this.omegaBoss instanceof OmegaBoss omega) {
-                        midBossChilds = omega.getSpawnMobs();
-                        this.explosionEntity = omega.getBoom();
-
-                        if (omega.getBossPattern() != null) {
-                            bossBullets.addAll(omega.getBossPattern().getBullets());
-                        }
-
-                        if (omega.getGuidedMissilePattern() != null) {
-                            this.bossBullets.addAll(omega.getGuidedMissilePattern().getBullets());
-                        }
+                        bossBullets.addAll(omega.getBullets());
                     }
 					updateBossBullets();
 
@@ -999,7 +1015,7 @@ public class GameModel {
 		int cy = source.getPositionY() + source.getHeight() / 2;
 		final int radius = GameConstant.BOMB_AOE_RADIUS;
 
-		java.util.List<Iterable<EnemyShip>> enemyFormations = new java.util.ArrayList<>();
+        List<Iterable<EnemyShip>> enemyFormations = new java.util.ArrayList<>();
 		if (enemyShipFormationModel != null) {
 			enemyFormations.add(enemyShipFormationModel);
 		}
@@ -1015,7 +1031,7 @@ public class GameModel {
 			}
 		}
 
-		java.util.List<BossEntity> allBosses = new java.util.ArrayList<>();
+        List<BossEntity> allBosses = new java.util.ArrayList<>();
 		if (omegaBoss != null) {
 			allBosses.add(omegaBoss);
 		}
@@ -1130,19 +1146,15 @@ public class GameModel {
                 this.finalBoss = new FinalBoss(this.width / 2 - 150, 80,  ships, this.width, this.height);
                 this.logger.info("Final Boss has spawned!");
                 break;
-            case "omegaBoss":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, ships);
+            case "omegaBoss", "omegaAndZetaAndFinal":
+                this.omegaBoss = new OmegaBoss(ship);
                 this.logger.info("Omega Boss has spawned!");
                 break;
             case "ZetaBoss":
                 this.zetaBoss = new ZetaBoss(Color.ORANGE, ship);
                 this.logger.info("Zeta Boss has spawned!");
                 break;
-            case "omegaAndZetaAndFinal":
-                this.omegaBoss = new OmegaBoss(Color.ORANGE, ships);
-                this.logger.info("Omega Boss has spawned!");
-                break;
-            default:
+	        default:
                 this.logger.warning("Unknown bossId: " + bossName);
                 break;
         }
@@ -1315,6 +1327,22 @@ public class GameModel {
     public int getBlackHoleCX() { return blackHoleCX; }
     public int getBlackHoleCY() { return blackHoleCY; }
     public int getBlackHoleRadius() { return blackHoleRadius; }
+    public boolean getIsTeleportP1(){ return this.isTeleportP1;}
+    public int getTeleportFromP1X() { return teleportFromP1X; }
+    public int getTeleportFromP1Y() { return teleportFromP1Y; }
+    public boolean getIsTeleportP2(){ return this.isTeleportP2;}
+    public int getTeleportFromP2X() { return teleportFromP2X; }
+    public int getTeleportFromP2Y() { return teleportFromP2Y; }
+    public int getAfterTeleportFromP1X() { return afterTeleportFromP1X; }
+    public int getAfterTeleportFromP1Y() { return afterTeleportFromP1Y; }
+    public int getAfterTeleportFromP2Y() { return afterTeleportFromP2Y; }
+    public int getAfterTeleportFromP2X() { return afterTeleportFromP2X; }
+    public void setIsTelportP1(boolean isTeleportP1){
+        this.isTeleportP1 = isTeleportP1;
+    }
+    public void setIsTelportP2(boolean isTeleportP2){
+        this.isTeleportP2 = isTeleportP2;
+    }
     public int getFinalSkillCnt(){
         return FinalSkillCnt;
     }

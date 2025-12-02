@@ -10,7 +10,6 @@ import java.util.Set;
 
 public class PinnedBossPattern extends BossPattern {
 
-	protected Cooldown shootCooldown;
 	protected HasBounds boss;
 
 	/** for move pattern */
@@ -35,7 +34,9 @@ public class PinnedBossPattern extends BossPattern {
 
 	@Override
 	public void attack() {
-		backGroundPattern.attack();
+		if(validateBackgroundPattern){
+			backGroundPattern.attack();
+		}
 		if(this.shootCooldown.checkFinished()){
 			this.shootCooldown.reset();
 			int[] arr = {0,1,-1,2,-2};

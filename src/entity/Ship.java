@@ -42,12 +42,11 @@ public class Ship extends Entity implements Collidable {
     private boolean isMove;
     private boolean movingSoundPlaying = false;
 	private int bombShotsRemaining = 0;
-
-	public void enableBomb(int count) {
-		this.bombShotsRemaining = count;
-	}
     private GameModel model;
 
+    public void enableBomb(int count) {
+        this.bombShotsRemaining = count;
+    }
 	// === Variable for Skil ===
 	public enum SkillType {
 		ORIGIN,
@@ -137,7 +136,7 @@ public class Ship extends Entity implements Collidable {
 
 	public void teleport(String direction, int screenWidth, int screenHeight) {
 		if (!canTeleport()) return;
-
+        SoundManager.play("sfx/Teleport.wav");
 		switch (direction) {
 			case "RIGHT":
 				this.positionX = Math.min(this.positionX + TELEPORT_DISTANCE, screenWidth - this.width - 1);
@@ -178,21 +177,20 @@ public class Ship extends Entity implements Collidable {
             int speed = ShopItem.getBulletSpeed();
 
 			int centerX = positionX + this.width / 2;
+			int centerY = positionY - BULLET_SPAWN_Y_OFFSET;
 
 			if (bombShotsRemaining > 0) {
-				int centerY = positionY - BULLET_SPAWN_Y_OFFSET;
 
-				Bullet b = new BombBullet(centerX, centerY, speed, Color.RED);
+				Bullet b = new BombBullet(centerX, centerY, speed);
 				b.setOwnerId(this.playerId);
 				bullets.add(b);
 
-				SoundManager.play("sfx/laser.wav");
+				SoundManager.playPooled("sfx/laser.wav");
 
 				bombShotsRemaining--;
 				return true;
 			}
-			int centerY = positionY;
-
+            centerY = positionY;
 			if (bulletCount == 1) {
 				// Normal shot (when Spread Shot is not purchased)
 				Bullet b = BulletPool.getBullet(centerX, centerY, speed);
@@ -392,6 +390,7 @@ public class Ship extends Entity implements Collidable {
 	 */
 	public void startCharging() {
 		if (this.chargingSkill != null) {
+            chargingSkill.use(this);
 			this.chargingSkill.startCharging();
 		}
 	}
@@ -402,6 +401,7 @@ public class Ship extends Entity implements Collidable {
 	 */
 	public void stopCharging() {
 		if (this.chargingSkill != null) {
+            chargingSkill.use(this);
 			this.chargingSkill.stopCharging();
 		}
 	}
