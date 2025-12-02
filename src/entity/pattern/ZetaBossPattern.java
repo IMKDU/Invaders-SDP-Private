@@ -2,10 +2,7 @@ package entity.pattern;
 
 import engine.Cooldown;
 import engine.Core;
-import entity.Bullet;
-import entity.HasBounds;
-import entity.MidBoss;
-import entity.Ship;
+import entity.*;
 
 import java.awt.*;
 import java.util.List;
@@ -40,7 +37,7 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
     private static final double PHASE2_TO_PHASE3_TRIGGER = 0.40;
 
     // BlackHole parameters
-    private static final int BLACKHOLE_RADIUS = 300;
+    private static final int BLACKHOLE_RADIUS = 1000;
     private static final double BLACKHOLE_PULL_CONSTANT = 0.005;
 
     // Pattern speeds
@@ -49,8 +46,8 @@ public class ZetaBossPattern extends BossPattern implements IBossPattern {
     private static final Color DIAGONAL_COLOR = Color.MAGENTA;
 
     // Screen dimensions
-    private static final int SCREEN_WIDTH = 448;
-    private static final int SCREEN_HEIGHT = 600;
+    private int SCREEN_WIDTH = GameConstant.SCREEN_WIDTH;
+    private int SCREEN_HEIGHT = GameConstant.SCREEN_HEIGHT;
 
     /** BlackHole states */
     private enum BlackHoleState {
