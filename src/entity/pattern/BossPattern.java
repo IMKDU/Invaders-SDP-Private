@@ -3,6 +3,7 @@ package entity.pattern;
 import engine.Cooldown;
 import entity.Bullet;
 import entity.HasBounds;
+import entity.LaserBeam;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -14,6 +15,7 @@ public abstract class BossPattern implements IBossPattern {
 	protected Point acceleration;
 	protected Cooldown shootCooldown;
 	protected Set<Bullet> bullets;
+	protected Set<LaserBeam> lasers;
 	protected boolean validateBackgroundPattern=true;
 
 	public BossPattern(Point position) {
@@ -30,6 +32,14 @@ public abstract class BossPattern implements IBossPattern {
 		Set<Bullet> returnBullets = this.bullets;
 		this.bullets = new HashSet<Bullet>();
 		return returnBullets;
+	}
+	public Set<LaserBeam> getLasers() {
+		if (this.lasers==null || this.lasers.isEmpty()) {
+			return java.util.Collections.emptySet();
+		}
+		Set<LaserBeam> returnLasers = this.lasers;
+		this.lasers = new HashSet<LaserBeam>();
+		return returnLasers;
 	}
 
 	public void setTarget(HasBounds target) { /* Default: do nothing */ }

@@ -2,6 +2,7 @@ package entity;
 
 import engine.Core;
 import entity.pattern.ApocalypseAttackPattern;
+import entity.pattern.BlackHolePattern;
 
 import java.awt.*;
 import java.util.logging.Logger;
@@ -95,4 +96,11 @@ public abstract class MidBoss extends Entity implements BossEntity, BossInfo {
 		model.requestBossHitByPlayerBullet(bullet, this);
 	}
 
+	/**
+	 * (Used by GameModel) Returns the current BlackHole pattern if active
+	 * @return Returns null for bosses without this pattern.
+	 */
+	public BlackHolePattern getCurrentBlackHole() {
+		return null;
+	}
 }

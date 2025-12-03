@@ -12,6 +12,7 @@ public interface Collidable {
 	default void onHitByPlayerBullet(Bullet bullet, GameModel model) {}
 	default void onHitByEnemyBullet(Bullet bullet, GameModel model) {}
 	default void onHitByBossBullet(BossBullet bullet, GameModel model) {}
+	default void onHitByLaserBeam(LaserBeam laser, GameModel model) {}
 
 	default void onCollideWithShip(Ship ship, GameModel model) {}
 	default void onCollideWithEnemyShip(EnemyShip enemy, GameModel model) {}
