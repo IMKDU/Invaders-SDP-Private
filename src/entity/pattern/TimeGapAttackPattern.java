@@ -3,23 +3,24 @@ package entity.pattern;
 import engine.Cooldown;
 import entity.Bullet;
 import entity.HasBounds;
-import entity.LaserBullet;
+import entity.LaserBeam;
 import entity.Ship;
 
+import java.util.HashSet;
 import java.util.List;
 import java.awt.*;
+import java.util.Set;
 
 public class TimeGapAttackPattern extends BossPattern {
 
-	private final int shootCooldownMilli = 400;
-	private int chargeCooldownMilli = 200;
-	private final int remainCooldownMilli = 1000;
+	private final int shootCooldownMilli = 500;
+	private int chargeCooldownMilli = 600;
+	private final int remainCooldownMilli = 400;
 	private final int movingSmoothRatio = 10;
-	private Cooldown shootCooldown;
 	private HasBounds boss;
 	private HasBounds target;
 	private Point targetPosition;
-	private Bullet bullet;
+
 	private boolean isUpdated=false;
 
     private List<Ship> ships;
@@ -33,6 +34,7 @@ public class TimeGapAttackPattern extends BossPattern {
         this.ships = ships;
 		this.screenWidth = screenWidth;
 		this.screenHeight = screenHeight;
+		this.lasers = new HashSet<LaserBeam>();
 	}
 
 	@Override
@@ -53,8 +55,8 @@ public class TimeGapAttackPattern extends BossPattern {
 			int randomX = (int) (Math.random() * screenWidth);
 			int randomY = (int) (Math.random() * screenHeight);
 			Point initBulletPosition = new Point(randomX,randomY);
-			this.bullet = new LaserBullet(initBulletPosition, targetPosition, chargeCooldownMilli, remainCooldownMilli);
-			this.bullets.add(bullet);
+			LaserBeam laserBeam = new LaserBeam(initBulletPosition, targetPosition, chargeCooldownMilli, remainCooldownMilli);
+			this.lasers.add(laserBeam);
 		}
 	}
 

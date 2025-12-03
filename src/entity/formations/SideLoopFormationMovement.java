@@ -1,4 +1,4 @@
-package entity;
+package entity.formations;
 
 import java.awt.Point;
 import java.util.HashMap;
@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import engine.Cooldown;
+import entity.EnemyShip;
+import entity.GameConstant;
+
 /**
  * Handles the Side Loop movement pattern using a look-ahead vector strategy.
  * Implements a "Follow-the-Leader" logic to prevent ship overlapping.

@@ -1,4 +1,4 @@
-package entity;
+package entity.formations;
 
 import java.awt.Point;
 import java.util.HashMap;
@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import engine.Cooldown;
+import entity.EnemyShip;
+import entity.GameConstant;
+
 /**
  * Ships move diagonally from corner to corner using a "Look-Ahead Vector" strategy
  * to ensure smooth movement without stuttering.

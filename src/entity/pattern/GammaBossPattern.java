@@ -2,14 +2,11 @@ package entity.pattern;
 
 import engine.Cooldown;
 import engine.Core;
-import entity.Bullet;
-import entity.GameConstant;
-import entity.HasBounds;
-import entity.MidBoss;
-import entity.Ship;
+import entity.*;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -84,6 +81,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
     private int attackCyclesCompleted = 0;
     /** Required attack cycles before switching to dash. */
     private static final int REQUIRED_ATTACK_CYCLES = 2;
+    private boolean isRight;
 
     /**
      * Enum for tracking current pattern cycle state.
@@ -473,7 +471,6 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
     public void attack() {
         if (attackPattern == null) return;
         attackPattern.attack();
-        Core.getLogger().info(attackCooldown.checkFinished() + " ");
     }
 
     @Override
@@ -481,6 +478,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
         if (movePattern == null) return;
         movePattern.move();
         if (movePattern != null) {
+            this.isRight = movePattern.getBossPosition().x == bossPosition.x ? this.isRight : movePattern.getBossPosition().x > bossPosition.x;
             bossPosition.x = movePattern.getBossPosition().x;
             bossPosition.y = movePattern.getBossPosition().y;
         }
@@ -492,15 +490,24 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
             return java.util.Collections.emptySet();
         }
 
-        Set<Bullet> bullets = this.attackPattern.getBullets();
-
-        // Track laser count for TimeGapAttackPattern (when in ATTACK state and using TimeGap)
-        if (cycleState == PatternCycleState.ATTACK && !usingZigZag && !bullets.isEmpty()) {
-            lasersFired += bullets.size();
-        }
-
-        return bullets;
+	    return new HashSet<>(this.attackPattern.getBullets());
     }
+
+	@Override
+	public Set<LaserBeam> getLasers() {
+		if (this.attackPattern==null) {
+			return java.util.Collections.emptySet();
+		}
+		Set<LaserBeam> returnLasers = this.attackPattern.getLasers();
+
+		// Track laser count for TimeGapAttackPattern (when in ATTACK state and using TimeGap)
+		if (cycleState == PatternCycleState.ATTACK && !usingZigZag) {
+			lasersFired += returnLasers.size();
+		}
+
+		this.attackPattern.lasers = new HashSet<LaserBeam>();
+		return returnLasers;
+	}
 
     @Override
     public void setTarget(HasBounds target) {
@@ -536,4 +543,5 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
     public boolean isInDashCooldown() {
         return isInDashCooldown;
     }
+    public boolean isRight() {return this.isRight;}
 }
