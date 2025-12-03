@@ -81,10 +81,10 @@ public class Ship extends Entity implements Collidable {
             this.spriteType = SpriteType.ShipP2;
             this.isP1Ship = false;
         }
-		this.shootingCooldown = new Cooldown(ShopItem.getShootingInterval());
+		this.shootingCooldown = new Cooldown(100);//ShopItem.getShootingInterval()
 		this.destructionCooldown = new Cooldown(1000);
 		this.shieldCooldown = new Cooldown(0);
-		this.isInvincible = false;
+		this.isInvincible = true;
 
 		this.skills = new HashMap<SkillType, ISkill>();
 		registerSkills();
@@ -224,7 +224,7 @@ public class Ship extends Entity implements Collidable {
 	 */
     public final void update() {
         if (this.isInvincible && this.shieldCooldown.checkFinished()) {
-            this.isInvincible = false;
+            this.isInvincible = true;
         }
         if (!this.destructionCooldown.checkFinished()) {
             double ratio = this.destructionCooldown.getRemaining() / (double) this.destructionCooldown.getTotal();
