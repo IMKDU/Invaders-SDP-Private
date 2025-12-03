@@ -1,5 +1,6 @@
 package entity;
 
+import audio.SoundManager;
 import engine.*;
 import engine.level.Level;
 
@@ -833,27 +834,33 @@ public class GameModel {
 
 		switch (item.getItemType()) {
 			case Heal:
+                SoundManager.play("sfx/Item_heal.wav");
 				if (ship.getPlayerId() == 1) gainLife();
 				else gainLifeP2();
 				break;
 
 			case Shield:
+                SoundManager.play("sfx/Item_shield.wav");
 				ship.activateInvincibility(5000);
 				break;
 
 			case Stop:
+                SoundManager.play("sfx/Item_stop.wav");
 				DropItem.applyTimeFreezeItem(3000);
 				break;
 
 			case Bomb:
+                SoundManager.play("sfx/Item_bomb.wav");
 				ship.enableBomb(GameConstant.BOMB_ITEM_SHOTS);
 				break;
 
 			case Coin:
+                SoundManager.play("sfx/Item_coin.wav");
 				this.coin += GameConstant.COIN_ITEM_VALUE;
 				break;
 
 			case SubShip:
+                SoundManager.play("sfx/Item_subship.wav");
                 DropItem.activateSubShip(ship, this.subShips);
                 break;
 
