@@ -15,7 +15,7 @@ public final class FontPack {
     private final FontMetrics regularMetrics;
     private final FontMetrics bigMetrics;
     private final FontMetrics smallMetrics;
-    private final FontMetrics small1Metrics;
+    private final FontMetrics smallBigMetrics;
 
     public FontPack(Graphics graphics, FileManager fm) {
         try {
@@ -27,7 +27,7 @@ public final class FontPack {
             regularMetrics = graphics.getFontMetrics(fontRegular);
             bigMetrics = graphics.getFontMetrics(fontBig);
             smallMetrics = graphics.getFontMetrics(fontSmall);
-            small1Metrics = graphics.getFontMetrics(fontSmallBig);
+            smallBigMetrics = graphics.getFontMetrics(fontSmallBig);
         } catch (IOException | FontFormatException e) {
             throw new RuntimeException("[FontPack] Failed to load fonts", e);
         }
@@ -40,5 +40,5 @@ public final class FontPack {
     public FontMetrics getRegularMetrics() {return regularMetrics;}
     public FontMetrics getBigMetrics() {return bigMetrics;}
     public FontMetrics getSmallMetrics() {return smallMetrics;}
-    public FontMetrics getSmall1Metrics() {return small1Metrics;}
+    public FontMetrics getSmallBigMetrics() {return smallBigMetrics;}
 }
