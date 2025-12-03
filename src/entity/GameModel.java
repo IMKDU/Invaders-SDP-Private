@@ -55,8 +55,6 @@ public class GameModel {
     private Cooldown enemyShipSpecialCooldown;
     /** team drawing may implement */
     private FinalBoss finalBoss;
-    /** Spawn pattern has Mob */
-    private List<MidBossMob> midBossChilds;
     /** Time until bonus ship explosion disappears. */
     private Cooldown enemyShipSpecialExplosionCooldown;
     /** Time until Boss explosion disappears. */
@@ -128,15 +126,9 @@ public class GameModel {
     private int FinalSkillCnt;
 
     private List<Ship> ships;
-//    /** variables for Boss BlackHole Pattern */
-//    private boolean blackHoleActive = false;
-//    private int blackHoleCX;
-//    private int blackHoleCY;
-//    private int blackHoleRadius;
-//    private Cooldown blackHoleCooldown;
 	private Set<BlackHole> blackHoles;
-    private int lastHp;
-    private static final int BLACK_HOLE_DURATION_MS = 7000;
+	private Set<MidBossMob> NoxisBossMobs;
+
     private Explosion explosionEntity = null;
     private int teleportFromP1X;
     private int teleportFromP1Y;
@@ -215,14 +207,10 @@ public class GameModel {
         this.elapsedTime = 0;
         this.finalBoss = null;
         this.omegaBoss = null;
-        this.midBossChilds = null;
         this.zetaBoss = null;
         this.gammaBoss = null;
         this.currentPhase = StagePhase.wave;
 
-//        bossPattern = new BossPattern();
-//        blackHoleCooldown = Core.getCooldown(BLACK_HOLE_DURATION_MS);
-//        lastHp = Integer.MAX_VALUE;
         /** ships list for boss argument */
         this.ships = new ArrayList<>();
         if (this.ship != null && this.livesP1 > 0) ships.add(this.ship);
@@ -482,9 +470,9 @@ public class GameModel {
         if (zetaBoss != null && !zetaBoss.isDestroyed()) entities.add(zetaBoss);
         if (gammaBoss != null && !gammaBoss.isDestroyed()) entities.add(gammaBoss);
 
-        if (midBossChilds != null){
-            for(MidBossMob mb : midBossChilds){ entities.add(mb); }
-        }
+//        if (midBossChilds != null){
+//            for(MidBossMob mb : midBossChilds){ entities.add(mb); }
+//        }
         if (explosionEntity != null) entities.add(explosionEntity);
 		entities.addAll(bullets);
 		entities.addAll(bossBullets);
@@ -1104,9 +1092,9 @@ public class GameModel {
 		if (finalBoss != null) {
 			allBosses.add(finalBoss);
 		}
-		if (midBossChilds != null) {
-			allBosses.addAll(midBossChilds);
-		}
+//		if (midBossChilds != null) {
+//			allBosses.addAll(midBossChilds);
+//		}
 
 		for (BossEntity boss : allBosses) {
 			if (!boss.isDestroyed() && inRange((Entity) boss, cx, cy, radius)) {
@@ -1366,7 +1354,7 @@ public class GameModel {
     public MidBoss getOmegaBoss() { return omegaBoss; }
     public MidBoss getZetaBoss() { return zetaBoss; }
     public MidBoss getGammaBoss() { return gammaBoss; }
-    public List<MidBossMob> getMidBossChilds() { return midBossChilds; }
+//    public List<MidBossMob> getMidBossChilds() { return midBossChilds; }
     public Set<Bullet> getBullets() { return bullets; }
     public Set<DropItem> getDropItems() { return dropItems; }
     public int getScoreP1() { return scoreP1; }
@@ -1382,10 +1370,6 @@ public class GameModel {
     public boolean isBonusLife() { return bonusLife; }
     public boolean isLevelFinished() { return levelFinished; }
     public Cooldown getScreenFinishedCooldown() { return screenFinishedCooldown; }
-//    public boolean isBlackHoleActive() { return blackHoleActive; }
-//    public int getBlackHoleCX() { return blackHoleCX; }
-//    public int getBlackHoleCY() { return blackHoleCY; }
-//    public int getBlackHoleRadius() { return blackHoleRadius; }
     public boolean getIsTeleportP1(){ return this.isTeleportP1;}
     public int getTeleportFromP1X() { return teleportFromP1X; }
     public int getTeleportFromP1Y() { return teleportFromP1Y; }
@@ -1445,11 +1429,11 @@ public class GameModel {
                 renderList.add(enemy);
             }
         }
-        if (getMidBossChilds() != null) {
-            for (MidBossMob child : getMidBossChilds()) {
-                renderList.add(child);
-            }
-        }
+//        if (getMidBossChilds() != null) {
+//            for (MidBossMob child : getMidBossChilds()) {
+//                renderList.add(child);
+//            }
+//        }
         // 4. added boss
         if (getOmegaBoss() != null) {
             renderList.add(getOmegaBoss());

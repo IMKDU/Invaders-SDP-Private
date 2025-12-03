@@ -33,7 +33,7 @@ public class DashPattern extends BossPattern {
             isShowingPath = true;
             pathShowStartTime = System.currentTimeMillis();
             dashSkillInitialized = true;
-            logger.info("OMEGA : Dash skill initiated");
+            logger.info("DashPattern : Dash-pattern initiated");
         }
         this.rightDash = (target.getPositionX() - this.bossPosition.x) > 0;
     }
@@ -59,7 +59,7 @@ public class DashPattern extends BossPattern {
 
                 // Distance check
                 if (distance < 1.0) {
-                    logger.warning("OMEGA : Player too close, aborting dash");
+                    logger.warning("DashPattern : Player too close, aborting dash");
                     return;
                 }
 
@@ -70,7 +70,7 @@ public class DashPattern extends BossPattern {
                 // Start dashing
                 isShowingPath = false;
                 isDashing = true;
-                logger.info("OMEGA : Dashing! Direction=(" + dashDirectionX + ", " + dashDirectionY + ")");
+                logger.info("DashPattern : Dashing! Direction=(" + dashDirectionX + ", " + dashDirectionY + ")");
             }
         }
     }
@@ -107,7 +107,7 @@ public class DashPattern extends BossPattern {
 
         // End dash when hitting wall
         if (hitBoundary) {
-            logger.info("OMEGA : Dash completed, hit the wall");
+            logger.info("DashPattern : Dash completed, hit the wall");
             isDashing = false;
         }
     }

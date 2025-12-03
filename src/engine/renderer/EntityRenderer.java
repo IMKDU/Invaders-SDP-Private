@@ -222,9 +222,13 @@ public final class EntityRenderer {
 	private void drawFinalBoss(FinalBoss finalBoss) {
 
 		// 1. Draw pattern effects
-		BossPattern currentPattern = finalBoss.getApocalypsePattern();
-		if (currentPattern != null) {
-			drawBossPattern(finalBoss, currentPattern);
+		BossPattern apocalypsePattern = finalBoss.getApocalypsePattern();
+		BossPattern dashPattern = finalBoss.getDashPattern();
+		if (apocalypsePattern != null) {
+			drawBossPattern(finalBoss, apocalypsePattern);
+		}
+		if (dashPattern != null) {
+			drawBossPattern(finalBoss, dashPattern);
 		}
 	}
 
@@ -339,13 +343,8 @@ public final class EntityRenderer {
 		}
 
         int[] targetPoint;
-		if (boss instanceof ZetaBoss) {
-            targetPoint = ((ZetaBoss) boss).getDashEndPoint();
-        } else if (boss instanceof GammaBoss) {
-        targetPoint = ((GammaBoss) boss).getDashEndPoint();
-        } else {
-            return;
-        }
+		targetPoint = dashPattern.getDashEndPoint(boss.getWidth(), boss.getHeight());
+
 
 		// Calculate boss center point
 		int bossWidth = boss.getWidth();

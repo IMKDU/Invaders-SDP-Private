@@ -7,6 +7,7 @@ import engine.DrawManager;
 import entity.pattern.*;
 import entity.Ship;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -20,17 +21,17 @@ public class FinalBoss extends MidBoss {
 	private static final int INIT_POS_X = GameConstant.SCREEN_WIDTH / 2 - 150;
 	/** Initial position in the y-axis. */
 	private static final int INIT_POS_Y = 80;
-	/** Width of Omega */
+	/** Width of Noxis */
 	private static final int NOXIS_WIDTH = 150 * 2;
-	/** Height of Omega */
+	/** Height of Noxis */
 	private static final int NOXIS_HEIGHT = 143 * 2;
-	/** Width of Omega */
-	private static final int NOXIS_WIDTH_ANGRY = 77 * 2;
-	/** Height of Omega */
-	private static final int NOXIS_HEIGHT_ANGRY = 89 * 2;
-	/** Current Health of Omega */
+//	/** Width of Noxis */
+//	private static final int NOXIS_WIDTH_ANGRY = 77 * 2;
+//	/** Height of Noxis */
+//	private static final int NOXIS_HEIGHT_ANGRY = 89 * 2;
+	/** Current Health of Noxis */
 	private static final int NOXIS_HEALTH = 80;
-	/** Point of Omega when destroyed */
+	/** Point of Noxis when destroyed */
 	private static final int NOXIS_POINT_VALUE = 1000;
 
     private Cooldown animationCooldown;
@@ -39,8 +40,7 @@ public class FinalBoss extends MidBoss {
 
 	private Logger logger;
 
-
-    /** basic attribute of final boss */
+	/** basic attribute of final boss */
 
     public FinalBoss(List<Ship> ships){
 
@@ -48,7 +48,7 @@ public class FinalBoss extends MidBoss {
 	    logger = Core.getLogger();
 	    this.spriteType = DrawManager.SpriteType.FinalBoss1;
         this.animationCooldown = new Cooldown(500);
-		this.noxisBossPattern = new NoxisBossPattern(this, ships);
+	    this.noxisBossPattern = new NoxisBossPattern(this, ships);
 	}
 
     /** for vibrant moving with final boss
@@ -126,6 +126,13 @@ public class FinalBoss extends MidBoss {
 	 */
 	public ApocalypseAttackPattern getApocalypsePattern() {
 		return noxisBossPattern.getApocalypsePattern();
+	}
+
+	/**
+	 * Get the Apocalypse pattern instance
+	 */
+	public DashPattern getDashPattern() {
+		return noxisBossPattern.getDashPattern();
 	}
 
 	@Override
