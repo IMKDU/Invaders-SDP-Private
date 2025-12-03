@@ -512,6 +512,13 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 		return blackHoles;
 	}
 
+	/**
+	 * Get the Apocalypse pattern instance
+	 */
+	public ApocalypseAttackPattern getApocalypsePattern() {
+		return apocalypsePattern;
+	}
+
 	@Override
 	public void setCooldown(Cooldown cooldown) {
 		attackPattern.setCooldown(cooldown);

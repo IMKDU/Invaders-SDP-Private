@@ -37,8 +37,6 @@ public class FinalBoss extends MidBoss {
 
 	private NoxisBossPattern noxisBossPattern;
 
-    private List<Ship> ships;
-
 	private Logger logger;
 
 
@@ -51,7 +49,6 @@ public class FinalBoss extends MidBoss {
 	    this.spriteType = DrawManager.SpriteType.FinalBoss1;
         this.animationCooldown = new Cooldown(500);
 		this.noxisBossPattern = new NoxisBossPattern(this, ships);
-        this.ships = ships;
 	}
 
     /** for vibrant moving with final boss
@@ -122,6 +119,13 @@ public class FinalBoss extends MidBoss {
 			return Set.of();
 		}
 		return this.noxisBossPattern.getBlackHoles();
+	}
+
+	/**
+	 * Get the Apocalypse pattern instance
+	 */
+	public ApocalypseAttackPattern getApocalypsePattern() {
+		return noxisBossPattern.getApocalypsePattern();
 	}
 
 	@Override

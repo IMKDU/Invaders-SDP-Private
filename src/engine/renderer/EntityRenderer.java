@@ -204,21 +204,29 @@ public final class EntityRenderer {
 			MidBossMob midBossMob = (MidBossMob) entity;
 			drawMidBossMob(midBossMob);
 		}
-		else {
-			drawEntity(entity, entity.getPositionX(), entity.getPositionY());
+		else if (entity instanceof FinalBoss finalBoss){
+			drawFinalBoss(finalBoss);
 		}
+		drawEntity(entity, entity.getPositionX(), entity.getPositionY());
 	}
 
     private void drawZetaBoss(ZetaBoss zetaBoss) {
-        // 1. Draw boss body
-        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
 
-        // 2. Draw pattern effects
+        // 1. Draw pattern effects
         BossPattern currentPattern = zetaBoss.getBossPattern();
         if (currentPattern != null) {
             drawBossPattern(zetaBoss, currentPattern);
         }
     }
+
+	private void drawFinalBoss(FinalBoss finalBoss) {
+
+		// 1. Draw pattern effects
+		BossPattern currentPattern = finalBoss.getApocalypsePattern();
+		if (currentPattern != null) {
+			drawBossPattern(finalBoss, currentPattern);
+		}
+	}
 
     /**
      * Draws GammaBoss entity with pattern-specific visualizations.

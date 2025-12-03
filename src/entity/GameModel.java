@@ -1231,22 +1231,11 @@ public class GameModel {
     public void finalbossManage(){
         if (this.finalBoss != null && !this.finalBoss.isDestroyed()) {
             this.finalBoss.update();
-//            BlackHolePattern bh = finalBoss.getCurrentBlackHole();
-
-//            if (bh != null && bh.isActive()) {
-//                blackHoleActive = true;
-//                blackHoleCX = bh.getCenterX();
-//                blackHoleCY = bh.getCenterY();
-//                blackHoleRadius = bh.getRadius();
-//            } else {
-//                blackHoleActive = false;
-//            }
-
-//			if(this.finalBoss.getBossPhase() == 3 && !this.is_cleared){
-//				bossBullets.clear();
-//				is_cleared = true;
-//				logger.info("boss is angry");
-//			}
+	        ApocalypseAttackPattern pattern = this.finalBoss.getApocalypsePattern();
+	        if (pattern != null && pattern.isAttacking()) {
+		        float progress = pattern.getAttackAnimationProgress();
+		        executeApocalypseDamage(pattern.getSafeZoneColumn(), progress);
+	        }
 			bossBullets.addAll(this.finalBoss.getBullets());
 			bossLasers.addAll(this.finalBoss.getLasers());
 			blackHoles.addAll(this.finalBoss.getBlackHoles());
