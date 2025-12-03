@@ -33,8 +33,14 @@ public final class HUDRenderer {
     private int teleportCenterYP1;
     private int teleportCenterXP2;
     private int teleportCenterYP2;
-    private final Map<DrawManager.SpriteType, BufferedImage> spriteMap;
+    private int originIconP1X;
+    private int originIconP2X;
 
+    private final Map<DrawManager.SpriteType, BufferedImage> spriteMap;
+    private int originIconP2Width;
+    private int originIconP2Height;
+    private int originIconP1Height;
+    private int originIconP1Width;
 
     public HUDRenderer(BackBuffer backBuffer, FontPack fontPack, EntityRenderer entityRenderer, Map<DrawManager.SpriteType, BufferedImage> spriteMap) {
         this.backBuffer = backBuffer;
@@ -278,6 +284,11 @@ public final class HUDRenderer {
                 int iconDrawW = icon.getWidth();
                 int iconX = centerX - iconDrawW / 2;
                 g.drawImage(icon, iconX, SKILL_EXPLAIN_YLINE_TOP, null);
+                if (i == 2){
+                    originIconP1X = iconX;
+                    originIconP1Width = icon.getWidth();
+                    originIconP1Height = icon.getHeight();
+                }
             }
 
             String b = bottomTexts[i];
@@ -349,6 +360,11 @@ public final class HUDRenderer {
                 int iconDrawW = icon.getWidth();
                 int iconX = centerX - iconDrawW / 2;
                 g.drawImage(icon, iconX, SKILL_EXPLAIN_YLINE_TOP, null);
+                if (i == 2){
+                    originIconP2X = iconX;
+                    originIconP2Width = icon.getWidth();
+                    originIconP2Height = icon.getHeight();
+                }
             }
 
             String b = bottomTexts[i];
@@ -359,5 +375,16 @@ public final class HUDRenderer {
 
             topX += 100;
         }
+    }
+
+    public void drawOriginUsed(){
+        Graphics2D g = (Graphics2D) backBuffer.getGraphics();
+        float alpha = 0.5f;
+        Composite old = g.getComposite();
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        g.setColor(Color.BLUE);
+        g.fillRect(this.originIconP1X, SKILL_EXPLAIN_YLINE_TOP, this.originIconP1Width,this.originIconP1Height);
+        g.fillRect(this.originIconP2X, SKILL_EXPLAIN_YLINE_TOP, this.originIconP2Width,this.originIconP2Height);
+        g.setComposite(old);
     }
 }

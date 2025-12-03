@@ -1,10 +1,8 @@
 package screen;
 
-import audio.SoundManager;
 import engine.DrawManager;
 import engine.DTO.HUDInfoDTO;
 import entity.*;
-import entity.pattern.ApocalypseAttackPattern;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +31,7 @@ public class GameView {
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
         if (model.isOriginSkillActivated()) {
-
+            drawManager.getHUDRenderer().drawOriginUsed();
             drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
             drawManager.getSpecialAnimationRenderer().draw();
 
@@ -107,6 +105,10 @@ public class GameView {
         drawManager.getHUDRenderer().drawItemsHUD(dto.getWidth(), dto.getHeight());
         drawManager.getHUDRenderer().drawLevel(GameConstant.ITEMS_SEPARATION_LINE_HEIGHT, dto.getLevelName());
 		drawManager.getHUDRenderer().drawTeleportCooldowns(dto.getWidth(), dto.getHeight(), dto.teleportCooldownP1, dto.teleportCooldownP2);
+        if (model.getUsedOrigin()){
+            drawManager.getHUDRenderer().drawOriginUsed();
+        }
+
         /** draw Line */
         drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), GameConstant.STAT_SEPARATION_LINE_HEIGHT - 1);
         drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), GameConstant.ITEMS_SEPARATION_LINE_HEIGHT);
