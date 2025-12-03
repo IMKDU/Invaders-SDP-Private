@@ -452,63 +452,59 @@ public class GameModel {
 	 * so this method manually checks their collisions and safely removes them after explosion.
 	 */
 	private void processBombBulletCollisions() {
-		// Snapshot used to safely iterate because BombBullet may remove itself during explosion.
+
+		// Snapshot used to safely iterate (BombBullet may remove itself during explosion)
 		List<Bullet> snapshot = new ArrayList<>(bullets);
 
-		// Separate removal set to avoid modifying the main bullets set during iteration.
+		// Separate removal set
 		Set<BombBullet> toRemove = new HashSet<>();
 
-		for (Bullet b : snapshot) {
-			if (!(b instanceof BombBullet)) continue;
+		// Prepare enemy formations list
+		List<Iterable<EnemyShip>> enemyFormations = new ArrayList<>();
+		if (enemyShipFormationModel != null) enemyFormations.add(enemyShipFormationModel);
+		if (enemyShipSpecialFormation != null) enemyFormations.add(enemyShipSpecialFormation);
 
+		// Prepare bosses list
+		List<BossEntity> bosses = new ArrayList<>();
+		if (omegaBoss != null) bosses.add(omegaBoss);
+		if (zetaBoss != null) bosses.add(zetaBoss);
+		if (finalBoss != null) bosses.add(finalBoss);
+
+		for (Bullet b : snapshot) {
+
+			if (!(b instanceof BombBullet)) continue;
 			BombBullet bomb = (BombBullet) b;
 			boolean exploded = false;
 
-			for (EnemyShip e : enemyShipFormationModel) {
-				if (e != null && !e.isDestroyed() && checkCollision(bomb, e)) {
-					bomb.explode(this);
-					exploded = true;
-					break;
+			// --- Check Enemy Formations ---
+			for (Iterable<EnemyShip> formation : enemyFormations) {
+				for (EnemyShip e : formation) {
+					if (e != null && !e.isDestroyed() && checkCollision(bomb, e)) {
+						bomb.explode(this);
+						exploded = true;
+						break;
+					}
+				}
+				if (exploded) break;
+			}
+
+			// --- Check Bosses ---
+			if (!exploded) {
+				for (BossEntity boss : bosses) {
+					if (boss != null && !boss.isDestroyed() && checkCollision(bomb, (Entity) boss)) {
+						bomb.explode(this);
+						exploded = true;
+						break;
+					}
 				}
 			}
-			if (exploded) {
-				toRemove.add(bomb);
-				continue;
-			}
 
-			for (EnemyShip e : enemyShipSpecialFormation) {
-				if (e != null && !e.isDestroyed() && checkCollision(bomb, e)) {
-					bomb.explode(this);
-					exploded = true;
-					break;
-				}
-			}
-			if (exploded) {
-				toRemove.add(bomb);
-				continue;
-			}
-
-			if (!exploded && omegaBoss != null && !omegaBoss.isDestroyed() && checkCollision(bomb, omegaBoss)) {
-				bomb.explode(this);
-				exploded = true;
-			}
-
-			if (!exploded && zetaBoss != null && !zetaBoss.isDestroyed() && checkCollision(bomb, zetaBoss)) {
-				bomb.explode(this);
-				exploded = true;
-			}
-
-			if (!exploded && finalBoss != null && !finalBoss.isDestroyed() && checkCollision(bomb, finalBoss)) {
-				bomb.explode(this);
+			// --- Check Off-Screen ---
+			if (!exploded && bomb.getPositionY() < GameConstant.STAT_SEPARATION_LINE_HEIGHT) {
 				exploded = true;
 			}
 
 			if (exploded) {
-				toRemove.add(bomb);
-				continue;
-			}
-
-			if (bomb.getPositionY() < GameConstant.STAT_SEPARATION_LINE_HEIGHT) {
 				toRemove.add(bomb);
 			}
 		}
@@ -1018,15 +1014,22 @@ public class GameModel {
         for (Bullet bullet : this.bullets) {
             if (bullet.getPositionY() < GameConstant.STAT_SEPARATION_LINE_HEIGHT
                     || bullet.getPositionY() > this.height){
-				// BombBullet must never be recycled; explosion logic handles removal
-				if (bullet instanceof BombBullet) {
-					continue;
-				}
+
 				recyclable.add(bullet);
 			}
         }
         this.bullets.removeAll(recyclable);
-        BulletPool.recycle(recyclable);
+		Set<Bullet> normalBullets = new HashSet<>();
+
+		for (Bullet b : recyclable) {
+			if (b instanceof BombBullet) {
+				BulletPool.recycleBomb((BombBullet) b);
+			} else {
+				normalBullets.add(b);
+			}
+		}
+
+		BulletPool.recycle(normalBullets);
     }
 
     /**
@@ -1133,8 +1136,6 @@ public class GameModel {
 				applyBombDamageToBoss(source, boss);
 			}
 		}
-		// Remove BombBullet directly; it must not use the normal bullet-recycling flow.
-		bullets.remove(source);
 	}
 
 
