@@ -30,6 +30,13 @@ public class GameView {
 
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
+        if (model.isBlackHoleActive()) {
+            drawManager.getEntityRenderer().drawBlackHole(
+                    model.getBlackHoleCX(),
+                    model.getBlackHoleCY(),
+                    model.getBlackHoleRadius() / 2
+            );
+        }
         if (model.getOmegaBoss() != null) {
             drawManager.getEntityRenderer().drawHealthBarWithHP(model.getOmegaBoss());
             drawManager.getUIRenderer().drawBossName("Omega");
@@ -71,13 +78,6 @@ public class GameView {
         }
 
         else {
-            if (model.isBlackHoleActive()) {
-                drawManager.getEntityRenderer().drawBlackHole(
-                        model.getBlackHoleCX(),
-                        model.getBlackHoleCY(),
-                        model.getBlackHoleRadius()
-                );
-            }
             drawManager.getEntityRenderer().drawTeleport(model.getTeleportFromP1X(), dto.getShipP1().getWidth(), model.getTeleportFromP1Y(), dto.getShipP1().getHeight(), model.getIsTeleportP1(),1,model.getAfterTeleportFromP1X(),model.getAfterTeleportFromP1Y());
             drawManager.getEntityRenderer().drawTeleport(model.getTeleportFromP2X(), dto.getShipP2().getWidth(), model.getTeleportFromP2Y(), dto.getShipP2().getHeight(), model.getIsTeleportP2(),2,model.getAfterTeleportFromP2X(),model.getAfterTeleportFromP2Y());
 

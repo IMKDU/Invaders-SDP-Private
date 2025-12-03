@@ -83,6 +83,12 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
     private static final int REQUIRED_ATTACK_CYCLES = 2;
     private boolean isRight;
 
+    public boolean isDashing() {
+        return attackPattern instanceof DashPattern &&
+                ((DashPattern) attackPattern).isDashing();
+    }
+
+
     /**
      * Enum for tracking current pattern cycle state.
      */
@@ -232,7 +238,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
             // Use TimeGap pattern
             int maxLasers = (phase == 2) ? 4 : 8;
             TimeGapAttackPattern timegap = new TimeGapAttackPattern(boss, targetShips, screenWidth, screenHeight);
-
+            timegap.setChargeCooldown(1500);
             movePattern = timegap;
             attackPattern = timegap;
             lasersFired = 0;
@@ -283,6 +289,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
                 Ship target = getRandomAliveShip();
                 if (target != null) {
                     DashPattern dash = new DashPattern(boss, target);
+                    dash.isDashing();
                     movePattern = dash;
                     attackPattern = dash;
                     cycleState = PatternCycleState.DASH;
@@ -478,7 +485,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
         if (movePattern == null) return;
         movePattern.move();
         if (movePattern != null) {
-            this.isRight = ((movePattern.getBossPosition().x - bossPosition.x) > 0);
+            this.isRight = movePattern.getBossPosition().x == bossPosition.x ? this.isRight : movePattern.getBossPosition().x > bossPosition.x;
             bossPosition.x = movePattern.getBossPosition().x;
             bossPosition.y = movePattern.getBossPosition().y;
         }
@@ -543,5 +550,5 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
     public boolean isInDashCooldown() {
         return isInDashCooldown;
     }
-    public boolean getIsRight() {return this.isRight;}
+    public boolean isRight() {return this.isRight;}
 }
