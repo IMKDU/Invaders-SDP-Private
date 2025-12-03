@@ -115,20 +115,53 @@ public class GammaBoss extends MidBoss {
      * Shows hitting sprite when boss is hit.
      */
     private void updateSprite() {
-        if (bossPattern.isRight()){
-            if (this.spriteType == DrawManager.SpriteType.GammaBoss1) {
-                this.spriteType = DrawManager.SpriteType.GammaBoss2;
+        boolean isRight = bossPattern.isRight();
+        boolean isDashing = bossPattern.isDashing();
+        if (bossPattern.getCurrentPhase() == 2 || bossPattern.getCurrentPhase() == 3){
+            if (isDashing){
+                if (bossPattern.isRight()) {
+                    if (this.spriteType == DrawManager.SpriteType.GammaBossDashing1) {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDashing2;
+                    } else {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDashing1;
+                    }
+                } else {
+                    if (this.spriteType == DrawManager.SpriteType.GammaBossDashing1Left) {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDashing2Left;
+                    } else {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDashing1Left;
+                    }
+                }
             }
             else {
-                this.spriteType = DrawManager.SpriteType.GammaBoss1;
+                if (bossPattern.isRight()) {
+                    if (this.spriteType == DrawManager.SpriteType.GammaBossDash1) {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDash2;
+                    } else {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDash1;
+                    }
+                } else {
+                    if (this.spriteType == DrawManager.SpriteType.GammaBossDash1Left) {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDash2Left;
+                    } else {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDash1Left;
+                    }
+                }
             }
         }
-        else{
-            if (this.spriteType == DrawManager.SpriteType.GammaBoss1Left) {
-                this.spriteType = DrawManager.SpriteType.GammaBoss2Left;
-            }
-            else {
-                this.spriteType = DrawManager.SpriteType.GammaBoss1Left;
+        else {
+            if (isRight) {
+                if (this.spriteType == DrawManager.SpriteType.GammaBoss1) {
+                    this.spriteType = DrawManager.SpriteType.GammaBoss2;
+                } else {
+                    this.spriteType = DrawManager.SpriteType.GammaBoss1;
+                }
+            } else {
+                if (this.spriteType == DrawManager.SpriteType.GammaBoss1Left) {
+                    this.spriteType = DrawManager.SpriteType.GammaBoss2Left;
+                } else {
+                    this.spriteType = DrawManager.SpriteType.GammaBoss1Left;
+                }
             }
         }
 

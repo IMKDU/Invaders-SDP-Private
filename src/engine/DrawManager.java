@@ -52,7 +52,7 @@ public final class DrawManager {
         Item_SubShip, Item_Stop, Shield, Item_Bomb, Item_Coin, BombBullet,Bomb1,Bomb2,
 		Item_Shield, Item_Heal, BlackHole1,BlackHole2, OmegaBossDash1, OmegaBossDash2, OmegaBossDash3, OmegaBossDash4, OmegaBossBullet,
         ZetaBoss1, ZetaBoss2,ZetaBossRight1,ZetaBossRight2, ZetaBossMoving1, ZetaBossMoving2, ZetaBossMovingRight1, ZetaBossMovingRight2, ZetaBossDash1,ZetaBossDash2,ZetaBossDashRight1,ZetaBossDashRight2,
-        GammaBoss1,GammaBoss2, GammaBoss1Left, GammaBoss2Left
+        GammaBoss1,GammaBoss2, GammaBoss1Left, GammaBoss2Left, GammaBossDash1,GammaBossDash2, GammaBossDash1Left, GammaBossDash2Left, GammaBossDashing1,GammaBossDashing2,GammaBossDashing1Left,GammaBossDashing2Left
     }
 
 	/**
