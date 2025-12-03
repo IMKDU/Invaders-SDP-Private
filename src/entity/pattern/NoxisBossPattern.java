@@ -41,38 +41,8 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 	private Cooldown cycleCooldownTimer;
 	private int cycleCooldown;
 
-	/** Cooldown for attack switching/firing. */
-	private Cooldown attackCooldown;
-	/** Cooldown for background switching */
-	private Cooldown backCooldown;
-
-	/** Cycle cooldown values for each phase. */
-	private final int cycleCooldownMillis = 15000;
-
-	/** Movement cooldown value shared across phases. */
-	private final int dashDuration = 8000;
-	private final int backAttackDuration = 10000;
-
 	/** Variable for Guided Missile Pattern */
 	private GuidedMissilePattern guidedMissilePattern;
-
-	/**
-	 * Enum for tracking current pattern cycle state.
-	 */
-	private enum PatternCycleState {
-		ATTACK,  // ZigZag or TimeGap attack
-		DASH
-	}
-
-	/**
-	 * Enum for tracking current pattern cycle state.
-	 */
-	private enum BackgroundPatternState {
-		DEFAULT,
-		BLACKHOLE,
-		BOMB,
-		MISSILE
-	}
 
 	/** BlackHole states */
 	private enum BlackHoleState {
@@ -225,18 +195,21 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 				this.blackHoleDuration = 5000; // 5 seconds
 				this.blackHoleCooldown = 10000; // 10 seconds
 				this.apocalypseCooldown = 20000; // 20 seconds
+				this.dashCooldown = 0; // No used
 				this.cycleCooldown = 11000; // 11 seconds
 				break;
 			case 2: // 70-40%
 				this.blackHoleDuration = 7000; // 7 seconds
 				this.blackHoleCooldown = 7000; // 7 seconds
-				this.apocalypseCooldown = 15000; // 15 seconds
+				this.apocalypseCooldown = 10000; // 15 seconds
+				this.dashCooldown = 8000; // 8 seconds
 				this.cycleCooldown = 10000; // 11 seconds
 				break;
 			case 3: // 40-0%
 				this.blackHoleDuration = 9000; // 9 seconds
 				this.blackHoleCooldown = 5000; // 5 seconds
-				this.apocalypseCooldown = 10000; // 10 seconds
+				this.apocalypseCooldown = 8000; // 10 seconds
+				this.dashCooldown = 5000; // 8 seconds
 				this.cycleCooldown = 16000; // 11 seconds
 				break;
 		}
@@ -244,6 +217,7 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 		this.blackHoleDurationTimer = new Cooldown(this.blackHoleDuration);
 		this.blackHoleCooldownTimer = new Cooldown(this.blackHoleCooldown);
 		this.apocalypseCooldownTimer = new Cooldown(this.apocalypseCooldown);
+		this.dashCooldownTimer = new Cooldown(this.dashCooldown);
 		this.cycleCooldownTimer = new Cooldown(this.cycleCooldown);
 	}
 
