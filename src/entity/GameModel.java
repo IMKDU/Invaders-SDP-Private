@@ -479,7 +479,7 @@ public class GameModel {
 			// --- Check Enemy Formations ---
 			for (Iterable<EnemyShip> formation : enemyFormations) {
 				for (EnemyShip e : formation) {
-					if (e != null && !e.isDestroyed() && checkCollision(bomb, e)) {
+					if (!e.isDestroyed() && checkCollision(bomb, e)) {
 						bomb.explode(this);
 						exploded = true;
 						break;
@@ -491,7 +491,7 @@ public class GameModel {
 			// --- Check Bosses ---
 			if (!exploded) {
 				for (BossEntity boss : bosses) {
-					if (boss != null && !boss.isDestroyed() && checkCollision(bomb, (Entity) boss)) {
+					if (!boss.isDestroyed() && checkCollision(bomb, (Entity) boss)) {
 						bomb.explode(this);
 						exploded = true;
 						break;
