@@ -78,6 +78,11 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.SubShipP2, new BufferedImage(50,31,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.GammaBoss1, new BufferedImage(50,55,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.GammaBoss2, new BufferedImage(50,55,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.ShootP1Icon, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.ShootP2Icon, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.ChargingLaserP2Icon, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.ChargingLaserP1Icon, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.OriginIcon, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
             fileManager.loadSprite(spriteMap);
             //symatric sprite
             spriteMap.put(SpriteType.OmegaBossDash3, mirrorSprite(spriteMap.get(SpriteType.OmegaBossDash1)));

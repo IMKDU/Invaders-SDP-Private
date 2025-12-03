@@ -4,7 +4,6 @@ import engine.BackBuffer;
 import engine.DrawManager;
 import engine.FontPack;
 import engine.ItemHUDManager;
-import entity.Ship;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -22,19 +21,27 @@ public final class HUDRenderer {
     private final BackBuffer backBuffer;
     private final FontPack fontPack;
     private final EntityRenderer entityRenderer;
-    private final BufferedImage teleportCool;
 
 	// Teleport cooldown UI constants
-	private static final int P1_COOLDOWN_X = 170;
-	private static final int P2_COOLDOWN_X_OFFSET = 200;
+	private static final int P1_COOLDOWN_X = 200;
+	private static final int P2_COOLDOWN_X_OFFSET = 100;
 	private static final int COOLDOWN_Y_OFFSET = 50;
 	private static final int TELEPORT_GAUGE_RADIUS = 26;
+    private int SKILL_EXPLAIN_YLINE_TOP;
+    private int SKILL_EXPLAIN_YLINE_BOTTOM;
+    private int teleportCenterXP1;
+    private int teleportCenterYP1;
+    private int teleportCenterXP2;
+    private int teleportCenterYP2;
+    private final Map<DrawManager.SpriteType, BufferedImage> spriteMap;
 
-    public HUDRenderer(BackBuffer backBuffer, FontPack fontPack, EntityRenderer entityRenderer, BufferedImage teleportCool) {
+
+    public HUDRenderer(BackBuffer backBuffer, FontPack fontPack, EntityRenderer entityRenderer, Map<DrawManager.SpriteType, BufferedImage> spriteMap) {
         this.backBuffer = backBuffer;
         this.fontPack = fontPack;
         this.entityRenderer = entityRenderer;
-        this.teleportCool = teleportCool;
+        this.spriteMap = spriteMap;
+
     }
 
     /** Draw score. */
@@ -69,7 +76,7 @@ public final class HUDRenderer {
     public void drawCoin(final int screenWidth, final int screenHeight, final int coin) {
         Graphics g = backBuffer.getGraphics();
         g.setFont(fontPack.getRegular());
-        g.setColor(Color.WHITE);
+        g.setColor(Color.YELLOW);
         FontMetrics fm = g.getFontMetrics();
         int fontHeight = fm.getHeight();
 
@@ -160,18 +167,20 @@ public final class HUDRenderer {
     }
 
 	/** Draw circular cooldown gauge */
-	private void drawTeleportCooldown(Graphics2D g, int x, int y, double ratio, Color readyColor) {
-		int r = TELEPORT_GAUGE_RADIUS;
-		g.setColor(Color.DARK_GRAY);
-		g.fillOval(x, y, r, r);
-
-		if (ratio >= 1.0) {
-            g.drawImage(this.teleportCool,x,y,r,r,null);
-
-		}
-
-        else{
-            g.drawImage(this.teleportCool, x, y, r, r, null);
+	private void drawTeleportCooldown(Graphics2D g, int x, int y, double ratio, boolean P1) {
+        int r = TELEPORT_GAUGE_RADIUS;
+        if (P1){
+            this.teleportCenterXP1 = x + r / 2;
+            this.teleportCenterYP1 = y + r / 2;
+        }
+        else {
+            this.teleportCenterXP2 = x + r / 2;
+            this.teleportCenterYP2 = y + r / 2;
+        }
+        this.SKILL_EXPLAIN_YLINE_TOP = y;
+        this.SKILL_EXPLAIN_YLINE_BOTTOM = y + r;
+        g.drawImage(this.spriteMap.get(DrawManager.SpriteType.TeleportCool),x,y,r,r,null);
+        if ((ratio < 1.0)){
             float alpha = 0.5f;
             Composite old = g.getComposite();
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
@@ -201,8 +210,154 @@ public final class HUDRenderer {
 
 		Graphics2D g = (Graphics2D) backBuffer.getGraphics();
 
-		drawTeleportCooldown(g, P1_COOLDOWN_X, screenHeight - COOLDOWN_Y_OFFSET, cooldownP1, Color.GREEN);
-		drawTeleportCooldown(g, screenWidth - P2_COOLDOWN_X_OFFSET, screenHeight - COOLDOWN_Y_OFFSET, cooldownP2, Color.PINK);
+		drawTeleportCooldown(g, P1_COOLDOWN_X, screenHeight - COOLDOWN_Y_OFFSET, cooldownP1, true);
+		drawTeleportCooldown(g, screenWidth / 2 + P2_COOLDOWN_X_OFFSET, screenHeight - COOLDOWN_Y_OFFSET, cooldownP2, false);
+        drawExplainP1Skill();
+        drawExplainP2Skill();
 
 	}
+
+    public void drawExplainP1Skill(){
+        Graphics2D g = (Graphics2D) backBuffer.getGraphics();
+
+
+        g.setFont(fontPack.getRegular());
+        g.setColor(Color.RED);
+        String p1 = "P1:";
+        FontMetrics fmLabel = g.getFontMetrics();
+        g.drawString(
+                p1,
+                teleportCenterXP1 - TELEPORT_GAUGE_RADIUS - fmLabel.stringWidth(p1) - 5,
+                teleportCenterYP1 + fmLabel.getAscent() / 2
+        );
+
+        g.setColor(Color.WHITE);
+
+
+        g.setFont(fontPack.getFontSmallBig());
+        String topText = "shift";
+        FontMetrics fmTop = g.getFontMetrics();
+
+        int topX = teleportCenterXP1 - fmTop.stringWidth(topText) / 2;
+        int topY = SKILL_EXPLAIN_YLINE_TOP - fmTop.getHeight() / 2;
+
+        g.drawString(topText, topX, topY);
+
+        String teleport = "teleport";
+        FontMetrics fmSmall = g.getFontMetrics();
+        int bottomX = teleportCenterXP1 - fmSmall.stringWidth(teleport) / 2;
+        int bottomY = SKILL_EXPLAIN_YLINE_BOTTOM + fmSmall.getHeight();
+        g.drawString(teleport, bottomX, bottomY);
+
+
+        String[] topTexts = {"hold  C", "SPACE", "PRESS  O"};
+        String[] bottomTexts = {"laser", "shoot", "origin"};
+
+        BufferedImage[] icons = {
+                spriteMap.get(DrawManager.SpriteType.ChargingLaserP1Icon),
+                spriteMap.get(DrawManager.SpriteType.ShootP1Icon),
+                spriteMap.get(DrawManager.SpriteType.OriginIcon)
+        };
+
+        topX += 100;
+
+        for (int i = 0; i < topTexts.length; i++) {
+
+            g.setFont(fontPack.getFontSmallBig());
+            FontMetrics fm = g.getFontMetrics();
+
+            String t = topTexts[i];
+            int tWidth = fm.stringWidth(t);
+
+            g.drawString(t, topX, topY);
+
+            int centerX = topX + tWidth / 2;
+
+            BufferedImage icon = icons[i];
+            if (icon != null) {
+                int iconDrawW = icon.getWidth();
+                int iconX = centerX - iconDrawW / 2;
+                g.drawImage(icon, iconX, SKILL_EXPLAIN_YLINE_TOP, null);
+            }
+
+            String b = bottomTexts[i];
+            int bWidth = fm.stringWidth(b);
+
+            int bX = centerX - bWidth / 2;
+            g.drawString(b, bX, bottomY);
+
+            topX += 100;
+        }
+    }
+
+    public void drawExplainP2Skill(){
+        Graphics2D g = (Graphics2D) backBuffer.getGraphics();
+        g.setFont(fontPack.getRegular());
+        g.setColor(Color.CYAN);
+        String p2 = "P2:";
+        FontMetrics fmLabel = g.getFontMetrics();
+        g.drawString(p2,teleportCenterXP2 - TELEPORT_GAUGE_RADIUS - fmLabel.stringWidth(p2) - 5, teleportCenterYP2 + fmLabel.getAscent() / 2);
+
+        g.setFont(fontPack.getFontSmallBig());
+        g.setColor(Color.WHITE);
+
+
+        g.setFont(fontPack.getFontSmallBig());
+
+        String topText = "?  or  /";
+        FontMetrics fmTop = g.getFontMetrics();
+
+        int topX = teleportCenterXP2 - fmTop.stringWidth(topText) / 2;
+        int topY = SKILL_EXPLAIN_YLINE_TOP - fmTop.getHeight() / 2;
+
+        g.drawString(topText, topX, topY);
+
+        g.setFont(fontPack.getFontSmallBig());
+        String teleport = "teleport";
+        FontMetrics fmSmall = g.getFontMetrics();
+        int bottomX = teleportCenterXP2 - fmSmall.stringWidth(teleport) / 2;
+        int bottomY = SKILL_EXPLAIN_YLINE_BOTTOM + fmSmall.getHeight();
+
+        g.drawString(teleport, bottomX, bottomY);
+
+
+        String[] topTexts = {"CTRL(L)", "ENTER", "PRESS  O"};
+        String[] bottomTexts = {"laser", "shoot", "origin"};
+
+        BufferedImage[] icons = {
+                spriteMap.get(DrawManager.SpriteType.ChargingLaserP2Icon),
+                spriteMap.get(DrawManager.SpriteType.ShootP2Icon),
+                spriteMap.get(DrawManager.SpriteType.OriginIcon)
+        };
+
+        topX += 100;
+
+        for (int i = 0; i < topTexts.length; i++) {
+
+            g.setFont(fontPack.getFontSmallBig());
+            FontMetrics fm = g.getFontMetrics();
+
+            String t = topTexts[i];
+            int tWidth = fm.stringWidth(t);
+
+            g.drawString(t, topX, topY);
+
+            int centerX = topX + tWidth / 2;
+
+            BufferedImage icon = icons[i];
+            if (icon != null) {
+                int iconDrawW = icon.getWidth();
+                int iconX = centerX - iconDrawW / 2;
+                g.drawImage(icon, iconX, SKILL_EXPLAIN_YLINE_TOP, null);
+            }
+
+            String b = bottomTexts[i];
+            int bWidth = fm.stringWidth(b);
+
+            int bX = centerX - bWidth / 2;
+            g.drawString(b, bX, bottomY);
+
+            topX += 100;
+        }
+    }
 }
