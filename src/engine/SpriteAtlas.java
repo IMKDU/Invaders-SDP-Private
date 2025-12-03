@@ -45,7 +45,7 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.Shield, new BufferedImage(61,61,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.FinalBoss1, new BufferedImage(50,40,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.FinalBoss2, new BufferedImage(50,40,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.FinalBossBullet,new BufferedImage(3,5,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.PinnedBossPatternBullet,new BufferedImage(6,10,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.FinalBossDeath, new BufferedImage(50,40,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.OmegaBoss1, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.OmegaBoss2, new BufferedImage(70,51,BufferedImage.TYPE_INT_ARGB));
@@ -56,7 +56,7 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.OmegaBossDash1, new BufferedImage(32,32,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.OmegaBossDash2, new BufferedImage(32,32,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.OmegaBossDeath, new BufferedImage(16,16,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.OmegaBossBullet, new BufferedImage(16,16,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.ZigZagAngryPatternBullet, new BufferedImage(16,16,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.Laser, new BufferedImage(5,13,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.BlackHole1, new BufferedImage(1024,1024,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.BlackHole2, new BufferedImage(1024,1024,BufferedImage.TYPE_INT_ARGB));
@@ -76,6 +76,7 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.Item_Coin, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.SubShipP1, new BufferedImage(50,31,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.SubShipP2, new BufferedImage(50,31,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.BasicBackGroundPatternBullet, new BufferedImage(6,13,BufferedImage.TYPE_INT_ARGB));
             fileManager.loadSprite(spriteMap);
             //symatric sprite
             spriteMap.put(SpriteType.OmegaBossDash3, mirrorSprite(spriteMap.get(SpriteType.OmegaBossDash1)));

@@ -2,7 +2,7 @@ package entity;
 
 import engine.DrawManager;
 
-import java.awt.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class BossBullet extends Bullet implements Collidable {
@@ -12,6 +12,7 @@ public class BossBullet extends Bullet implements Collidable {
     private int dy;
 
 	private boolean markedForRemoval = false;
+    private DrawManager.SpriteType[] bulletImages;
 
 	/** bossBullets carry bullets that the boss will shoot */
     /**
@@ -36,11 +37,27 @@ public class BossBullet extends Bullet implements Collidable {
         super(x, y, 0, width, height);
         this.dx = dx;
         this.dy = dy;
-        if (type.equals("FinalBoss")){
-            this.spriteType = DrawManager.SpriteType.FinalBossBullet;
+        if (type.equals("SpreadShotPattern")){
+            this.bulletImages = new DrawManager.SpriteType[]{DrawManager.SpriteType.PinnedBossPatternBullet, DrawManager.SpriteType.BasicBackGroundPatternBullet};
+            int index = ThreadLocalRandom.current().nextInt(bulletImages.length);
+            if (index == 0){
+                super.width = 6;
+                super.height = 10;
+            }
+            else if (index == 1){
+                super.width = 6;
+                super.height = 13;
+            }
+            this.spriteType = bulletImages[index];
         }
-        else if (type.equals("OmegaBoss")){
-            this.spriteType = DrawManager.SpriteType.OmegaBossBullet;
+        else if (type.equals("ZigZagAngryPattern")){
+            this.spriteType = DrawManager.SpriteType.ZigZagAngryPatternBullet;
+        }
+        else if (type.equals("PinnedBossPattern")){
+            this.spriteType = DrawManager.SpriteType.PinnedBossPatternBullet;
+        }
+        else if (type.equals("BasicBackGroundPattern")){
+            this.spriteType = DrawManager.SpriteType.BasicBackGroundPatternBullet;
         }
 
     }

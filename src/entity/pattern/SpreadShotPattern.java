@@ -117,7 +117,7 @@ public class SpreadShotPattern extends BossPattern {
 				vy,
 				6,
 				12,
-				"OmegaBoss"
+				"SpreadShotPattern"
 		);
 
 		this.bullets.add(bullet);
