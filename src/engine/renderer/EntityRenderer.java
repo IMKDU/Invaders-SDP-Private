@@ -567,7 +567,6 @@ public final class EntityRenderer {
             int drawX = centerX - scaledW / 2;
             int drawY = centerY - scaledH / 2;
             g.drawImage(bombexplosion, drawX, drawY, scaledW, scaledH, null);
-            SoundManager.play("sfx/BombExplosion.wav");
         }
     }
 

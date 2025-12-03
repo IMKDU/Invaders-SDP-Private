@@ -239,39 +239,29 @@ public final class HUDRenderer {
     }
 
 
-    public void drawExplainP1Skill(
-            int centerX,
-            int centerY,
-            int topLineY,
-            int bottomLineY
-    ) {
-
+    private void drawPlayerSkillExplain(int centerX, int centerY, int topLineY, int bottomLineY, Color labelColor, String playerLabel, String topMainText, String[] topTexts, String[] bottomTexts, BufferedImage[] icons, boolean isP1) {
         Graphics2D g = (Graphics2D) backBuffer.getGraphics();
 
+        // Label (P1: / P2:)
         g.setFont(fontPack.getRegular());
-        g.setColor(Color.RED);
+        g.setColor(labelColor);
 
-        String p1 = "P1:";
         FontMetrics fmLabel = g.getFontMetrics();
 
-        g.drawString(
-                p1,
-                centerX - TELEPORT_GAUGE_RADIUS - fmLabel.stringWidth(p1) - 5,
-                centerY + fmLabel.getAscent() / 2
-        );
-
-        g.setColor(Color.WHITE);
+        g.drawString(playerLabel, centerX - TELEPORT_GAUGE_RADIUS - fmLabel.stringWidth(playerLabel) - 5, centerY + fmLabel.getAscent() / 2);
+        // Main texts
         g.setFont(fontPack.getFontSmallBig());
+        g.setColor(Color.WHITE);
 
-        String topText = "shift";
         FontMetrics fmTop = g.getFontMetrics();
 
-        int topX = centerX - fmTop.stringWidth(topText) / 2;
+        int topX = centerX - fmTop.stringWidth(topMainText) / 2;
         int topY = topLineY - fmTop.getHeight() / 2;
 
-        g.drawString(topText, topX, topY);
+        g.drawString(topMainText, topX, topY);
 
         String teleport = "teleport";
+
         FontMetrics fmSmall = g.getFontMetrics();
 
         int bottomX = centerX - fmSmall.stringWidth(teleport) / 2;
@@ -279,22 +269,12 @@ public final class HUDRenderer {
 
         g.drawString(teleport, bottomX, bottomY);
 
-        String[] topTexts = {"hold  C", "SPACE", "PRESS  O"};
-        String[] bottomTexts = {"laser", "shoot", "origin"};
-
-        BufferedImage[] icons = {
-                spriteMap.get(DrawManager.SpriteType.ChargingLaserP1Icon),
-                spriteMap.get(DrawManager.SpriteType.ShootP1Icon),
-                spriteMap.get(DrawManager.SpriteType.OriginIcon)
-        };
-
+        // Skill rows
         topX += 100;
 
         for (int i = 0; i < topTexts.length; i++) {
 
-            g.setFont(fontPack.getFontSmallBig());
             FontMetrics fm = g.getFontMetrics();
-
             String t = topTexts[i];
             int tWidth = fm.stringWidth(t);
 
@@ -307,10 +287,17 @@ public final class HUDRenderer {
                 int iconX = center - icon.getWidth() / 2;
                 g.drawImage(icon, iconX, topLineY, null);
 
+
                 if (i == 2) {
-                    originIconP1X = iconX;
-                    originIconP1Width = icon.getWidth();
-                    originIconP1Height = icon.getHeight();
+                    if (isP1) {
+                        originIconP1X = iconX;
+                        originIconP1Width = icon.getWidth();
+                        originIconP1Height = icon.getHeight();
+                    } else {
+                        originIconP2X = iconX;
+                        originIconP2Width = icon.getWidth();
+                        originIconP2Height = icon.getHeight();
+                    }
                 }
             }
 
@@ -323,92 +310,13 @@ public final class HUDRenderer {
             topX += 100;
         }
     }
-
-
-    public void drawExplainP2Skill(
-            int centerX,
-            int centerY,
-            int topLineY,
-            int bottomLineY
-    ) {
-
-        Graphics2D g = (Graphics2D) backBuffer.getGraphics();
-
-        g.setFont(fontPack.getRegular());
-        g.setColor(Color.CYAN);
-
-        String p2 = "P2:";
-        FontMetrics fmLabel = g.getFontMetrics();
-
-        g.drawString(
-                p2,
-                centerX - TELEPORT_GAUGE_RADIUS - fmLabel.stringWidth(p2) - 5,
-                centerY + fmLabel.getAscent() / 2
-        );
-
-        g.setFont(fontPack.getFontSmallBig());
-        g.setColor(Color.WHITE);
-
-        String topText = "?  or  /";
-        FontMetrics fmTop = g.getFontMetrics();
-
-        int topX = centerX - fmTop.stringWidth(topText) / 2;
-        int topY = topLineY - fmTop.getHeight() / 2;
-
-        g.drawString(topText, topX, topY);
-
-        String teleport = "teleport";
-        FontMetrics fmSmall = g.getFontMetrics();
-
-        int bottomX = centerX - fmSmall.stringWidth(teleport) / 2;
-        int bottomY = bottomLineY + fmSmall.getHeight();
-
-        g.drawString(teleport, bottomX, bottomY);
-
-        String[] topTexts = {"CTRL(L)", "ENTER", "PRESS  O"};
-        String[] bottomTexts = {"laser", "shoot", "origin"};
-
-        BufferedImage[] icons = {
-                spriteMap.get(DrawManager.SpriteType.ChargingLaserP2Icon),
-                spriteMap.get(DrawManager.SpriteType.ShootP2Icon),
-                spriteMap.get(DrawManager.SpriteType.OriginIcon)
-        };
-
-        topX += 100;
-
-        for (int i = 0; i < topTexts.length; i++) {
-
-            g.setFont(fontPack.getFontSmallBig());
-            FontMetrics fm = g.getFontMetrics();
-
-            String t = topTexts[i];
-            int tWidth = fm.stringWidth(t);
-
-            g.drawString(t, topX, topY);
-
-            int center = topX + tWidth / 2;
-
-            BufferedImage icon = icons[i];
-            if (icon != null) {
-                int iconX = center - icon.getWidth() / 2;
-                g.drawImage(icon, iconX, topLineY, null);
-
-                if (i == 2) {
-                    originIconP2X = iconX;
-                    originIconP2Width = icon.getWidth();
-                    originIconP2Height = icon.getHeight();
-                }
-            }
-
-            String b = bottomTexts[i];
-            int bWidth = fm.stringWidth(b);
-
-            int bX = center - bWidth / 2;
-            g.drawString(b, bX, bottomY);
-
-            topX += 100;
-        }
+    public void drawExplainP1Skill(int centerX,int centerY,int topLineY,int bottomLineY) {
+        drawPlayerSkillExplain(centerX, centerY, topLineY, bottomLineY, Color.RED, "P1:", "shift", new String[]{"hold  C", "SPACE", "PRESS  O"}, new String[]{"laser","shoot","origin"}, new BufferedImage[]{spriteMap.get(DrawManager.SpriteType.ChargingLaserP1Icon), spriteMap.get(DrawManager.SpriteType.ShootP1Icon), spriteMap.get(DrawManager.SpriteType.OriginIcon)}, true);
     }
+    public void drawExplainP2Skill(int centerX,int centerY,int topLineY,int bottomLineY) {
+        drawPlayerSkillExplain(centerX, centerY, topLineY, bottomLineY, Color.CYAN, "P2:", "?  or  /", new String[]{"CTRL(L)", "ENTER", "PRESS  O"}, new String[]{"laser","shoot","origin"}, new BufferedImage[]{spriteMap.get(DrawManager.SpriteType.ChargingLaserP2Icon), spriteMap.get(DrawManager.SpriteType.ShootP2Icon), spriteMap.get(DrawManager.SpriteType.OriginIcon)}, false);
+    }
+
 
 
     public void drawOriginUsed(int topY) {
@@ -417,26 +325,11 @@ public final class HUDRenderer {
         float alpha = 0.5f;
         Composite old = g.getComposite();
 
-        g.setComposite(AlphaComposite.getInstance(
-                AlphaComposite.SRC_OVER, alpha
-        ));
-
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
         g.setColor(Color.BLUE);
 
-        g.fillRect(
-                originIconP1X,
-                topY,
-                originIconP1Width,
-                originIconP1Height
-        );
-
-        g.fillRect(
-                originIconP2X,
-                topY,
-                originIconP2Width,
-                originIconP2Height
-        );
-
+        g.fillRect(originIconP1X, topY, originIconP1Width, originIconP1Height);
+        g.fillRect(originIconP2X, topY, originIconP2Width, originIconP2Height);
         g.setComposite(old);
     }
 
