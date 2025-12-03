@@ -30,6 +30,36 @@ public class GameView {
 
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
+        if (model.getOmegaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getOmegaBoss());
+            drawManager.getUIRenderer().drawBossName("Omega");
+        }
+        if (model.getFinalBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getFinalBoss());
+            drawManager.getUIRenderer().drawBossName("???");
+        }
+        if (model.getZetaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getZetaBoss());
+            drawManager.getUIRenderer().drawBossName("Zeta");
+        }
+        if (model.getGammaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getGammaBoss());
+            drawManager.getEntityRenderer().drawGammaBoss((GammaBoss) model.getGammaBoss());
+            drawManager.getUIRenderer().drawBossName("Gamma");
+        }
+        if (model.getBossLasers() != null) {
+            for (LaserBeam laser : model.getBossLasers()) {
+                drawManager.getEntityRenderer().drawLaser(laser);
+            }
+        }
+        if(model.getExplosionEntity() != null){
+            drawManager.getEntityRenderer().drawExplosion(
+                    model.isExplosionBoom(),
+                    model.getExplosionEntity(),
+                    model.getWarningExplosion()
+            );
+        }
+
         if (model.isOriginSkillActivated()) {
             drawManager.getHUDRenderer().drawOriginUsed();
             drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
@@ -79,28 +109,6 @@ public class GameView {
                 }
             }
         }
-        if (model.getOmegaBoss() != null) {
-            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getOmegaBoss());
-            drawManager.getUIRenderer().drawBossName("Omega");
-        }
-        if (model.getFinalBoss() != null) {
-            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getFinalBoss());
-            drawManager.getUIRenderer().drawBossName("???");
-        }
-        if (model.getZetaBoss() != null) {
-            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getZetaBoss());
-            drawManager.getUIRenderer().drawBossName("Zeta");
-        }
-        if (model.getGammaBoss() != null) {
-            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getGammaBoss());
-            drawManager.getEntityRenderer().drawGammaBoss((GammaBoss) model.getGammaBoss());
-            drawManager.getUIRenderer().drawBossName("Gamma");
-        }
-		if (model.getBossLasers() != null) {
-			for (LaserBeam laser : model.getBossLasers()) {
-				drawManager.getEntityRenderer().drawLaser(laser);
-			}
-		}
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50, 2);
         drawManager.getHUDRenderer().drawCoin(dto.getWidth(), dto.getHeight(), dto.getCoin());
@@ -139,13 +147,7 @@ public class GameView {
             drawChargingSkill(model.getShipP2(), dto.getWidth(), dto.getHeight());
         }
 
-        if(model.getExplosionEntity() != null){
-            drawManager.getEntityRenderer().drawExplosion(
-                    model.isExplosionBoom(),
-                    model.getExplosionEntity(),
-                    model.getWarningExplosion()
-            );
-        }
+
         /** countdown */
         if (!model.isInputDelayFinished()) {
             int countdown = (int) ((GameModel.INPUT_DELAY
