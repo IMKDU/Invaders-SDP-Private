@@ -447,6 +447,76 @@ public class GameModel {
     }
 
 	/**
+	 * Handles collision detection exclusively for BombBullet.
+	 * BombBullets are excluded from the normal entity collision system,
+	 * so this method manually checks their collisions and safely removes them after explosion.
+	 */
+	private void processBombBulletCollisions() {
+		// Snapshot used to safely iterate because BombBullet may remove itself during explosion.
+		List<Bullet> snapshot = new ArrayList<>(bullets);
+
+		// Separate removal set to avoid modifying the main bullets set during iteration.
+		Set<BombBullet> toRemove = new HashSet<>();
+
+		for (Bullet b : snapshot) {
+			if (!(b instanceof BombBullet)) continue;
+
+			BombBullet bomb = (BombBullet) b;
+			boolean exploded = false;
+
+			for (EnemyShip e : enemyShipFormationModel) {
+				if (e != null && !e.isDestroyed() && checkCollision(bomb, e)) {
+					bomb.explode(this);
+					exploded = true;
+					break;
+				}
+			}
+			if (exploded) {
+				toRemove.add(bomb);
+				continue;
+			}
+
+			for (EnemyShip e : enemyShipSpecialFormation) {
+				if (e != null && !e.isDestroyed() && checkCollision(bomb, e)) {
+					bomb.explode(this);
+					exploded = true;
+					break;
+				}
+			}
+			if (exploded) {
+				toRemove.add(bomb);
+				continue;
+			}
+
+			if (!exploded && omegaBoss != null && !omegaBoss.isDestroyed() && checkCollision(bomb, omegaBoss)) {
+				bomb.explode(this);
+				exploded = true;
+			}
+
+			if (!exploded && zetaBoss != null && !zetaBoss.isDestroyed() && checkCollision(bomb, zetaBoss)) {
+				bomb.explode(this);
+				exploded = true;
+			}
+
+			if (!exploded && finalBoss != null && !finalBoss.isDestroyed() && checkCollision(bomb, finalBoss)) {
+				bomb.explode(this);
+				exploded = true;
+			}
+
+			if (exploded) {
+				toRemove.add(bomb);
+				continue;
+			}
+
+			if (bomb.getPositionY() < GameConstant.STAT_SEPARATION_LINE_HEIGHT) {
+				toRemove.add(bomb);
+			}
+		}
+		// Safe removal after iteration
+		bullets.removeAll(toRemove);
+	}
+
+	/**
 	 * Detects collisions between all active entities.
 	 * Each pair of collidables is checked, and their collision handlers are invoked.
 	 */
@@ -483,7 +553,15 @@ public class GameModel {
             for(MidBossMob mb : midBossChilds){ entities.add(mb); }
         }
         if (explosionEntity != null) entities.add(explosionEntity);
-		entities.addAll(bullets);
+		// First, handle BombBullet collisions separately because they do NOT participate in normal collision logic.
+		processBombBulletCollisions();
+
+		// Add only regular bullets to the collision entity list.
+		for (Bullet b : bullets) {
+			if (!(b instanceof BombBullet)) {
+				entities.add(b);
+			}
+		}
 		entities.addAll(bossBullets);
 		entities.addAll(dropItems);
 
@@ -939,8 +1017,13 @@ public class GameModel {
         Set<Bullet> recyclable = new HashSet<Bullet>();
         for (Bullet bullet : this.bullets) {
             if (bullet.getPositionY() < GameConstant.STAT_SEPARATION_LINE_HEIGHT
-                    || bullet.getPositionY() > this.height)
-                recyclable.add(bullet);
+                    || bullet.getPositionY() > this.height){
+				// BombBullet must never be recycled; explosion logic handles removal
+				if (bullet instanceof BombBullet) {
+					continue;
+				}
+				recyclable.add(bullet);
+			}
         }
         this.bullets.removeAll(recyclable);
         BulletPool.recycle(recyclable);
@@ -1050,8 +1133,8 @@ public class GameModel {
 				applyBombDamageToBoss(source, boss);
 			}
 		}
-
-		requestRemoveBullet(source);
+		// Remove BombBullet directly; it must not use the normal bullet-recycling flow.
+		bullets.remove(source);
 	}
 
 

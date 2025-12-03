@@ -9,14 +9,13 @@ public class BombBullet extends Bullet {
 		this.spriteType = SpriteType.BombBullet;
 	}
 
+	/** Called when BombBullet truly hits a valid enemy/boss. */
+	public void explode(GameModel model) {
+		model.requestBombAoEDamage(this);
+	}
+
+	/** Completely block all entity-based collision callbacks */
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
-
-		if (other instanceof DropItem) {
-			return;
-		}
-        super.onCollision(other, model);
-        model.requestBombAoEDamage(this);
-
 	}
 }
