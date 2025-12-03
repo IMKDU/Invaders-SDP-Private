@@ -28,9 +28,9 @@ public class GammaBoss extends MidBoss {
     /** Initial position in the y-axis */
     private static final int INIT_POS_Y = 80;
     /** Width of GammaBoss */
-    private static final int GAMMA_WIDTH = 70 * 2;
+    private static final int GAMMA_WIDTH = 50 * 2;
     /** Height of GammaBoss */
-    private static final int GAMMA_HEIGHT = 51 * 2;
+    private static final int GAMMA_HEIGHT = 55 * 2;
     /** Health points */
     private static final int GAMMA_HEALTH = 65;
     /** Point value when destroyed */
