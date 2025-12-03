@@ -51,11 +51,6 @@ public class HorizontalPattern extends BossPattern {
     }
 
     @Override
-    public Point getBossPosition() {
-        return new Point(this.bossPosition.x, this.bossPosition.y);
-    }
-
-    @Override
     public void setTarget(HasBounds target) {
         // No target needed for this pattern
     }

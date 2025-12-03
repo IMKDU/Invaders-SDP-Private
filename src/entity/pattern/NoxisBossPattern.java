@@ -7,68 +7,54 @@ import entity.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class NoxisBossPattern extends BossPattern implements IBossPattern {
-	/** Horizontal speed used in phase 1 movement. */
-	private static final int HORIZONTAL_SPEED = 2;
+
 	/** Pattern select threshold: Pinned(58%), Another(42%) */
 	private static final double PHASE1_ATTACK_SELECT_RATIO = 0.58;
-	/** HP ratio threshold: phase 1 → phase 2. */
-	private static final double PHASE1_TO_PHASE2_TRIGGER = (double) 3 /5;
-	/** HP ratio threshold: phase 2 → phase 3. */
-	private static final double PHASE2_TO_PHASE3_TRIGGER = (double) 3 /10;
 
-	/** Screen dimensions. */
-	private final int screenWidth;
-	private final int screenHeight;
+	/** HP ratio thresholds for phase transitions */
+	private static final double PHASE1_TO_PHASE2_TRIGGER = 0.70;
+	private static final double PHASE2_TO_PHASE3_TRIGGER = 0.40;
 
-	/** Currently selected attack pattern. */
-	private IBossPattern attackPattern;
-	/** Currently selected movement pattern. */
-	private IBossPattern movePattern;
+	// BlackHole parameters
+	private static final int BLACKHOLE_RADIUS = 1000;
+	private static final double BLACKHOLE_PULL_CONSTANT = 0.005;
+
+	/** Horizontal speed used in phase 1 movement. */
+	private static final int HORIZONTAL_SPEED = 2;
+
+	// Pattern speeds
+	private static final int DIAGONAL_X_SPEED = 4;
+	private static final int DIAGONAL_Y_SPEED = 3;
+	private static final Color DIAGONAL_COLOR = Color.MAGENTA;
+
+	// Screen dimensions
+	private int SCREEN_WIDTH = GameConstant.SCREEN_WIDTH;
+	private int SCREEN_HEIGHT = GameConstant.SCREEN_HEIGHT;
+
 	/** Selected background patterns. */
 	private List<IBossPattern> currentBackPatterns = new ArrayList<>();
 
 	/** Cooldown for 1 cycle */
-	private Cooldown cycleCooldown;
+	private Cooldown cycleCooldownTimer;
+	private int cycleCooldown;
+
 	/** Cooldown for attack switching/firing. */
 	private Cooldown attackCooldown;
-	/** Cooldown for movement switching. */
-	private Cooldown dashCooldown;
 	/** Cooldown for background switching */
 	private Cooldown backCooldown;
 
 	/** Cycle cooldown values for each phase. */
 	private final int cycleCooldownMillis = 15000;
-	/** Attack cooldown values for each phase. */
-	private final int[][] attackCooldownMillis = {
-			{5000, 9000},
-			{8000, 10000},
-			{8000, 16000}
-	};
+
 	/** Movement cooldown value shared across phases. */
-	private final int dashCooldownMillis = 8000;
-	private final int backCooldownMillis = 10000;
+	private final int dashDuration = 8000;
+	private final int backAttackDuration = 10000;
 
-	/** Currently active phase (1, 2, or 3). */
-	private int currentPhase=0;
-
-	/** Reference to the owning boss. */
-	private final MidBoss boss;
-	/** Reference to the player target. */
-	private List<Ship> targetShips;
-
-	/** Current sub-pattern in the cycle (for phase 2 and 3). */
-	private NoxisBossPattern.PatternCycleState cycleState = NoxisBossPattern.PatternCycleState.ATTACK;
-	/** Flag to track if in dash cooldown. */
-	private boolean isInDashCooldown = false;
-
-	/** Track if using ZigZag or TimeGap for current attack cycle. */
-	private boolean usingZigZag = false;
-	/** Number of attack cycles completed (for ZigZag). */
-	private int attackCyclesCompleted = 0;
-	/** Required attack cycles before switching to dash. */
-	private static final int REQUIRED_ATTACK_CYCLES = 2;
+	/** Variable for Guided Missile Pattern */
+	private GuidedMissilePattern guidedMissilePattern;
 
 	/**
 	 * Enum for tracking current pattern cycle state.
@@ -88,21 +74,78 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 		MISSILE
 	}
 
+	/** BlackHole states */
+	private enum BlackHoleState {
+		ACTIVE,         // BlackHole is pulling players
+		COOLDOWN,       // BlackHole is inactive
+		FORCED_STOP     // BlackHole stopped by Apocalypse
+	}
+
+	/** Apocalypse states */
+	private enum ApocalypseState {
+		READY,          // Ready to activate (cooldown finished)
+		CHARGING,       // 3 seconds charging phase
+		FIRING,         // 2 seconds firing phase
+		COOLDOWN        // Waiting for cooldown
+	}
+
+	/** Currently active phase (1, 2, or 3). */
+	private int currentPhase=1;
+
+	/** Reference to the owning boss. */
+	private final MidBoss boss;
+	/** Reference to the player target. */
+	private List<Ship> ships;
+	/** Logger instance */
+	private final Logger logger;
+	/** Random generator for random selections */
+	private final Random random;
+
+	// BlackHole state management
+	private BlackHoleState blackHoleState = BlackHoleState.COOLDOWN;
+	private Cooldown blackHoleDurationTimer;
+	private Cooldown blackHoleCooldownTimer;
+	private int blackHoleDuration;
+	private int blackHoleCooldown;
+
+	// Apocalypse state management
+	private ApocalypseState apocalypseState = ApocalypseState.COOLDOWN;
+	private ApocalypseAttackPattern apocalypsePattern;
+	private Cooldown apocalypseCooldownTimer;
+	private int apocalypseCooldown;
+
+	// Dash pattern management
+	private Cooldown dashCooldownTimer;
+	private int dashCooldown;
+
+	// Current patterns
+	private BossPattern attackPattern;
+	private BossPattern movementPattern;
+
 	/**
 	 * Creates a new Omega boss pattern controller.
 	 *
 	 * @param boss   The owning mid-boss instance.
 	 * @param ships The current player target.
 	 */
-	public NoxisBossPattern(MidBoss boss, List<Ship> ships, int screenWidth, int screenHeight) {
+	public NoxisBossPattern(MidBoss boss, List<Ship> ships) {
 		super(new Point(boss.getPositionX(),boss.getPositionY()));
 		this.boss = boss;
-		this.targetShips = ships;
-		this.screenWidth = screenWidth;
-		this.screenHeight = screenHeight;
-		attackCooldown = new Cooldown(attackCooldownMillis[0][0]);
-		dashCooldown = new Cooldown(dashCooldownMillis);
-		Core.getLogger().info("NoxisBossPattern:  Finish Initializing");
+		this.ships = ships;
+		this.logger = Core.getLogger();
+		this.random = new Random();
+
+		// Initialize Apocalypse Pattern
+		this.apocalypsePattern = new ApocalypseAttackPattern(boss);
+		this.guidedMissilePattern = new GuidedMissilePattern(this.boss, ships);
+
+		updateTimersForPhase();
+
+		// Initialize pattern
+		this.movementPattern = createMovementPattern();
+		this.attackPattern = createAttackPattern();
+
+		this.logger.info("NoxisBossPattern:  Finish Initializing");
 	}
 
 	/**
@@ -114,164 +157,337 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 	 * </ul>
 	 */
 	public void update(){
-		int trigger = checkPhase();
-		boolean isInit = trigger != currentPhase;
-		if(trigger == 1){
-			phase1(isInit);
+		updatePhase();
+
+		// Priority 1: Check if Apocalypse cooldown finished
+		if (this.currentPhase!=1 && apocalypseState == ApocalypseState.COOLDOWN && apocalypseCooldownTimer.checkFinished()) {
+			forceStopBlackHole();
+			startApocalypse();
+			stopMovement();
+			return;
 		}
-		else if(trigger == 2){
-			phase2(isInit);
+
+		// Priority 2: Handle active Apocalypse
+		if (this.currentPhase!=1 && apocalypseState == ApocalypseState.CHARGING || apocalypseState == ApocalypseState.FIRING) {
+			updateApocalypse();
+			stopMovement();
+			return;
 		}
-		else if(trigger == 3){
-			phase3(isInit);
+
+		// Priority 3: Handle BlackHole cycle
+		updateBlackHoleCycle();
+
+		// Priority 4: Update movement (always except during Apocalypse)
+		if (this.currentPhase!=1 && guidedMissilePattern != null) {
+			guidedMissilePattern.attack();
 		}
-		updateBackPattern(currentPhase);
+
+		this.move();
+		this.attack();
 	}
 
-	private List<IBossPattern> getRandomPatterns(List<IBossPattern> patterns, int howMany){
-		List<IBossPattern> randomPatterns = new ArrayList<>(patterns);
-		Collections.shuffle(randomPatterns);
-		return randomPatterns.subList(0, howMany);
+	/**
+	 * Updates the current phase based on health percentage
+	 */
+	private void updatePhase() {
+		int previousPhase = this.currentPhase;
+		double healthPercent = (double) boss.getHealPoint() / boss.getMaxHealPoint();
+		if (healthPercent > PHASE1_TO_PHASE2_TRIGGER) {
+			this.currentPhase = 1;
+		} else if (healthPercent > PHASE2_TO_PHASE3_TRIGGER) {
+			this.currentPhase = 2;
+		} else {
+			this.currentPhase = 3;
+		}
+		// Update timers if phase changed
+		if (previousPhase != this.currentPhase) {
+			updateTimersForPhase();
+			// Recreate movement pattern for new phase
+			this.movementPattern = createMovementPattern();
+			this.attackPattern = createAttackPattern();
+			logger.info("NoxisBossPattern: Phase changed to " + this.currentPhase);
+		}
+		// Update patterns if cycle cooldown is done
+		if (cycleCooldownTimer.checkFinished()) {
+			logger.info("NoxisBossPattern: Cycle ended - change patterns");
+			this.movementPattern = createMovementPattern();
+			this.attackPattern = createAttackPattern();
+			this.cycleCooldownTimer.reset();
+		}
 	}
 
-	private void updateBackPattern(int howMany){
+	/**
+	 * Updates timers based on current phase
+	 */
+	private void updateTimersForPhase() {
+		switch (this.currentPhase) {
+			case 1: // 100-70%
+				this.blackHoleDuration = 5000; // 5 seconds
+				this.blackHoleCooldown = 10000; // 10 seconds
+				this.apocalypseCooldown = 20000; // 20 seconds
+				this.cycleCooldown = 11000; // 11 seconds
+				break;
+			case 2: // 70-40%
+				this.blackHoleDuration = 7000; // 7 seconds
+				this.blackHoleCooldown = 7000; // 7 seconds
+				this.apocalypseCooldown = 15000; // 15 seconds
+				this.cycleCooldown = 10000; // 11 seconds
+				break;
+			case 3: // 40-0%
+				this.blackHoleDuration = 9000; // 9 seconds
+				this.blackHoleCooldown = 5000; // 5 seconds
+				this.apocalypseCooldown = 10000; // 10 seconds
+				this.cycleCooldown = 16000; // 11 seconds
+				break;
+		}
+		// Create new timers with updated durations
+		this.blackHoleDurationTimer = new Cooldown(this.blackHoleDuration);
+		this.blackHoleCooldownTimer = new Cooldown(this.blackHoleCooldown);
+		this.apocalypseCooldownTimer = new Cooldown(this.apocalypseCooldown);
+		this.cycleCooldownTimer = new Cooldown(this.cycleCooldown);
+	}
+
+	/**
+	 * Force stops BlackHole when Apocalypse starts
+	 */
+	private void forceStopBlackHole() {
+		if (blackHoleState == BlackHoleState.ACTIVE) {
+			logger.info("NoxisBossPattern: BlackHole force-stopped by Apocalypse");
+		}
+		blackHoleState = BlackHoleState.FORCED_STOP;
 		if(currentBackPatterns.isEmpty()) return;
-		if(backCooldown==null){
-			backCooldown = new Cooldown(backCooldownMillis);
+
+		Set<IBossPattern> removeBlackHoles = new HashSet<>();
+		for(IBossPattern back: currentBackPatterns){
+			if(back instanceof BlackHolePattern){
+				removeBlackHoles.add(back);
+			}
 		}
-		else if(backCooldown.checkFinished()){
-			backCooldown.reset();
-		}
-		for (IBossPattern backPattern : currentBackPatterns) {
-			backPattern.attack();
+		currentBackPatterns.removeAll(removeBlackHoles);
+	}
+
+	/**
+	 * Starts Apocalypse attack
+	 */
+	private void startApocalypse() {
+		apocalypseState = ApocalypseState.CHARGING;
+		apocalypsePattern.start(1);
+		logger.info("NoxisBossPattern: Apocalypse activated!");
+	}
+
+	/**
+	 * Updates Apocalypse state
+	 */
+	private void updateApocalypse() {
+		apocalypsePattern.attack();
+		// Check if Apocalypse finished
+		if (!apocalypsePattern.isPatternActive()) {
+			apocalypseState = ApocalypseState.COOLDOWN;
+			apocalypseCooldownTimer.reset();
+			// Restart BlackHole fresh from Active state
+			restartBlackHoleFresh();
+			// Resume movement
+			this.movementPattern = createMovementPattern();
+			this.attackPattern = createAttackPattern();
+			logger.info("NoxisBossPattern: Apocalypse ended, restarting BlackHole");
 		}
 	}
 
 	/**
-	 * Returns the current phase index based on boss HP.
-	 *
-	 * @return 1, 2, or 3 depending on HP thresholds.
+	 * Restarts BlackHole from fresh Active state after Apocalypse
 	 */
-	public int checkPhase(){
-		if(boss.getHealPoint()>boss.getMaxHealPoint()*PHASE1_TO_PHASE2_TRIGGER){
-			return 1;
-		}
-		if(boss.getHealPoint()>boss.getMaxHealPoint()*PHASE2_TO_PHASE3_TRIGGER){
-			return 2;
-		}
-		return 3;
+	private void restartBlackHoleFresh() {
+		activateBlackHole();
 	}
 
 	/**
-	 * Phase 1 configuration: horizontal movement + pinned attack.
-	 *
-	 * @param isInit {@code true} if phase just started.
+	 * Updates BlackHole cycle (Active ↔ Cooldown)
 	 */
-	private void phase1(boolean isInit){
-		currentPhase=1;
-		boolean isPinnedAttack = Math.random()< PHASE1_ATTACK_SELECT_RATIO;
-		if(isInit){
-			Core.getLogger().info("NoxisBossPattern: phase1 start");
-
-			movePattern = new SpreadShotPattern(boss, targetShips.getFirst());
-			attackPattern = new SpreadShotPattern(boss, targetShips.getFirst());
-			attackCooldown.setMilliseconds(attackCooldownMillis[2][0]);
-			resetCooldown();
-			attackPattern.setCooldown(attackCooldown);
-			addBlackHoleBackGround();
-		}
-//		if(attackCooldown.checkFinished()){
-//			movePattern = isPinnedAttack ? new HorizontalPattern(boss, 3) : new  SpreadShotPattern(boss, targetShips.getFirst());
-//			attackPattern = isPinnedAttack ? patterns.get(1) : patterns.getLast();
-//			if(isPinnedAttack) resetCooldown();
-//		}
-	}
-
-//	private void phase1Cycle()
-
-
-	/**
-	 * Phase 2 configuration: pinned movement and attack.
-	 *
-	 * @param isInit {@code true} if phase just started.
-	 */
-	private void phase2(boolean isInit){
-		currentPhase=2;
-		if(isInit){
-			Core.getLogger().info("NoxisBossPattern: phase2 start");
-
-//			movePattern=patterns.getLast();
-//			attackPattern=patterns.getLast();
-//			attackCooldown.setMilliseconds(attackCooldownMillis[1][0]);
-//			resetCooldown();
-//			attackPattern.setCooldown(attackCooldown);
+	private void updateBlackHoleCycle() {
+		switch (blackHoleState) {
+			case ACTIVE:
+				// Check if duration finished
+				if (blackHoleDurationTimer.checkFinished()) {
+					deactivateBlackHoles();
+				}
+				break;
+			case COOLDOWN:
+				// Check if cooldown finished
+				if (blackHoleCooldownTimer.checkFinished()) {
+					activateBlackHole();
+				}
+				break;
+			case FORCED_STOP:
+				// Wait for Apocalypse to finish (handled in updateApocalypse)
+				break;
 		}
 	}
 
 	/**
-	 * Phase 3 configuration: mixes pinned and spread-shot patterns.
-	 *
-	 * @param isInit {@code true} if phase just started.
+	 * Activates BlackHole at a random position
 	 */
-	private void phase3(boolean isInit){
-		currentPhase=3;
-		boolean isPinnedAttack = Math.random()< PHASE1_ATTACK_SELECT_RATIO;
-		if(isInit){
-			Core.getLogger().info("NoxisBossPattern: phase3 start");
-
-//			movePattern=patterns.getFirst();
-//			attackPattern = patterns.get(1);
-//			attackCooldown.setMilliseconds(attackCooldownMillis[2][0]);
-//			resetCooldown();
-//			attackPattern.setCooldown(attackCooldown);
-		}
-//		if(attackCooldown.checkFinished()){
-//			movePattern = isPinnedAttack ? patterns.getFirst() : patterns.getLast();
-//			attackPattern = isPinnedAttack ? patterns.get(1) : patterns.getLast();
-//			if(isPinnedAttack) resetCooldown();
-//		}
-	}
-
-	private void addBlackHoleBackGround() {
-		Core.getLogger().info("NoxisBossPattern: Black Hole Background Pattern Activated!");
-
-		int cx = this.boss.getPositionX() + this.boss.getWidth() / 2;
-		int cy = this.boss.getPositionY() + this.boss.getHeight() + 60;
-		int radius = GameConstant.SCREEN_HEIGHT;
-
-		currentBackPatterns.add(new BlackHolePattern(boss, targetShips, cx, cy, radius, 0.005, 7000));
+	private void activateBlackHole() {
+		// Generate random center position for BlackHole
+		int centerX = random.nextInt(SCREEN_WIDTH - 200) + 100;
+		int centerY = random.nextInt(200) + 150;
+		currentBackPatterns.add(new BlackHolePattern(
+				boss,
+				ships,
+				centerX,
+				centerY,
+				BLACKHOLE_RADIUS,
+				BLACKHOLE_PULL_CONSTANT,
+				blackHoleDuration
+		));
+		blackHoleState = BlackHoleState.ACTIVE;
+		blackHoleDurationTimer.reset();
+		logger.info("NoxisBossPattern: BlackHole activated at (" + centerX + ", " + centerY + ")");
 	}
 
 	/**
-	 * Resets both attack and movement cooldowns.
+	 * Deactivates BlackHole and starts cooldown
 	 */
-	private void resetCooldown(){
-		attackCooldown.reset();
-		dashCooldown.reset();
+	private void deactivateBlackHoles() {
+		blackHoleState = BlackHoleState.COOLDOWN;
+		if(currentBackPatterns.isEmpty()) return;
+
+		Set<IBossPattern> removeBlackHoles = new HashSet<>();
+		for(IBossPattern back: currentBackPatterns){
+			if(back instanceof BlackHolePattern){
+				removeBlackHoles.add(back);
+			}
+		}
+		currentBackPatterns.removeAll(removeBlackHoles);
+		blackHoleCooldownTimer.reset();
+		logger.info("NoxisBossPattern: BlackHole deactivated, cooldown started");
+	}
+
+	/**
+	 * Creates movement pattern based on current phase
+	 */
+	private BossPattern createAttackPattern() {
+		switch (this.currentPhase) {
+			case 1: // Phase 1: DiagonalPattern - SpreadShotPattern - TimeGapAttackPattern
+				logger.info("NoxisBossPattern: Attack - following movement");
+				return movementPattern;
+			case 2: // Phase 2: ZigZagAngryPattern - DashPattern
+				logger.info("NoxisBossPattern: Attack - ZigZag Angry");
+				return new ZigZagAngryPattern(boss, SCREEN_WIDTH, SCREEN_HEIGHT);
+			case 3: // Phase 3: Random between Diagonal and ZigZagAngry
+				if (random.nextBoolean()) {
+					logger.info("NoxisBossPattern: Attack - Diagonal (random)");
+					return new DiagonalPattern(boss, DIAGONAL_X_SPEED, DIAGONAL_Y_SPEED, DIAGONAL_COLOR);
+				} else {
+					logger.info("NoxisBossPattern: Attack - ZigZag Angry (random)");
+					return new ZigZagAngryPattern(boss, SCREEN_WIDTH, SCREEN_HEIGHT);
+				}
+			default:
+				return new DiagonalPattern(boss, DIAGONAL_X_SPEED, DIAGONAL_Y_SPEED, DIAGONAL_COLOR);
+		}
+	}
+
+	/**
+	 * Creates movement pattern based on current phase
+	 */
+	private BossPattern createMovementPattern() {
+		switch (this.currentPhase) {
+			case 1: // Phase 1: Horizontal -
+				int choice = random.nextInt(3);
+				switch (choice) {
+					case 0:
+						logger.info("NoxisBossPattern: Movement - Horizontal");
+						return new HorizontalPattern(boss, HORIZONTAL_SPEED);
+					case 1:
+						logger.info("NoxisBossPattern: Movement - SpreadShot");
+						return new SpreadShotPattern(boss, getRandomShip());
+					case 2:
+						logger.info("NoxisBossPattern: Movement - TimeGap");
+						return new TimeGapAttackPattern(boss, ships, SCREEN_WIDTH, SCREEN_HEIGHT);
+				}
+			case 2: // Phase 2: ZigZagAngryPattern
+				logger.info("NoxisBossPattern: Movement - ZigZag Angry");
+				return new ZigZagAngryPattern(boss, SCREEN_WIDTH, SCREEN_HEIGHT);
+			case 3: // Phase 3: Random between Diagonal and ZigZagAngry
+				if (random.nextBoolean()) {
+					logger.info("NoxisBossPattern: Movement - Diagonal (random)");
+					return new DiagonalPattern(boss, DIAGONAL_X_SPEED, DIAGONAL_Y_SPEED, DIAGONAL_COLOR);
+				} else {
+					logger.info("NoxisBossPattern: Movement - ZigZag Angry (random)");
+					return new ZigZagAngryPattern(boss, SCREEN_WIDTH, SCREEN_HEIGHT);
+				}
+			default:
+				return new DiagonalPattern(boss, DIAGONAL_X_SPEED, DIAGONAL_Y_SPEED, DIAGONAL_COLOR);
+		}
+	}
+
+	/**
+	 * Stops attack
+	 */
+	private void stopAttack(int milli) {
+
+	}
+
+	/**
+	 * Stops movement (during Apocalypse)
+	 */
+	private void stopMovement() {
+		// Movement is handled by not calling movementPattern.move()
 	}
 
 	@Override
 	public void attack() {
-		if(attackPattern==null) return;
-		attackPattern.attack();
+		// Attack is handled in update() for each pattern
+		if (blackHoleState == BlackHoleState.ACTIVE && currentBackPatterns != null) {
+			for (IBossPattern back : currentBackPatterns) {
+				back.attack();
+			}
+		}
+		// Update position from movement pattern
+		if (attackPattern != null) {
+			attackPattern.attack();
+		}
 	}
-
 	@Override
 	public void move() {
-		if(movePattern==null) return;
-		movePattern.move();
-		if(movePattern != null){
-			bossPosition.x = movePattern.getBossPosition().x;
-			bossPosition.y = movePattern.getBossPosition().y;
+		// Movement handled in update()
+		// During Apocalypse, don't move
+		if (apocalypseState == ApocalypseState.CHARGING || apocalypseState == ApocalypseState.FIRING) {
+			// Boss doesn't move during Apocalypse
+			return;
+		}
+		// Update position from movement pattern
+		if (movementPattern != null) {
+			movementPattern.move();
+			this.bossPosition.x = movementPattern.getBossPosition().x;
+			this.bossPosition.y = movementPattern.getBossPosition().y;
 		}
 	}
-
+	@Override
+	public Point getBossPosition() {
+		return new Point(this.bossPosition.x, this.bossPosition.y);
+	}
 	@Override
 	public Set<Bullet> getBullets() {
-		if (this.attackPattern == null) {
-			return java.util.Collections.emptySet();
+		Set<Bullet> allBullets = new java.util.HashSet<>();
+		if (attackPattern != null) {
+			allBullets.addAll(attackPattern.getBullets());
 		}
-		return new HashSet<>(this.attackPattern.getBullets());
+		if (guidedMissilePattern != null) {
+			allBullets.addAll(guidedMissilePattern.getBullets());
+		}
+		if (apocalypsePattern != null) {
+			allBullets.addAll(apocalypsePattern.getBullets());
+		}
+		return allBullets;
+	}
+	@Override
+	public void setTarget(HasBounds target) {
+		// Not used for NoxisBoss patterns
+	}
+
+	private Ship getRandomShip(){
+		int choice = random.nextInt(ships.size());
+		return ships.get(choice);
 	}
 
 	@Override
@@ -279,7 +495,7 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 		if (this.attackPattern == null) {
 			return java.util.Collections.emptySet();
 		}
-		return new HashSet<>(this.attackPattern.getLasers());
+		return this.attackPattern.getLasers();
 	}
 
 	@Override
@@ -291,26 +507,19 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 			}
 			if(backPattern instanceof BlackHolePattern blackHolePattern){
 				blackHoles.addAll(blackHolePattern.getBlackHoles());
-//				if(blackHoles!=null) Core.getLogger().info("NoxisBossPattern: "+ blackHoles.size());
 			}
 		}
 		return blackHoles;
 	}
 
 	@Override
-	public void setTarget(HasBounds target) {
-		attackPattern.setTarget(target);
-	}
-
-	@Override
 	public void setCooldown(Cooldown cooldown) {
 		attackPattern.setCooldown(cooldown);
-		movePattern.setCooldown(cooldown);
+		movementPattern.setCooldown(cooldown);
 	}
 
 	@Override
 	public void validateBackgroundPattern(boolean condition) {
 		attackPattern.validateBackgroundPattern(condition);
 	}
-
 }

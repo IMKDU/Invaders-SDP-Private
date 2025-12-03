@@ -50,7 +50,7 @@ public class FinalBoss extends MidBoss {
 	    logger = Core.getLogger();
 	    this.spriteType = DrawManager.SpriteType.FinalBoss1;
         this.animationCooldown = new Cooldown(500);
-		this.noxisBossPattern = new NoxisBossPattern(this, ships, GameConstant.SCREEN_WIDTH, GameConstant.SCREEN_HEIGHT);
+		this.noxisBossPattern = new NoxisBossPattern(this, ships);
         this.ships = ships;
 	}
 
@@ -65,8 +65,6 @@ public class FinalBoss extends MidBoss {
 
 		if(noxisBossPattern!=null){
 			noxisBossPattern.update();
-			noxisBossPattern.move();
-			noxisBossPattern.attack();
 
 			this.positionX = noxisBossPattern.getBossPosition().x;
 			this.positionY = noxisBossPattern.getBossPosition().y;

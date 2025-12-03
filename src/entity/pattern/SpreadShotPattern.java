@@ -18,7 +18,7 @@ public class SpreadShotPattern extends BossPattern {
 	private boolean movingToCenter = true;
 	private int currentTargetX = 0;
 	private static final int SPREAD_STEP = 12;
-	private static final int SHOOT_COOLDOWN_MILLI = 500;
+	private static final int SHOOT_COOLDOWN_MILLI = 5000;
 
 	private boolean isFinished = false;
 
@@ -32,6 +32,7 @@ public class SpreadShotPattern extends BossPattern {
 	@Override
 	public void move() {
 		if (shootCooldown!=null && shootCooldown.checkFinished()){
+			Core.getLogger().info("SpreadShotPattern: spread-shot is ready.");
 			isFinished = false;
 			movingToCenter = true;
 			currentTargetX = 0;
@@ -74,7 +75,7 @@ public class SpreadShotPattern extends BossPattern {
 			bossPosition.x = targetX;
 			movingToCenter = false;
 			currentTargetX = 0;
-			logger.info("OMEGA : Center reached, starting SPREAD SHOT.");
+			logger.info("SpreadShotPattern : Center reached. Ready for SPREAD-SHOT.");
 		}
 	}
 
@@ -117,7 +118,7 @@ public class SpreadShotPattern extends BossPattern {
 				vy,
 				6,
 				12,
-				"OmegaBoss"
+				"Enemy"
 		);
 
 		this.bullets.add(bullet);
