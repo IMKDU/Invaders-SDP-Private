@@ -1,6 +1,5 @@
 package entity;
 
-import audio.SoundManager;
 import engine.*;
 import engine.level.Level;
 
@@ -12,9 +11,7 @@ import entity.pattern.ApocalypseAttackPattern;
 import java.util.List;
 import java.util.logging.Logger;
 
-import engine.*;
 import engine.level.ItemDrop;
-import entity.pattern.BackgroundExplosionPattern;
 import entity.pattern.BlackHolePattern;
 import entity.pattern.ISkill;
 import entity.skills.OriginSkill;
@@ -103,6 +100,7 @@ public class GameModel {
 
     /** bossBullets carry bullets which Boss fires */
     private Set<Bullet> bossBullets;
+	private Set<LaserBeam> bossLasers;
     /** Is the bullet on the screen erased */
     private boolean is_cleared = false;
     /** Timer to track elapsed time. */
@@ -178,6 +176,7 @@ public class GameModel {
     public final void initialize() {
         /** Initialize the bullet Boss fired */
         this.bossBullets = new HashSet<>();
+		this.bossLasers = new HashSet<>();
         enemyShipFormationModel = new EnemyShipFormationModel(this.currentLevel, width);
         this.enemyShipFormationModel.applyEnemyColor(this.currentLevel.getColorForLevel());
         this.ship = new Ship(this.width / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 13 / 15,Color.GREEN,true);
@@ -316,22 +315,6 @@ public class GameModel {
         this.cleanupAllEntities();
     }
 
-	private void updateBossBullets() {
-		if (bossBullets.isEmpty()) return;
-
-		Iterator<Bullet> iterator = bossBullets.iterator();
-
-		while (iterator.hasNext()) {
-			Bullet b = iterator.next();
-			b.update();
-
-			if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
-				iterator.remove();
-			}
-		}
-	}
-
-
     /**
      * Updates all non-player-controlled game logic.
      */
@@ -359,7 +342,6 @@ public class GameModel {
                     if (this.omegaBoss instanceof OmegaBoss omega) {
                         bossBullets.addAll(omega.getBullets());
                     }
-					updateBossBullets();
 
                     if (this.omegaBoss.isDestroyed()) {
                         if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
@@ -375,7 +357,6 @@ public class GameModel {
                 // ZetaBoss logic added
                 if (this.zetaBoss != null) {
                     this.zetaBoss.update();
-					updateBossBullets();
 
                     ApocalypseAttackPattern pattern = this.zetaBoss.getApocalypsePattern();
                     if (pattern != null && pattern.isAttacking()) {
@@ -400,13 +381,16 @@ public class GameModel {
                     if (this.gammaBoss instanceof GammaBoss gamma) {
                         this.explosionEntity = gamma.getBoom();
                         bossBullets.addAll(gamma.getBossPattern().getBullets());
+						bossLasers.addAll(gamma.getBossPattern().getLasers());
                     }
-                    updateBossBullets();
 
                     if (this.gammaBoss.isDestroyed()) {
                         this.logger.info("Gamma Boss destroyed!");
                     }
                 }
+
+	            updateBossBullets();
+	            updateBossLasers();
 
                 boolean isFinalBossAlive = (this.finalBoss != null && !this.finalBoss.isDestroyed());
                 boolean isOmegaBossAlive = (this.omegaBoss != null && !this.omegaBoss.isDestroyed());
@@ -516,6 +500,13 @@ public class GameModel {
 				}
 			}
 		}
+		for (LaserBeam laser : bossLasers){
+			for (Entity a : entities) {
+				if(laser.isActive() && checkLaserRotatedCollision(a, laser)){
+					a.onCollision(laser, this);
+				}
+			}
+		}
 		entities.clear();
 	}
 
@@ -620,6 +611,48 @@ public class GameModel {
 
         return horizontalOverlap && verticalOverlap;
     }
+
+	/**
+	 * Checks if an entity collides with the laser beam area.
+	 * @param entityBounds The entity to check collision with
+	 * @param laserBounds Bottom boundary of the laser beam
+	 * @return True if the entity collides with the laser beam area
+	 */
+	private boolean checkLaserRotatedCollision(HasBounds entityBounds, LaserInfo laserBounds) {
+		Point p1 = laserBounds.getStartPosition();
+		Point p2 = laserBounds.getEndPosition();
+
+		// except if p1 or p2 are not valid
+		if (p1 == null || p2 == null) return false;
+
+		// calculate points
+		int rX = entityBounds.getPositionX();
+		int rY = entityBounds.getPositionY();
+		int rW = entityBounds.getWidth();
+		int rH = entityBounds.getHeight();
+		int rRight = rX + rW;
+		int rBottom = rY + rH;
+
+		// check if the laser's startPoint and endPoint is included in the bounding box
+		boolean p1Inside = (p1.x >= rX && p1.x <= rRight && p1.y >= rY && p1.y <= rBottom);
+		boolean p2Inside = (p2.x >= rX && p2.x <= rRight && p2.y >= rY && p2.y <= rBottom);
+
+		if (p1Inside || p2Inside) {
+			return true;
+		}
+
+		// check laser passes across one of the (Top, Bottom, Left, Right)
+		// Top Edge
+		if (java.awt.geom.Line2D.linesIntersect(p1.x, p1.y, p2.x, p2.y, rX, rY, rRight, rY)) return true;
+		// Bottom Edge
+		if (java.awt.geom.Line2D.linesIntersect(p1.x, p1.y, p2.x, p2.y, rX, rBottom, rRight, rBottom)) return true;
+		// Left Edge
+		if (java.awt.geom.Line2D.linesIntersect(p1.x, p1.y, p2.x, p2.y, rX, rY, rX, rBottom)) return true;
+		// Right Edge
+		if (java.awt.geom.Line2D.linesIntersect(p1.x, p1.y, p2.x, p2.y, rRight, rY, rRight, rBottom)) return true;
+
+		return false;
+	}
 
     /**
      * Destroys an enemy hit by the laser and awards points.
@@ -1212,36 +1245,8 @@ public class GameModel {
 				is_cleared = true;
 				logger.info("boss is angry");
 			}
-			bossBullets.addAll(this.finalBoss.getBossPattern().getBullets());
-
-            /** bullets to erase */
-            Set<Bullet> bulletsToRemove = new HashSet<>();
-
-            for (Bullet b : bossBullets) {
-                b.update();
-                /** If the bullet goes off the screen */
-                if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
-                    /** bulletsToRemove carry bullet */
-                    bulletsToRemove.add(b);
-                }
-                /** If the bullet collides with ship */
-                else if (this.livesP1 > 0 && this.checkCollision(b, this.ship) && !this.ship.isInvincible()) {
-                    if (!this.ship.isDestroyed()) {
-						requestShipDamage(this.ship, 1);
-                        this.logger.info("Hit on player ship, " + this.livesP1 + " lives remaining.");
-                    }
-                    bulletsToRemove.add(b);
-                }
-                else if (this.shipP2 != null && this.livesP2 > 0 && !this.shipP2.isDestroyed() && this.checkCollision(b, this.shipP2) && !this.ship.isInvincible()) {
-                    if (!this.shipP2.isDestroyed()) {
-						requestShipDamage(this.shipP2, 1);
-                        this.logger.info("Hit on player ship2, " + this.livesP2 + " lives remaining.");
-                    }
-                    bulletsToRemove.add(b);
-                }
-            }
-            /** all bullets are removed */
-            bossBullets.removeAll(bulletsToRemove);
+			bossBullets.addAll(this.finalBoss.getBullets());
+			bossLasers.addAll(this.finalBoss.getLasers());
 
         }
         if (this.finalBoss != null && this.finalBoss.isDestroyed()) {
@@ -1250,7 +1255,37 @@ public class GameModel {
         }
     }
 
-    // --- Timer and State Management Methods for Controller ---
+	private void updateBossBullets() {
+		/** bullets to erase */
+		Set<Bullet> bulletsToRemove = new HashSet<>();
+
+		for (Bullet b : bossBullets) {
+			b.update();
+			/** If the bullet goes off the screen */
+			if (b.isOffScreen(width, height) || b.shouldBeRemoved()) {
+				/** bulletsToRemove carry bullet */
+				bulletsToRemove.add(b);
+			}
+		}
+		/** all bullets are removed */
+		bossBullets.removeAll(bulletsToRemove);
+	}
+
+	private void updateBossLasers() {
+		/** bullets to erase */
+		Set<LaserBeam> lasersToRemove = new HashSet<>();
+
+		for(LaserBeam laser : bossLasers) {
+			laser.update();
+			if(laser.shouldBeRemoved()){
+				lasersToRemove.add(laser);
+			}
+		}
+		bossLasers.removeAll(lasersToRemove);
+
+	}
+
+		// --- Timer and State Management Methods for Controller ---
 
     public boolean isTimerRunning() {
         return this.gameTimer.isRunning();
@@ -1336,6 +1371,7 @@ public class GameModel {
     public EnemyShipSpecialFormation getEnemyShipSpecialFormation() { return enemyShipSpecialFormation; }
     public FinalBoss getFinalBoss() { return finalBoss; }
     public Set<Bullet> getBossBullets() { return bossBullets; }
+	public Set<LaserBeam> getBossLasers() { return bossLasers; }
     public EnemyShipFormationModel getEnemyShipFormationModel() { return enemyShipFormationModel; }
     public MidBoss getOmegaBoss() { return omegaBoss; }
     public MidBoss getZetaBoss() { return zetaBoss; }
