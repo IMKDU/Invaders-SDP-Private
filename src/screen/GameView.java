@@ -1,6 +1,7 @@
 package screen;
 
 import audio.SoundManager;
+import engine.Core;
 import engine.DrawManager;
 import engine.DTO.HUDInfoDTO;
 import entity.*;
@@ -32,23 +33,21 @@ public class GameView {
 
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
-        if (model.isOriginSkillActivated()) {
+        if (GameConstant.origin_skill_activated) {
 
             drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
             drawManager.getSpecialAnimationRenderer().draw();
 
             if (drawManager.getSpecialAnimationRenderer().isFinished()) {
-                model.setOriginSkillActivated(false);
+                GameConstant.origin_skill_activated=false;
             }
         }
 
         else {
-            if (model.isBlackHoleActive()) {
-                drawManager.getEntityRenderer().drawBlackHole(
-                        model.getBlackHoleCX(),
-                        model.getBlackHoleCY(),
-                        model.getBlackHoleRadius()
-                );
+            if (!model.getBlackHoles().isEmpty()) {
+				for(BlackHole bkh : model.getBlackHoles()) {
+					drawManager.getEntityRenderer().drawBlackHole(bkh);
+				}
             }
             drawManager.getEntityRenderer().drawTeleport(model.getTeleportFromP1X(), dto.getShipP1().getWidth(), model.getTeleportFromP1Y(), dto.getShipP1().getHeight(), model.getIsTeleportP1(),1,model.getAfterTeleportFromP1X(),model.getAfterTeleportFromP1Y());
             drawManager.getEntityRenderer().drawTeleport(model.getTeleportFromP2X(), dto.getShipP2().getWidth(), model.getTeleportFromP2Y(), dto.getShipP2().getHeight(), model.getIsTeleportP2(),2,model.getAfterTeleportFromP2X(),model.getAfterTeleportFromP2Y());

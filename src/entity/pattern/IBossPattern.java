@@ -1,8 +1,10 @@
 package entity.pattern;
 
 import engine.Cooldown;
+import entity.BlackHole;
 import entity.Bullet;
 import entity.HasBounds;
+import entity.LaserBeam;
 
 import java.awt.*;
 import java.util.Set;
@@ -35,6 +37,21 @@ public interface IBossPattern {
 	 * @return Set of active bullets.
 	 */
 	Set<Bullet> getBullets();
+
+	/**
+	 * Returns all Lasers managed or spawned by this pattern.
+	 *
+	 * @return Set of active bullets.
+	 */
+	Set<LaserBeam> getLasers();
+
+	/**
+	 * Returns all black-holes managed or spawned by this pattern.
+	 *
+	 * @return Set of active blackHoles.
+	 */
+	Set<BlackHole> getBlackHoles();
+
 
 	/**
 	 * Sets the current target (usually the player) for this pattern.

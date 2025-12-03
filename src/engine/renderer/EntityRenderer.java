@@ -495,7 +495,10 @@ public final class EntityRenderer {
     }
 
     /** Draw circle for pull_attack pattern */
-    public void drawBlackHole(final int cx, final int cy, final int size) {
+    public void drawBlackHole(HasCircleBounds blackHole) {
+		int cx = blackHole.getPositionCX();
+		int cy =  blackHole.getPositionCY();
+		int size = blackHole.getRadius();
         Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
 
         if (this.blackholeAnimationCooldown.checkFinished()) {

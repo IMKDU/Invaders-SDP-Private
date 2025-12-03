@@ -128,17 +128,16 @@ public class GameModel {
     private int FinalSkillCnt;
 
     private List<Ship> ships;
-    /** variables for Boss BlackHole Pattern */
-    private boolean blackHoleActive = false;
-    private int blackHoleCX;
-    private int blackHoleCY;
-    private int blackHoleRadius;
-    private Cooldown blackHoleCooldown;
+//    /** variables for Boss BlackHole Pattern */
+//    private boolean blackHoleActive = false;
+//    private int blackHoleCX;
+//    private int blackHoleCY;
+//    private int blackHoleRadius;
+//    private Cooldown blackHoleCooldown;
+	private Set<BlackHole> blackHoles;
     private int lastHp;
     private static final int BLACK_HOLE_DURATION_MS = 7000;
     private Explosion explosionEntity = null;
-    private static boolean usedOrigin = false;
-    private boolean originSkillActivated = false;
     private int teleportFromP1X;
     private int teleportFromP1Y;
     private int afterTeleportFromP1X;
@@ -179,6 +178,7 @@ public class GameModel {
         /** Initialize the bullet Boss fired */
         this.bossBullets = new HashSet<>();
 		this.bossLasers = new HashSet<>();
+		this.blackHoles = new HashSet<>();
         enemyShipFormationModel = new EnemyShipFormationModel(this.currentLevel, width);
         this.enemyShipFormationModel.applyEnemyColor(this.currentLevel.getColorForLevel());
         this.ship = new Ship(this.width / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 13 / 15,Color.GREEN,true);
@@ -369,7 +369,7 @@ public class GameModel {
                     if (this.zetaBoss.isDestroyed()) {
                         if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.zetaBoss = null;
-                            this.finalBoss = new FinalBoss(this.width / 2 - 150, 50, ships, this.width, this.height); // [추가] Final 소환
+                            this.finalBoss = new FinalBoss(ships);
                             this.logger.info("Final Boss has spawned!");
                         } else {
 
@@ -398,7 +398,7 @@ public class GameModel {
                 boolean isOmegaBossAlive = (this.omegaBoss != null && !this.omegaBoss.isDestroyed());
                 boolean isZetaBossAlive = (this.zetaBoss != null && !this.zetaBoss.isDestroyed());
                 boolean isGammaBossAlive = (this.gammaBoss != null && !this.gammaBoss.isDestroyed());
-                if (!originSkillActivated) {
+                if (!GameConstant.origin_skill_activated) {
                     if (!isFinalBossAlive && !isOmegaBossAlive && !isZetaBossAlive && !isGammaBossAlive) {
                         if (!this.levelFinished) {
                             this.levelFinished = true;
@@ -1206,7 +1206,7 @@ public class GameModel {
         this.logger.info("Spawning boss: " + bossName);
         switch (bossName) {
             case "finalBoss":
-                this.finalBoss = new FinalBoss(this.width / 2 - 150, 80,  ships, this.width, this.height);
+                this.finalBoss = new FinalBoss(ships);
                 this.logger.info("Final Boss has spawned!");
                 break;
             case "omegaBoss", "omegaAndZetaAndFinal":
@@ -1231,25 +1231,25 @@ public class GameModel {
     public void finalbossManage(){
         if (this.finalBoss != null && !this.finalBoss.isDestroyed()) {
             this.finalBoss.update();
-            BlackHolePattern bh = finalBoss.getCurrentBlackHole();
+//            BlackHolePattern bh = finalBoss.getCurrentBlackHole();
 
-            if (bh != null && bh.isActive()) {
-                blackHoleActive = true;
-                blackHoleCX = bh.getCenterX();
-                blackHoleCY = bh.getCenterY();
-                blackHoleRadius = bh.getRadius();
-            } else {
-                blackHoleActive = false;
-            }
+//            if (bh != null && bh.isActive()) {
+//                blackHoleActive = true;
+//                blackHoleCX = bh.getCenterX();
+//                blackHoleCY = bh.getCenterY();
+//                blackHoleRadius = bh.getRadius();
+//            } else {
+//                blackHoleActive = false;
+//            }
 
-			if(this.finalBoss.getBossPhase() == 3 && !this.is_cleared){
-				bossBullets.clear();
-				is_cleared = true;
-				logger.info("boss is angry");
-			}
+//			if(this.finalBoss.getBossPhase() == 3 && !this.is_cleared){
+//				bossBullets.clear();
+//				is_cleared = true;
+//				logger.info("boss is angry");
+//			}
 			bossBullets.addAll(this.finalBoss.getBullets());
 			bossLasers.addAll(this.finalBoss.getLasers());
-
+			blackHoles.addAll(this.finalBoss.getBlackHoles());
         }
         if (this.finalBoss != null && this.finalBoss.isDestroyed()) {
             this.levelFinished = true;
@@ -1349,13 +1349,6 @@ public class GameModel {
         return this.score;
     }
 
-    public void setUsedOrigin(boolean used){
-        this.usedOrigin = used;
-    }
-    public boolean getUsedOrigin(){return usedOrigin;}
-    public boolean isOriginSkillActivated() { return originSkillActivated; }
-    public void setOriginSkillActivated(boolean v) { originSkillActivated = v; }
-
     // --- Getters for View ---
 
     public boolean isInputDelayFinished() {
@@ -1374,6 +1367,12 @@ public class GameModel {
     public FinalBoss getFinalBoss() { return finalBoss; }
     public Set<Bullet> getBossBullets() { return bossBullets; }
 	public Set<LaserBeam> getBossLasers() { return bossLasers; }
+	public Set<BlackHole> getBlackHoles() {
+		if(this.finalBoss==null) {
+			return Set.of();
+		}
+		return finalBoss.getBlackHoles();
+	}
     public EnemyShipFormationModel getEnemyShipFormationModel() { return enemyShipFormationModel; }
     public MidBoss getOmegaBoss() { return omegaBoss; }
     public MidBoss getZetaBoss() { return zetaBoss; }
@@ -1394,10 +1393,10 @@ public class GameModel {
     public boolean isBonusLife() { return bonusLife; }
     public boolean isLevelFinished() { return levelFinished; }
     public Cooldown getScreenFinishedCooldown() { return screenFinishedCooldown; }
-    public boolean isBlackHoleActive() { return blackHoleActive; }
-    public int getBlackHoleCX() { return blackHoleCX; }
-    public int getBlackHoleCY() { return blackHoleCY; }
-    public int getBlackHoleRadius() { return blackHoleRadius; }
+//    public boolean isBlackHoleActive() { return blackHoleActive; }
+//    public int getBlackHoleCX() { return blackHoleCX; }
+//    public int getBlackHoleCY() { return blackHoleCY; }
+//    public int getBlackHoleRadius() { return blackHoleRadius; }
     public boolean getIsTeleportP1(){ return this.isTeleportP1;}
     public int getTeleportFromP1X() { return teleportFromP1X; }
     public int getTeleportFromP1Y() { return teleportFromP1Y; }

@@ -30,12 +30,12 @@ public class OriginSkill implements ISkill {
 
         this.ship = ship;
         this.model = ship.getModel();
-        if (this.model.getUsedOrigin()) return;
+        if (GameConstant.used_origin) return;
 
         this.used = true;
         this.active = true;
-        this.model.setUsedOrigin(true);
-        this.model.setOriginSkillActivated(true);
+        GameConstant.used_origin = true;
+        GameConstant.origin_skill_activated = true;
 
         this.startTime = System.currentTimeMillis();
 

@@ -14,50 +14,44 @@ import java.awt.*;
 import java.util.Set;
 import java.util.logging.Logger;
 
-public class FinalBoss extends Entity implements BossEntity, Collidable{
+public class FinalBoss extends MidBoss {
 
-    private int healPoint;
-    private final int maxHp;
-    private final int pointValue;
-    private boolean isDestroyed;
+	/** Initial position in the x-axis. */
+	private static final int INIT_POS_X = GameConstant.SCREEN_WIDTH / 2 - 150;
+	/** Initial position in the y-axis. */
+	private static final int INIT_POS_Y = 80;
+	/** Width of Omega */
+	private static final int NOXIS_WIDTH = 150 * 2;
+	/** Height of Omega */
+	private static final int NOXIS_HEIGHT = 143 * 2;
+	/** Width of Omega */
+	private static final int NOXIS_WIDTH_ANGRY = 77 * 2;
+	/** Height of Omega */
+	private static final int NOXIS_HEIGHT_ANGRY = 89 * 2;
+	/** Current Health of Omega */
+	private static final int NOXIS_HEALTH = 80;
+	/** Point of Omega when destroyed */
+	private static final int NOXIS_POINT_VALUE = 1000;
 
     private Cooldown animationCooldown;
-    private int screenWidth;
-    private int screenHeight;
 
-	private BossPattern bossPattern;
-	private HasBounds playerPosition;
-	private int bossPhase = 1;
+	private NoxisBossPattern noxisBossPattern;
 
     private List<Ship> ships;
-    private boolean blackHole70 = false;
-    private boolean blackHole40 = false;
-    private boolean blackHole10 = false;
-    private BlackHolePattern currentBlackHole = null;
 
 	private Logger logger;
 
 
     /** basic attribute of final boss */
 
-    public FinalBoss(int positionX, int positionY, List<Ship> ships, int screenWidth, int screenHeight){
+    public FinalBoss(List<Ship> ships){
 
-        super(positionX, positionY, 150 * 2,143 * 2, Color.RED);
-        this.healPoint = 80;
-        this.maxHp = healPoint;
-        this.pointValue = 1000;
-        this.spriteType = DrawManager.SpriteType.FinalBoss1;
-        this.isDestroyed = false;
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
-
+        super(INIT_POS_X, INIT_POS_Y, NOXIS_WIDTH, NOXIS_HEIGHT, NOXIS_HEALTH, NOXIS_POINT_VALUE, null);
+	    logger = Core.getLogger();
+	    this.spriteType = DrawManager.SpriteType.FinalBoss1;
         this.animationCooldown = new Cooldown(500);
-
+		this.noxisBossPattern = new NoxisBossPattern(this, ships, GameConstant.SCREEN_WIDTH, GameConstant.SCREEN_HEIGHT);
         this.ships = ships;
-
-		this.playerPosition = playerPosition;
-		logger = Core.getLogger();
-	    choosePattern();
 	}
 
     /** for vibrant moving with final boss
@@ -66,47 +60,33 @@ public class FinalBoss extends Entity implements BossEntity, Collidable{
      */
     @Override
     public void update(){
-        if(this.animationCooldown.checkFinished()){
-            this.animationCooldown.reset();
 
-            switch (this.spriteType) {
-                case FinalBoss1:
-                    this.spriteType = DrawManager.SpriteType.FinalBoss2;
-                    break;
-                case FinalBoss2:
-                    this.spriteType = DrawManager.SpriteType.FinalBoss1;
-                    break;
-            }
-        }
-        choosePattern();
-        double hpRatio = (double) this.healPoint / this.maxHp;
+		chooseSprite();
 
-        if (!blackHole70 && hpRatio <= 0.7) {
-            activateBlackHole();
-            blackHole70 = true;
-        }
-        if (!blackHole40 && hpRatio <= 0.4) {
-            activateBlackHole();
-            blackHole40 = true;
-        }
-        if (!blackHole10 && hpRatio <= 0.1) {
-            activateBlackHole();
-            blackHole10 = true;
-        }
+		if(noxisBossPattern!=null){
+			noxisBossPattern.update();
+			noxisBossPattern.move();
+			noxisBossPattern.attack();
 
-        if (currentBlackHole != null) {
-            currentBlackHole.attack();
-            if (currentBlackHole.isFinished()) {
-                currentBlackHole = null;
-            }
-        }
-
-		bossPattern.move();
-		bossPattern.attack();
-
-		this.positionX = bossPattern.getBossPosition().x;
-		this.positionY = bossPattern.getBossPosition().y;
+			this.positionX = noxisBossPattern.getBossPosition().x;
+			this.positionY = noxisBossPattern.getBossPosition().y;
+		}
     }
+
+	private void chooseSprite(){
+		if(this.animationCooldown.checkFinished()){
+			this.animationCooldown.reset();
+
+			switch (this.spriteType) {
+				case FinalBoss1:
+					this.spriteType = DrawManager.SpriteType.FinalBoss2;
+					break;
+				case FinalBoss2:
+					this.spriteType = DrawManager.SpriteType.FinalBoss1;
+					break;
+			}
+		}
+	}
 
     /** decrease boss' healpoint */
     @Override
@@ -116,40 +96,6 @@ public class FinalBoss extends Entity implements BossEntity, Collidable{
         if(this.healPoint <= 0){
             this.destroy();
         }
-    }
-
-    /** movement pattern of final boss */
-    private void choosePattern(){
-        if(this.healPoint > this.maxHp /2 && this.bossPhase == 1){
-			++this.bossPhase;
-			bossPattern = new PinnedBossPattern(this, screenWidth, screenHeight);
-			logger.info("FINAL: Pinned Pattern");
-        }
-        else if (this.healPoint <= this.maxHp /2 && this.bossPhase == 2){
-			++this.bossPhase;
-            bossPattern = new ZigZagPattern(this, screenWidth, screenHeight);
-	        logger.info("FINAL: Zigzag Pattern");
-        }
-        else if (this.healPoint <= this.maxHp /4 && this.bossPhase == 3) {
-			++this.bossPhase;
-			bossPattern = new ZigZagAngryPattern(this,screenWidth, screenHeight);
-	        logger.info("FINAL: Angry Pattern");
-
-        }
-		else if (this.healPoint <= this.maxHp /6 && this.bossPhase == 4) {
-			++this.bossPhase;
-	        bossPattern = new TimeGapAttackPattern(this,ships,screenWidth,screenHeight);
-        }
-    }
-
-    private void activateBlackHole() {
-        logger.info("FINAL: Black Hole Pattern Activated!");
-
-        int cx = this.positionX + this.width / 2;
-        int cy = this.positionY + this.height + 60;
-        int radius = screenHeight;
-
-        currentBlackHole = new BlackHolePattern(this, ships, cx, cy, radius, 0.005, 7000);
     }
 
     /** move simple */
@@ -165,43 +111,20 @@ public class FinalBoss extends Entity implements BossEntity, Collidable{
         if(!this.isDestroyed){
             this.spriteType = DrawManager.SpriteType.FinalBossDeath;
             this.isDestroyed = true;
+	        this.logger.info("Noxis : Boss NOXIS destroyed!");
         }
     }
 
-    /** check final boss' destroy */
-    @Override
-    public boolean isDestroyed(){
-        return this.isDestroyed;
-    }
+	public Set<Bullet> getBullets() { return this.noxisBossPattern.getBullets(); }
 
-	@Override
-	public int getHealPoint(){
-		return this.healPoint;
-	}
+	public Set<LaserBeam> getLasers() { return this.noxisBossPattern.getLasers(); }
 
-	public int getMaxHp(){
-		return this.maxHp;
-	}
-
-	@Override
-	public int getPointValue(){
-		return this.pointValue;
-	}
-
-	public Set<Bullet> getBullets() { return this.bossPattern.getBullets(); }
-	public Set<LaserBeam> getLasers() { return this.bossPattern.getLasers(); }
-	public int getBossPhase() { return bossPhase; }
-
-	public void setTarget(HasBounds target){
-		this.playerPosition = target;
-		if(bossPattern != null){
-			bossPattern.setTarget(target);
+	public Set<BlackHole> getBlackHoles() {
+		if(noxisBossPattern==null){
+			return Set.of();
 		}
+		return this.noxisBossPattern.getBlackHoles();
 	}
-
-    public BlackHolePattern getCurrentBlackHole(){
-        return currentBlackHole;
-    }
 
 	@Override
 	public void onCollision(Collidable other, GameModel model) {

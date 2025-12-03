@@ -1,6 +1,7 @@
 package entity.pattern;
 
 import engine.Cooldown;
+import entity.BlackHole;
 import entity.Bullet;
 import entity.HasBounds;
 import entity.LaserBeam;
@@ -14,8 +15,11 @@ public abstract class BossPattern implements IBossPattern {
 	protected Point velocity;
 	protected Point acceleration;
 	protected Cooldown shootCooldown;
+
 	protected Set<Bullet> bullets;
 	protected Set<LaserBeam> lasers;
+	protected Set<BlackHole> blackHoles;
+
 	protected boolean validateBackgroundPattern=true;
 
 	public BossPattern(Point position) {
@@ -37,9 +41,13 @@ public abstract class BossPattern implements IBossPattern {
 		if (this.lasers==null || this.lasers.isEmpty()) {
 			return java.util.Collections.emptySet();
 		}
-		Set<LaserBeam> returnLasers = this.lasers;
-		this.lasers = new HashSet<LaserBeam>();
-		return returnLasers;
+		return lasers;
+	}
+	public Set<BlackHole> getBlackHoles() {
+		if (this.blackHoles==null || this.blackHoles.isEmpty()) {
+			return java.util.Collections.emptySet();
+		}
+		return blackHoles;
 	}
 
 	public void setTarget(HasBounds target) { /* Default: do nothing */ }

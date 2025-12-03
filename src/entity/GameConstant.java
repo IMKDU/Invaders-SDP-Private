@@ -28,6 +28,9 @@ public final class GameConstant {
 	/** Bomb explosion area radius (in pixels) */
 	public static final int BOMB_AOE_RADIUS = 100;
 
+	public static boolean origin_skill_activated = false;
+	public static boolean used_origin = false;
+
 	private GameConstant() {}
     private static boolean initialized = false;
 
