@@ -81,6 +81,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
     private int attackCyclesCompleted = 0;
     /** Required attack cycles before switching to dash. */
     private static final int REQUIRED_ATTACK_CYCLES = 2;
+    private boolean isRight;
 
     /**
      * Enum for tracking current pattern cycle state.
@@ -477,6 +478,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
         if (movePattern == null) return;
         movePattern.move();
         if (movePattern != null) {
+            this.isRight = movePattern.getBossPosition().x == bossPosition.x ? this.isRight : movePattern.getBossPosition().x > bossPosition.x;
             bossPosition.x = movePattern.getBossPosition().x;
             bossPosition.y = movePattern.getBossPosition().y;
         }
@@ -541,4 +543,5 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
     public boolean isInDashCooldown() {
         return isInDashCooldown;
     }
+    public boolean isRight() {return this.isRight;}
 }
