@@ -347,7 +347,7 @@ public class GameModel {
                     if (this.omegaBoss.isDestroyed()) {
                         if ("omegaAndZetaAndFinal".equals(this.currentLevel.getBossId())) {
                             this.omegaBoss = null;
-                            this.zetaBoss = new ZetaBoss(Color.MAGENTA, this.ship);
+                            this.zetaBoss = new ZetaBoss(Color.MAGENTA, this.ship, this.ships);
                             this.logger.info("Zeta Boss has spawned!");
                         } else {
 
@@ -359,6 +359,25 @@ public class GameModel {
                 if (this.zetaBoss != null) {
                     this.zetaBoss.update();
 
+                    if (this.zetaBoss instanceof ZetaBoss zeta) {
+                        if (zeta.getBossPattern() != null) {
+                            bossBullets.addAll(zeta.getBossPattern().getBullets());
+                        }
+                    }
+                    updateBossBullets();
+
+                    // Handle BlackHole pattern for visualization
+                    BlackHolePattern zetaBlackHole = this.zetaBoss.getCurrentBlackHole();
+                    if (zetaBlackHole != null && zetaBlackHole.isActive()) {
+                        blackHoleActive = true;
+                        blackHoleCX = zetaBlackHole.getCenterX();
+                        blackHoleCY = zetaBlackHole.getCenterY();
+                        blackHoleRadius = zetaBlackHole.getRadius();
+                    } else if (blackHoleActive) {
+                        blackHoleActive = false;
+                    }
+
+                    // Handle Apocalypse pattern damage
                     ApocalypseAttackPattern pattern = this.zetaBoss.getApocalypsePattern();
                     if (pattern != null && pattern.isAttacking()) {
                         float progress = pattern.getAttackAnimationProgress();
@@ -586,6 +605,17 @@ public class GameModel {
                 gammaBoss.takeDamage(1);
                 if (gammaBoss.isDestroyed()) {
                     handleAnyBossDestruction(gammaBoss, playerNum);
+                }
+            }
+        }
+
+        // Check collision with zeta boss
+        if (zetaBoss != null && !zetaBoss.isDestroyed()) {
+            if (checkLaserEntityCollision(zetaBoss, laserLeft, laserRight, laserTop, laserBottom)) {
+                // Deal damage to gamma boss (laser deals 1 damage per frame it's active)
+                zetaBoss.takeDamage(1);
+                if (zetaBoss.isDestroyed()) {
+                    handleAnyBossDestruction(zetaBoss, playerNum);
                 }
             }
         }
@@ -1219,7 +1249,7 @@ public class GameModel {
                 this.logger.info("Omega Boss has spawned!");
                 break;
             case "ZetaBoss":
-                this.zetaBoss = new ZetaBoss(Color.ORANGE, ship);
+                this.zetaBoss = new ZetaBoss(Color.ORANGE, ship, ships);
                 this.logger.info("Zeta Boss has spawned!");
                 break;
             case "gammaBoss":

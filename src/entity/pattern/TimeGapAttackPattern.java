@@ -14,7 +14,7 @@ import java.util.Set;
 public class TimeGapAttackPattern extends BossPattern {
 
 	private final int shootCooldownMilli = 500;
-	private final int chargeCooldownMilli = 600;
+	private int chargeCooldownMilli = 600;
 	private final int remainCooldownMilli = 400;
 	private final int movingSmoothRatio = 10;
 	private HasBounds boss;
@@ -98,5 +98,13 @@ public class TimeGapAttackPattern extends BossPattern {
     @Override
 	public void setTarget(HasBounds target){
 		this.target = target;
+	}
+
+	/**
+	 * Set the charge cooldown time (laser warning duration before attack)
+	 * @param chargeCooldownMilli Laser warning time in milliseconds
+	 */
+	public void setChargeCooldown(int chargeCooldownMilli) {
+		this.chargeCooldownMilli = chargeCooldownMilli;
 	}
 }

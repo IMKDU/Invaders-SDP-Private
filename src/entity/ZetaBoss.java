@@ -4,18 +4,27 @@ import audio.SoundManager;
 import engine.Core;
 import engine.Cooldown;
 import engine.DrawManager;
-import entity.pattern.ApocalypseAttackPattern;
-import entity.pattern.BossPattern;
-import entity.pattern.DashPattern;
-import entity.pattern.DiagonalPattern;
-import entity.pattern.HorizontalPattern;
+import entity.pattern.ZetaBossPattern;
 
 import java.awt.*;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Zeta - Mid Boss (Enhanced version of Omega)
- * Inherits all patterns from OmegaBoss and includes the Apocalypse pattern.
+ * Zeta - Mid Boss with complex phase-based pattern cycles
+ *
+ * Features 4 attack patterns with health-based phase transitions:
+ * - BlackHolePattern: Random position, phase-specific cooldowns
+ * - DiagonalPattern: Random diagonal movement
+ * - ApocalypseAttackPattern: 3s charging + 2s attack
+ * - ZigZagAngryPattern: ZigZag with rapid fire attacks
+ *
+ * Phase System:
+ * - Phase 1 (100-70%): BlackHole → Apocalypse → Diagonal
+ * - Phase 2 (70-40%): BlackHole → Apocalypse → ZigZag Angry
+ * - Phase 3 (40-0%): BlackHole → Apocalypse → Random(Diagonal or ZigZag)
+ *
+ * All pattern logic is delegated to {@link ZetaBossPattern}.
  */
 public class ZetaBoss extends MidBoss {
 
@@ -28,143 +37,51 @@ public class ZetaBoss extends MidBoss {
     /** Height of Zeta */
     private static final int ZETA_HEIGHT = 100 * 2;
     /** Current Health of Zeta */
-    private static final int ZETA_HEALTH = 60; // Slightly higher HP than Omega
+    private static final int ZETA_HEALTH = 60;
     /** Point of Zeta when destroyed */
     private static final int ZETA_POINT_VALUE = 800;
-    /** Speed of x in pattern 1 */
-    private static final int PATTERN_1_X_SPEED = 1;
-    /** Speed of x in pattern 2 */
-    private static final int PATTERN_2_X_SPEED = 4;
-    /** Speed of y in pattern 2 */
-    private static final int PATTERN_2_Y_SPEED = 3;
-    /** Color of pattern 2 */
-    private static final Color PATTERN_2_COLOR = Color.MAGENTA;
 
-    private boolean hasUsedApocalypse = false;
-
-    /** Dash cooldown duration in milliseconds (5 seconds) */
-    private static final int DASH_COOLDOWN_MS = 5000;
-
-    /** Boss pattern instance for delegating movement logic */
-    private BossPattern bossPattern;
-    /** Player reference for pattern targeting */
-    private Ship targetShip;
-    /** Current boss phase */
-    private int bossPhase = 1;
+    /** Boss pattern coordinator for delegating movement and attack logic */
+    private ZetaBossPattern bossPattern;
     /** Logger instance */
     private Logger logger;
-    /** Cooldown timer for dash attack */
-    private Cooldown dashCooldown;
-    /** Flag to track if currently in dash cooldown */
-    private boolean isInDashCooldown = false;
+    /** Animation cooldown */
     private Cooldown animationCooldown;
-    private boolean movingRight;
 
     /**
      * Constructor, establishes the boss entity's generic properties.
      *
-     * @param color             Color of the boss entity.
-     * @param player           The player ship to target
+     * @param color  Color of the boss entity.
+     * @param player The player ship to target
+     * @param ships  List of ships for BlackHolePattern
      */
-    public ZetaBoss(Color color, Ship player) {
+    public ZetaBoss(Color color, Ship player, List<Ship> ships) {
         super(INIT_POS_X, INIT_POS_Y, ZETA_WIDTH, ZETA_HEIGHT, ZETA_HEALTH, ZETA_POINT_VALUE, color);
-        this.targetShip = player;
-        // Reusing OmegaBoss sprites as placeholders
         this.spriteType = DrawManager.SpriteType.ZetaBoss1;
         this.logger = Core.getLogger();
         this.animationCooldown = new Cooldown(200);
-        this.dashCooldown = new Cooldown(DASH_COOLDOWN_MS);
-        // Initialize Apocalypse Pattern
-        this.apocalypsePattern = new ApocalypseAttackPattern(this);
-        this.logger.info("ZETA : Initializing Boss ZETA");
 
-        choosePattern();
+        // Initialize pattern coordinator
+        this.bossPattern = new ZetaBossPattern(this, ships);
+
+        this.logger.info("ZETA: Initializing Boss ZETA");
     }
 
     /**
      * Updates the entity's state for the current game frame.
+     * Handles animation, pattern updates, and position synchronization.
      */
     @Override
     public void update() {
+        // Handle sprite animation
         if (this.animationCooldown.checkFinished()) {
             this.animationCooldown.reset();
-            if (this.bossPhase == 2) {
-                if (isHorizonRight()){
-                    if (this.spriteType == DrawManager.SpriteType.ZetaBossRight1) {
-                        this.spriteType = DrawManager.SpriteType.ZetaBossRight2;
-                    } else {
-                        this.spriteType = DrawManager.SpriteType.ZetaBossRight1;
-                    }
-                }
-                else {
-                    if (this.spriteType == DrawManager.SpriteType.ZetaBoss1) {
-                        this.spriteType = DrawManager.SpriteType.ZetaBoss2;
-                    } else {
-                        this.spriteType = DrawManager.SpriteType.ZetaBoss1;
-                    }
-                }
-            }
-            else if (this.bossPhase == 3){
-                this.setWidth(119 * 2);
-                this.setHeight(126 * 2);
-                if (isDiagonalRight()){
-                    if (this.spriteType == DrawManager.SpriteType.ZetaBossMovingRight1) {
-                        this.spriteType = DrawManager.SpriteType.ZetaBossMovingRight2;
-                    } else {
-                        this.spriteType = DrawManager.SpriteType.ZetaBossMovingRight1;
-                    }
-                }
-                else {
-                    if (this.spriteType == DrawManager.SpriteType.ZetaBossMoving1) {
-                        this.spriteType = DrawManager.SpriteType.ZetaBossMoving2;
-                    } else {
-                        this.spriteType = DrawManager.SpriteType.ZetaBossMoving1;
-                    }
-                }
-            }
-            else {
-                if (!isInDashCooldown) {
-                    this.setWidth(144 * 2);
-                    this.setHeight(153 * 2);
-
-                    if (this.isDashRight()) {
-                        if (this.spriteType == DrawManager.SpriteType.ZetaBossDashRight1) {
-                            this.spriteType = DrawManager.SpriteType.ZetaBossDashRight2;
-                        } else {
-                            this.spriteType = DrawManager.SpriteType.ZetaBossDashRight1;
-                        }
-                    } else {
-                        if (this.spriteType == DrawManager.SpriteType.ZetaBossDash1) {
-                            this.spriteType = DrawManager.SpriteType.ZetaBossDash2;
-                        } else {
-                            this.spriteType = DrawManager.SpriteType.ZetaBossDash1;
-                        }
-                    }
-                }
-                else {
-                    this.setWidth(119 * 2);
-                    this.setHeight(126 * 2);
-                    if (isDiagonalRight()){
-                        if (this.spriteType == DrawManager.SpriteType.ZetaBossMovingRight1) {
-                            this.spriteType = DrawManager.SpriteType.ZetaBossMovingRight2;
-                        } else {
-                            this.spriteType = DrawManager.SpriteType.ZetaBossMovingRight1;
-                        }
-                    }
-                    else {
-                        if (this.spriteType == DrawManager.SpriteType.ZetaBossMoving1) {
-                            this.spriteType = DrawManager.SpriteType.ZetaBossMoving2;
-                        } else {
-                            this.spriteType = DrawManager.SpriteType.ZetaBossMoving1;
-                        }
-                    }
-                }
-            }
+            updateSprite();
         }
 
-        choosePattern();
-
+        // Update pattern coordinator
         if (bossPattern != null) {
+            bossPattern.update();
             bossPattern.move();
             bossPattern.attack();
 
@@ -173,108 +90,46 @@ public class ZetaBoss extends MidBoss {
             this.positionY = bossPattern.getBossPosition().y;
         }
     }
-    private boolean isDashRight(){
-        if (bossPattern instanceof DashPattern) {
-            return ((DashPattern) bossPattern).getRightDash();
-        }
-        return true;
-    }
-    private boolean isHorizonRight(){
-        if (bossPattern instanceof HorizontalPattern horizontalPattern) {
-            return horizontalPattern.getIsRight();
-        }
-        return true;
-    }
-    private boolean isDiagonalRight(){
-        if (bossPattern instanceof DiagonalPattern) {
-            return ((DiagonalPattern) bossPattern).getIsRight();
-        }
-        return true;
-    }
 
     /**
-     * Chooses the appropriate pattern based on boss health
+     * Updates the sprite based on current phase and pattern
      */
-    private void choosePattern() {
+    private void updateSprite() {
+        // Check if we're in a movement pattern (Diagonal or ZigZag)
+        if (bossPattern != null && bossPattern.getActivePattern() instanceof entity.pattern.DiagonalPattern) {
+            // Use movement sprites for diagonal pattern
+            this.setWidth(119 * 2);
+            this.setHeight(126 * 2);
 
-        // Do not execute the normal pattern logic below while the Apocalypse Pattern is active
-        if (this.apocalypsePattern.isPatternActive()) {
-            return;
-        }
-        // Trigger if HP is 50% or less, hasn't been used yet
-        if (!this.hasUsedApocalypse && this.healPoint <= this.maxHp / 2) {
-            if (this.bossPattern != this.apocalypsePattern) {
-                this.bossPattern = this.apocalypsePattern; // Switch pattern
-                this.apocalypsePattern.start(1); // Trigger start
-                this.hasUsedApocalypse = true;
-                logger.info("ZETA : Apocalypse Pattern Activated!");
-                return;
+            boolean isRight = isDiagonalRight();
+            if (isRight) {
+                this.spriteType = (this.spriteType == DrawManager.SpriteType.ZetaBossMovingRight1)
+                        ? DrawManager.SpriteType.ZetaBossMovingRight2
+                        : DrawManager.SpriteType.ZetaBossMovingRight1;
+            } else {
+                this.spriteType = (this.spriteType == DrawManager.SpriteType.ZetaBossMoving1)
+                        ? DrawManager.SpriteType.ZetaBossMoving2
+                        : DrawManager.SpriteType.ZetaBossMoving1;
             }
-        }
+        } else {
+            // Use default sprites for other patterns
+            this.setWidth(100 * 2);
+            this.setHeight(100 * 2);
 
-        // Execute normal pattern logic if Apocalypse Pattern is finished or inactive
-
-        // Pattern 1: Horizontal (HP > 50%)
-        if (this.healPoint > this.maxHp / 2) {
-            if (this.bossPhase < 2) {
-                this.bossPhase = 2;
-                bossPattern = new HorizontalPattern(this, PATTERN_1_X_SPEED);
-                logger.info("ZETA : move using horizontal pattern");
-            }
-        }
-        // Pattern 2: Diagonal (33% < HP <= 50%)
-        else if (this.healPoint > this.maxHp / 3) {
-            // Return to diagonal pattern immediately after Apocalypse
-            if (this.bossPhase < 3 || this.bossPattern == this.apocalypsePattern) {
-                this.bossPhase = 3;
-                bossPattern = new DiagonalPattern(this, PATTERN_2_X_SPEED, PATTERN_2_Y_SPEED, PATTERN_2_COLOR);
-                logger.info("ZETA : move using diagonal pattern");
-            }
-        }
-        // Pattern 3: Dash (HP <= 33%)
-        else {
-            if (this.bossPhase < 4) {
-                this.bossPhase = 4;
-                startDashPattern();
-            }
-            handleDashCycle();
+            this.spriteType = (this.spriteType == DrawManager.SpriteType.ZetaBoss1)
+                    ? DrawManager.SpriteType.ZetaBoss2
+                    : DrawManager.SpriteType.ZetaBoss1;
         }
     }
 
     /**
-     * Handles the dash attack cycle in phase 3
+     * Checks if the diagonal pattern is moving right
      */
-    private void handleDashCycle() {
-        // Check if dash is completed
-        if (bossPattern instanceof DashPattern) {
-            DashPattern dashPattern = (DashPattern) bossPattern;
-            if (dashPattern.isDashCompleted()) {
-                startDashCooldown();
-            }
+    private boolean isDiagonalRight() {
+        if (bossPattern != null && bossPattern.getActivePattern() instanceof entity.pattern.DiagonalPattern) {
+            return ((entity.pattern.DiagonalPattern) bossPattern.getActivePattern()).getIsRight();
         }
-        // Check if cooldown is finished and ready for next dash
-        else if (isInDashCooldown && dashCooldown.checkFinished()) {
-            startDashPattern();
-        }
-    }
-
-    private void startDashPattern() {
-        bossPattern = new DashPattern(this, targetShip);
-        isInDashCooldown = false;
-        logger.info("ZETA : Starting dash attack");
-    }
-
-    private void startDashCooldown() {
-        bossPattern = new DiagonalPattern(this, PATTERN_2_X_SPEED, PATTERN_2_Y_SPEED, PATTERN_2_COLOR);
-        isInDashCooldown = true;
-        dashCooldown.reset();
-        logger.info("ZETA : Dash cooldown started (5 seconds)");
-    }
-    private boolean isCurrentlyDashing() {
-        if (bossPattern instanceof DashPattern) {
-            return ((DashPattern) bossPattern).isDashing();
-        }
-        return false;
+        return true;
     }
 
     @Override
@@ -286,8 +141,8 @@ public class ZetaBoss extends MidBoss {
     @Override
     public void destroy() {
         this.isDestroyed = true;
-        this.spriteType = DrawManager.SpriteType.OmegaBossDeath; // Reuse Omega death sprite
-        this.logger.info("ZETA : Boss ZETA destroyed!");
+        this.spriteType = DrawManager.SpriteType.OmegaBossDeath;
+        this.logger.info("ZETA: Boss ZETA destroyed!");
     }
 
     @Override
@@ -299,37 +154,42 @@ public class ZetaBoss extends MidBoss {
         }
     }
 
-    public boolean isShowingPath() {
-        if (bossPattern instanceof DashPattern) {
-            return ((DashPattern) bossPattern).isShowingPath();
-        }
-        return false;
-    }
-
-    public int[] getDashEndPoint() {
-        if (bossPattern instanceof DashPattern) {
-            return ((DashPattern) bossPattern).getDashEndPoint(this.width, this.height);
-        }
-        return new int[]{this.positionX + this.width / 2, this.positionY + this.height / 2};
-    }
-
-    public BossPattern getBossPattern() {
+    /**
+     * Get current boss pattern coordinator.
+     *
+     * @return Current ZetaBossPattern instance
+     */
+    public ZetaBossPattern getBossPattern() {
         return this.bossPattern;
     }
 
+    /**
+     * Get current boss phase.
+     *
+     * @return Current phase (1-3)
+     */
     public int getBossPhase() {
-        return this.bossPhase;
+        return bossPattern != null ? bossPattern.getCurrentPhase() : 1;
     }
 
-    public boolean isInDashCooldown() {
-        return isInDashCooldown;
+    /**
+     * Get current BlackHole pattern if active.
+     *
+     * @return Current BlackHolePattern instance, or null if not active
+     */
+    @Override
+    public entity.pattern.BlackHolePattern getCurrentBlackHole() {
+        return bossPattern != null ? bossPattern.getCurrentBlackHole() : null;
     }
 
-    public void setTarget(Ship target) {
-        this.targetShip = target;
-        if (bossPattern != null) {
-            bossPattern.setTarget(target);
-        }
+    /**
+     * Get Apocalypse pattern instance.
+     *
+     * @return ApocalypseAttackPattern instance
+     */
+    @Override
+    public entity.pattern.ApocalypseAttackPattern getApocalypsePattern() {
+        return bossPattern != null ? bossPattern.getApocalypsePattern() : null;
     }
 
     @Override

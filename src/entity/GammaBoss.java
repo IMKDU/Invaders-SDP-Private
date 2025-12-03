@@ -28,9 +28,9 @@ public class GammaBoss extends MidBoss {
     /** Initial position in the y-axis */
     private static final int INIT_POS_Y = 80;
     /** Width of GammaBoss */
-    private static final int GAMMA_WIDTH = 70 * 2;
+    private static final int GAMMA_WIDTH = 50 * 2;
     /** Height of GammaBoss */
-    private static final int GAMMA_HEIGHT = 51 * 2;
+    private static final int GAMMA_HEIGHT = 55 * 2;
     /** Health points */
     private static final int GAMMA_HEALTH = 65;
     /** Point value when destroyed */
@@ -51,8 +51,7 @@ public class GammaBoss extends MidBoss {
 
     /** Animation cooldown for sprite changes */
     private Cooldown animationCooldown;
-    /** Flag to track if boss was hit (for visual feedback) */
-    private boolean ishit = false;
+
 
     /**
      * Constructor, establishes the GammaBoss entity's properties.
@@ -68,7 +67,7 @@ public class GammaBoss extends MidBoss {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
         this.logger = Core.getLogger();
-        this.spriteType = DrawManager.SpriteType.OmegaBoss1; // Using OmegaBoss sprite temporarily
+        this.spriteType = DrawManager.SpriteType.GammaBoss1;
         this.animationCooldown = new Cooldown(200);
 
         // Initialize pattern coordinator
@@ -78,7 +77,7 @@ public class GammaBoss extends MidBoss {
         this.explosionPattern = new BackgroundExplosionPattern();
 
         this.logger.info("GAMMA: Initializing Boss GAMMA");
-        SoundManager.play("sfx/OmegaBossAppearance.wav");
+        SoundManager.play("sfx/GammaBossAppear.wav");
     }
 
     /**
@@ -116,16 +115,56 @@ public class GammaBoss extends MidBoss {
      * Shows hitting sprite when boss is hit.
      */
     private void updateSprite() {
-        if (this.ishit) {
-            this.spriteType = DrawManager.SpriteType.OmegaBossHitting;
-            this.ishit = false;
-        } else {
-            if (this.spriteType == DrawManager.SpriteType.OmegaBoss1) {
-                this.spriteType = DrawManager.SpriteType.OmegaBoss2;
-            } else {
-                this.spriteType = DrawManager.SpriteType.OmegaBoss1;
+        boolean isRight = bossPattern.isRight();
+        boolean isDashing = bossPattern.isDashing();
+        if (bossPattern.getCurrentPhase() == 2 || bossPattern.getCurrentPhase() == 3){
+            if (isDashing){
+                if (bossPattern.isRight()) {
+                    if (this.spriteType == DrawManager.SpriteType.GammaBossDashing1) {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDashing2;
+                    } else {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDashing1;
+                    }
+                } else {
+                    if (this.spriteType == DrawManager.SpriteType.GammaBossDashing1Left) {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDashing2Left;
+                    } else {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDashing1Left;
+                    }
+                }
+            }
+            else {
+                if (bossPattern.isRight()) {
+                    if (this.spriteType == DrawManager.SpriteType.GammaBossDash1) {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDash2;
+                    } else {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDash1;
+                    }
+                } else {
+                    if (this.spriteType == DrawManager.SpriteType.GammaBossDash1Left) {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDash2Left;
+                    } else {
+                        this.spriteType = DrawManager.SpriteType.GammaBossDash1Left;
+                    }
+                }
             }
         }
+        else {
+            if (isRight) {
+                if (this.spriteType == DrawManager.SpriteType.GammaBoss1) {
+                    this.spriteType = DrawManager.SpriteType.GammaBoss2;
+                } else {
+                    this.spriteType = DrawManager.SpriteType.GammaBoss1;
+                }
+            } else {
+                if (this.spriteType == DrawManager.SpriteType.GammaBoss1Left) {
+                    this.spriteType = DrawManager.SpriteType.GammaBoss2Left;
+                } else {
+                    this.spriteType = DrawManager.SpriteType.GammaBoss1Left;
+                }
+            }
+        }
+
     }
 
     /** Simple movement method */
@@ -153,10 +192,9 @@ public class GammaBoss extends MidBoss {
     @Override
     public void takeDamage(int damage) {
         this.healPoint -= damage;
-        SoundManager.play("sfx/OmegaBoss_hitting.wav");
-        ishit = true;
-
+        SoundManager.play("sfx/GammaBoss_hitting.wav");
         if (this.healPoint <= 0) {
+            SoundManager.play("sfx/GammaBossDying.wav");
             this.destroy();
         }
     }

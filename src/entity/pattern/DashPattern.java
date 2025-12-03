@@ -1,6 +1,7 @@
 package entity.pattern;
 
 import engine.Core;
+import engine.DrawManager;
 import entity.GameConstant;
 import entity.HasBounds;
 
@@ -107,6 +108,8 @@ public class DashPattern extends BossPattern {
 
         // End dash when hitting wall
         if (hitBoundary) {
+            DrawManager drawManager = Core.getDrawManager();
+            drawManager.startShake(50, 25);
             logger.info("OMEGA : Dash completed, hit the wall");
             isDashing = false;
         }
