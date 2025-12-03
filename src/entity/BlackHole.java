@@ -51,7 +51,6 @@ public class BlackHole extends Entity implements HasCircleBounds {
 	public void update(){
 		if(effectCooldown.checkFinished()){
 			isDestroyed = true;
-			Core.getLogger().info("EEEEEEEEEE: Needs to be destroyed");
 		}
 		else{
 			for(Entity e : targets){
