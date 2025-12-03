@@ -67,7 +67,7 @@ public class GammaBoss extends MidBoss {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
         this.logger = Core.getLogger();
-        this.spriteType = DrawManager.SpriteType.GammaBoss1; // Using OmegaBoss sprite temporarily
+        this.spriteType = DrawManager.SpriteType.GammaBoss1;
         this.animationCooldown = new Cooldown(200);
 
         // Initialize pattern coordinator
@@ -115,7 +115,7 @@ public class GammaBoss extends MidBoss {
      * Shows hitting sprite when boss is hit.
      */
     private void updateSprite() {
-        if (bossPattern.getIsRight()){
+        if (bossPattern.isRight()){
             if (this.spriteType == DrawManager.SpriteType.GammaBoss1) {
                 this.spriteType = DrawManager.SpriteType.GammaBoss2;
             }

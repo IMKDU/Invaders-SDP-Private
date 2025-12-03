@@ -478,7 +478,7 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
         if (movePattern == null) return;
         movePattern.move();
         if (movePattern != null) {
-            this.isRight = ((movePattern.getBossPosition().x - bossPosition.x) > 0);
+            this.isRight = movePattern.getBossPosition().x == bossPosition.x ? this.isRight : movePattern.getBossPosition().x > bossPosition.x;
             bossPosition.x = movePattern.getBossPosition().x;
             bossPosition.y = movePattern.getBossPosition().y;
         }
@@ -543,5 +543,5 @@ public class GammaBossPattern extends BossPattern implements IBossPattern {
     public boolean isInDashCooldown() {
         return isInDashCooldown;
     }
-    public boolean getIsRight() {return this.isRight;}
+    public boolean isRight() {return this.isRight;}
 }
