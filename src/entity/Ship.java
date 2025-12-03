@@ -23,7 +23,7 @@ public class Ship extends Entity implements Collidable {
 	/** Time between shots. */
 	private static final int SHOOTING_INTERVAL = 750;
 	/** Movement of the ship for each unit of time. */
-	private static final int SPEED = 6;
+	private static final int SPEED = 2;
 	/** Y-offset from the ship position to the bullet spawn position */
 	private static final int BULLET_SPAWN_Y_OFFSET = 36;
 
@@ -81,7 +81,7 @@ public class Ship extends Entity implements Collidable {
             this.spriteType = SpriteType.ShipP2;
             this.isP1Ship = false;
         }
-		this.shootingCooldown = new Cooldown(50);
+		this.shootingCooldown = new Cooldown(ShopItem.getShootingInterval());
 		this.destructionCooldown = new Cooldown(1000);
 		this.shieldCooldown = new Cooldown(0);
 		this.isInvincible = false;

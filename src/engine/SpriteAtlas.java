@@ -76,8 +76,13 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.Item_Coin, new BufferedImage(20,20,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.SubShipP1, new BufferedImage(50,31,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.SubShipP2, new BufferedImage(50,31,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.GammaBoss1, new BufferedImage(50,55,BufferedImage.TYPE_INT_ARGB));
-            spriteMap.put(SpriteType.GammaBoss2, new BufferedImage(50,55,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.GammaBoss1, new BufferedImage(50,70,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.GammaBoss2, new BufferedImage(50,70,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.GammaBossDash1, new BufferedImage(50,70,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.GammaBossDash2, new BufferedImage(50,70,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.GammaBossDashing1, new BufferedImage(50,70,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.GammaBossDashing2, new BufferedImage(50,70,BufferedImage.TYPE_INT_ARGB));
+
             fileManager.loadSprite(spriteMap);
             //symatric sprite
             spriteMap.put(SpriteType.OmegaBossDash3, mirrorSprite(spriteMap.get(SpriteType.OmegaBossDash1)));
@@ -91,6 +96,10 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.ZetaBossDashRight2, mirrorSprite(spriteMap.get(SpriteType.ZetaBossDash2)));
             spriteMap.put(SpriteType.GammaBoss1Left, mirrorSprite(spriteMap.get(SpriteType.GammaBoss1)));
             spriteMap.put(SpriteType.GammaBoss2Left, mirrorSprite(spriteMap.get(SpriteType.GammaBoss2)));
+            spriteMap.put(SpriteType.GammaBossDash1Left, mirrorSprite(spriteMap.get(SpriteType.GammaBossDash1)));
+            spriteMap.put(SpriteType.GammaBossDash2Left, mirrorSprite(spriteMap.get(SpriteType.GammaBossDash2)));
+            spriteMap.put(SpriteType.GammaBossDashing1Left, mirrorSprite(spriteMap.get(SpriteType.GammaBossDashing1)));
+            spriteMap.put(SpriteType.GammaBossDashing2Left, mirrorSprite(spriteMap.get(SpriteType.GammaBossDashing2)));
 
         } catch (IOException e) {
             Core.getLogger().warning("[SpriteAtlas] Failed to load sprites: " + e.getMessage());
