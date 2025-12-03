@@ -23,7 +23,7 @@ public class GuidedBullet extends BossBullet {
      */
     public GuidedBullet(int x, int y, Ship target) {
         // dx, dy are calculated every frame, so initial values are 0. Size is 8x8, color is RED.
-        super(x, y, 0, 0, 30, 30, "OmegaBoss");
+        super(x, y, 0, 0, 30, 30, "GuidedBullet");
         this.animationCooldown = new Cooldown(200);
         this.setColor(Color.RED);
         this.target = target;

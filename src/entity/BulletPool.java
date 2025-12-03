@@ -47,7 +47,7 @@ public final class BulletPool {
 			bullet.resetPenetration();
 			bullet.setSprite();
 		} else {
-			bullet = new Bullet(positionX, positionY, speed, 5 * 2 , 10 * 2);
+			bullet = new Bullet(positionX, positionY, speed, 5 * 2 , 10 * 2,false);
 			bullet.setPositionX(positionX - bullet.getWidth() / 2);
 		}
 		return bullet;
