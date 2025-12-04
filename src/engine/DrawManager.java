@@ -46,12 +46,14 @@ public final class DrawManager {
 	/** Sprite types. */
     public static enum SpriteType {
         ShipP1,ShipP2,ShipP1Move,ShipP2Move,ShipP2Explosion1,ShipP2Explosion2, ShipP2Explosion3,Life, ShipP1Explosion1,ShipP1Explosion2,ShipP1Explosion3,
-        Bullet, EnemyBullet, EnemyShipA1, EnemyShipA2, Laser, Teleport, TeleportCool,BombExplosion,
+        Bullet, EnemyBullet, EnemyShipA1, EnemyShipA2, Laser, Teleport, TeleportCool,BombExplosion,SubShipP1,SubShipP2,
         EnemyShipB1, EnemyShipB2, EnemyShipC1, EnemyShipC2, EnemyShipSpecial, EnemyShipSpecialLeft, EnemySpecialExplosion,
         FinalBoss1, FinalBoss2,FinalBossBullet,FinalBossDeath,OmegaBoss1, OmegaBoss2,OmegaBossHitting,OmegaBossMoving1,OmegaBossMoving2,OmegaBossMoving3,OmegaBossMoving4,OmegaBossDeath, Explosion, SoundOn, SoundOff, Item_MultiShot,
-        Item_Atkspeed, Item_Penetrate, Item_SubShip, Item_Stop, Shield, Item_Bomb, Item_Coin, BombBullet,Bomb1,Bomb2,
+        Item_SubShip, Item_Stop, Shield, Item_Bomb, Item_Coin, BombBullet,Bomb1,Bomb2,
 		Item_Shield, Item_Heal, BlackHole1,BlackHole2, OmegaBossDash1, OmegaBossDash2, OmegaBossDash3, OmegaBossDash4, OmegaBossBullet,
-        ZetaBoss1, ZetaBoss2,ZetaBossRight1,ZetaBossRight2, ZetaBossMoving1, ZetaBossMoving2, ZetaBossMovingRight1, ZetaBossMovingRight2, ZetaBossDash1,ZetaBossDash2,ZetaBossDashRight1,ZetaBossDashRight2
+        ZetaBoss1, ZetaBoss2,ZetaBossRight1,ZetaBossRight2, ZetaBossMoving1, ZetaBossMoving2, ZetaBossMovingRight1, ZetaBossMovingRight2, ZetaBossDash1,ZetaBossDash2,ZetaBossDashRight1,ZetaBossDashRight2,
+        GammaBoss1,GammaBoss2, GammaBoss1Left, GammaBoss2Left, GammaBossDash1,GammaBossDash2, GammaBossDash1Left, GammaBossDash2Left, GammaBossDashing1,GammaBossDashing2,GammaBossDashing1Left,GammaBossDashing2Left,
+        ShootP1Icon,ShootP2Icon,ChargingLaserP1Icon,ChargingLaserP2Icon,OriginIcon
     }
 
 	/**
@@ -97,7 +99,7 @@ public final class DrawManager {
             fontPack = new FontPack(backBuffer.getGraphics(), fileManager);
             entityRenderer = new EntityRenderer(spriteAtlas.getSpriteMap(),backBuffer,this.scale, this.loader);
 			itemRenderer = new ItemRenderer(backBuffer, spriteAtlas.getSpriteMap(), this.scale);
-			hudRenderer = new HUDRenderer(backBuffer, fontPack, entityRenderer,spriteAtlas.getSpriteMap().get(SpriteType.TeleportCool));
+			hudRenderer = new HUDRenderer(backBuffer, fontPack, entityRenderer,spriteAtlas.getSpriteMap());
             shopRenderer = new ShopRenderer(backBuffer,fontPack);
             uiRenderer = new UIRenderer(backBuffer,fontPack);
             specialAnimationRenderer = new SpecialAnimationRenderer(backBuffer);

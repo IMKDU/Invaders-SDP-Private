@@ -1,5 +1,6 @@
 package screen;
 
+import engine.Core;
 import engine.DrawManager;
 import engine.DTO.HUDInfoDTO;
 import entity.*;
@@ -30,8 +31,46 @@ public class GameView {
 
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
-        if (GameConstant.origin_skill_activated) {
 
+		/** draw configures */
+	    if (!model.getBlackHoles().isEmpty()) {
+		    for(BlackHole bkh : model.getBlackHoles()) {
+			    drawManager.getEntityRenderer().drawBlackHole(bkh);
+		    }
+	    }
+        if (model.getOmegaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getOmegaBoss());
+            drawManager.getUIRenderer().drawBossName("Omega");
+        }
+        if (model.getFinalBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getFinalBoss());
+            drawManager.getUIRenderer().drawBossName("???");
+        }
+        if (model.getZetaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getZetaBoss());
+            drawManager.getUIRenderer().drawBossName("Zeta");
+        }
+        if (model.getGammaBoss() != null) {
+            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getGammaBoss());
+            drawManager.getEntityRenderer().drawGammaBoss((GammaBoss) model.getGammaBoss());
+            drawManager.getUIRenderer().drawBossName("Gamma");
+        }
+        if (model.getBossLasers() != null) {
+            for (LaserBeam laser : model.getBossLasers()) {
+                drawManager.getEntityRenderer().drawLaser(laser);
+            }
+        }
+	    if(model.getExplosions() != null){
+		    for(Explosion ex : model.getExplosions()){
+			    drawManager.getEntityRenderer().drawExplosion(
+					    ex.isBoom(),
+					    ex,
+					    ex.getWarningProgress()
+			    );
+		    }
+	    }
+
+	    if (GameConstant.origin_skill_activated) {
             drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
             drawManager.getSpecialAnimationRenderer().draw();
 
@@ -41,11 +80,6 @@ public class GameView {
         }
 
         else {
-            if (!model.getBlackHoles().isEmpty()) {
-				for(BlackHole bkh : model.getBlackHoles()) {
-					drawManager.getEntityRenderer().drawBlackHole(bkh);
-				}
-            }
             drawManager.getEntityRenderer().drawTeleport(model.getTeleportFromP1X(), dto.getShipP1().getWidth(), model.getTeleportFromP1Y(), dto.getShipP1().getHeight(), model.getIsTeleportP1(),1,model.getAfterTeleportFromP1X(),model.getAfterTeleportFromP1Y());
             drawManager.getEntityRenderer().drawTeleport(model.getTeleportFromP2X(), dto.getShipP2().getWidth(), model.getTeleportFromP2Y(), dto.getShipP2().getHeight(), model.getIsTeleportP2(),2,model.getAfterTeleportFromP2X(),model.getAfterTeleportFromP2Y());
 
@@ -66,7 +100,7 @@ public class GameView {
                         drawManager.getItemRenderer().render((DropItem) e);
                         continue;
                     }
-                    if (e instanceof Ship) { // ship을 맨 마지막에 그리기
+                    if (e instanceof Ship) {
                         shipRenderQueue.add(e);
                         continue;
                     }
@@ -77,28 +111,6 @@ public class GameView {
                 }
             }
         }
-        if (model.getOmegaBoss() != null) {
-            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getOmegaBoss());
-            drawManager.getUIRenderer().drawBossName("Omega");
-        }
-        if (model.getFinalBoss() != null) {
-            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getFinalBoss());
-            drawManager.getUIRenderer().drawBossName("???");
-        }
-        if (model.getZetaBoss() != null) {
-            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getZetaBoss());
-            drawManager.getUIRenderer().drawBossName("Zeta");
-        }
-        if (model.getGammaBoss() != null) {
-            drawManager.getEntityRenderer().drawHealthBarWithHP(model.getGammaBoss());
-            drawManager.getEntityRenderer().drawGammaBoss((GammaBoss) model.getGammaBoss());
-            drawManager.getUIRenderer().drawBossName("Gamma");
-        }
-		if (model.getBossLasers() != null) {
-			for (LaserBeam laser : model.getBossLasers()) {
-				drawManager.getEntityRenderer().drawLaser(laser);
-			}
-		}
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP1(), 25, 1);
         drawManager.getHUDRenderer().drawScore(dto.getWidth(), dto.getScoreP2(), 50, 2);
         drawManager.getHUDRenderer().drawCoin(dto.getWidth(), dto.getHeight(), dto.getCoin());
@@ -107,7 +119,11 @@ public class GameView {
         drawManager.getHUDRenderer().drawTime(GameConstant.ITEMS_SEPARATION_LINE_HEIGHT, dto.getElapsedTimeMillis());
         drawManager.getHUDRenderer().drawItemsHUD(dto.getWidth(), dto.getHeight());
         drawManager.getHUDRenderer().drawLevel(GameConstant.ITEMS_SEPARATION_LINE_HEIGHT, dto.getLevelName());
-		drawManager.getHUDRenderer().drawTeleportCooldowns(dto.getWidth(), dto.getHeight(), dto.teleportCooldownP1, dto.teleportCooldownP2);
+        drawManager.getHUDRenderer().drawTeleportCooldowns(dto.getWidth(), dto.getHeight(), dto.teleportCooldownP1, dto.teleportCooldownP2);
+//        if (dto.isOriginUsed()){
+//            drawManager.getHUDRenderer().drawOriginUsed();
+//        }
+
         /** draw Line */
         drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), GameConstant.STAT_SEPARATION_LINE_HEIGHT - 1);
         drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), GameConstant.ITEMS_SEPARATION_LINE_HEIGHT);
@@ -133,15 +149,6 @@ public class GameView {
             drawChargingSkill(model.getShipP2(), dto.getWidth(), dto.getHeight());
         }
 
-        if(model.getExplosions() != null){
-			for(Explosion ex : model.getExplosions()){
-				drawManager.getEntityRenderer().drawExplosion(
-						ex.isBoom(),
-						ex,
-						ex.getWarningProgress()
-				);
-			}
-        }
         /** countdown */
         if (!model.isInputDelayFinished()) {
             int countdown = (int) ((GameModel.INPUT_DELAY

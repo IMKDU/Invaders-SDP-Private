@@ -107,6 +107,9 @@ public class OriginSkill implements ISkill {
         if (model.getZetaBoss() != null && !model.getZetaBoss().isDestroyed()) {
             model.getZetaBoss().takeDamage(dmg);
         }
+        if (model.getGammaBoss() != null && !model.getGammaBoss().isDestroyed()) {
+            model.getGammaBoss().takeDamage(dmg);
+        }
     }
 
     public boolean isActive() { return active; }

@@ -51,7 +51,6 @@ public final class HUDInfoDTO {
 			float teleportCooldownP1,
 			float teleportCooldownP2
 	) {
-
         this.width = width;
         this.height = height;
         this.scoreP1 = scoreP1;

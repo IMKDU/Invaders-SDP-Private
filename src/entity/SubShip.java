@@ -35,14 +35,14 @@ public class SubShip extends Entity {
      * @param isLeft True if this is the left sub-ship, false for right.
      */
     public SubShip(Ship owner, boolean isLeft) {
-        // Size is roughly half of the main ship (which is 13x8 * 2)
-        super(0, 0, 13, 8, isLeft ? Color.CYAN : Color.ORANGE);
+        // Size is roughly half of the main ship (which is 50x31 * 2)
+        super(0, 0, 50, 31, isLeft ? Color.CYAN : Color.ORANGE);
         this.owner = owner;
         this.isLeft = isLeft;
         if (owner.getPlayerId() == 1) {
-            this.spriteType = SpriteType.ShipP1;
+            this.spriteType = SpriteType.SubShipP1;
         } else {
-            this.spriteType = SpriteType.ShipP2;
+            this.spriteType = SpriteType.SubShipP2;
         }
 
         // Position offset: Left side or Right side

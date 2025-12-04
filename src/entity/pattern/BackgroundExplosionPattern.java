@@ -1,5 +1,6 @@
 package entity.pattern;
 
+import audio.SoundManager;
 import engine.Cooldown;
 import entity.Explosion;
 import entity.GameConstant;
@@ -11,6 +12,7 @@ public class BackgroundExplosionPattern extends BossPattern {
     private Explosion explosionEntity = null;
     private final int MARGIN = 150;
     private final int MARGIN_2 = 200;
+    private boolean isSoundPlayed;
 
     /**
      * Initializes the background explosion pattern and sets the spawn cooldown.
@@ -37,7 +39,13 @@ public class BackgroundExplosionPattern extends BossPattern {
     public void attack() {
         if (explosionEntity != null) {
             explosionEntity.update();
-            if (explosionEntity.shouldBeRemoved()) {
+            if (explosionEntity.isBoom() && !isSoundPlayed) {
+                SoundManager.play("sfx/BombExplosion.wav");
+                isSoundPlayed = true;
+            }
+	        if (explosionEntity.shouldBeRemoved()) {
+                isSoundPlayed = false;
+				spawnExplosion();
                 this.cooldown.reset();
             }
         } else if (cooldown.checkFinished()) {

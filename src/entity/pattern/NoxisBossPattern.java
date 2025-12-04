@@ -11,9 +11,6 @@ import java.util.logging.Logger;
 
 public class NoxisBossPattern extends BossPattern implements IBossPattern {
 
-	/** Pattern select threshold: Pinned(58%), Another(42%) */
-	private static final double PHASE1_ATTACK_SELECT_RATIO = 0.58;
-
 	/** HP ratio thresholds for phase transitions */
 	private static final double PHASE1_TO_PHASE2_TRIGGER = 0.70;
 	private static final double PHASE2_TO_PHASE3_TRIGGER = 0.40;
