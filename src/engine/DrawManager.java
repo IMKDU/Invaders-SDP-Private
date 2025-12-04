@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import audio.SoundManager;
 import engine.renderer.*;
 import screen.TitleScreen.Star;
 import screen.TitleScreen.ShootingStar;
@@ -119,6 +120,7 @@ public final class DrawManager {
 
     public void startShake(int duration, int intensity) {
         backBuffer.setShake(duration, intensity);
+        SoundManager.play("sfx/shaking.wav");
     }
 
 	/**

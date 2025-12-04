@@ -19,6 +19,8 @@ public class BossBullet extends Bullet implements Collidable {
 
     private final int BACKGROUND_WIDTH  = 6;
     private final int BACKGROUND_HEIGHT = 13;
+    private final int ENEMYBULLET_WIDTH = 5;
+    private final int ENEMYBULLET_HEIGHT = 15;
 
 	/** bossBullets carry bullets that the boss will shoot */
     /**
@@ -49,15 +51,19 @@ public class BossBullet extends Bullet implements Collidable {
 
     private void applyPattern(BossPattern.PatternBulletType type){
         if (type == BossPattern.PatternBulletType.SPREAD_SHOT){
-            this.bulletImages = new DrawManager.SpriteType[]{DrawManager.SpriteType.PinnedBossPatternBullet, DrawManager.SpriteType.BasicBackGroundPatternBullet};
+            this.bulletImages = new DrawManager.SpriteType[]{DrawManager.SpriteType.PinnedBossPatternBullet, DrawManager.SpriteType.BasicBackGroundPatternBullet,DrawManager.SpriteType.EnemyBullet};
             int index = ThreadLocalRandom.current().nextInt(bulletImages.length);
             if (index == 0){
                 this.width = PINNED_WIDTH;
                 this.height = PINNED_HEIGHT;
             }
-            else {
+            else if (index == 1){
                 this.width = BACKGROUND_WIDTH;
                 this.height = BACKGROUND_HEIGHT;
+            }
+            else {
+                this.width = ENEMYBULLET_WIDTH;
+                this.height = ENEMYBULLET_HEIGHT;
             }
             this.spriteType = bulletImages[index];
         }
