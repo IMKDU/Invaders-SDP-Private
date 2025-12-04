@@ -31,6 +31,7 @@ public final class HUDInfoDTO {
 	/** Teleport cooldown */
 	public float teleportCooldownP1;
 	public float teleportCooldownP2;
+    private final boolean originUsed;
 
 	public HUDInfoDTO(
             int width,
@@ -49,9 +50,10 @@ public final class HUDInfoDTO {
             String achievementText,
             String healthPopupText,
 			float teleportCooldownP1,
-			float teleportCooldownP2
+			float teleportCooldownP2,
+            boolean originUsed
 	) {
-
+        this.originUsed = originUsed;
         this.width = width;
         this.height = height;
         this.scoreP1 = scoreP1;
@@ -123,6 +125,9 @@ public final class HUDInfoDTO {
 
     public int getLevel(){
         return level;
+    }
+    public boolean isOriginUsed() {
+        return originUsed;
     }
 
     public Ship getShipP1() {return this.shipP1;}
