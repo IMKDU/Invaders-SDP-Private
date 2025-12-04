@@ -1227,7 +1227,7 @@ public class GameModel {
 			this.bossBullets.addAll(this.finalBoss.getBullets());
 	        this.bossLasers.addAll(this.finalBoss.getLasers());
 	        this.blackHoles.addAll(this.finalBoss.getBlackHoles());
-	        this.explosions.addAll(this.finalBoss.getBoom());
+	        this.explosions = this.finalBoss.getBoom();
 	        this.midBossMobs=this.finalBoss.getChildShips();
         }
         if (this.finalBoss != null && this.finalBoss.isDestroyed()) {

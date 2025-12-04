@@ -158,9 +158,10 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 	public void update(){
 		if(currentPhase>1){
 			// Priority 1: Check if Apocalypse cooldown finished
-			if (dashState==DashState.COOLDOWN && apocalypseState == ApocalypseState.COOLDOWN && apocalypseCooldownTimer.checkFinished()) {
+			if (dashState==DashState.COOLDOWN && getLasers().isEmpty() && apocalypseState == ApocalypseState.COOLDOWN && apocalypseCooldownTimer.checkFinished()) {
 				forceStopBlackHole();
 				forceRemoveChilds();
+				forceRemoveExplosions();
 				startApocalypse();
 				stopMovement();
 				return;
@@ -309,6 +310,11 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 		spawnMobChilds = Set.of();
 	}
 
+	public void forceRemoveExplosions(){
+		explosions.clear();
+		explosionPatterns.clear();
+	}
+
 	public void loadSavedChilds(){
 		spawnMobChilds = spawnMobPattern.getChildShips();
 	}
@@ -358,6 +364,7 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 		if(explosionPatterns == null || explosionCooldownTimer.checkFinished()) {
 			explosionCooldownTimer.reset();
 			explosionPatterns.add(new BackgroundExplosionPattern());
+			logger.info("NoxisBossPattern: Explosion background Added. Current Explosion-num: "+explosions.size());
 			return;
 		}
 		for(BackgroundExplosionPattern explosionPattern : this.explosionPatterns){
@@ -619,7 +626,6 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 		if(this.explosionPatterns == null || this.explosions==null){
 			return Set.of();
 		}
-		logger.info("NoxisBossPattern: Movement - Boom: "+explosions.size());
 		return explosions;
 	}
 
