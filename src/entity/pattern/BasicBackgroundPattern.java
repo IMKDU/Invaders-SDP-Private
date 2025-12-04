@@ -23,7 +23,7 @@ public class BasicBackgroundPattern extends BossPattern {
 		if (this.shootCooldown.checkFinished()) {
 			this.shootCooldown.reset();
 			int randomX = (int) (Math.random() * screenWidth);
-			BossBullet bullet = new BossBullet(randomX, 1, 0, 2,6,10, "BasicBackGroundPattern");
+			BossBullet bullet = new BossBullet(randomX, 1, 0, 2,6,10, PatternBulletType.BACKGROUND);
 			bullets.add(bullet);
 		}
 	}

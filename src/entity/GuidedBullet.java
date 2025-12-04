@@ -2,6 +2,7 @@ package entity;
 
 import engine.DrawManager;
 import entity.GameModel;
+import entity.pattern.BossPattern;
 
 import java.awt.*;
 
@@ -20,7 +21,7 @@ public class GuidedBullet extends BossBullet {
      */
     public GuidedBullet(int x, int y, Ship target) {
         // dx, dy are calculated every frame, so initial values are 0. Size is 8x8, color is RED.
-        super(x, y, 0, 0, 8, 8, "OmegaBoss");
+        super(x, y, 0, 0, 8, 8, BossPattern.PatternBulletType.GUIDED);
 
         this.setColor(Color.RED);
         this.target = target;

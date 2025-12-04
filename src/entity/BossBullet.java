@@ -1,6 +1,7 @@
 package entity;
 
 import engine.DrawManager;
+import entity.pattern.BossPattern;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -13,6 +14,11 @@ public class BossBullet extends Bullet implements Collidable {
 
 	private boolean markedForRemoval = false;
     private DrawManager.SpriteType[] bulletImages;
+    private final int PINNED_WIDTH  = 6;
+    private final int PINNED_HEIGHT = 10;
+
+    private final int BACKGROUND_WIDTH  = 6;
+    private final int BACKGROUND_HEIGHT = 13;
 
 	/** bossBullets carry bullets that the boss will shoot */
     /**
@@ -30,37 +36,42 @@ public class BossBullet extends Bullet implements Collidable {
      *            bullet's width
      * @param height
      *            bullet's height
-     * @param type
+     * @param patternBulletType
      *            bullet's sprite type
      */
-    public BossBullet(int x, int y, int dx, int dy, int width, int height, String type) {
+    public BossBullet(int x, int y, int dx, int dy, int width, int height, BossPattern.PatternBulletType patternBulletType) {
         super(x, y, 0, width, height);
         this.dx = dx;
         this.dy = dy;
-        if (type.equals("SpreadShotPattern")){
+        applyPattern(patternBulletType);
+
+    }
+
+    private void applyPattern(BossPattern.PatternBulletType type){
+        if (type == BossPattern.PatternBulletType.SPREAD_SHOT){
             this.bulletImages = new DrawManager.SpriteType[]{DrawManager.SpriteType.PinnedBossPatternBullet, DrawManager.SpriteType.BasicBackGroundPatternBullet};
             int index = ThreadLocalRandom.current().nextInt(bulletImages.length);
             if (index == 0){
-                super.width = 6;
-                super.height = 10;
+                this.width = PINNED_WIDTH;
+                this.height = PINNED_HEIGHT;
             }
-            else if (index == 1){
-                super.width = 6;
-                super.height = 13;
+            else {
+                this.width = BACKGROUND_WIDTH;
+                this.height = BACKGROUND_HEIGHT;
             }
             this.spriteType = bulletImages[index];
         }
-        else if (type.equals("ZigZagAngryPattern")){
+        else if (type == BossPattern.PatternBulletType.ZIGZAG_ANGRY){
             this.spriteType = DrawManager.SpriteType.ZigZagAngryPatternBullet;
         }
-        else if (type.equals("PinnedBossPattern")){
+        else if (type == BossPattern.PatternBulletType.PINNED){
             this.spriteType = DrawManager.SpriteType.PinnedBossPatternBullet;
         }
-        else if (type.equals("BasicBackGroundPattern")){
+        else if (type == BossPattern.PatternBulletType.BACKGROUND){
             this.spriteType = DrawManager.SpriteType.BasicBackGroundPatternBullet;
         }
-
     }
+
     /**
      * move a bullet
      */
