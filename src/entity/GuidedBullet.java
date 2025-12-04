@@ -14,6 +14,8 @@ public class GuidedBullet extends BossBullet {
     private double speedValue;
     private Cooldown animationCooldown;
     private double angle;
+    private final double ANGLE_INTERPOLATION_FACTOR = 0.15;
+
 
     /**
      * Constructor for GuidedBullet
@@ -60,7 +62,7 @@ public class GuidedBullet extends BossBullet {
                 double moveX = (dx / distance) * speedValue;
                 double moveY = (dy / distance) * speedValue;
                 double targetAngle = Math.atan2(dy, dx);
-                this.angle += (targetAngle - this.angle) * 0.15;
+                this.angle += (targetAngle - this.angle) * ANGLE_INTERPOLATION_FACTOR;
                 this.preciseX += moveX;
                 this.preciseY += moveY;
             }

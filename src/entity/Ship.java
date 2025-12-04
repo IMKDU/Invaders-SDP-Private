@@ -43,6 +43,9 @@ public class Ship extends Entity implements Collidable {
     private boolean movingSoundPlaying = false;
 	private int bombShotsRemaining = 0;
     private GameModel model;
+    private static final int BOMB_BULLET_BASE_WIDTH  = 20;
+    private static final int BOMB_BULLET_BASE_HEIGHT = 53;
+    private static final int BOMB_BULLET_SCALE = 2;
 
     public void enableBomb(int count) {
         this.bombShotsRemaining = count;
@@ -180,8 +183,8 @@ public class Ship extends Entity implements Collidable {
 			int centerY = positionY - BULLET_SPAWN_Y_OFFSET;
 
 			if (bombShotsRemaining > 0) {
-                int bombWidth  = 20 * 2;
-                int bombHeight = 53 * 2;
+                int bombWidth  = BOMB_BULLET_BASE_WIDTH * BOMB_BULLET_SCALE;
+                int bombHeight = BOMB_BULLET_BASE_HEIGHT * BOMB_BULLET_SCALE;
 
                 int bombX = centerX - bombWidth / 2;
                 int bombY = positionY - bombHeight;
