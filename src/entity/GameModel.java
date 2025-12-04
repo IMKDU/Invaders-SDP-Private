@@ -127,8 +127,8 @@ public class GameModel {
     private List<Ship> ships;
 	private Set<BlackHole> blackHoles;
 	private Set<MidBossMob> midBossMobs;
+    private Set<Explosion> explosions;
 
-    private Explosion explosionEntity = null;
     private int teleportFromP1X;
     private int teleportFromP1Y;
     private int afterTeleportFromP1X;
@@ -171,6 +171,8 @@ public class GameModel {
 		this.bossLasers = new HashSet<>();
 		this.blackHoles = new HashSet<>();
 		this.midBossMobs = new HashSet<>();
+		this.explosions = new HashSet<>();
+
         enemyShipFormationModel = new EnemyShipFormationModel(this.currentLevel, width);
         this.enemyShipFormationModel.applyEnemyColor(this.currentLevel.getColorForLevel());
         this.ship = new Ship(this.width / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 13 / 15,Color.GREEN,true);
@@ -359,8 +361,6 @@ public class GameModel {
                             this.zetaBoss = null;
                             this.finalBoss = new FinalBoss(ships);
                             this.logger.info("Final Boss has spawned!");
-                        } else {
-
                         }
                     }
                 }
@@ -369,8 +369,8 @@ public class GameModel {
                 if (this.gammaBoss != null) {
                     this.gammaBoss.update();
                     if (this.gammaBoss instanceof GammaBoss gamma) {
-                        this.explosionEntity = gamma.getBoom();
-                        bossBullets.addAll(gamma.getBossPattern().getBullets());
+                        this.explosions.add(gamma.getBoom());
+                        this.bossBullets.addAll(gamma.getBossPattern().getBullets());
 						bossLasers.addAll(gamma.getBossPattern().getLasers());
                     }
 
@@ -379,8 +379,10 @@ public class GameModel {
                     }
                 }
 
-	            updateBossBullets();
-	            updateBossLasers();
+	            validateBossBulletsSet();
+	            validateLaserBeamsSet();
+				validateExplosionsSet();
+				validateBlackHolesSet();
 
                 boolean isFinalBossAlive = (this.finalBoss != null && !this.finalBoss.isDestroyed());
                 boolean isOmegaBossAlive = (this.omegaBoss != null && !this.omegaBoss.isDestroyed());
@@ -471,7 +473,7 @@ public class GameModel {
         if (gammaBoss != null && !gammaBoss.isDestroyed()) entities.add(gammaBoss);
 
         if (midBossMobs != null){ entities.addAll(midBossMobs); }
-        if (explosionEntity != null) entities.add(explosionEntity);
+        if (explosions != null) entities.addAll(explosions);
 		entities.addAll(bullets);
 		entities.addAll(bossBullets);
 		entities.addAll(dropItems);
@@ -1222,10 +1224,11 @@ public class GameModel {
 		        float progress = pattern.getAttackAnimationProgress();
 		        executeApocalypseDamage(pattern.getSafeZoneColumn(), progress);
 	        }
-			bossBullets.addAll(this.finalBoss.getBullets());
-			bossLasers.addAll(this.finalBoss.getLasers());
-			blackHoles=this.finalBoss.getBlackHoles();
-			midBossMobs=this.finalBoss.getChildShips();
+			this.bossBullets.addAll(this.finalBoss.getBullets());
+	        this.bossLasers.addAll(this.finalBoss.getLasers());
+	        this.blackHoles.addAll(this.finalBoss.getBlackHoles());
+	        this.explosions.addAll(this.finalBoss.getBoom());
+	        this.midBossMobs=this.finalBoss.getChildShips();
         }
         if (this.finalBoss != null && this.finalBoss.isDestroyed()) {
             this.levelFinished = true;
@@ -1233,7 +1236,7 @@ public class GameModel {
         }
     }
 
-	private void updateBossBullets() {
+	private void validateBossBulletsSet() {
 		/** bullets to erase */
 		Set<Bullet> bulletsToRemove = new HashSet<>();
 
@@ -1249,8 +1252,8 @@ public class GameModel {
 		bossBullets.removeAll(bulletsToRemove);
 	}
 
-	private void updateBossLasers() {
-		/** bullets to erase */
+	private void validateLaserBeamsSet() {
+		/** Lasers to erase */
 		Set<LaserBeam> lasersToRemove = new HashSet<>();
 
 		for(LaserBeam laser : bossLasers) {
@@ -1261,6 +1264,16 @@ public class GameModel {
 		}
 		bossLasers.removeAll(lasersToRemove);
 
+	}
+
+	private void validateExplosionsSet() {
+		/** explosions to erase */
+		explosions.removeIf(Explosion::shouldBeRemoved);
+	}
+
+	private void validateBlackHolesSet() {
+		/** black-holes to erase */
+		blackHoles.removeIf(BlackHole::shouldBeRemoved);
 	}
 
 		// --- Timer and State Management Methods for Controller ---
@@ -1395,9 +1408,9 @@ public class GameModel {
         return ships;
     }
 
-    public boolean isExplosionBoom() { return explosionEntity.isBoom(); }
-    public Explosion getExplosionEntity() { return explosionEntity; }
-    public double getWarningExplosion() { return explosionEntity.getWarningProgress(); }
+//    public boolean isExplosionBoom() { return explosions.isBoom(); }
+    public Set<Explosion> getExplosions() { return explosions; }
+//    public double getWarningExplosion() { return explosions.getWarningProgress(); }
 
     public List<Entity> getEntitiesToRender() {
         List<Entity> renderList = new ArrayList<>();

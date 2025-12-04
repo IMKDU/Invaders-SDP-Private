@@ -1,11 +1,8 @@
 package screen;
 
-import audio.SoundManager;
-import engine.Core;
 import engine.DrawManager;
 import engine.DTO.HUDInfoDTO;
 import entity.*;
-import entity.pattern.ApocalypseAttackPattern;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,12 +133,14 @@ public class GameView {
             drawChargingSkill(model.getShipP2(), dto.getWidth(), dto.getHeight());
         }
 
-        if(model.getExplosionEntity() != null){
-            drawManager.getEntityRenderer().drawExplosion(
-                    model.isExplosionBoom(),
-                    model.getExplosionEntity(),
-                    model.getWarningExplosion()
-            );
+        if(model.getExplosions() != null){
+			for(Explosion ex : model.getExplosions()){
+				drawManager.getEntityRenderer().drawExplosion(
+						ex.isBoom(),
+						ex,
+						ex.getWarningProgress()
+				);
+			}
         }
         /** countdown */
         if (!model.isInputDelayFinished()) {

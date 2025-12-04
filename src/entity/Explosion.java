@@ -69,7 +69,7 @@ public class Explosion extends Entity {
     /**
      * Returns whether the entity is destroyed.
      * */
-    public boolean isDestroyed() {
+    public boolean shouldBeRemoved() {
         return isDestroyed;
     }
 

@@ -30,7 +30,7 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 	private static final int DIAGONAL_Y_SPEED = 3;
 	private static final Color DIAGONAL_COLOR = Color.MAGENTA;
 
-	private static final int DASH_MAXIMUM = 4;
+	private static final int DASH_MAXIMUM = 3;
 
 	// Screen dimensions
 	private int SCREEN_WIDTH = GameConstant.SCREEN_WIDTH;
@@ -107,9 +107,12 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 	private int spawnMobCooldown;
 
 	// Explosion pattern management
-	private BackgroundExplosionPattern explosionPattern;
+	private Set<BackgroundExplosionPattern> explosionPatterns;
+	private Set<Explosion> explosions;
 	private Cooldown explosionCooldownTimer;
 	private int explosionCooldown;
+
+	private int laserCooldown;
 
 	/** Cooldown for 1 cycle */
 	private Cooldown cycleCooldownTimer;
@@ -128,12 +131,13 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 		this.logger = Core.getLogger();
 		this.random = new Random();
 
-		// Initialize Apocalypse Pattern
+		// Initialize Patterns
 		this.apocalypsePattern = new ApocalypseAttackPattern(boss);
 		this.guidedMissilePattern = new GuidedMissilePattern(this.boss, ships);
 		this.spawnMobPattern = new SpawnMobPattern(boss);
 		this.spawnMobChilds = spawnMobPattern.getChildShips();
-
+		this.explosionPatterns = new HashSet<>();
+		this.explosions = new HashSet<>();
 		updateTimersForPhase();
 
 		// Initialize pattern
@@ -152,52 +156,50 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 	 * </ul>
 	 */
 	public void update(){
-		switch (currentPhase) {
-			case 3:
-				if (dashState==DashState.COOLDOWN && apocalypseState == ApocalypseState.COOLDOWN && apocalypseCooldownTimer.checkFinished()) {
+		if(currentPhase>1){
+			// Priority 1: Check if Apocalypse cooldown finished
+			if (dashState==DashState.COOLDOWN && apocalypseState == ApocalypseState.COOLDOWN && apocalypseCooldownTimer.checkFinished()) {
+				forceStopBlackHole();
+				forceRemoveChilds();
+				startApocalypse();
+				stopMovement();
+				return;
+			}
 
-				}
-				// intentional fall-through
-			case 2:
-				// Priority 1: Check if Apocalypse cooldown finished
-				if (dashState==DashState.COOLDOWN && apocalypseState == ApocalypseState.COOLDOWN && apocalypseCooldownTimer.checkFinished()) {
-					forceStopBlackHole();
-					forceRemoveChilds();
-					startApocalypse();
-					stopMovement();
-					return;
-				}
+			// Priority 2: Handle active Apocalypse
+			if (dashState==DashState.COOLDOWN && getLasers().isEmpty() && (apocalypseState == ApocalypseState.CHARGING || apocalypseState == ApocalypseState.FIRING)) {
+				updateApocalypse();
+				stopMovement();
+				return;
+			}
 
-				// Priority 2: Handle active Apocalypse
-				if (dashState==DashState.COOLDOWN && (apocalypseState == ApocalypseState.CHARGING || apocalypseState == ApocalypseState.FIRING)) {
-					updateApocalypse();
-					stopMovement();
-					return;
-				}
+			// Restore BosMobs
+			loadSavedChilds();
 
-				// Restore BosMobs
-				loadSavedChilds();
+			// Priority 3: Handle BlackHole cycle
+			updateBlackHoleCycle();
 
-				// Priority 3: Handle BlackHole cycle
-				updateBlackHoleCycle();
+			// Priority 3: Handle SpawnMob cycle
+			updateSpawnMobCycle();
 
-				// Priority 3: Handle SpawnMob cycle
-				updateSpawnMobCycle();
+			// Priority 3: Handle Dash cycle
+			if (dashState==DashState.COOLDOWN && dashCooldown!=0 && dashCooldownTimer.checkFinished() || dashState==DashState.DASHING) {
+				updateDash();
+				stopMovement();
+				return;
+			}
+		}
+		if(currentPhase>2){
 
-				// Priority 3: Handle Dash cycle
-				if (dashState==DashState.COOLDOWN && dashCooldownTimer.checkFinished() || dashState==DashState.DASHING) {
-					updateDash();
-					stopMovement();
-					return;
-				}
+			// Priority 4: Update movement (always except during Apocalypse)
+			if (guidedMissilePattern != null) {
+				guidedMissilePattern.attack();
+			}
 
-				// Priority 4: Update movement (always except during Apocalypse)
-				if (guidedMissilePattern != null) {
-					guidedMissilePattern.attack();
-				}
-				break;
-			case 1:
-				break;
+			updateExplosionCycle();
+		}
+		if(currentPhase>3){
+
 		}
 		updatePhase();
 
@@ -225,6 +227,8 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 			this.movementPattern = createMovementPattern();
 			this.attackPattern = movementPattern;
 			logger.info("NoxisBossPattern: Phase changed to " + this.currentPhase);
+			dashCooldownTimer.reset();
+			cycleCooldownTimer.reset();
 		}
 		// Update patterns if cycle cooldown is done
 		if (cycleCooldownTimer.checkFinished()) {
@@ -232,7 +236,8 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 			this.movementPattern = createMovementPattern();
 			this.attackPattern = movementPattern;
 			renewTimers();
-			this.cycleCooldownTimer.reset();
+			dashCooldownTimer.reset();
+			cycleCooldownTimer.reset();
 		}
 	}
 
@@ -251,7 +256,7 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 			case 2: // 70-40%
 				this.blackHoleDuration = 7000; // 7 seconds
 				this.blackHoleCooldown = 7000; // 7 seconds
-				this.apocalypseCooldown = 10000; // 15 seconds
+				this.apocalypseCooldown = 15000; // 15 seconds
 				this.dashCooldown = 8000; // 8 seconds
 				this.cycleCooldown = 10000; // 11 seconds
 				this.spawnMobCooldown = 20000; // 20 seconds
@@ -260,10 +265,11 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 				this.blackHoleDuration = 9000; // 9 seconds
 				this.blackHoleCooldown = 5000; // 5 seconds
 				this.apocalypseCooldown = 8000; // 10 seconds
-				this.dashCooldown = 5000; // 8 seconds
+				this.dashCooldown = 0; // not used
 				this.cycleCooldown = 16000; // 11 seconds
-				this.explosionCooldown = 1000; // 1 seconds
+				this.explosionCooldown = 2000; // 2 seconds
 				this.spawnMobCooldown = 15000; // 15 seconds
+				this.laserCooldown = 16000;
 				break;
 		}
 		// Create new timers with updated durations
@@ -343,6 +349,25 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 			spawnMobCooldownTimer.reset();
 			spawnMobPattern = new SpawnMobPattern(boss);
 		}
+	}
+
+	/**
+	 * Updates Explosions state
+	 */
+	public void updateExplosionCycle(){
+		if(explosionPatterns == null || explosionCooldownTimer.checkFinished()) {
+			explosionCooldownTimer.reset();
+			explosionPatterns.add(new BackgroundExplosionPattern());
+			return;
+		}
+		for(BackgroundExplosionPattern explosionPattern : this.explosionPatterns){
+			if(explosionPattern.getBoom()!=null){
+				explosions.add(explosionPattern.getBoom());
+			}
+			explosionPattern.attack();
+		}
+		explosions.removeIf(Explosion::shouldBeRemoved);
+		explosionPatterns.removeIf(pattern -> pattern.getBoom() != null && pattern.getBoom().shouldBeRemoved());
 	}
 
 	/**
@@ -493,24 +518,17 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 	}
 
 	private BossPattern createPhase3Pattern(){
-		int choice = random.nextInt(3);
-		if(choice == 0){
-			if (random.nextBoolean()) {
-				logger.info("NoxisBossPattern: Movement - Diagonal (random)");
-				return new DiagonalPattern(boss, DIAGONAL_X_SPEED, DIAGONAL_Y_SPEED, DIAGONAL_COLOR);
-			} else {
-				logger.info("NoxisBossPattern: Movement - ZigZag Angry (random)");
-				return new ZigZagAngryPattern(boss, SCREEN_WIDTH, SCREEN_HEIGHT);
-			}
+		int choice = random.nextInt(4);
+//		if (choice==0) {
+//			logger.info("NoxisBossPattern: Movement - Diagonal (random)");
+//			return new DiagonalPattern(boss, DIAGONAL_X_SPEED, DIAGONAL_Y_SPEED, DIAGONAL_COLOR);
+//		}
+		if(choice == 1 || choice==0){
+			logger.info("NoxisBossPattern: Movement - TimeGap");
+			return new TimeGapAttackPattern(boss, ships, SCREEN_WIDTH, SCREEN_HEIGHT);
 		}
+		logger.info("NoxisBossPattern: Movement - ZigZag Angry (random)");
 		return new ZigZagAngryPattern(boss, SCREEN_WIDTH, SCREEN_HEIGHT);
-	}
-
-	/**
-	 * Stops attack
-	 */
-	private void stopAttack(int milli) {
-
 	}
 
 	/**
@@ -595,6 +613,14 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 			}
 		}
 		return blackHoles;
+	}
+
+	public Set<Explosion> getBoom(){
+		if(this.explosionPatterns == null || this.explosions==null){
+			return Set.of();
+		}
+		logger.info("NoxisBossPattern: Movement - Boom: "+explosions.size());
+		return explosions;
 	}
 
 	/**

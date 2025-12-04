@@ -37,8 +37,7 @@ public class BackgroundExplosionPattern extends BossPattern {
     public void attack() {
         if (explosionEntity != null) {
             explosionEntity.update();
-            if (explosionEntity.isDestroyed()) {
-                explosionEntity = null;
+            if (explosionEntity.shouldBeRemoved()) {
                 this.cooldown.reset();
             }
         } else if (cooldown.checkFinished()) {

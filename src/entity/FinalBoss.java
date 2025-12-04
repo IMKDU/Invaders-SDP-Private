@@ -139,6 +139,10 @@ public class FinalBoss extends MidBoss {
 		return noxisBossPattern.getChildShips();
 	}
 
+	public Set<Explosion> getBoom(){
+		return noxisBossPattern.getBoom();
+	}
+
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
 		other.onCollideWithBoss(this, model);
