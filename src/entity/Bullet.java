@@ -41,12 +41,12 @@ public class Bullet extends Entity implements Collidable {
 	 *            Speed of the bullet, positive or negative depending on
 	 *            direction - positive is down.
 	 */
-	public Bullet(final int positionX, final int positionY, final int speed, final int width, final int height, final boolean isBossBullet) {
+	public Bullet(final int positionX, final int positionY, final int speed, final int width, final int height, final boolean isNormalBullet) {
 		super(positionX, positionY, width, height,null);
 		this.speed = speed;
 		this.penetrationCount = 0;
 		this.maxPenetration = ShopItem.getPenetrationCount();
-        if (!isBossBullet){
+        if (isNormalBullet){
             setSprite();
         }
 

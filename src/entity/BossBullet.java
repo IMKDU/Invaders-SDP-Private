@@ -33,7 +33,7 @@ public class BossBullet extends Bullet implements Collidable {
      *            bullet's sprite type
      */
     public BossBullet(int x, int y, int dx, int dy, int width, int height, String type) {
-        super(x, y, 0, width, height,true);
+        super(x, y, 0, width, height,false);
         this.dx = dx;
         this.dy = dy;
         if (type.equals("FinalBoss")){

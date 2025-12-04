@@ -81,10 +81,10 @@ public class Ship extends Entity implements Collidable {
             this.spriteType = SpriteType.ShipP2;
             this.isP1Ship = false;
         }
-		this.shootingCooldown = new Cooldown(100);//ShopItem.getShootingInterval()
+		this.shootingCooldown = new Cooldown(ShopItem.getShootingInterval());
 		this.destructionCooldown = new Cooldown(1000);
 		this.shieldCooldown = new Cooldown(0);
-		this.isInvincible = true;
+		this.isInvincible = false;
 
 		this.skills = new HashMap<SkillType, ISkill>();
 		registerSkills();
@@ -180,8 +180,13 @@ public class Ship extends Entity implements Collidable {
 			int centerY = positionY - BULLET_SPAWN_Y_OFFSET;
 
 			if (bombShotsRemaining > 0) {
+                int bombWidth  = 20 * 2;
+                int bombHeight = 53 * 2;
 
-				Bullet b = new BombBullet(centerX, centerY, speed);
+                int bombX = centerX - bombWidth / 2;
+                int bombY = positionY - bombHeight;
+
+                Bullet b = new BombBullet(bombX, bombY, speed, bombWidth ,bombHeight);
 				b.setOwnerId(this.playerId);
 				bullets.add(b);
 
@@ -224,7 +229,7 @@ public class Ship extends Entity implements Collidable {
 	 */
     public final void update() {
         if (this.isInvincible && this.shieldCooldown.checkFinished()) {
-            this.isInvincible = true;
+            this.isInvincible = false;
         }
         if (!this.destructionCooldown.checkFinished()) {
             double ratio = this.destructionCooldown.getRemaining() / (double) this.destructionCooldown.getTotal();
