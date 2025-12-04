@@ -495,7 +495,7 @@ public final class EntityRenderer {
     }
 
     /** Draw circle for pull_attack pattern */
-    public void drawBlackHole(final int cx, final int cy, final int size) {
+    public void drawBlackHole(final int cx, final int cy, int size) {
         Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
 
         if (this.blackholeAnimationCooldown.checkFinished()) {
@@ -506,7 +506,6 @@ public final class EntityRenderer {
         }
 
         BufferedImage img = spriteMap.get(blackHoleType);
-
         int drawX = cx - size / 2;
         int drawY = cy - size / 2;
 
@@ -516,10 +515,7 @@ public final class EntityRenderer {
 
         g2d.setClip(new java.awt.geom.Ellipse2D.Float(drawX, drawY, size, size));
 
-
         g2d.drawImage(img, drawX, drawY, size, size, null);
-
-
         g2d.setClip(oldClip);
     }
 
@@ -571,7 +567,6 @@ public final class EntityRenderer {
             int drawX = centerX - scaledW / 2;
             int drawY = centerY - scaledH / 2;
             g.drawImage(bombexplosion, drawX, drawY, scaledW, scaledH, null);
-            SoundManager.play("sfx/BombExplosion.wav");
         }
     }
 
