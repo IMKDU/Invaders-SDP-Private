@@ -90,7 +90,6 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
         );
 
         this.movementStrategy = new EnemyShipFormationMovement(this,GameConstant.ITEMS_SEPARATION_LINE_HEIGHT,screenWidth);
-        this.shootingManager = new FormationShootingManager(level, this.enemyShips);
 
         this.baseSpeed = level.getBaseSpeed();
         this.movementSpeed = this.baseSpeed;
@@ -134,9 +133,12 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
         if(level.getLevel() == 3){
             List<EnemyShip> verticalEnemy = enemyFlatten(enemyShips);
             VerticalLoopFormationMovement verticalLoop = new VerticalLoopFormationMovement(verticalEnemy, SEPARATION_DISTANCE);
-
+            enemyShips = new ArrayList<>();
+            enemyShips.add(verticalEnemy);
             addMovementStrategy(verticalLoop);
         }
+
+        this.shootingManager = new FormationShootingManager(level, this.enemyShips);
     }
 
     public List<EnemyShip> enemyFlatten(List<List<EnemyShip>> enemyShips){
