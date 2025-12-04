@@ -144,18 +144,20 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
 
                     case "vertical":
                         List<EnemyShip> flatList = enemyFlatten(targetGroup);
-                        finalEnemyShips.add(flatList);
                         addMovementStrategy(new VerticalLoopFormationMovement(flatList, SEPARATION_DISTANCE));
-                        if(strategySize == 1) {
+                        if (strategySize == 1) {
                             for (EnemyShip ship : flatList) {
                                 List<EnemyShip> individualCol = new ArrayList<>();
                                 individualCol.add(ship);
                                 finalEnemyShips.add(individualCol);
                             }
+                        } else {
+                            finalEnemyShips.add(flatList);
                         }
                         break;
 
                     default:
+                        logger.warning("Unknown movement strategy: " + strategyName);
                         break;
                 }
             }
