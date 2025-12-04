@@ -28,7 +28,7 @@ public class MidBossMobMovement {
     /** The height of the boss, used for center calculation. */
     private int midBossHeight;
     /** Radius of the orbit movement when in Pattern 2 or low HP state. */
-    private static final double ORBIT_RADIUS = 50.0;
+    private static final double ORBIT_RADIUS = 200.0;
     /** Speed multiplier for the orbit angle per frame. */
     private static final double ORBIT_SPEED = 0.02;
     /** Frequency for horizontal oscillation when descending. */

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import engine.level.ItemDrop;
-import entity.pattern.BlackHolePattern;
 import entity.pattern.ISkill;
 import entity.skills.OriginSkill;
 
@@ -127,7 +126,7 @@ public class GameModel {
 
     private List<Ship> ships;
 	private Set<BlackHole> blackHoles;
-	private Set<MidBossMob> NoxisBossMobs;
+	private Set<MidBossMob> midBossMobs;
 
     private Explosion explosionEntity = null;
     private int teleportFromP1X;
@@ -171,6 +170,7 @@ public class GameModel {
         this.bossBullets = new HashSet<>();
 		this.bossLasers = new HashSet<>();
 		this.blackHoles = new HashSet<>();
+		this.midBossMobs = new HashSet<>();
         enemyShipFormationModel = new EnemyShipFormationModel(this.currentLevel, width);
         this.enemyShipFormationModel.applyEnemyColor(this.currentLevel.getColorForLevel());
         this.ship = new Ship(this.width / 4, GameConstant.ITEMS_SEPARATION_LINE_HEIGHT * 13 / 15,Color.GREEN,true);
@@ -470,9 +470,7 @@ public class GameModel {
         if (zetaBoss != null && !zetaBoss.isDestroyed()) entities.add(zetaBoss);
         if (gammaBoss != null && !gammaBoss.isDestroyed()) entities.add(gammaBoss);
 
-//        if (midBossChilds != null){
-//            for(MidBossMob mb : midBossChilds){ entities.add(mb); }
-//        }
+        if (midBossMobs != null){ entities.addAll(midBossMobs); }
         if (explosionEntity != null) entities.add(explosionEntity);
 		entities.addAll(bullets);
 		entities.addAll(bossBullets);
@@ -1092,9 +1090,9 @@ public class GameModel {
 		if (finalBoss != null) {
 			allBosses.add(finalBoss);
 		}
-//		if (midBossChilds != null) {
-//			allBosses.addAll(midBossChilds);
-//		}
+		if (midBossMobs != null) {
+			allBosses.addAll(midBossMobs);
+		}
 
 		for (BossEntity boss : allBosses) {
 			if (!boss.isDestroyed() && inRange((Entity) boss, cx, cy, radius)) {
@@ -1227,6 +1225,7 @@ public class GameModel {
 			bossBullets.addAll(this.finalBoss.getBullets());
 			bossLasers.addAll(this.finalBoss.getLasers());
 			blackHoles.addAll(this.finalBoss.getBlackHoles());
+			midBossMobs.addAll(this.finalBoss.getChildShips());
         }
         if (this.finalBoss != null && this.finalBoss.isDestroyed()) {
             this.levelFinished = true;
@@ -1354,7 +1353,7 @@ public class GameModel {
     public MidBoss getOmegaBoss() { return omegaBoss; }
     public MidBoss getZetaBoss() { return zetaBoss; }
     public MidBoss getGammaBoss() { return gammaBoss; }
-//    public List<MidBossMob> getMidBossChilds() { return midBossChilds; }
+//    public Set<MidBossMob> getMidBossChilds() { return midBossMobs; }
     public Set<Bullet> getBullets() { return bullets; }
     public Set<DropItem> getDropItems() { return dropItems; }
     public int getScoreP1() { return scoreP1; }
@@ -1429,11 +1428,9 @@ public class GameModel {
                 renderList.add(enemy);
             }
         }
-//        if (getMidBossChilds() != null) {
-//            for (MidBossMob child : getMidBossChilds()) {
-//                renderList.add(child);
-//            }
-//        }
+        if (midBossMobs != null) {
+			renderList.addAll(midBossMobs);
+        }
         // 4. added boss
         if (getOmegaBoss() != null) {
             renderList.add(getOmegaBoss());

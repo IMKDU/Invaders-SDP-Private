@@ -135,6 +135,10 @@ public class FinalBoss extends MidBoss {
 		return noxisBossPattern.getDashPattern();
 	}
 
+	public Set<MidBossMob> getChildShips() {
+		return noxisBossPattern.getChildShips();
+	}
+
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
 		other.onCollideWithBoss(this, model);

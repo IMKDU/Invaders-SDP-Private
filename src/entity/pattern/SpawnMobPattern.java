@@ -1,20 +1,20 @@
 package entity.pattern;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.awt.*;
+import java.util.List;
 import java.util.logging.Logger;
 import entity.GameConstant;
 import entity.HasBounds;
+import entity.MidBoss;
 import entity.MidBossMob;
 
 public class SpawnMobPattern extends BossPattern {
 
 
-    private HasBounds boss;
+    private MidBoss boss;
     /** Boss spawn child ships */
-    private List<MidBossMob> childShips;
+    private Set<MidBossMob> childShips;
     /** Current accumulated count of all ships spawned throughout the fight. */
     private int spawnCount = 0;
     /** Movement speed of the spawned child ships. */
@@ -36,10 +36,10 @@ public class SpawnMobPattern extends BossPattern {
     private Logger logger;
     /** List of ship count increments for each spawn phase (5, 10, 15, 30) */
     private final int[] SPAWN_COUNT_LIST = {
-            5,
-            10,
-            15,
-            30
+            4,
+            6,
+            8,
+            10
     };
     /** List of required accumulated spawn totals to trigger the next phase (0, 5, 15, 30). */
     private int SPAWN_COUNT_CHECK = 0;
@@ -58,15 +58,15 @@ public class SpawnMobPattern extends BossPattern {
     private final int MOB_POINT_VALUE = 10;
     /**
      * Initializes the SpawnMobPattern component.
-     * @param Boss_MaxHP The maximum health of the boss.
      */
-    public SpawnMobPattern(HasBounds boss,int Boss_MaxHP) {
+    public SpawnMobPattern(MidBoss boss) {
         super(new Point(boss.getPositionX(), boss.getPositionY()));
-        this.childShips = new ArrayList<MidBossMob>();
+        this.childShips = new HashSet<>();
 
+		this.boss = boss;
         this.BOSS_WIDTH = boss.getWidth();
         this.BOSS_HEIGHT = boss.getHeight();
-        this.BOSS_MAXHP = Boss_MaxHP;
+        this.BOSS_MAXHP = boss.getMaxHealPoint();
         this.logger = engine.Core.getLogger();
         this.movementStrategy = new MidBossMobMovement(
                 this.BOSS_WIDTH,
@@ -77,34 +77,34 @@ public class SpawnMobPattern extends BossPattern {
 
     /**
      * Updates the pattern status, checks for spawning, and updates child ship movement.
-     * @param bossHealPoint The current health point of the main boss.
      */
-    public void update(HasBounds boss,int bossHealPoint) {
+	@Override
+    public void attack() {
         this.bossPositionX = boss.getPositionX();
         this.bossPositionY = boss.getPositionY();
-        this.checkPatternSwitch(bossHealPoint);
-        this.spawnPattern(bossHealPoint);
+        this.checkPatternSwitch(boss.getHealPoint());
+        this.spawnPattern(boss.getHealPoint());
         this.childMovePattern();
     }
     /**
      * Executes the current movement pattern for all active child ships.
      */
     public void childMovePattern() {
-        if(this.currentPattern == 1) {
-            this.movementStrategy.pattern_1_Movement(
-                    this.bossPositionX,
-                    this.bossPositionY,
-                    this.childShips,
-                    this.spawnCount
-            );
-        } else {
+//        if(this.currentPattern == 1) {
+//            this.movementStrategy.pattern_1_Movement(
+//                    this.bossPositionX,
+//                    this.bossPositionY,
+//                    this.childShips.stream().toList(),
+//                    this.spawnCount
+//            );
+//        } else {
             this.movementStrategy.pattern_2_Movement(
                     this.bossPositionX,
                     this.bossPositionY,
-                    this.childShips,
+                    this.childShips.stream().toList(),
                     this.spawnCount
             );
-        }
+//        }
     }
     /**
      * Checks if the pattern needs to switch based on the boss's current health.
@@ -164,14 +164,13 @@ public class SpawnMobPattern extends BossPattern {
     }
 
     @Override
-    public void attack(){}
-
-    @Override
-    public void move(){}
+    public void move(){
+		// There's no movement in this pattern.
+    }
     /**
      * Returns the list of currently active child ships.
      * NOTE: This is the getter method required by the game controller for collision and rendering.
      * @return The list of MidBossMob children.
      */
-    public List<MidBossMob> getChildShips() { return childShips; }
+    public Set<MidBossMob> getChildShips() { return childShips; }
 }
