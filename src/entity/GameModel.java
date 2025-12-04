@@ -1224,8 +1224,8 @@ public class GameModel {
 	        }
 			bossBullets.addAll(this.finalBoss.getBullets());
 			bossLasers.addAll(this.finalBoss.getLasers());
-			blackHoles.addAll(this.finalBoss.getBlackHoles());
-			midBossMobs.addAll(this.finalBoss.getChildShips());
+			blackHoles=this.finalBoss.getBlackHoles();
+			midBossMobs=this.finalBoss.getChildShips();
         }
         if (this.finalBoss != null && this.finalBoss.isDestroyed()) {
             this.levelFinished = true;

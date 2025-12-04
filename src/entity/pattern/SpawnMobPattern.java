@@ -37,9 +37,9 @@ public class SpawnMobPattern extends BossPattern {
     /** List of ship count increments for each spawn phase (5, 10, 15, 30) */
     private final int[] SPAWN_COUNT_LIST = {
             4,
-            6,
-            8,
-            10
+            2,
+            2,
+            3
     };
     /** List of required accumulated spawn totals to trigger the next phase (0, 5, 15, 30). */
     private int SPAWN_COUNT_CHECK = 0;

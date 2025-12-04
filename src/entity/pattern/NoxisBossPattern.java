@@ -102,6 +102,7 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 
 	// SpawnMob pattern management
 	private SpawnMobPattern spawnMobPattern;
+	private Set<MidBossMob> spawnMobChilds;
 	private Cooldown spawnMobCooldownTimer;
 	private int spawnMobCooldown;
 
@@ -131,6 +132,7 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 		this.apocalypsePattern = new ApocalypseAttackPattern(boss);
 		this.guidedMissilePattern = new GuidedMissilePattern(this.boss, ships);
 		this.spawnMobPattern = new SpawnMobPattern(boss);
+		this.spawnMobChilds = spawnMobPattern.getChildShips();
 
 		updateTimersForPhase();
 
@@ -160,6 +162,7 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 				// Priority 1: Check if Apocalypse cooldown finished
 				if (dashState==DashState.COOLDOWN && apocalypseState == ApocalypseState.COOLDOWN && apocalypseCooldownTimer.checkFinished()) {
 					forceStopBlackHole();
+					forceRemoveChilds();
 					startApocalypse();
 					stopMovement();
 					return;
@@ -171,6 +174,9 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 					stopMovement();
 					return;
 				}
+
+				// Restore BosMobs
+				loadSavedChilds();
 
 				// Priority 3: Handle BlackHole cycle
 				updateBlackHoleCycle();
@@ -291,6 +297,14 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 			}
 		}
 		currentBackPatterns.removeAll(removeBlackHoles);
+	}
+
+	public void forceRemoveChilds(){
+		spawnMobChilds = Set.of();
+	}
+
+	public void loadSavedChilds(){
+		spawnMobChilds = spawnMobPattern.getChildShips();
 	}
 
 	/**
@@ -598,8 +612,8 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 	}
 
 	public Set<MidBossMob> getChildShips() {
-		if(spawnMobPattern == null || spawnMobPattern.getChildShips().isEmpty()) return Set.of();
-		return spawnMobPattern.getChildShips();
+		if(spawnMobChilds == null || spawnMobPattern.getChildShips().isEmpty()) return Set.of();
+		return spawnMobChilds;
 	}
 
 	@Override
