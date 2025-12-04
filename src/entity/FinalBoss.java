@@ -112,7 +112,7 @@ public class FinalBoss extends Entity implements BossEntity, Collidable{
     @Override
     public void takeDamage(int damage){
         this.healPoint -= damage;
-        SoundManager.play("sfx/pikachu.wav");
+        SoundManager.playPooled("sfx/pikachu.wav");
         if(this.healPoint <= 0){
             this.destroy();
         }

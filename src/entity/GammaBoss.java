@@ -192,7 +192,7 @@ public class GammaBoss extends MidBoss {
     @Override
     public void takeDamage(int damage) {
         this.healPoint -= damage;
-        SoundManager.play("sfx/GammaBoss_hitting.wav");
+        SoundManager.playPooled("sfx/GammaBoss_hitting.wav");
         if (this.healPoint <= 0) {
             SoundManager.play("sfx/GammaBossDying.wav");
             this.destroy();
