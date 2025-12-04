@@ -4,7 +4,6 @@ import engine.BackBuffer;
 import engine.DrawManager;
 import engine.FontPack;
 import engine.ItemHUDManager;
-import entity.Ship;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -22,19 +21,27 @@ public final class HUDRenderer {
     private final BackBuffer backBuffer;
     private final FontPack fontPack;
     private final EntityRenderer entityRenderer;
-    private final BufferedImage teleportCool;
 
 	// Teleport cooldown UI constants
-	private static final int P1_COOLDOWN_X = 170;
-	private static final int P2_COOLDOWN_X_OFFSET = 200;
+	private static final int P1_COOLDOWN_X = 200;
+	private static final int P2_COOLDOWN_X_OFFSET = 100;
 	private static final int COOLDOWN_Y_OFFSET = 50;
 	private static final int TELEPORT_GAUGE_RADIUS = 26;
+    private int originIconP1X;
+    private int originIconP2X;
 
-    public HUDRenderer(BackBuffer backBuffer, FontPack fontPack, EntityRenderer entityRenderer, BufferedImage teleportCool) {
+    private final Map<DrawManager.SpriteType, BufferedImage> spriteMap;
+    private int originIconP2Width;
+    private int originIconP2Height;
+    private int originIconP1Height;
+    private int originIconP1Width;
+
+    public HUDRenderer(BackBuffer backBuffer, FontPack fontPack, EntityRenderer entityRenderer, Map<DrawManager.SpriteType, BufferedImage> spriteMap) {
         this.backBuffer = backBuffer;
         this.fontPack = fontPack;
         this.entityRenderer = entityRenderer;
-        this.teleportCool = teleportCool;
+        this.spriteMap = spriteMap;
+
     }
 
     /** Draw score. */
@@ -69,7 +76,7 @@ public final class HUDRenderer {
     public void drawCoin(final int screenWidth, final int screenHeight, final int coin) {
         Graphics g = backBuffer.getGraphics();
         g.setFont(fontPack.getRegular());
-        g.setColor(Color.WHITE);
+        g.setColor(Color.YELLOW);
         FontMetrics fm = g.getFontMetrics();
         int fontHeight = fm.getHeight();
 
@@ -160,49 +167,170 @@ public final class HUDRenderer {
     }
 
 	/** Draw circular cooldown gauge */
-	private void drawTeleportCooldown(Graphics2D g, int x, int y, double ratio, Color readyColor) {
-		int r = TELEPORT_GAUGE_RADIUS;
-		g.setColor(Color.DARK_GRAY);
-		g.fillOval(x, y, r, r);
+    /** Draw circular cooldown gauge */
+    private void drawTeleportCooldown(Graphics2D g, int x, int y, double ratio) {
+        int r = TELEPORT_GAUGE_RADIUS;
 
-		if (ratio >= 1.0) {
-            g.drawImage(this.teleportCool,x,y,r,r,null);
+        g.drawImage(
+                spriteMap.get(DrawManager.SpriteType.TeleportCool),
+                x, y, r, r, null
+        );
 
-		}
-
-        else{
-            g.drawImage(this.teleportCool, x, y, r, r, null);
+        if (ratio < 1.0) {
             float alpha = 0.5f;
             Composite old = g.getComposite();
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+
             g.setColor(Color.BLUE);
-            int h = (int)(r * ratio);
+            int h = (int) (r * ratio);
             g.fillRect(x, y + (r - h), r, h);
+
             g.setComposite(old);
 
-            int seconds = Math.max(1, (int)Math.ceil((1.0 - ratio) * 5));
+            int seconds = Math.max(1, (int) Math.ceil((1.0 - ratio) * 5));
             String text = seconds + "";
+
             g.setFont(fontPack.getRegular());
             FontMetrics fm = g.getFontMetrics();
-            int textX = x + (TELEPORT_GAUGE_RADIUS - fm.stringWidth(text)) / 2;
-            int textY = y + (TELEPORT_GAUGE_RADIUS + fm.getAscent()) / 2 - 3;
+
+            int textX = x + (r - fm.stringWidth(text)) / 2;
+            int textY = y + (r + fm.getAscent()) / 2 - 3;
+
             g.setColor(Color.BLACK);
-            g.drawString(text, textX+1, textY+1);
-            g.setColor(Color.red);
+            g.drawString(text, textX + 1, textY + 1);
+
+            g.setColor(Color.RED);
             g.drawString(text, textX, textY);
-
         }
+    }
+
+    /** Draw teleport cooldowns for P1 and P2 */
+    /** Draw teleport cooldowns for P1 and P2 */
+    public void drawTeleportCooldowns(int screenWidth, int screenHeight, double cooldownP1, double cooldownP2, boolean originUsed) {
+        Graphics2D g = (Graphics2D) backBuffer.getGraphics();
+        int r = TELEPORT_GAUGE_RADIUS;
+        int y = screenHeight - COOLDOWN_Y_OFFSET;
+
+        // -------- P1 --------
+        int p1X = P1_COOLDOWN_X;
+        int p1CenterX = p1X + r / 2;
+        int p1CenterY = y + r / 2;
+
+        drawTeleportCooldown(g, p1X, y, cooldownP1);
+
+        drawExplainP1Skill(
+                p1CenterX,
+                p1CenterY,
+                y,
+                y + r
+        );
+
+        // -------- P2 --------
+        int p2X = screenWidth / 2 + P2_COOLDOWN_X_OFFSET;
+        int p2CenterX = p2X + r / 2;
+        int p2CenterY = y + r / 2;
+
+        drawTeleportCooldown(g, p2X, y, cooldownP2);
+
+        drawExplainP2Skill(p2CenterX, p2CenterY, y, y + r);
+        if (originUsed) {
+            drawOriginUsed(y);
+        }
+    }
+
+
+    private void drawPlayerSkillExplain(int centerX, int centerY, int topLineY, int bottomLineY, Color labelColor, String playerLabel, String topMainText, String[] topTexts, String[] bottomTexts, BufferedImage[] icons, boolean isP1) {
+        Graphics2D g = (Graphics2D) backBuffer.getGraphics();
+
+        // Label (P1: / P2:)
+        g.setFont(fontPack.getRegular());
+        g.setColor(labelColor);
+
+        FontMetrics fmLabel = g.getFontMetrics();
+
+        g.drawString(playerLabel, centerX - TELEPORT_GAUGE_RADIUS - fmLabel.stringWidth(playerLabel) - 5, centerY + fmLabel.getAscent() / 2);
+        // Main texts
+        g.setFont(fontPack.getFontSmallBig());
+        g.setColor(Color.WHITE);
+
+        FontMetrics fmTop = g.getFontMetrics();
+
+        int topX = centerX - fmTop.stringWidth(topMainText) / 2;
+        int topY = topLineY - fmTop.getHeight() / 2;
+
+        g.drawString(topMainText, topX, topY);
+
+        String teleport = "teleport";
+
+        FontMetrics fmSmall = g.getFontMetrics();
+
+        int bottomX = centerX - fmSmall.stringWidth(teleport) / 2;
+        int bottomY = bottomLineY + fmSmall.getHeight();
+
+        g.drawString(teleport, bottomX, bottomY);
+
+        // Skill rows
+        topX += 100;
+
+        for (int i = 0; i < topTexts.length; i++) {
+
+            FontMetrics fm = g.getFontMetrics();
+            String t = topTexts[i];
+            int tWidth = fm.stringWidth(t);
+
+            g.drawString(t, topX, topY);
+
+            int center = topX + tWidth / 2;
+
+            BufferedImage icon = icons[i];
+            if (icon != null) {
+                int iconX = center - icon.getWidth() / 2;
+                g.drawImage(icon, iconX, topLineY, null);
+
+
+                if (i == 2) {
+                    if (isP1) {
+                        originIconP1X = iconX;
+                        originIconP1Width = icon.getWidth();
+                        originIconP1Height = icon.getHeight();
+                    } else {
+                        originIconP2X = iconX;
+                        originIconP2Width = icon.getWidth();
+                        originIconP2Height = icon.getHeight();
+                    }
+                }
+            }
+
+            String b = bottomTexts[i];
+            int bWidth = fm.stringWidth(b);
+
+            int bX = center - bWidth / 2;
+            g.drawString(b, bX, bottomY);
+
+            topX += 100;
+        }
+    }
+    public void drawExplainP1Skill(int centerX,int centerY,int topLineY,int bottomLineY) {
+        drawPlayerSkillExplain(centerX, centerY, topLineY, bottomLineY, Color.RED, "P1:", "shift", new String[]{"hold  C", "SPACE", "PRESS  O"}, new String[]{"laser","shoot","origin"}, new BufferedImage[]{spriteMap.get(DrawManager.SpriteType.ChargingLaserP1Icon), spriteMap.get(DrawManager.SpriteType.ShootP1Icon), spriteMap.get(DrawManager.SpriteType.OriginIcon)}, true);
+    }
+    public void drawExplainP2Skill(int centerX,int centerY,int topLineY,int bottomLineY) {
+        drawPlayerSkillExplain(centerX, centerY, topLineY, bottomLineY, Color.CYAN, "P2:", "?  or  /", new String[]{"CTRL(L)", "ENTER", "PRESS  O"}, new String[]{"laser","shoot","origin"}, new BufferedImage[]{spriteMap.get(DrawManager.SpriteType.ChargingLaserP2Icon), spriteMap.get(DrawManager.SpriteType.ShootP2Icon), spriteMap.get(DrawManager.SpriteType.OriginIcon)}, false);
+    }
 
 
 
-	}
-	/** Draw teleport cooldowns for P1 and P2 */
-	public void drawTeleportCooldowns(int screenWidth, int screenHeight, double cooldownP1, double cooldownP2) {
+    public void drawOriginUsed(int topY) {
+        Graphics2D g = (Graphics2D) backBuffer.getGraphics();
 
-		Graphics2D g = (Graphics2D) backBuffer.getGraphics();
+        float alpha = 0.5f;
+        Composite old = g.getComposite();
 
-		drawTeleportCooldown(g, P1_COOLDOWN_X, screenHeight - COOLDOWN_Y_OFFSET, cooldownP1, Color.GREEN);
-		drawTeleportCooldown(g, screenWidth - P2_COOLDOWN_X_OFFSET, screenHeight - COOLDOWN_Y_OFFSET, cooldownP2, Color.PINK);
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        g.setColor(Color.BLUE);
 
-	}
+        g.fillRect(originIconP1X, topY, originIconP1Width, originIconP1Height);
+        g.fillRect(originIconP2X, topY, originIconP2Width, originIconP2Height);
+        g.setComposite(old);
+    }
+
 }
