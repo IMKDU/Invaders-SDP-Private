@@ -102,7 +102,7 @@
         "formationWidth": 7,
         "formationHeight": 6,
         "baseSpeed": 20,
-        "shootingFrecuency": 1000,
+        "shootingFrecuency": 800,
         "movementStrategy": ["vertical"]
       },
       "enemyTypes": [
@@ -152,7 +152,7 @@
         "formationHeight": 6,
         "baseSpeed": 2,
         "shootingFrecuency": 500,
-        "movementStrategy": ["cross","side"]
+        "movementStrategy": ["side","cross"]
       },
       "enemyTypes": [
         { "type": "enemyA", "count": 10 },

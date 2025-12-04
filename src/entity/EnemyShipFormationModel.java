@@ -89,42 +89,6 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
                 nShipsWide,
                 nShipsHigh
         );
-        List<List<List<EnemyShip>>> partitionGroup = new ArrayList<>();
-        int strategySize = levelStrategy.size();
-        this.enemySeparation = builder.getSeparationDistance();
-        if(levelStrategy.getFirst().equals("default")) this.movementStrategy = new EnemyShipFormationMovement(this,GameConstant.ITEMS_SEPARATION_LINE_HEIGHT,screenWidth);
-        else{
-            if(strategySize > 1 ) partitionGroup = builder.splitGroup(enemyShips,strategySize);
-            else partitionGroup.add(enemyShips);
-            List<List<EnemyShip>> finalEnemyShips = new ArrayList<>();
-            for (int i = 0; i < strategySize; i++) {
-                String strategyName = levelStrategy.get(i);
-                List<List<EnemyShip>> targetGroup = partitionGroup.get(i);
-
-                switch (strategyName.toLowerCase()) {
-                    case "side":
-                        addMovementStrategy(new SideLoopFormationMovement(targetGroup));
-                        finalEnemyShips.addAll(targetGroup);
-                        break;
-
-                    case "cross":
-                        addMovementStrategy(new CrossFormationMovement(targetGroup));
-                        finalEnemyShips.addAll(targetGroup);
-                        break;
-
-                    case "vertical":
-                        List<EnemyShip> flatList = enemyFlatten(targetGroup);
-                        finalEnemyShips.add(flatList);
-                        addMovementStrategy(new VerticalLoopFormationMovement(flatList, SEPARATION_DISTANCE));
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-            enemyShips = finalEnemyShips;
-        }
-        this.shootingManager = new FormationShootingManager(level,enemyShips);
 
         this.baseSpeed = level.getBaseSpeed();
         this.movementSpeed = this.baseSpeed;
@@ -151,6 +115,54 @@ public class EnemyShipFormationModel implements Iterable<EnemyShip> {
         this.width = (this.nShipsWide - 1) * SEPARATION_DISTANCE + this.shipWidth;
         this.height = (this.nShipsHigh - 1) * SEPARATION_DISTANCE + this.shipHeight;
 
+        List<List<List<EnemyShip>>> partitionGroup = new ArrayList<>();
+        int strategySize = levelStrategy.size();
+        this.enemySeparation = builder.getSeparationDistance();
+        /** Apply default movement if no strategy is specified or 'default' is chosen */
+        if( levelStrategy.isEmpty() || levelStrategy.getFirst().equals("default")) this.movementStrategy = new EnemyShipFormationMovement(this,GameConstant.ITEMS_SEPARATION_LINE_HEIGHT,screenWidth);
+        else{
+            /** Partition enemy ships into subgroups based on the number of strategies */
+            if(strategySize > 1 ) partitionGroup = builder.splitGroup(enemyShips,strategySize);
+            else partitionGroup.add(enemyShips);
+            List<List<EnemyShip>> finalEnemyShips = new ArrayList<>();
+
+            /** Assign movement logic to each subgroup */
+            for (int i = 0; i < strategySize; i++) {
+                String strategyName = levelStrategy.get(i);
+                List<List<EnemyShip>> targetGroup = partitionGroup.get(i);
+
+                switch (strategyName.toLowerCase()) {
+                    case "side":
+                        addMovementStrategy(new SideLoopFormationMovement(targetGroup));
+                        finalEnemyShips.addAll(targetGroup);
+                        break;
+
+                    case "cross":
+                        addMovementStrategy(new CrossFormationMovement(targetGroup));
+                        finalEnemyShips.addAll(targetGroup);
+                        break;
+
+                    case "vertical":
+                        List<EnemyShip> flatList = enemyFlatten(targetGroup);
+                        finalEnemyShips.add(flatList);
+                        addMovementStrategy(new VerticalLoopFormationMovement(flatList, SEPARATION_DISTANCE));
+                        if(strategySize == 1) {
+                            for (EnemyShip ship : flatList) {
+                                List<EnemyShip> individualCol = new ArrayList<>();
+                                individualCol.add(ship);
+                                finalEnemyShips.add(individualCol);
+                            }
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            /** Update the main enemy list with the re-organized structure */
+            enemyShips = finalEnemyShips;
+        }
+        this.shootingManager = new FormationShootingManager(level,enemyShips);
     }
 
     public List<EnemyShip> enemyFlatten(List<List<EnemyShip>> enemyShips){
