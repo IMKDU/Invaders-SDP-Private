@@ -28,8 +28,8 @@ public final class GameConstant {
 	/** Bomb explosion area radius (in pixels) */
 	public static final int BOMB_AOE_RADIUS = 100;
 
-	public static boolean origin_skill_activated = false;
-	public static boolean used_origin = false;
+	private static boolean origin_skill_activated = false;
+	private static boolean used_origin = false;
 
 	private GameConstant() {}
     private static boolean initialized = false;
@@ -45,4 +45,17 @@ public final class GameConstant {
 
         initialized = true;
     }
+
+	public static boolean getOrigin_skill_activated() {
+		return origin_skill_activated;
+	}
+	public static boolean getUsed_origin() {
+		return used_origin;
+	}
+	public static void setOrigin_skill_activated(boolean value) {
+		origin_skill_activated = value;
+	}
+	public static void setUsed_origin(boolean value) {
+		used_origin = value;
+	}
 }

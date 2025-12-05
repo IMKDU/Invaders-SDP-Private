@@ -67,7 +67,7 @@ public class BlackHole extends Entity implements HasCircleBounds {
 					double ux = dx/dist;
 					double uy = dy/dist;
 
-					if (!GameConstant.origin_skill_activated) {
+					if (!GameConstant.getOrigin_skill_activated()) {
 						e.setPositionX(e.getPositionX()+(int)(ux*force));
 						e.setPositionY(e.getPositionY()+(int)(uy*force));
 					}

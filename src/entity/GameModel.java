@@ -405,7 +405,7 @@ public class GameModel {
                 boolean isOmegaBossAlive = (this.omegaBoss != null && !this.omegaBoss.isDestroyed());
                 boolean isZetaBossAlive = (this.zetaBoss != null && !this.zetaBoss.isDestroyed());
                 boolean isGammaBossAlive = (this.gammaBoss != null && !this.gammaBoss.isDestroyed());
-                if (!GameConstant.origin_skill_activated) {
+                if (!GameConstant.getOrigin_skill_activated()) {
                     if (!isFinalBossAlive && !isOmegaBossAlive && !isZetaBossAlive && !isGammaBossAlive) {
                         if (!this.levelFinished) {
                             this.levelFinished = true;
@@ -1302,7 +1302,7 @@ public class GameModel {
         String bossName = this.currentLevel.getBossId();
 
         if (bossName == null || bossName.isEmpty()) {
-			if(GameConstant.origin_skill_activated) return;
+			if(GameConstant.getOrigin_skill_activated()) return;
             this.logger.info("No boss for this level. Proceeding to finish.");
             return;
         }

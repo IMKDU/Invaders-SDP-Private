@@ -234,7 +234,7 @@ public final class HUDRenderer {
         drawTeleportCooldown(g, p2X, y, cooldownP2);
 
         drawExplainP2Skill(p2CenterX, p2CenterY, y, y + r);
-        if (GameConstant.used_origin) {
+        if (GameConstant.getUsed_origin()) {
             drawOriginUsed(y);
         }
     }

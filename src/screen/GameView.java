@@ -70,12 +70,12 @@ public class GameView {
 		    }
 	    }
 
-	    if (GameConstant.origin_skill_activated) {
+	    if (GameConstant.getOrigin_skill_activated()) {
             drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
             drawManager.getSpecialAnimationRenderer().draw();
 
             if (drawManager.getSpecialAnimationRenderer().isFinished()) {
-                GameConstant.origin_skill_activated=false;
+                GameConstant.setOrigin_skill_activated(false);
             }
         }
 
