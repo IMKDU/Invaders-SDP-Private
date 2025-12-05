@@ -871,7 +871,7 @@ public class GameModel {
 	public void requestBossHitByPlayerBullet(Bullet bullet, BossEntity boss) {
 
 
-		boss.takeDamage(1);
+		boss.takeDamage(GameConstant.PLAYER_BULLET_DAMAGE);
 
 		if (!bullet.penetration()) {
 			bullets.remove(bullet);

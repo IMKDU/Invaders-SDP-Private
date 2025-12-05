@@ -23,6 +23,8 @@ public final class GameConstant {
 	public static final int COIN_ITEM_VALUE = 30;
 	/** Points-to-coin conversion rate */
 	public static final int POINTS_TO_COIN_CONVERSION = 10;
+	/** Damage dealt to bosses by player Bullet */
+	public static final int PLAYER_BULLET_DAMAGE = 5;
 	/** Damage dealt to bosses by bomb explosion */
 	public static final int BOMB_DAMAGE_TO_BOSS = 2;
 	/** Bomb explosion area radius (in pixels) */

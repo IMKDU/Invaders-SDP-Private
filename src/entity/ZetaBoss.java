@@ -37,7 +37,7 @@ public class ZetaBoss extends MidBoss {
     /** Height of Zeta */
     private static final int ZETA_HEIGHT = 100 * 2;
     /** Current Health of Zeta */
-    private static final int ZETA_HEALTH = 60;
+    private static final int ZETA_HEALTH = 500;
     /** Point of Zeta when destroyed */
     private static final int ZETA_POINT_VALUE = 800;
 

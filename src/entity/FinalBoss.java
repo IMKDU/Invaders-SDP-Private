@@ -30,7 +30,7 @@ public class FinalBoss extends MidBoss {
 //	/** Height of Noxis */
 //	private static final int NOXIS_HEIGHT_ANGRY = 89 * 2;
 	/** Current Health of Noxis */
-	private static final int NOXIS_HEALTH = 80;
+	private static final int NOXIS_HEALTH = 1000;
 	/** Point of Noxis when destroyed */
 	private static final int NOXIS_POINT_VALUE = 1000;
 

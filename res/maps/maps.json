@@ -17,7 +17,6 @@
         { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyA", "itemId": "Bomb", "dropChance": 0.05 }
       ],
-
       "completionBonus": { "currency": 10 }
     },
     {
@@ -43,7 +42,6 @@
         { "enemyType": "enemyB", "itemId": "Coin", "dropChance": 0.05 },
         { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 }
       ],
-      "bossId": "ZetaBoss",
       "completionBonus": { "currency": 20 }
     },
     {
@@ -68,7 +66,7 @@
         { "enemyType": "enemyA", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 }
       ],
-      "bossId": "gammaBoss",
+      "bossId": "omegaBoss",
       "completionBonus": { "currency": 30 }
     },
     {
@@ -92,7 +90,7 @@
         { "enemyType": "enemyB", "itemId": "Coin", "dropChance": 0.05 },
         { "enemyType": "enemyB", "itemId": "SubShip", "dropChance": 0.1 }
       ],
-      "bossId": "finalBoss",
+      "bossId" : "gammaBoss",
       "completionBonus": { "currency": 40 }
     },
     {
@@ -118,7 +116,6 @@
         { "enemyType": "enemyC", "itemId": "Stop", "dropChance": 0.1 },
         { "enemyType": "enemyC", "itemId": "SubShip", "dropChance": 0.1 }
       ],
-      "bossId": "omegaBoss",
       "completionBonus": { "currency": 50 }
     },
     {
@@ -165,7 +162,7 @@
         { "enemyType": "enemyC", "itemId": "SubShip", "dropChance": 0.1 },
         { "enemyType": "enemyC", "itemId": "Heal", "dropChance": 0.05 }
       ],
-      "bossId": "omegaAndZetaAndFinal",
+      "bossId": "finalBoss",
       "completionBonus": { "currency": 90 },
       "achievementTrigger": "Conqueror"
     }

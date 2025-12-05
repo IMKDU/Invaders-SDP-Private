@@ -13,10 +13,10 @@ import entity.pattern.ISkill;
 public class ChargingSkill implements ISkill {
 
     /** Duration required to fully charge the skill (in milliseconds) */
-    private static final long CHARGE_DURATION = 5000;
+    private static final long CHARGE_DURATION = 4500;
 
     /** Duration of the laser beam after firing (in milliseconds) */
-    private static final long LASER_DURATION = 1500;
+    private static final long LASER_DURATION = 750;
 
     /** Cooldown duration after using the skill (in milliseconds) */
     private static final long COOLDOWN_DURATION = 0;
