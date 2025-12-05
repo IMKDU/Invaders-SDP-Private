@@ -1342,9 +1342,9 @@ public class GameModel {
 	        }
 			this.bossBullets.addAll(this.finalBoss.getBullets());
 	        this.bossLasers.addAll(this.finalBoss.getLasers());
-	        this.blackHoles = this.finalBoss.getBlackHoles();
-	        this.explosions = this.finalBoss.getBoom();
-	        this.midBossMobs=this.finalBoss.getChildShips();
+	        this.blackHoles = new HashSet<>(this.finalBoss.getBlackHoles());
+	        this.explosions = new HashSet<>(this.finalBoss.getBoom());
+	        this.midBossMobs = new HashSet<>(this.finalBoss.getChildShips());
         }
         if (this.finalBoss != null && this.finalBoss.isDestroyed()) {
             this.levelFinished = true;
