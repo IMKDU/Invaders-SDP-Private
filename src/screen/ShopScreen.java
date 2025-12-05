@@ -43,11 +43,11 @@ public class ShopScreen extends Screen {
 
     /** Price structure for each item level [item][level]. */
     private static final int[][] ITEM_PRICES = {
-            {30, 60, 100},      // MultiShot: Level 1-3
-            {25, 50, 75, 100, 150},  // Rapid Fire: Level 1-5
+            {80},      // MultiShot: Level 1-3
+            {25, 50, 80, 120, 160},  // Rapid Fire: Level 1-5
             {40, 80},           // Penetration: Level 1-2
-            {35, 70, 110},      // Bullet Speed: Level 1-3
-            {20, 40, 60, 80, 100}    // Ship Speed: Level 1-5
+            {35, 70, 120},      // Bullet Speed: Level 1-3
+            {20, 50, 80, 110, 140}    // Ship Speed: Level 1-5
     };
 
     /** Item names. */
@@ -69,7 +69,7 @@ public class ShopScreen extends Screen {
     };
 
     /** Maximum levels for each item. */
-    private static final int[] MAX_LEVELS = {3, 5, 2, 3, 5};
+    private static final int[] MAX_LEVELS = {1, 5, 2, 3, 5};
 
     /** Mode: 0 = selecting item, 1 = selecting level. */
     private int selectionMode;
@@ -196,7 +196,7 @@ public class ShopScreen extends Screen {
         }
 
         // Select item (enter level selection)
-        if (inputManager.isKeyDown(KeyEvent.VK_SPACE)) {
+        if (inputManager.isKeyDown(KeyEvent.VK_SPACE) || inputManager.isKeyDown(KeyEvent.VK_ENTER)) {
             if (selectedItem == TOTAL_ITEMS) {
                 // Exit option selected
                 this.isRunning = false;
@@ -241,7 +241,7 @@ public class ShopScreen extends Screen {
         }
 
         // Confirm purchase
-        if (inputManager.isKeyDown(KeyEvent.VK_SPACE)) {
+        if (inputManager.isKeyDown(KeyEvent.VK_SPACE) || inputManager.isKeyDown(KeyEvent.VK_ENTER)) {
             purchaseItem(selectedItem, selectedLevel);
             this.selectionCooldown.reset();
         }
@@ -368,7 +368,7 @@ public class ShopScreen extends Screen {
             case ITEM_BULLET_SPEED:
                 return ShopItem.getBulletSpeedLevel();
             case ITEM_SHIP_SPEED:
-                return ShopItem.getSHIPSpeedCOUNT() / 5; // Convert back to level
+                return ShopItem.getShipSpeedLevel();
             default:
                 return 0;
         }

@@ -1,5 +1,7 @@
 package entity;
 
+import engine.Core;
+
 /**
  * Manages the in-game item (enhancement) system.
  * This is a temporary implementation focusing on functionality.
@@ -15,13 +17,13 @@ public class ShopItem {
 	private static int multiShotLevel = 0;
 
 	/** Maximum MultiShot level */
-	private static final int MAX_MULTI_SHOT_LEVEL = 3;
+	private static final int MAX_MULTI_SHOT_LEVEL = 1;
 
 	/** Number of bullets fired per level */
-	private static final int[] MULTI_SHOT_BULLETS = {1, 2, 3, 4};
+	private static final int[] MULTI_SHOT_BULLETS = {1, 2};
 
 	/** Spacing between bullets per level (in pixels) */
-	private static final int[] MULTI_SHOT_SPACING = {0, 10, 8, 5};
+	private static final int[] MULTI_SHOT_SPACING = {0, 20};
 
 
 	/**
@@ -39,7 +41,7 @@ public class ShopItem {
 	private static final int MAX_RAPID_FIRE_LEVEL = 5;
 
 	/** Base Shooting Interval */
-	private static final int BASE_SHOOTING_INTERVAL = 750;
+	private static final int BASE_SHOOTING_INTERVAL = 500;
 
 	/** Rapid Fire Reduction Per Level (%)*/
 	private static final int[] RAPID_FIRE_REDUCTION = {0, 5, 10, 15, 20, 30};
@@ -61,10 +63,10 @@ public class ShopItem {
 	private static final int MAX_SHIP_SPEED_LEVEL = 5;
 
 	/** Ship speed per level */
-	private static final int[] SHIP_SPEED = {0, 5, 10, 15, 20, 25};
+	private static final int[] SHIP_SPEED = {0, 2, 4, 6, 8, 10};
 
 	/** Ship Speed Increase Per Level (%)*/
-	private static int SHIPSPEEDLEVEL = 0;
+	private static int shipSpeedLevel = 0;
 	// ==================== Bullet Speed DropItem ====================
 
 	/** Bullet Speed level (0 = not purchased, 1-3 = enhancement levels) */
@@ -241,12 +243,16 @@ public class ShopItem {
 		if (level < 0 || level > MAX_SHIP_SPEED_LEVEL) {
 			return false;
 		}
-		SHIPSPEEDLEVEL = level;
+		shipSpeedLevel = level;
 		return true;
 	}
 
-	public static int getSHIPSpeedCOUNT() {
-		return SHIP_SPEED[SHIPSPEEDLEVEL];
+	public static int getShipSpeed() {
+		return SHIP_SPEED[shipSpeedLevel];
+	}
+
+	public static int getShipSpeedLevel(){
+		return shipSpeedLevel;
 	}
 
 	public static int getBulletSpeedLevel() {
@@ -301,7 +307,7 @@ public class ShopItem {
 		rapidFireLevel = 0;
 		penetrationLevel = 0;
 		bulletSpeedLevel = 0;
-		SHIPSPEEDLEVEL = 0;
+		shipSpeedLevel = 0;
 	}
 
 	/**
@@ -325,8 +331,8 @@ public class ShopItem {
 		status.append("Bullet Speed Level: ").append(bulletSpeedLevel)
 				.append(" (Speed: ").append(getBulletSpeed())
 				.append(")\n");
-		status.append("Ship Speed Level: ").append(SHIPSPEEDLEVEL)
-				.append(" (Speed: ").append(getSHIPSpeedCOUNT());
+		status.append("Ship Speed Level: ").append(shipSpeedLevel)
+				.append(" (Speed: ").append(getShipSpeed());
 		return status.toString();
 	}
 
@@ -338,6 +344,6 @@ public class ShopItem {
         rapidFireLevel = MAX_RAPID_FIRE_LEVEL;
         penetrationLevel = MAX_PENETRATION_LEVEL;
         bulletSpeedLevel = MAX_BULLET_SPEED_LEVEL;
-        SHIPSPEEDLEVEL = MAX_SHIP_SPEED_LEVEL;
+        shipSpeedLevel = MAX_SHIP_SPEED_LEVEL;
     }
 }

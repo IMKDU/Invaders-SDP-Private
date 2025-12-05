@@ -20,8 +20,6 @@ import entity.skills.OriginSkill;
 public class Ship extends Entity implements Collidable {
 
 	// === Constants ===
-	/** Time between shots. */
-	private static final int SHOOTING_INTERVAL = 750;
 	/** Movement of the ship for each unit of time. */
 	private static final int SPEED = 3;
 	/** Y-offset from the ship position to the bullet spawn position */
@@ -389,7 +387,7 @@ public class Ship extends Entity implements Collidable {
 	public final void moveRight() {
         if (controlsDisabled) return;
 
-        int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+        int shipspeed = ShopItem.getShipSpeed();
 		this.positionX += SPEED*(1+shipspeed/10);
         this.isMove = true;
 	}
@@ -401,7 +399,7 @@ public class Ship extends Entity implements Collidable {
 	public final void moveLeft() {
         if (controlsDisabled) return;
 
-        int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+        int shipspeed = ShopItem.getShipSpeed();
 		this.positionX -= SPEED*(1+shipspeed/10);
         this.isMove = true;
 	}
@@ -413,7 +411,7 @@ public class Ship extends Entity implements Collidable {
 	public final void moveUp() {
         if (controlsDisabled) return;
 
-        int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+        int shipspeed = ShopItem.getShipSpeed();
 		this.positionY -= SPEED*(1+shipspeed/10);
         this.isMove = true;
 	}
@@ -425,7 +423,7 @@ public class Ship extends Entity implements Collidable {
 	public final void moveDown() {
         if (controlsDisabled) return;
 
-        int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+        int shipspeed = ShopItem.getShipSpeed();
 		this.positionY += SPEED*(1+shipspeed/10);
         this.isMove = true;
 	}
