@@ -304,7 +304,7 @@ public class NoxisBossPattern extends BossPattern implements IBossPattern {
 	}
 
 	public void forceRemoveChilds(){
-		spawnMobChilds = Set.of();
+		spawnMobChilds.clear();
 	}
 
 	public void forceRemoveExplosions(){
