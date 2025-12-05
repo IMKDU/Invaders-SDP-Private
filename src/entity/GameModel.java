@@ -1518,6 +1518,7 @@ public class GameModel {
     public List<Ship> getShips() {
         return ships;
     }
+    public boolean getOriginSkillActive(){return this.originSkillActivated;}
 
 //    public boolean isExplosionBoom() { return explosions.isBoom(); }
     public Set<Explosion> getExplosions() { return explosions; }

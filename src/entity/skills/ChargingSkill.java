@@ -177,6 +177,24 @@ public class ChargingSkill implements ISkill {
         return (currentTime - lastChargingSkillUse) >= COOLDOWN_DURATION;
     }
 
+    public void forceStop() {
+
+        if (isCharging) {
+            isCharging = false;
+            chargeStartTime = 0;
+            SoundManager.stopSingleLoopChannel("sfx/ChargingLaser.wav", channel());
+        }
+
+        if (isLaserActive) {
+            isLaserActive = false;
+            laserStartTime = 0;
+            SoundManager.stop("sfx/FireChargingLaser.wav");
+        }
+
+        lastChargingSkillUse = 0;
+    }
+
+
     /**
      * Gets the ship reference (for future extensions if needed).
      * @return The ship that owns this skill
