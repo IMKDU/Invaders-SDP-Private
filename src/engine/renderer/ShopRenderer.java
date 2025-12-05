@@ -121,7 +121,7 @@ public final class ShopRenderer {
             for (int lvl = 1; lvl <= maxLevel; lvl++) {
                 int price = prices[lvl - 1];
                 boolean canAfford;
-				if(currentLevel<=lvl){
+				if(currentLevel<lvl){
 					canAfford = playerCoins >= Arrays.stream(prices, currentLevel, lvl).sum();
 				} else canAfford = false;
                 boolean isOwned = currentLevel >= lvl;

@@ -1,6 +1,8 @@
 package screen;
 
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
+
 import audio.SoundManager;
 import engine.Cooldown;
 import engine.DTO.ShopInfoDTO;
@@ -283,7 +285,8 @@ public class ShopScreen extends Screen {
      */
     private void purchaseItem(final int itemIndex, final int level) {
         int currentLevel = getCurrentLevel(itemIndex);
-        int price = ITEM_PRICES[itemIndex][level - 1];
+		if(level < currentLevel) return;
+        int price = Arrays.stream(ITEM_PRICES[itemIndex], currentLevel, level).sum();
 
         // Check if already at or above this level
         if (currentLevel >= level) {
