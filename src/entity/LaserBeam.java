@@ -1,5 +1,6 @@
 package entity;
 
+import audio.SoundManager;
 import engine.Cooldown;
 
 import java.awt.*;
@@ -14,13 +15,14 @@ public class LaserBeam extends Entity implements LaserInfo {
 	private final int remainCooldownMilli;
 	private boolean shouldBeRemoved =false;
 	private boolean isActive=false;
+    private boolean firedSoundPlayed = false;
 
-	public LaserBeam(Point startPosition, Point targetPosition, int chargeCooldownMilli, int remainCooldownMilli) {
+
+    public LaserBeam(Point startPosition, Point targetPosition, int chargeCooldownMilli, int remainCooldownMilli) {
 		super(startPosition.x, startPosition.y, 0, 0, Color.green);
 		this.targetPosition=targetPosition;
 		this.chargeCooldownMilli=chargeCooldownMilli;
 		this.remainCooldownMilli=remainCooldownMilli;
-
 		extendLaserPoint(startPosition, targetPosition);
 	}
 
@@ -65,9 +67,11 @@ public class LaserBeam extends Entity implements LaserInfo {
 			this.chargeCooldown = new Cooldown(chargeCooldownMilli);
 			chargeCooldown.reset();
 		}
-		if(this.chargeCooldown.checkFinished()){
+		if(this.chargeCooldown.checkFinished() && !firedSoundPlayed){
 			this.color = Color.red;
 			this.isActive=true;
+            SoundManager.play("sfx/LaserBlaster.wav");
+            firedSoundPlayed = true;
 			if(this.remainCooldown==null){
 				this.remainCooldown = new Cooldown(remainCooldownMilli);
 				remainCooldown.reset();

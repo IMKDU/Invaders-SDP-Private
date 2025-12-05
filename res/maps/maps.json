@@ -7,7 +7,8 @@
         "formationWidth": 5,
         "formationHeight": 4,
         "baseSpeed": 60,
-        "shootingFrecuency": 2000
+        "shootingFrecuency": 2000,
+        "movementStrategy": ["default"]
       },
       "enemyTypes": [
         { "type": "enemyA", "count": 20 }
@@ -26,7 +27,8 @@
         "formationWidth": 5,
         "formationHeight": 5,
         "baseSpeed": 50,
-        "shootingFrecuency": 2500
+        "shootingFrecuency": 1500,
+        "movementStrategy": ["side"]
       },
       "enemyTypes": [
         { "type": "enemyA", "count": 15 },
@@ -51,7 +53,8 @@
         "formationWidth": 6,
         "formationHeight": 5,
         "baseSpeed": 40,
-        "shootingFrecuency": 1500
+        "shootingFrecuency": 1500,
+        "movementStrategy": ["cross"]
       },
       "enemyTypes": [
         { "type": "enemyA", "count": 15 },
@@ -75,7 +78,8 @@
         "formationWidth": 6,
         "formationHeight": 6,
         "baseSpeed": 30,
-        "shootingFrecuency": 1500
+        "shootingFrecuency": 1300,
+        "movementStrategy": ["side","cross"]
       },
       "enemyTypes": [
         { "type": "enemyA", "count": 18 },
@@ -98,7 +102,8 @@
         "formationWidth": 7,
         "formationHeight": 6,
         "baseSpeed": 20,
-        "shootingFrecuency": 1000
+        "shootingFrecuency": 800,
+        "movementStrategy": ["vertical"]
       },
       "enemyTypes": [
         { "type": "enemyA", "count": 14 },
@@ -123,7 +128,8 @@
         "formationWidth": 7,
         "formationHeight": 7,
         "baseSpeed": 10,
-        "shootingFrecuency": 1000
+        "shootingFrecuency": 800,
+        "movementStrategy": ["side","vertical"]
       },
       "enemyTypes": [
         { "type": "enemyB", "count": 25 },
@@ -145,7 +151,8 @@
         "formationWidth": 6,
         "formationHeight": 6,
         "baseSpeed": 2,
-        "shootingFrecuency": 500
+        "shootingFrecuency": 500,
+        "movementStrategy": ["side","cross"]
       },
       "enemyTypes": [
         { "type": "enemyA", "count": 10 },
