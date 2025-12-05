@@ -234,6 +234,17 @@ public class Ship extends Entity implements Collidable {
         if (this.isInvincible && this.shieldCooldown.checkFinished()) {
             this.isInvincible = false;
         }
+        if (!this.controlsDisabled) {
+            this.chargingSkill.update();
+        }
+        if (model.getOriginSkillActive()) {
+            this.controlsDisabled = true;
+        }
+        if (destructionCooldown.checkFinished()) {
+            if (!model.getOriginSkillActive()) {
+                this.controlsDisabled = false;
+            }
+        }
         if (!this.destructionCooldown.checkFinished()) {
             double ratio = this.destructionCooldown.getRemaining() / (double) this.destructionCooldown.getTotal();
             SpriteType explosion1 = this.isP1Ship ? SpriteType.ShipP1Explosion1 : SpriteType.ShipP2Explosion1;
@@ -246,6 +257,9 @@ public class Ship extends Entity implements Collidable {
                 this.spriteType = explosion2;
             } else {
                 this.spriteType = explosion3;
+            }
+            if (!this.isInvincible) {
+                this.activateInvincibility(2000);
             }
         } else {
             SpriteType moveSprite = this.isP1Ship ? SpriteType.ShipP1Move : SpriteType.ShipP2Move;
@@ -305,6 +319,10 @@ public class Ship extends Entity implements Collidable {
             SoundManager.stopSingleLoop("sfx/ShipMoving.wav");
             SoundManager.play("sfx/destroy.wav");
             this.destructionCooldown.reset();
+            this.disableAllControls(true);
+            if (this.chargingSkill != null) {
+                this.chargingSkill.forceStop();
+            }
         }
     }
 
@@ -397,7 +415,7 @@ public class Ship extends Entity implements Collidable {
 	 * Should be called when the player presses and holds the C key.
 	 */
 	public void startCharging() {
-		if (this.chargingSkill != null) {
+		if (this.chargingSkill != null && !model.getOriginSkillActive()) {
             chargingSkill.use(this);
 			this.chargingSkill.startCharging();
 		}

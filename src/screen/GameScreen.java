@@ -219,6 +219,11 @@ public class GameScreen extends Screen {
         Ship s1 = model.getShip();
         Ship s2 = model.getShipP2();
 
+        if ((s1 != null && s1.isControlsDisabled()) ||
+                (s2 != null && s2.isControlsDisabled())) {
+            return;
+        }
+
         if (s1 != null && !s1.isDestroyed() && model.getLivesP1() > 0) {
             s1.useSkill(Ship.SkillType.ORIGIN);
             return;
