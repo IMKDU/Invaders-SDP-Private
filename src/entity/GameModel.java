@@ -466,6 +466,72 @@ public class GameModel {
     }
 
 	/**
+	 * Handles collision detection exclusively for BombBullet.
+	 * BombBullets are excluded from the normal entity collision system,
+	 * so this method manually checks their collisions and safely removes them after explosion.
+	 */
+	private void processBombBulletCollisions() {
+
+		// Snapshot used to safely iterate (BombBullet may remove itself during explosion)
+		List<Bullet> snapshot = new ArrayList<>(bullets);
+
+		// Separate removal set
+		Set<BombBullet> toRemove = new HashSet<>();
+
+		// Prepare enemy formations list
+		List<Iterable<EnemyShip>> enemyFormations = new ArrayList<>();
+		if (enemyShipFormationModel != null) enemyFormations.add(enemyShipFormationModel);
+		if (enemyShipSpecialFormation != null) enemyFormations.add(enemyShipSpecialFormation);
+
+		// Prepare bosses list
+		List<BossEntity> bosses = new ArrayList<>();
+		if (omegaBoss != null) bosses.add(omegaBoss);
+		if (zetaBoss != null) bosses.add(zetaBoss);
+		if (finalBoss != null) bosses.add(finalBoss);
+
+		for (Bullet b : snapshot) {
+
+			if (!(b instanceof BombBullet)) continue;
+			BombBullet bomb = (BombBullet) b;
+			boolean exploded = false;
+
+			// --- Check Enemy Formations ---
+			for (Iterable<EnemyShip> formation : enemyFormations) {
+				for (EnemyShip e : formation) {
+					if (!e.isDestroyed() && checkCollision(bomb, e)) {
+						bomb.explode(this);
+						exploded = true;
+						break;
+					}
+				}
+				if (exploded) break;
+			}
+
+			// --- Check Bosses ---
+			if (!exploded) {
+				for (BossEntity boss : bosses) {
+					if (!boss.isDestroyed() && checkCollision(bomb, (Entity) boss)) {
+						bomb.explode(this);
+						exploded = true;
+						break;
+					}
+				}
+			}
+
+			// --- Check Off-Screen ---
+			if (!exploded && bomb.getPositionY() < GameConstant.STAT_SEPARATION_LINE_HEIGHT) {
+				exploded = true;
+			}
+
+			if (exploded) {
+				toRemove.add(bomb);
+			}
+		}
+		// Safe removal after iteration
+		bullets.removeAll(toRemove);
+	}
+
+	/**
 	 * Detects collisions between all active entities.
 	 * Each pair of collidables is checked, and their collision handlers are invoked.
 	 */
@@ -503,7 +569,15 @@ public class GameModel {
             for(MidBossMob mb : midBossChilds){ entities.add(mb); }
         }
         if (explosionEntity != null) entities.add(explosionEntity);
-		entities.addAll(bullets);
+		// First, handle BombBullet collisions separately because they do NOT participate in normal collision logic.
+		processBombBulletCollisions();
+
+		// Add only regular bullets to the collision entity list.
+		for (Bullet b : bullets) {
+			if (!(b instanceof BombBullet)) {
+				entities.add(b);
+			}
+		}
 		entities.addAll(bossBullets);
 		entities.addAll(dropItems);
 
@@ -1030,11 +1104,23 @@ public class GameModel {
         Set<Bullet> recyclable = new HashSet<Bullet>();
         for (Bullet bullet : this.bullets) {
             if (bullet.getPositionY() < GameConstant.STAT_SEPARATION_LINE_HEIGHT
-                    || bullet.getPositionY() > this.height)
-                recyclable.add(bullet);
+                    || bullet.getPositionY() > this.height){
+
+				recyclable.add(bullet);
+			}
         }
         this.bullets.removeAll(recyclable);
-        BulletPool.recycle(recyclable);
+		Set<Bullet> normalBullets = new HashSet<>();
+
+		for (Bullet b : recyclable) {
+			if (b instanceof BombBullet) {
+				BulletPool.recycleBomb((BombBullet) b);
+			} else {
+				normalBullets.add(b);
+			}
+		}
+
+		BulletPool.recycle(normalBullets);
     }
 
     /**
@@ -1141,8 +1227,6 @@ public class GameModel {
 				applyBombDamageToBoss(source, boss);
 			}
 		}
-
-		requestRemoveBullet(source);
 	}
 
 

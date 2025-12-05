@@ -14,7 +14,7 @@ public final class BulletPool {
 
 	/** Set of already created bullets. */
 	private static Set<Bullet> pool = new HashSet<Bullet>();
-
+	private static Set<BombBullet> bombPool = new HashSet<>();
 	/**
 	 * Constructor, not called.
 	 */
@@ -53,6 +53,20 @@ public final class BulletPool {
 		return bullet;
 	}
 
+	public static BombBullet getBombBullet(final int x, final int y, final int speed) {
+		BombBullet b;
+
+		if (!bombPool.isEmpty()) {
+			b = bombPool.iterator().next();
+			bombPool.remove(b);
+			b.reset(x, y, speed);
+		} else {
+			b = new BombBullet(x, y, speed);
+		}
+
+		return b;
+	}
+
 	/**
 	 * Adds one or more bullets to the list of available ones.
 	 *
@@ -62,4 +76,9 @@ public final class BulletPool {
 	public static void recycle(final Set<Bullet> bullet) {
 		pool.addAll(bullet);
 	}
+
+	public static void recycleBomb(final BombBullet b) {
+		bombPool.add(b);
+	}
+
 }
