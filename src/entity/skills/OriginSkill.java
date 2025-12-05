@@ -27,6 +27,7 @@ public class OriginSkill implements ISkill {
     @Override
     public void use(Ship ship) {
         if (used || active) return;
+        if (ship.isCharging() || ship.isLaserActive()) return;
 
         this.ship = ship;
         this.model = ship.getModel();
