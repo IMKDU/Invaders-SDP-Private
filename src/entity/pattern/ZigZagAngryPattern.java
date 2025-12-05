@@ -18,8 +18,8 @@ public class ZigZagAngryPattern extends ZigZagPattern {
 	public void attack(){
 		if (this.shootCooldown.checkFinished()) {
 			this.shootCooldown.reset();
-			BossBullet bullet1 = new BossBullet(boss.getPositionX() + boss.getWidth() / 2 - 3 + 100, boss.getPositionY()+boss.getHeight(), 0, 5,6,10, "FinalBoss");
-			BossBullet bullet2 = new BossBullet(boss.getPositionX() + boss.getWidth() / 2 - 3 - 100, boss.getPositionY()+boss.getHeight(), 0, 5,6,10, "FinalBoss");
+			BossBullet bullet1 = new BossBullet(boss.getPositionX() + boss.getWidth() / 2 - 3 + 70, boss.getPositionY(), 0, 5,6,10, PatternBulletType.ZIGZAG_ANGRY);
+			BossBullet bullet2 = new BossBullet(boss.getPositionX() + boss.getWidth() / 2 - 3 - 70, boss.getPositionY(), 0, 5,6,10, PatternBulletType.ZIGZAG_ANGRY);
 			bullets.add(bullet1);
 			bullets.add(bullet2);
 		}

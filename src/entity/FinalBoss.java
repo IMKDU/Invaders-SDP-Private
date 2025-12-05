@@ -87,7 +87,7 @@ public class FinalBoss extends MidBoss {
     @Override
     public void takeDamage(int damage){
         this.healPoint -= damage;
-        SoundManager.play("sfx/pikachu.wav");
+        SoundManager.play("sfx/FinalBossHitting.wav");
         if(this.healPoint <= 0){
             this.destroy();
         }
