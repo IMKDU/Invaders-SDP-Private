@@ -23,7 +23,7 @@ public class Ship extends Entity implements Collidable {
 	/** Time between shots. */
 	private static final int SHOOTING_INTERVAL = 750;
 	/** Movement of the ship for each unit of time. */
-	private static final int SPEED = 2;
+	private static final int SPEED = 3;
 	/** Y-offset from the ship position to the bullet spawn position */
 	private static final int BULLET_SPAWN_Y_OFFSET = 36;
 
