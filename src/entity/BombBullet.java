@@ -5,8 +5,12 @@ import engine.DrawManager.SpriteType;
 public class BombBullet extends Bullet {
 
 	public BombBullet(int x, int y, int speed, int width, int height) {
-		super(x, y, speed, width, height,false);
+		super(x, y, speed, width, height);
 		this.spriteType = SpriteType.BombBullet;
+    }
+    @Override
+    public void setSprite() {
+        // do nothing
     }
 
 	public void reset(int x, int y, int speed) {
