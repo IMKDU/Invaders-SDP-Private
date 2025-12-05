@@ -82,7 +82,7 @@ public class Ship extends Entity implements Collidable {
             this.isP1Ship = false;
         }
 		this.shootingCooldown = new Cooldown(ShopItem.getShootingInterval());
-		this.destructionCooldown = new Cooldown(1000);
+		this.destructionCooldown = new Cooldown(600);
 		this.shieldCooldown = new Cooldown(0);
 		this.isInvincible = false;
 
@@ -342,7 +342,8 @@ public class Ship extends Entity implements Collidable {
     }
     public final void destroy() {
         if (!this.isInvincible) {
-            SoundManager.stopSingleLoop("sfx/ShipMoving.wav");
+	        this.activateInvincibility(GameConstant.PLAYER_COLLIDE_INVINCIBLE_TIME);
+	        SoundManager.stopSingleLoop("sfx/ShipMoving.wav");
             SoundManager.play("sfx/destroy.wav");
             this.destructionCooldown.reset();
         }

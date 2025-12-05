@@ -28,7 +28,8 @@ public final class GameConstant {
 	/** Bomb explosion area radius (in pixels) */
 	public static final int BOMB_AOE_RADIUS = 100;
 
-	public static final int TELEPORT_INVINCISIBLE_TIME = 60;
+	public static final int TELEPORT_INVINCIBLE_TIME = 60;
+	public static final int PLAYER_COLLIDE_INVINCIBLE_TIME = 1100;
 
 	private static boolean origin_skill_activated = false;
 	private static boolean used_origin = false;

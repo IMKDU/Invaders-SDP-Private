@@ -250,7 +250,7 @@ public class GameModel {
             this.teleportFromP1Y = ship.positionY;
             this.isTeleportP1 = true;
 			ship.teleport(direction, width, height);
-			ship.activateInvincibility(GameConstant.TELEPORT_INVINCISIBLE_TIME);
+			ship.activateInvincibility(GameConstant.TELEPORT_INVINCIBLE_TIME);
             this.afterTeleportFromP1X = ship.positionX;
             this.afterTeleportFromP1Y = ship.positionY;
 		}
