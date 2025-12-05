@@ -16,6 +16,7 @@ public class Level {
     private int formationHeight;
     private int baseSpeed;
     private int shootingFrecuency;
+    private List<String> movementStrategy = new ArrayList<>();
 
     // New fields for the complex JSON structure
     private String levelName;
@@ -42,6 +43,7 @@ public class Level {
         this.formationHeight = formationHeight;
         this.baseSpeed = baseSpeed;
         this.shootingFrecuency = shootingFrecuency;
+        this.movementStrategy.add("default");
     }
 
     /**
@@ -86,6 +88,7 @@ public class Level {
             this.formationHeight = this.enemyFormation.getFormationHeight();
             this.baseSpeed = this.enemyFormation.getBaseSpeed();
             this.shootingFrecuency = this.enemyFormation.getShootingFrecuency();
+            this.movementStrategy = this.enemyFormation.getMovementStrategy();
         }
     }
 
@@ -118,6 +121,8 @@ public class Level {
     public LevelEnemyFormation getEnemyFormation() {
         return enemyFormation;
     }
+
+    public List<String> getMovementStrategy() { return movementStrategy; }
 
     public List<EnemyType> getEnemyTypes() {
         return enemyTypes;
