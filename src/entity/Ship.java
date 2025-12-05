@@ -93,6 +93,34 @@ public class Ship extends Entity implements Collidable {
 
 	public void move(String direction, int screenWidth, int screenHeight) {
 		switch (direction) {
+			case "RIGHT_UP":
+				if (positionX + width + SPEED <= screenWidth - 1)
+					moveRight();
+				if (positionY - SPEED >= GameConstant.STAT_SEPARATION_LINE_HEIGHT)
+					moveUp();
+				break;
+
+			case "RIGHT_DOWN":
+				if (positionX + width + SPEED <= screenWidth - 1)
+					moveRight();
+				if (positionY + height + SPEED <= screenHeight)
+					moveDown();
+				break;
+
+			case "LEFT_UP":
+				if (positionX - SPEED >= 1)
+					moveLeft();
+				if (positionY - SPEED >= GameConstant.STAT_SEPARATION_LINE_HEIGHT)
+					moveUp();
+				break;
+
+			case "LEFT_DOWN":
+				if (positionX - SPEED >= 1)
+					moveLeft();
+				if (positionY + height + SPEED <= screenHeight)
+					moveDown();
+				break;
+
 			case "RIGHT":
 				if (positionX + width + SPEED <= screenWidth - 1)
 					moveRight();
@@ -138,6 +166,26 @@ public class Ship extends Entity implements Collidable {
 		if (!canTeleport()) return;
         SoundManager.play("sfx/Teleport.wav");
 		switch (direction) {
+			case "RIGHT_UP":
+				this.positionX = Math.min(this.positionX + TELEPORT_DISTANCE, screenWidth - this.width - 1);
+				this.positionY = Math.max(this.positionY - TELEPORT_DISTANCE, GameConstant.STAT_SEPARATION_LINE_HEIGHT);
+				break;
+
+			case "RIGHT_DOWN":
+				this.positionX = Math.min(this.positionX + TELEPORT_DISTANCE, screenWidth - this.width - 1);
+				this.positionY = Math.min(this.positionY + TELEPORT_DISTANCE, screenHeight - this.height - 1);
+				break;
+
+			case "LEFT_UP":
+				this.positionX = Math.max(this.positionX - TELEPORT_DISTANCE, 1);
+				this.positionY = Math.max(this.positionY - TELEPORT_DISTANCE, GameConstant.STAT_SEPARATION_LINE_HEIGHT);
+				break;
+
+			case "LEFT_DOWN":
+				this.positionX = Math.max(this.positionX - TELEPORT_DISTANCE, 1);
+				this.positionY = Math.min(this.positionY + TELEPORT_DISTANCE, screenHeight - this.height - 1);
+				break;
+
 			case "RIGHT":
 				this.positionX = Math.min(this.positionX + TELEPORT_DISTANCE, screenWidth - this.width - 1);
 				break;

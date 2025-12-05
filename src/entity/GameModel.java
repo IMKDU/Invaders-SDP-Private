@@ -240,7 +240,7 @@ public class GameModel {
      * Processes a player move command received from the Controller.
      * (Includes boundary checking logic)
      * @param playerNum (1 or 2)
-     * @param direction ("RIGHT", "LEFT", "UP", "DOWN")
+     * @param direction ("RIGHT_UP", "RIGHT_DOWN", "LEFT_UP", "LEFT_DOWN", "RIGHT", "LEFT", "UP", "DOWN")
      */
 	public void playerMoveOrTeleport(int playerNum, String direction, boolean teleport) {
 		Ship ship = (playerNum == 1) ? this.ship : this.shipP2;
