@@ -15,7 +15,7 @@ import entity.GameConstant;
  */
 public class CrossFormationMovement implements IMovementStrategy {
 
-    private final int SHIP_SPEED = 8;
+    private final int SHIP_SPEED = 4;
     private final int LOOK_AHEAD_DISTANCE = 80;
     private final float LINE_SPEED = 0.005f;
 
