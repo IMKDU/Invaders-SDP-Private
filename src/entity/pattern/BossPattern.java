@@ -18,6 +18,13 @@ public abstract class BossPattern implements IBossPattern {
 	protected Set<LaserBeam> lasers;
 	protected boolean validateBackgroundPattern=true;
 
+    public enum PatternBulletType {
+        SPREAD_SHOT,
+        ZIGZAG_ANGRY,
+        PINNED,
+        BACKGROUND,
+        GUIDED
+    }
 	public BossPattern(Point position) {
 		this.bossPosition = position;
 		this.bullets = new HashSet<Bullet>();

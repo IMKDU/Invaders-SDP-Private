@@ -1,5 +1,6 @@
 package entity.pattern;
 
+import audio.SoundManager;
 import engine.Core;
 import engine.DrawManager;
 import entity.GameConstant;
