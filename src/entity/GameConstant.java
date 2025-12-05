@@ -1,8 +1,6 @@
 package entity;
 
 
-import engine.Core;
-
 public final class GameConstant {
 
     /** Height of the interface separation line. */
@@ -29,6 +27,8 @@ public final class GameConstant {
 	public static final int BOMB_DAMAGE_TO_BOSS = 2;
 	/** Bomb explosion area radius (in pixels) */
 	public static final int BOMB_AOE_RADIUS = 100;
+
+	public static final int TELEPORT_INVINCISIBLE_TIME = 60;
 
 	private static boolean origin_skill_activated = false;
 	private static boolean used_origin = false;
