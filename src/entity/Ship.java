@@ -229,11 +229,11 @@ public class Ship extends Entity implements Collidable {
         if (!this.controlsDisabled) {
             this.chargingSkill.update();
         }
-        if (model.getOriginSkillActive()) {
+        if (GameConstant.getOrigin_skill_activated()) {
             this.controlsDisabled = true;
         }
         if (destructionCooldown.checkFinished()) {
-            if (!model.getOriginSkillActive()) {
+            if (!GameConstant.getOrigin_skill_activated()) {
                 this.controlsDisabled = false;
             }
         }
@@ -407,7 +407,7 @@ public class Ship extends Entity implements Collidable {
 	 * Should be called when the player presses and holds the C key.
 	 */
 	public void startCharging() {
-		if (this.chargingSkill != null && !model.getOriginSkillActive()) {
+		if (this.chargingSkill != null && !GameConstant.getOrigin_skill_activated()) {
             chargingSkill.use(this);
 			this.chargingSkill.startCharging();
 		}
