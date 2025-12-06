@@ -1,5 +1,6 @@
-package entity.core.*;
+package entity;
 
+import engine.bullet.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
