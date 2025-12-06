@@ -207,7 +207,7 @@ public final class HUDRenderer {
 
     /** Draw teleport cooldowns for P1 and P2 */
     /** Draw teleport cooldowns for P1 and P2 */
-    public void drawTeleportCooldowns(int screenWidth, int screenHeight, double cooldownP1, double cooldownP2) {
+    public void drawTeleportCooldowns(int screenWidth, int screenHeight, double cooldownP1, double cooldownP2, boolean originUsed) {
         Graphics2D g = (Graphics2D) backBuffer.getGraphics();
         int r = TELEPORT_GAUGE_RADIUS;
         int y = screenHeight - COOLDOWN_Y_OFFSET;
@@ -234,7 +234,7 @@ public final class HUDRenderer {
         drawTeleportCooldown(g, p2X, y, cooldownP2);
 
         drawExplainP2Skill(p2CenterX, p2CenterY, y, y + r);
-        if (GameConstant.getUsed_origin()) {
+        if (originUsed) {
             drawOriginUsed(y);
         }
     }

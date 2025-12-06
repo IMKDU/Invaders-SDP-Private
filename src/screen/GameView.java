@@ -70,12 +70,12 @@ public class GameView {
 		    }
 	    }
 
-	    if (GameConstant.getOrigin_skill_activated()) {
+	    if (model.getOrigin_skill_activated()) {
             drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
             drawManager.getSpecialAnimationRenderer().draw();
 
             if (drawManager.getSpecialAnimationRenderer().isFinished()) {
-                GameConstant.setOrigin_skill_activated(false);
+                model.setOrigin_skill_activated(false);
             }
         }
 
@@ -119,7 +119,7 @@ public class GameView {
         drawManager.getHUDRenderer().drawTime(GameConstant.ITEMS_SEPARATION_LINE_HEIGHT, dto.getElapsedTimeMillis());
         drawManager.getHUDRenderer().drawItemsHUD(dto.getWidth(), dto.getHeight());
         drawManager.getHUDRenderer().drawLevel(GameConstant.ITEMS_SEPARATION_LINE_HEIGHT, dto.getLevelName());
-        drawManager.getHUDRenderer().drawTeleportCooldowns(dto.getWidth(), dto.getHeight(), dto.teleportCooldownP1, dto.teleportCooldownP2);
+        drawManager.getHUDRenderer().drawTeleportCooldowns(dto.getWidth(), dto.getHeight(), dto.teleportCooldownP1, dto.teleportCooldownP2,dto.getOriginUsed());
 //        if (dto.isOriginUsed()){
 //            drawManager.getHUDRenderer().drawOriginUsed();
 //        }

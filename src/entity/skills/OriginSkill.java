@@ -16,7 +16,7 @@ public class OriginSkill implements ISkill {
     private Ship ship;
     private GameModel model;
 
-    private boolean used = false;
+    private static boolean used = false;
     private boolean active = false;
 
     private Cooldown burstTick;
@@ -31,12 +31,12 @@ public class OriginSkill implements ISkill {
 
         this.ship = ship;
         this.model = ship.getModel();
-        if (GameConstant.getUsed_origin()) return;
+        if (GameModel.getUsed_origin()) return;
 
-        this.used = true;
+        used = true;
         this.active = true;
-        GameConstant.setUsed_origin(true);
-        GameConstant.setOrigin_skill_activated(true);
+        GameModel.setUsed_origin(true);
+        GameModel.setOrigin_skill_activated(true);
 
         this.startTime = System.currentTimeMillis();
 
@@ -57,6 +57,12 @@ public class OriginSkill implements ISkill {
         }
 
         ship.disableAllControls(true);
+    }
+
+
+    public static void resetUsed() {
+        GameModel.setUsed_origin(false);
+        used = false;
     }
 
     public void update() {
