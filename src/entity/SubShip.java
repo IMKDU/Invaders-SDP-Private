@@ -150,7 +150,7 @@ public class SubShip extends Entity {
         model.requestRemoveBullet(bullet);
 
         // Play destruction sound
-        SoundManager.play("sfx/impact.wav");
+        SoundManager.play("sfx/destroy.wav");
 
         // Destroy sub-ship (disappears immediately)
         this.destroy();
@@ -162,7 +162,7 @@ public class SubShip extends Entity {
         model.requestRemoveBossBullet(bullet);
 
         // Play destruction sound
-        SoundManager.play("sfx/impact.wav");
+        SoundManager.play("sfx/destroy.wav");
 
         // // Destroy sub-ship (disappears immediately)
         this.destroy();
@@ -171,7 +171,7 @@ public class SubShip extends Entity {
     @Override
     public void onCollideWithEnemyShip(EnemyShip enemy, GameModel model) {
         // Play collision sound
-        SoundManager.play("sfx/impact.wav");
+        SoundManager.play("sfx/destroy.wav");
 
         // Destroy sub-ship
         this.destroy();
@@ -183,7 +183,7 @@ public class SubShip extends Entity {
     @Override
     public void onCollideWithBoss(BossEntity boss, GameModel model) {
         // Play collision sound
-        SoundManager.play("sfx/impact.wav");
+        SoundManager.play("sfx/destroy.wav");
 
         // Destroy sub-ship
         this.destroy();

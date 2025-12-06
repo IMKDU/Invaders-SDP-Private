@@ -4,10 +4,14 @@ import engine.DrawManager.SpriteType;
 
 public class BombBullet extends Bullet {
 
-	public BombBullet(int x, int y, int speed) {
-		super(x, y, speed, 20, 53);
+	public BombBullet(int x, int y, int speed, int width, int height) {
+		super(x, y, speed, width, height);
 		this.spriteType = SpriteType.BombBullet;
-	}
+    }
+    @Override
+    public void setSprite() {
+        // do nothing
+    }
 
 	public void reset(int x, int y, int speed) {
 		this.positionX = x;
@@ -25,5 +29,15 @@ public class BombBullet extends Bullet {
 	/** Completely block all entity-based collision callbacks */
 	@Override
 	public void onCollision(Collidable other, GameModel model) {
+
+		if (other instanceof DropItem) {
+			return;
+		}
+        if (!(other instanceof EnemyShip) && !(other instanceof BossEntity)) {
+            return;
+        }
+        super.onCollision(other, model);
+        model.requestBombAoEDamage(this);
+
 	}
 }
