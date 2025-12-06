@@ -220,6 +220,7 @@ public final class EntityRenderer {
 		}
         else if (entity instanceof GuidedBullet gb) {
             drawGuidedRotated(gb);
+            return;
         }
 		drawEntity(entity, entity.getPositionX(), entity.getPositionY());
 	}
@@ -521,7 +522,7 @@ public final class EntityRenderer {
     public void drawBlackHole(HasCircleBounds blackHole) {
 		int cx = blackHole.getPositionCX();
 		int cy =  blackHole.getPositionCY();
-		int size = blackHole.getRadius();
+		int size = blackHole.getRadius() / 2;
         Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
 
         if (this.blackholeAnimationCooldown.checkFinished()) {
