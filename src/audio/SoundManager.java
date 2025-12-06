@@ -1,9 +1,12 @@
 package audio;
 
+import engine.Core;
+
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,6 +154,58 @@ public class SoundManager {
             if (c.isRunning()) c.stop();
         }
     }
+
+	public static void disposeAll(){
+		// 1) BGM in CACHE
+		for (Clip c : CACHE.values()) {
+			closeClipSafely(c, false);
+		}
+		CACHE.clear();
+
+		// 2) SINGLE_LOOP_MAP
+		for (Clip c : SINGLE_LOOP_MAP.values()) {
+			closeClipSafely(c, true);
+		}
+		SINGLE_LOOP_MAP.clear();
+
+		// 3) SINGLE_LOOP_CHANNEL_MAP
+		for (Clip c : SINGLE_LOOP_CHANNEL_MAP.values()) {
+			closeClipSafely(c, true);
+		}
+		SINGLE_LOOP_CHANNEL_MAP.clear();
+
+		// 4) PLAY_MAP (use snapshot to avoid ConcurrentModificationException)
+		for (List<Clip> list : PLAY_MAP.values()) {
+			if (list == null) continue;
+			List<Clip> snapshot = new ArrayList<>(list); // copy first
+			list.clear();                                // detach all
+			for (Clip c : snapshot) {
+				closeClipSafely(c, true);
+			}
+		}
+		PLAY_MAP.clear();
+
+		// 5) POOL
+		for (List<Clip> list : POOL.values()) {
+			if (list == null) continue;
+			List<Clip> snapshot = new ArrayList<>(list);
+			list.clear();
+			for (Clip c : snapshot) {
+				closeClipSafely(c, true);
+			}
+		}
+		POOL.clear();
+	}
+
+	/** Stop and close the given clip safely. */
+	private static void closeClipSafely(Clip c, boolean flushBeforeClose) {
+		if (c == null) return;
+		System.out.println("[Sound] closeClipSafely: " + c);
+		try { if (c.isRunning()) c.stop(); } catch (Exception ignored) {}
+		try { if (flushBeforeClose) c.flush(); } catch (Exception ignored) {}
+		try { c.close(); } catch (Exception ignored) {}
+	}
+
     public static void setVolume(Clip clip, float dB) {
         try {
             FloatControl gain = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);

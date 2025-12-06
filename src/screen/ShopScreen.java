@@ -118,9 +118,7 @@ public class ShopScreen extends Screen {
 
         this.logger.info("Shop screen initialized with " +
                 gameState.getCoin() + " coins. BetweenLevels=" + betweenLevels);
-        SoundManager.stop("sfx/Shop.wav");
-        SoundManager.stopAll();
-        SoundManager.stopSingleLoop("sfx/ShipMoving.wav");
+		SoundManager.stopAll();
         SoundManager.playLoop("sfx/Shop.wav");
     }
 
@@ -187,6 +185,7 @@ public class ShopScreen extends Screen {
         if (inputManager.isKeyDown(KeyEvent.VK_UP)
                 || inputManager.isKeyDown(KeyEvent.VK_W)) {
             previousItem();
+	        SoundManager.play("sfx/menu_select.wav");
             this.selectionCooldown.reset();
         }
 
@@ -194,6 +193,7 @@ public class ShopScreen extends Screen {
         if (inputManager.isKeyDown(KeyEvent.VK_DOWN)
                 || inputManager.isKeyDown(KeyEvent.VK_S)) {
             nextItem();
+	        SoundManager.play("sfx/menu_select.wav");
             this.selectionCooldown.reset();
         }
 
@@ -205,7 +205,8 @@ public class ShopScreen extends Screen {
                 SoundManager.stopAll();
             } else {
                 // Enter level selection mode
-                selectionMode = 1;
+	            SoundManager.play("sfx/menu_select.wav");
+	            selectionMode = 1;
                 selectedLevel = getCurrentLevel(selectedItem) + 1; // Next level
                 if (selectedLevel > MAX_LEVELS[selectedItem]) {
                     selectedLevel = MAX_LEVELS[selectedItem];
@@ -231,6 +232,7 @@ public class ShopScreen extends Screen {
             if (selectedLevel > 1) {
                 selectedLevel--;
             }
+	        SoundManager.play("sfx/menu_select.wav");
             this.selectionCooldown.reset();
         }
 
@@ -240,18 +242,21 @@ public class ShopScreen extends Screen {
             if (selectedLevel < MAX_LEVELS[selectedItem]) {
                 selectedLevel++;
             }
+	        SoundManager.play("sfx/menu_select.wav");
             this.selectionCooldown.reset();
         }
 
         // Confirm purchase
         if (inputManager.isKeyDown(KeyEvent.VK_SPACE) || inputManager.isKeyDown(KeyEvent.VK_ENTER)) {
             purchaseItem(selectedItem, selectedLevel);
+	        SoundManager.play("sfx/menu_select.wav");
             this.selectionCooldown.reset();
         }
 
         // Cancel (back to item selection)
         if (inputManager.isKeyDown(KeyEvent.VK_ESCAPE)) {
             selectionMode = 0;
+	        SoundManager.play("sfx/menu_select.wav");
             this.selectionCooldown.reset();
         }
     }
