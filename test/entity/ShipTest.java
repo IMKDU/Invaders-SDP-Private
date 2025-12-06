@@ -1,7 +1,7 @@
 package entity; // ◀ Must match the original package
 
 // Import required classes for JUnit and AWT Color
-import entity.ship.*
+import entity.ship.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
