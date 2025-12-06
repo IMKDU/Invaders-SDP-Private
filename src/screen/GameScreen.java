@@ -302,6 +302,7 @@ public class GameScreen extends Screen {
      * Returns the game state for other systems.
      */
     public final GameState getGameState() {
-        return this.model.getGameState();
+        model.syncToGameState();
+        return this.gameState;
     }
 }

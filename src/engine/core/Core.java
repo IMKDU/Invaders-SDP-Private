@@ -160,17 +160,7 @@ public final class Core {
                             frame.setScreen(currentScreen);
                             LOGGER.info("Closing shop screen.");
 
-                            gameState = new GameState(
-                                    gameState.getLevel() + 1,          // Increment level
-                                    gameState.getScore(),              // Keep current score
-		                            gameState.getScoreP1(),            // Keep current score
-		                            gameState.getScoreP2(),            // Keep current score
-                                    gameState.getLivesRemaining(),     // Keep remaining lives
-                                    gameState.getLivesRemainingP2(),   // Keep remaining livesP2
-                                    gameState.getBulletsShot(),        // Keep bullets fired
-                                    gameState.getShipsDestroyed(),     // Keep ships destroyed
-                                    gameState.getCoin()                // Keep current coins
-                            );
+                            gameState.setLevel(gameState.getLevel() + 1);
                         }
                         // Loop while player still has lives and levels remaining
                     } while (gameState.getLivesRemaining() > 0 || gameState.getLivesRemainingP2() > 0);
@@ -183,12 +173,21 @@ public final class Core {
                             + gameState.getScore() + ", "
                             + gameState.getLivesRemaining() + " lives remaining, "
                             + gameState.getBulletsShot() + " bullets shot and "
-                            + gameState.getShipsDestroyed() + " ships destroyed.");
-
-	                gameState = new GameState(1, 0, 0, 0, MAX_LIVES, MAX_LIVES, 0, 0,0);
+                            + gameState.getShipsKill() + " ships destroyed.");
                     currentScreen = new ScoreScreen(FRAME_WIDTH, FRAME_HEIGHT, GameConstant.FPS, gameState);
                     returnCode = frame.setScreen(currentScreen);
                     LOGGER.info("Closing score screen.");
+                    gameState = new GameState(
+                            1,
+                            0,
+                            0,
+                            0,
+                            MAX_LIVES,
+                            MAX_LIVES,
+                            0,
+                            0,
+                            0
+                    );
                     break;
                 case 3:
                     // High scores
