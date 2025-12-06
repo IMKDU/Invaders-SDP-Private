@@ -1,4 +1,4 @@
-package entity;
+package entity.core.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

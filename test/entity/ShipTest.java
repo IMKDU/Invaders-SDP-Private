@@ -1,4 +1,4 @@
-package entity; // ◀ Must match the original package
+package entity.core.*; // ◀ Must match the original package
 
 // Import required classes for JUnit and AWT Color
 import org.junit.jupiter.api.BeforeEach;
