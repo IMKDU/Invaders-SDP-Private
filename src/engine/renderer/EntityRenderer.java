@@ -200,6 +200,9 @@ public final class EntityRenderer {
            ZetaBoss zetaBoss = (ZetaBoss) entity;
            drawZetaBoss(zetaBoss);
         }
+		else if (entity instanceof FinalBoss finalBoss){
+			drawFinalBoss(finalBoss);
+		}
 		else if (entity instanceof MidBossMob) {
 			MidBossMob midBossMob = (MidBossMob) entity;
 			drawMidBossMob(midBossMob);
@@ -207,13 +210,6 @@ public final class EntityRenderer {
         else if (entity instanceof GuidedBullet gb) {
             drawGuidedRotated(gb);
         }
-		else if (entity instanceof MidBossMob) {
-			MidBossMob midBossMob = (MidBossMob) entity;
-			drawMidBossMob(midBossMob);
-		}
-		else if (entity instanceof FinalBoss finalBoss){
-			drawFinalBoss(finalBoss);
-		}
 		drawEntity(entity, entity.getPositionX(), entity.getPositionY());
 	}
 
