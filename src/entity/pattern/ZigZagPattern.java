@@ -19,8 +19,14 @@ public class ZigZagPattern extends PinnedBossPattern {
 
 	protected void moveZigzag(int zigSpeed, int vertSpeed){
 		super.bossPosition.x += (this.zigDirection * zigSpeed);
-		if(this.bossPosition.x <= 0 || this.bossPosition.x >= screenWidth-boss.getWidth()){
-			this.zigDirection*=-1;
+
+		// Check and adjust position at boundaries
+		if(this.bossPosition.x <= 0){
+			this.bossPosition.x = 0;
+			this.zigDirection = 1;  // Move right
+		} else if(this.bossPosition.x >= screenWidth - boss.getWidth()){
+			this.bossPosition.x = screenWidth - boss.getWidth();
+			this.zigDirection = -1;  // Move left
 		}
 
 		if(goingDown){
