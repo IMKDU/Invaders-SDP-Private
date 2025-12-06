@@ -45,15 +45,15 @@ public class Bullet extends Entity implements Collidable {
 		super(positionX, positionY, width, height,null);
 		this.speed = speed;
 		this.penetrationCount = 0;
-		this.maxPenetration = ShopItem.getPenetrationCount();
+            setSprite();
 
-		setSprite();
+
 	}
 
 	/**
 	 * Sets correct sprite for the bullet, based on speed.
 	 */
-	public final void setSprite() {
+	public void setSprite() {
 		if (speed < 0){
             this.spriteType = SpriteType.Bullet;
             super.height = 10;

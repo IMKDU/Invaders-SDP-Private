@@ -42,11 +42,15 @@ public class BossBullet extends Bullet implements Collidable {
      *            bullet's sprite type
      */
     public BossBullet(int x, int y, int dx, int dy, int width, int height, BossPattern.PatternBulletType patternBulletType) {
-        super(x, y, 0, width, height);
+        super(x, y, 0, width * 2, height * 2);
         this.dx = dx;
         this.dy = dy;
         applyPattern(patternBulletType);
 
+    }
+    @Override
+    public void setSprite() {
+        // do nothing
     }
 
     private void applyPattern(BossPattern.PatternBulletType type){

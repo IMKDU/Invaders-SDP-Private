@@ -61,7 +61,7 @@ public final class BulletPool {
 			bombPool.remove(b);
 			b.reset(x, y, speed);
 		} else {
-			b = new BombBullet(x, y, speed);
+			b = new BombBullet(x, y, speed,20 * 2, 53 *2);
 		}
 
 		return b;

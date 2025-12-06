@@ -188,7 +188,7 @@ public class EnemyShip extends Entity implements Collidable {
             }
             else {
                 this.spriteType = SpriteType.Explosion;
-                SoundManager.play("sfx/disappearance.wav");
+                SoundManager.playPooled("sfx/disappearance.wav");
             }
 
             this.explosionCooldown.reset();
