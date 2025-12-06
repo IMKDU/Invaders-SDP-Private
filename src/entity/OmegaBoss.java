@@ -34,7 +34,7 @@ public class OmegaBoss extends MidBoss {
 	/** Height of Omega */
 	private static final int OMEGA_HEIGHT_ANGRY = 89 * 2;
 	/** Current Health of Omega */
-	private static final int OMEGA_HEALTH = 45;
+	private static final int OMEGA_HEALTH = 300;
 	/** Point of Omega when destroyed */
 	private static final int OMEGA_POINT_VALUE = 500;
 

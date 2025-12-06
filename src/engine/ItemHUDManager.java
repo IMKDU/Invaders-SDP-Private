@@ -244,7 +244,7 @@ public class ItemHUDManager {
             case BULLET_SPEED:
                 return ShopItem.getBulletSpeedLevel() > 0;
             case SHIP_SPEED:
-                return ShopItem.getSHIPSpeedCOUNT() > 0;
+                return ShopItem.getShipSpeedLevel() > 0;
             default:
                 return false;
         }
@@ -264,7 +264,7 @@ public class ItemHUDManager {
             case BULLET_SPEED:
                 return ShopItem.getBulletSpeedLevel();
             case SHIP_SPEED:
-                return ShopItem.getSHIPSpeedCOUNT();
+                return ShopItem.getShipSpeed();
             default:
                 return 0;
         }

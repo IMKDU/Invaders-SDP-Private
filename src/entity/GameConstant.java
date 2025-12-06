@@ -1,8 +1,6 @@
 package entity;
 
 
-import engine.Core;
-
 public final class GameConstant {
 
     /** Height of the interface separation line. */
@@ -23,10 +21,18 @@ public final class GameConstant {
 	public static final int COIN_ITEM_VALUE = 30;
 	/** Points-to-coin conversion rate */
 	public static final int POINTS_TO_COIN_CONVERSION = 10;
+	/** Damage dealt to bosses by player Bullet */
+	public static final int PLAYER_BULLET_DAMAGE = 5;
 	/** Damage dealt to bosses by bomb explosion */
 	public static final int BOMB_DAMAGE_TO_BOSS = 2;
 	/** Bomb explosion area radius (in pixels) */
 	public static final int BOMB_AOE_RADIUS = 100;
+
+	public static final int TELEPORT_INVINCIBLE_TIME = 60;
+	public static final int PLAYER_COLLIDE_INVINCIBLE_TIME = 1100;
+
+	private static boolean origin_skill_activated = false;
+	private static boolean used_origin = false;
 
 	private GameConstant() {}
     private static boolean initialized = false;
@@ -42,4 +48,17 @@ public final class GameConstant {
 
         initialized = true;
     }
+
+	public static boolean getOrigin_skill_activated() {
+		return origin_skill_activated;
+	}
+	public static boolean getUsed_origin() {
+		return used_origin;
+	}
+	public static void setOrigin_skill_activated(boolean value) {
+		origin_skill_activated = value;
+	}
+	public static void setUsed_origin(boolean value) {
+		used_origin = value;
+	}
 }

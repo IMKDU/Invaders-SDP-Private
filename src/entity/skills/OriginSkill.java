@@ -6,7 +6,7 @@ import entity.pattern.ISkill;
 
 public class OriginSkill implements ISkill {
 
-    private static final int TOTAL_DAMAGE = 80;
+    private static final int TOTAL_DAMAGE = 250;
     private static final int DURATION_MS = 11000;
 
     private static final int BURST_WINDOW_MS = 1000;
@@ -31,12 +31,12 @@ public class OriginSkill implements ISkill {
 
         this.ship = ship;
         this.model = ship.getModel();
-        if (this.model.getUsedOrigin()) return;
+        if (GameConstant.getUsed_origin()) return;
 
         this.used = true;
         this.active = true;
-        this.model.setUsedOrigin(true);
-        this.model.setOriginSkillActivated(true);
+        GameConstant.setUsed_origin(true);
+        GameConstant.setOrigin_skill_activated(true);
 
         this.startTime = System.currentTimeMillis();
 

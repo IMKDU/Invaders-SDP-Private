@@ -5,6 +5,7 @@ import engine.DTO.ShopInfoDTO;
 import engine.FontPack;
 
 import java.awt.*;
+import java.util.Arrays;
 
 public final class ShopRenderer {
 
@@ -94,7 +95,6 @@ public final class ShopRenderer {
         FontMetrics metrics = g.getFontMetrics();
 
         g.setColor(isSelected || isLevelSelection ? Color.GREEN : Color.WHITE);
-
         // item name + level info
         String levelInfo = (currentLevel > 0)
                 ? String.format(" [Lv.%d/%d]", currentLevel, maxLevel)
@@ -120,7 +120,10 @@ public final class ShopRenderer {
 
             for (int lvl = 1; lvl <= maxLevel; lvl++) {
                 int price = prices[lvl - 1];
-                boolean canAfford = playerCoins >= price;
+                boolean canAfford;
+				if(currentLevel<lvl){
+					canAfford = playerCoins >= Arrays.stream(prices, currentLevel, lvl).sum();
+				} else canAfford = false;
                 boolean isOwned = currentLevel >= lvl;
                 boolean isThisLevel = (lvl == selectedLevel);
 

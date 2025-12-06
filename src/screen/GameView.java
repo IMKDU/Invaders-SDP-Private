@@ -1,5 +1,6 @@
 package screen;
 
+import engine.Core;
 import engine.DrawManager;
 import engine.DTO.HUDInfoDTO;
 import entity.*;
@@ -30,13 +31,13 @@ public class GameView {
 
         /** frame initialize */
         drawManager.initDrawing(dto.getWidth(), dto.getHeight());
-        if (model.isBlackHoleActive()) {
-            drawManager.getEntityRenderer().drawBlackHole(
-                    model.getBlackHoleCX(),
-                    model.getBlackHoleCY(),
-                    model.getBlackHoleRadius() / 2
-            );
-        }
+
+		/** draw configures */
+	    if (!model.getBlackHoles().isEmpty()) {
+		    for(BlackHole bkh : model.getBlackHoles()) {
+			    drawManager.getEntityRenderer().drawBlackHole(bkh);
+		    }
+	    }
         if (model.getOmegaBoss() != null) {
             drawManager.getEntityRenderer().drawHealthBarWithHP(model.getOmegaBoss());
             drawManager.getUIRenderer().drawBossName("Omega");
@@ -59,21 +60,22 @@ public class GameView {
                 drawManager.getEntityRenderer().drawLaser(laser);
             }
         }
-        if(model.getExplosionEntity() != null){
-            drawManager.getEntityRenderer().drawExplosion(
-                    model.isExplosionBoom(),
-                    model.getExplosionEntity(),
-                    model.getWarningExplosion()
-            );
-        }
+	    if(model.getExplosions() != null){
+		    for(Explosion ex : model.getExplosions()){
+			    drawManager.getEntityRenderer().drawExplosion(
+					    ex.isBoom(),
+					    ex,
+					    ex.getWarningProgress()
+			    );
+		    }
+	    }
 
-        if (model.isOriginSkillActivated()) {
-//            drawManager.getHUDRenderer().drawOriginUsed();
+	    if (GameConstant.getOrigin_skill_activated()) {
             drawManager.getSpecialAnimationRenderer().update(model.getCurrentLevel().getLevel());
             drawManager.getSpecialAnimationRenderer().draw();
 
             if (drawManager.getSpecialAnimationRenderer().isFinished()) {
-                model.setOriginSkillActivated(false);
+                GameConstant.setOrigin_skill_activated(false);
             }
         }
 
@@ -98,7 +100,7 @@ public class GameView {
                         drawManager.getItemRenderer().render((DropItem) e);
                         continue;
                     }
-                    if (e instanceof Ship) { // ship을 맨 마지막에 그리기
+                    if (e instanceof Ship) {
                         shipRenderQueue.add(e);
                         continue;
                     }
@@ -117,10 +119,10 @@ public class GameView {
         drawManager.getHUDRenderer().drawTime(GameConstant.ITEMS_SEPARATION_LINE_HEIGHT, dto.getElapsedTimeMillis());
         drawManager.getHUDRenderer().drawItemsHUD(dto.getWidth(), dto.getHeight());
         drawManager.getHUDRenderer().drawLevel(GameConstant.ITEMS_SEPARATION_LINE_HEIGHT, dto.getLevelName());
-        drawManager.getHUDRenderer().drawTeleportCooldowns(dto.getWidth(), dto.getHeight(), dto.teleportCooldownP1, dto.teleportCooldownP2, dto.isOriginUsed());
-        if (dto.isOriginUsed()){
+        drawManager.getHUDRenderer().drawTeleportCooldowns(dto.getWidth(), dto.getHeight(), dto.teleportCooldownP1, dto.teleportCooldownP2);
+//        if (dto.isOriginUsed()){
 //            drawManager.getHUDRenderer().drawOriginUsed();
-        }
+//        }
 
         /** draw Line */
         drawManager.getUIRenderer().drawHorizontalLine(dto.getWidth(), GameConstant.STAT_SEPARATION_LINE_HEIGHT - 1);
@@ -146,7 +148,6 @@ public class GameView {
         if (model.getShipP2() != null) {
             drawChargingSkill(model.getShipP2(), dto.getWidth(), dto.getHeight());
         }
-
 
         /** countdown */
         if (!model.isInputDelayFinished()) {

@@ -20,10 +20,8 @@ import entity.skills.OriginSkill;
 public class Ship extends Entity implements Collidable {
 
 	// === Constants ===
-	/** Time between shots. */
-	private static final int SHOOTING_INTERVAL = 750;
 	/** Movement of the ship for each unit of time. */
-	private static final int SPEED = 2;
+	private static final int SPEED = 3;
 	/** Y-offset from the ship position to the bullet spawn position */
 	private static final int BULLET_SPAWN_Y_OFFSET = 36;
 
@@ -35,7 +33,7 @@ public class Ship extends Entity implements Collidable {
 	private Cooldown shieldCooldown;
 	/** Checks if the ship is invincible. */
 	private boolean isInvincible;
-	private static final int TELEPORT_COOLDOWN_MS = 5000;
+	private static final int TELEPORT_COOLDOWN_MS = 6000;
 	// === [ADD] Which player: 1 = P1, 2 = P2 (default 1 for single-player compatibility) ===
     private int playerId = 1;
     private boolean isP1Ship;
@@ -85,7 +83,7 @@ public class Ship extends Entity implements Collidable {
             this.isP1Ship = false;
         }
 		this.shootingCooldown = new Cooldown(ShopItem.getShootingInterval());
-		this.destructionCooldown = new Cooldown(1000);
+		this.destructionCooldown = new Cooldown(600);
 		this.shieldCooldown = new Cooldown(0);
 		this.isInvincible = false;
 
@@ -96,6 +94,34 @@ public class Ship extends Entity implements Collidable {
 
 	public void move(String direction, int screenWidth, int screenHeight) {
 		switch (direction) {
+			case "RIGHT_UP":
+				if (positionX + width + SPEED <= screenWidth - 1)
+					moveRight();
+				if (positionY - SPEED >= GameConstant.STAT_SEPARATION_LINE_HEIGHT)
+					moveUp();
+				break;
+
+			case "RIGHT_DOWN":
+				if (positionX + width + SPEED <= screenWidth - 1)
+					moveRight();
+				if (positionY + height + SPEED <= screenHeight)
+					moveDown();
+				break;
+
+			case "LEFT_UP":
+				if (positionX - SPEED >= 1)
+					moveLeft();
+				if (positionY - SPEED >= GameConstant.STAT_SEPARATION_LINE_HEIGHT)
+					moveUp();
+				break;
+
+			case "LEFT_DOWN":
+				if (positionX - SPEED >= 1)
+					moveLeft();
+				if (positionY + height + SPEED <= screenHeight)
+					moveDown();
+				break;
+
 			case "RIGHT":
 				if (positionX + width + SPEED <= screenWidth - 1)
 					moveRight();
@@ -141,6 +167,26 @@ public class Ship extends Entity implements Collidable {
 		if (!canTeleport()) return;
         SoundManager.play("sfx/Teleport.wav");
 		switch (direction) {
+			case "RIGHT_UP":
+				this.positionX = Math.min(this.positionX + TELEPORT_DISTANCE, screenWidth - this.width - 1);
+				this.positionY = Math.max(this.positionY - TELEPORT_DISTANCE, GameConstant.STAT_SEPARATION_LINE_HEIGHT);
+				break;
+
+			case "RIGHT_DOWN":
+				this.positionX = Math.min(this.positionX + TELEPORT_DISTANCE, screenWidth - this.width - 1);
+				this.positionY = Math.min(this.positionY + TELEPORT_DISTANCE, screenHeight - this.height - 1);
+				break;
+
+			case "LEFT_UP":
+				this.positionX = Math.max(this.positionX - TELEPORT_DISTANCE, 1);
+				this.positionY = Math.max(this.positionY - TELEPORT_DISTANCE, GameConstant.STAT_SEPARATION_LINE_HEIGHT);
+				break;
+
+			case "LEFT_DOWN":
+				this.positionX = Math.max(this.positionX - TELEPORT_DISTANCE, 1);
+				this.positionY = Math.min(this.positionY + TELEPORT_DISTANCE, screenHeight - this.height - 1);
+				break;
+
 			case "RIGHT":
 				this.positionX = Math.min(this.positionX + TELEPORT_DISTANCE, screenWidth - this.width - 1);
 				break;
@@ -237,11 +283,11 @@ public class Ship extends Entity implements Collidable {
         if (!this.controlsDisabled) {
             this.chargingSkill.update();
         }
-        if (model.getOriginSkillActive()) {
+        if (GameConstant.getOrigin_skill_activated()) {
             this.controlsDisabled = true;
         }
         if (destructionCooldown.checkFinished()) {
-            if (!model.getOriginSkillActive()) {
+            if (!GameConstant.getOrigin_skill_activated()) {
                 this.controlsDisabled = false;
             }
         }
@@ -316,7 +362,8 @@ public class Ship extends Entity implements Collidable {
     }
     public final void destroy() {
         if (!this.isInvincible) {
-            SoundManager.stopSingleLoop("sfx/ShipMoving.wav");
+	        this.activateInvincibility(GameConstant.PLAYER_COLLIDE_INVINCIBLE_TIME);
+	        SoundManager.stopSingleLoop("sfx/ShipMoving.wav");
             SoundManager.play("sfx/destroy.wav");
             this.destructionCooldown.reset();
             this.disableAllControls(true);
@@ -366,7 +413,7 @@ public class Ship extends Entity implements Collidable {
 	public final void moveRight() {
         if (controlsDisabled) return;
 
-        int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+        int shipspeed = ShopItem.getShipSpeed();
 		this.positionX += SPEED*(1+shipspeed/10);
         this.isMove = true;
 	}
@@ -378,7 +425,7 @@ public class Ship extends Entity implements Collidable {
 	public final void moveLeft() {
         if (controlsDisabled) return;
 
-        int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+        int shipspeed = ShopItem.getShipSpeed();
 		this.positionX -= SPEED*(1+shipspeed/10);
         this.isMove = true;
 	}
@@ -390,7 +437,7 @@ public class Ship extends Entity implements Collidable {
 	public final void moveUp() {
         if (controlsDisabled) return;
 
-        int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+        int shipspeed = ShopItem.getShipSpeed();
 		this.positionY -= SPEED*(1+shipspeed/10);
         this.isMove = true;
 	}
@@ -402,7 +449,7 @@ public class Ship extends Entity implements Collidable {
 	public final void moveDown() {
         if (controlsDisabled) return;
 
-        int shipspeed = ShopItem.getSHIPSpeedCOUNT();
+        int shipspeed = ShopItem.getShipSpeed();
 		this.positionY += SPEED*(1+shipspeed/10);
         this.isMove = true;
 	}
@@ -415,7 +462,7 @@ public class Ship extends Entity implements Collidable {
 	 * Should be called when the player presses and holds the C key.
 	 */
 	public void startCharging() {
-		if (this.chargingSkill != null && !model.getOriginSkillActive()) {
+		if (this.chargingSkill != null && !GameConstant.getOrigin_skill_activated()) {
             chargingSkill.use(this);
 			this.chargingSkill.startCharging();
 		}

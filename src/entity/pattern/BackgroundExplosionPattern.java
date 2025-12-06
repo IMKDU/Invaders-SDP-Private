@@ -43,9 +43,9 @@ public class BackgroundExplosionPattern extends BossPattern {
                 SoundManager.play("sfx/BombExplosion.wav");
                 isSoundPlayed = true;
             }
-            if (explosionEntity.isDestroyed()) {
-                explosionEntity = null;
+	        if (explosionEntity.shouldBeRemoved()) {
                 isSoundPlayed = false;
+				spawnExplosion();
                 this.cooldown.reset();
             }
         } else if (cooldown.checkFinished()) {

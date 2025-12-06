@@ -4,6 +4,7 @@ import engine.BackBuffer;
 import engine.DrawManager;
 import engine.FontPack;
 import engine.ItemHUDManager;
+import entity.GameConstant;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -206,7 +207,7 @@ public final class HUDRenderer {
 
     /** Draw teleport cooldowns for P1 and P2 */
     /** Draw teleport cooldowns for P1 and P2 */
-    public void drawTeleportCooldowns(int screenWidth, int screenHeight, double cooldownP1, double cooldownP2, boolean originUsed) {
+    public void drawTeleportCooldowns(int screenWidth, int screenHeight, double cooldownP1, double cooldownP2) {
         Graphics2D g = (Graphics2D) backBuffer.getGraphics();
         int r = TELEPORT_GAUGE_RADIUS;
         int y = screenHeight - COOLDOWN_Y_OFFSET;
@@ -233,7 +234,7 @@ public final class HUDRenderer {
         drawTeleportCooldown(g, p2X, y, cooldownP2);
 
         drawExplainP2Skill(p2CenterX, p2CenterY, y, y + r);
-        if (originUsed) {
+        if (GameConstant.getUsed_origin()) {
             drawOriginUsed(y);
         }
     }
@@ -311,10 +312,10 @@ public final class HUDRenderer {
         }
     }
     public void drawExplainP1Skill(int centerX,int centerY,int topLineY,int bottomLineY) {
-        drawPlayerSkillExplain(centerX, centerY, topLineY, bottomLineY, Color.RED, "P1:", "shift", new String[]{"hold  C", "SPACE", "PRESS  O"}, new String[]{"laser","shoot","origin"}, new BufferedImage[]{spriteMap.get(DrawManager.SpriteType.ChargingLaserP1Icon), spriteMap.get(DrawManager.SpriteType.ShootP1Icon), spriteMap.get(DrawManager.SpriteType.OriginIcon)}, true);
+        drawPlayerSkillExplain(centerX, centerY, topLineY, bottomLineY, Color.RED, "P1:", "SHIFT(L)", new String[]{"CTRL(L)", "SPACE", "PRESS  O"}, new String[]{"laser","shoot","origin"}, new BufferedImage[]{spriteMap.get(DrawManager.SpriteType.ChargingLaserP1Icon), spriteMap.get(DrawManager.SpriteType.ShootP1Icon), spriteMap.get(DrawManager.SpriteType.OriginIcon)}, true);
     }
     public void drawExplainP2Skill(int centerX,int centerY,int topLineY,int bottomLineY) {
-        drawPlayerSkillExplain(centerX, centerY, topLineY, bottomLineY, Color.CYAN, "P2:", "?  or  /", new String[]{"CTRL(L)", "ENTER", "PRESS  O"}, new String[]{"laser","shoot","origin"}, new BufferedImage[]{spriteMap.get(DrawManager.SpriteType.ChargingLaserP2Icon), spriteMap.get(DrawManager.SpriteType.ShootP2Icon), spriteMap.get(DrawManager.SpriteType.OriginIcon)}, false);
+        drawPlayerSkillExplain(centerX, centerY, topLineY, bottomLineY, Color.CYAN, "P2:", "\\ or |", new String[]{"SHIFT(R)", "ENTER", "PRESS  O"}, new String[]{"laser","shoot","origin"}, new BufferedImage[]{spriteMap.get(DrawManager.SpriteType.ChargingLaserP2Icon), spriteMap.get(DrawManager.SpriteType.ShootP2Icon), spriteMap.get(DrawManager.SpriteType.OriginIcon)}, false);
     }
 
 

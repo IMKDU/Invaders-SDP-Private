@@ -9,9 +9,9 @@ import java.awt.*;
  */
 public class MidBossMob extends MidBoss {
     /** The width of the child mob entity. */
-    private static final int WIDTH = 24;
+    private static final int WIDTH = 25*2;
     /** The height of the child mob entity. */
-    private static final int HEIGHT= 16;
+    private static final int HEIGHT= 25*2;
     /** Flag to determine horizontal movement direction. True for right, false for left. */
     private boolean directionRight = true;
     private int colorID;

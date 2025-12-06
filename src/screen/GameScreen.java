@@ -104,7 +104,8 @@ public class GameScreen extends Screen {
                 this.model.startTimer();
             }
 			// Handle W,A,S,D and arrow keys to move Player 1 & 2
-			handlePlayerMovementInput();
+			handleP1MovementInput();
+			handleP2MovementInput();
 			// Handle keyboard input to activate player skills
 			handlePlayerSkillInput();
 
@@ -131,48 +132,71 @@ public class GameScreen extends Screen {
             this.isRunning = false;
         }
     }
-	private void handlePlayerMovementInput() {
+	private void handleP1MovementInput() {
 		// Player 1 Input
         model.setIsTelportP1(false);
-        model.setIsTelportP2(false);
 		if (model.getLivesP1() > 0 && model.getShip() != null && !model.getShip().isDestroyed()) {
 
-			boolean shift1 = inputManager.isP1ShiftDown();
+			boolean shift1 = inputManager.isLeftShiftDown();
 
-			if (inputManager.isP1KeyDown(KeyEvent.VK_D)) {
+			boolean up    = inputManager.isP1KeyDown(KeyEvent.VK_W);
+			boolean down  = inputManager.isP1KeyDown(KeyEvent.VK_S);
+			boolean left  = inputManager.isP1KeyDown(KeyEvent.VK_A);
+			boolean right = inputManager.isP1KeyDown(KeyEvent.VK_D);
+
+			if (right && up) {
+				model.playerMoveOrTeleport(1, "RIGHT_UP", shift1);
+			} else if (right && down) {
+				model.playerMoveOrTeleport(1, "RIGHT_DOWN", shift1);
+			} else if (left && up) {
+				model.playerMoveOrTeleport(1, "LEFT_UP", shift1);
+			} else if (left && down) {
+				model.playerMoveOrTeleport(1, "LEFT_DOWN", shift1);
+			} else if (right) {
 				model.playerMoveOrTeleport(1, "RIGHT", shift1);
-			}
-			if (inputManager.isP1KeyDown(KeyEvent.VK_A)) {
+			} else if (left) {
 				model.playerMoveOrTeleport(1, "LEFT", shift1);
-			}
-			if (inputManager.isP1KeyDown(KeyEvent.VK_W)) {
+			} else if (up) {
 				model.playerMoveOrTeleport(1, "UP", shift1);
-			}
-			if (inputManager.isP1KeyDown(KeyEvent.VK_S)) {
+			} else if (down) {
 				model.playerMoveOrTeleport(1, "DOWN", shift1);
 			}
 			if (inputManager.isP1KeyDown(KeyEvent.VK_SPACE)) {
 				model.playerFire(1);
 			}
 		}
+	}
 
+	private void handleP2MovementInput(){
+		model.setIsTelportP2(false);
 		// Player 2 Input
 		if (model.getShipP2() != null && model.getLivesP2() > 0 && !model.getShipP2().isDestroyed()) {
 
-			boolean isSlashDown = inputManager.isP2SlashDown();
+			boolean isSlashDown = inputManager.isRightShiftDown();
 
-			if (inputManager.isP2KeyDown(KeyEvent.VK_RIGHT)) {
+			boolean up    = inputManager.isP2KeyDown(KeyEvent.VK_UP);
+			boolean down  = inputManager.isP2KeyDown(KeyEvent.VK_DOWN);
+			boolean left  = inputManager.isP2KeyDown(KeyEvent.VK_LEFT);
+			boolean right = inputManager.isP2KeyDown(KeyEvent.VK_RIGHT);
+
+			if (right && up) {
+				model.playerMoveOrTeleport(2, "RIGHT_UP", isSlashDown);
+			} else if (right && down) {
+				model.playerMoveOrTeleport(2, "RIGHT_DOWN", isSlashDown);
+			} else if (left && up) {
+				model.playerMoveOrTeleport(2, "LEFT_UP", isSlashDown);
+			} else if (left && down) {
+				model.playerMoveOrTeleport(2, "LEFT_DOWN", isSlashDown);
+			} else if (right) {
 				model.playerMoveOrTeleport(2, "RIGHT", isSlashDown);
-			}
-			if (inputManager.isP2KeyDown(KeyEvent.VK_LEFT)) {
+			} else if (left) {
 				model.playerMoveOrTeleport(2, "LEFT", isSlashDown);
-			}
-			if (inputManager.isP2KeyDown(KeyEvent.VK_UP)) {
+			} else if (up) {
 				model.playerMoveOrTeleport(2, "UP", isSlashDown);
-			}
-			if (inputManager.isP2KeyDown(KeyEvent.VK_DOWN)) {
+			} else if (down) {
 				model.playerMoveOrTeleport(2, "DOWN", isSlashDown);
 			}
+
 			if (inputManager.isP2KeyDown(KeyEvent.VK_ENTER)) {
 				model.playerFire(2);
 			}
@@ -185,8 +209,8 @@ public class GameScreen extends Screen {
      */
     private void handlePlayerSkillInput() {
 
-        boolean isChargingDownP1 = inputManager.isP1KeyDown(java.awt.event.KeyEvent.VK_C);
-        boolean isChargingDownP2 = inputManager.isP2KeyDown(java.awt.event.KeyEvent.VK_CONTROL);
+        boolean isChargingDownP1 = inputManager.isP1KeyDown(KeyEvent.VK_CONTROL);
+        boolean isChargingDownP2 = inputManager.isP2KeyDown(KeyEvent.VK_BACK_SLASH);
 
         if (model.getShip() != null && model.getLivesP1() > 0 && !model.getShip().isDestroyed()) {
             handleChargingInput(model.getShip(), isChargingDownP1);
@@ -197,7 +221,7 @@ public class GameScreen extends Screen {
         }
 
 
-        boolean isOriginDown = inputManager.isKeyDown(java.awt.event.KeyEvent.VK_O);
+        boolean isOriginDown = inputManager.isKeyDown(KeyEvent.VK_O);
         if (isOriginDown) {
             handleOriginSkillInput();
         }
@@ -267,8 +291,7 @@ public class GameScreen extends Screen {
 				model.getAchievementText(),
 				model.getHealthPopupText(),
 				teleportCooldownP1,
-				teleportCooldownP2,
-                model.getUsedOrigin()
+				teleportCooldownP2
 		);
 	}
 

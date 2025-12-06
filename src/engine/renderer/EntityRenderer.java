@@ -200,6 +200,9 @@ public final class EntityRenderer {
            ZetaBoss zetaBoss = (ZetaBoss) entity;
            drawZetaBoss(zetaBoss);
         }
+		else if (entity instanceof FinalBoss finalBoss){
+			drawFinalBoss(finalBoss);
+		}
 		else if (entity instanceof MidBossMob) {
 			MidBossMob midBossMob = (MidBossMob) entity;
 			drawMidBossMob(midBossMob);
@@ -207,14 +210,10 @@ public final class EntityRenderer {
         else if (entity instanceof GuidedBullet gb) {
             drawGuidedRotated(gb);
         }
-		else {
-			drawEntity(entity, entity.getPositionX(), entity.getPositionY());
-		}
+		drawEntity(entity, entity.getPositionX(), entity.getPositionY());
 	}
 
     private void drawZetaBoss(ZetaBoss zetaBoss) {
-        // 1. Draw boss body
-        drawEntity(zetaBoss, zetaBoss.getPositionX(), zetaBoss.getPositionY());
 
         // 2. Draw pattern effects
         if (zetaBoss.getBossPattern() != null) {
@@ -224,6 +223,19 @@ public final class EntityRenderer {
             }
         }
     }
+
+	private void drawFinalBoss(FinalBoss finalBoss) {
+
+		// 1. Draw pattern effects
+		BossPattern apocalypsePattern = finalBoss.getApocalypsePattern();
+		BossPattern dashPattern = finalBoss.getDashPattern();
+		if (apocalypsePattern != null) {
+			drawBossPattern(finalBoss, apocalypsePattern);
+		}
+		if (dashPattern != null) {
+			drawBossPattern(finalBoss, dashPattern);
+		}
+	}
 
     /**
      * Draws GammaBoss entity with pattern-specific visualizations.
@@ -336,11 +348,8 @@ public final class EntityRenderer {
         }
 
         int[] targetPoint;
-        if (boss instanceof GammaBoss) {
-            targetPoint = ((GammaBoss) boss).getDashEndPoint();
-        } else {
-            return;
-        }
+		targetPoint = dashPattern.getDashEndPoint(boss.getWidth(), boss.getHeight());
+
 
         // Calculate boss center point
         int bossWidth = boss.getWidth();
@@ -498,7 +507,10 @@ public final class EntityRenderer {
     }
 
     /** Draw circle for pull_attack pattern */
-    public void drawBlackHole(final int cx, final int cy, int size) {
+    public void drawBlackHole(HasCircleBounds blackHole) {
+		int cx = blackHole.getPositionCX();
+		int cy =  blackHole.getPositionCY();
+		int size = blackHole.getRadius();
         Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
 
         if (this.blackholeAnimationCooldown.checkFinished()) {

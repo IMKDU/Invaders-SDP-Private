@@ -17,6 +17,8 @@ public final class InputManager implements KeyListener {
 	private static boolean[] keys;
 	/** Singleton instance of the class. */
 	private static InputManager instance;
+	private boolean leftShiftDown;
+	private boolean rightShiftDown;
 
 	/**
 	 * Private constructor.
@@ -55,8 +57,18 @@ public final class InputManager implements KeyListener {
 	 */
 	@Override
 	public void keyPressed(final KeyEvent key) {
-		if (key.getKeyCode() >= 0 && key.getKeyCode() < NUM_KEYS)
-			keys[key.getKeyCode()] = true;
+		int code = key.getKeyCode();
+		if (code >= 0 && code < NUM_KEYS)
+			keys[code] = true;
+
+		if (code == KeyEvent.VK_SHIFT) {
+			int loc = key.getKeyLocation();
+			if (loc == KeyEvent.KEY_LOCATION_LEFT) {
+				leftShiftDown = true;
+			} else if (loc == KeyEvent.KEY_LOCATION_RIGHT) {
+				rightShiftDown = true;
+			}
+		}
 	}
 
 	/**
@@ -67,8 +79,19 @@ public final class InputManager implements KeyListener {
 	 */
 	@Override
 	public void keyReleased(final KeyEvent key) {
-		if (key.getKeyCode() >= 0 && key.getKeyCode() < NUM_KEYS)
-			keys[key.getKeyCode()] = false;
+		int code = key.getKeyCode();
+		if (code >= 0 && code < NUM_KEYS)
+			keys[code] = false;
+
+		// when right, left shifs released
+		if (code == KeyEvent.VK_SHIFT) {
+			int loc = key.getKeyLocation();
+			if (loc == KeyEvent.KEY_LOCATION_LEFT) {
+				leftShiftDown = false;
+			} else if (loc == KeyEvent.KEY_LOCATION_RIGHT) {
+				rightShiftDown = false;
+			}
+		}
 	}
 
 	/**
@@ -90,8 +113,12 @@ public final class InputManager implements KeyListener {
 		return isKeyDown(keyCode);
 	}
 
-	public boolean isP1ShiftDown() {
-		return keys[KeyEvent.VK_SHIFT];
+	public boolean isLeftShiftDown() {
+		return leftShiftDown;
+	}
+
+	public boolean isRightShiftDown() {
+		return rightShiftDown;
 	}
 
 	public boolean isP2SlashDown() {

@@ -32,7 +32,7 @@ public class GammaBoss extends MidBoss {
     /** Height of GammaBoss */
     private static final int GAMMA_HEIGHT = 55 * 2;
     /** Health points */
-    private static final int GAMMA_HEALTH = 65;
+    private static final int GAMMA_HEALTH = 400;
     /** Point value when destroyed */
     private static final int GAMMA_POINT_VALUE = 700;
 
