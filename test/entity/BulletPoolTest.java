@@ -1,6 +1,7 @@
 package entity;
 
-import engine.bullet.*;
+import entity.bullet.Bullet;
+import entity.bullet.BulletPool;
 import engine.shop.ShopItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
