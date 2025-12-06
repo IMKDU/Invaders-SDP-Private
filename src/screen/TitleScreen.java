@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
-import engine.Cooldown;
-import engine.DrawManager.SpriteType;
+import engine.core.Cooldown;
+import engine.view.DrawManager.SpriteType;
 import entity.Entity;
-import entity.SoundButton;
+import audio.SoundButton;
 
 import audio.SoundManager;
 

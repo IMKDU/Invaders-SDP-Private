@@ -1,9 +1,9 @@
 package entity.pattern;
 
-import engine.Cooldown;
-import entity.GuidedBullet;
-import entity.HasBounds;
-import entity.Ship;
+import engine.core.Cooldown;
+import entity.bullet.GuidedBullet;
+import entity.base.HasBounds;
+import entity.ship.Ship;
 import entity.GameConstant;
 
 import java.awt.*;

@@ -1,10 +1,9 @@
 package entity.pattern;
 
-import engine.Cooldown;
-import entity.BlackHole;
-import entity.Bullet;
-import entity.HasBounds;
-import entity.LaserBeam;
+import engine.core.Cooldown;
+import entity.bullet.Bullet;
+import entity.base.HasBounds;
+import entity.bullet.LaserBeam;
 
 import java.awt.*;
 import java.util.HashSet;

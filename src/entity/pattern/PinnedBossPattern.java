@@ -1,9 +1,9 @@
 package entity.pattern;
 
-import engine.Cooldown;
-import entity.BossBullet;
-import entity.Bullet;
-import entity.HasBounds;
+import engine.core.Cooldown;
+import entity.bullet.BossBullet;
+import entity.bullet.Bullet;
+import entity.base.HasBounds;
 
 import java.awt.*;
 import java.util.Set;

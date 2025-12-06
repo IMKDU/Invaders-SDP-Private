@@ -9,14 +9,14 @@ public class HealthBar {
     private int x2;
     private int y2;
 
-    public HealthBar(int HP, int positionX, int positionY, int width, int height){
-        this.maxHP = HP;
-        this.current_HP = HP;
-        this.x1 = positionX;
-        this.y1 = positionY - 3;
-        this.x2 = positionX + width;
-        this.y2 = this.y1;
-    }
+//    public HealthBar(int HP, int positionX, int positionY, int width, int height){
+//        this.maxHP = HP;
+//        this.current_HP = HP;
+//        this.x1 = positionX;
+//        this.y1 = positionY - 3;
+//        this.x2 = positionX + width;
+//        this.y2 = this.y1;
+//    }
     public HealthBar(int HP){
         this.maxHP = HP;
         this.current_HP = HP;

@@ -1,7 +1,9 @@
 package entity.pattern;
 
-import engine.Core;
+import engine.core.Core;
 import entity.*;
+import entity.base.HasBounds;
+import entity.ship.Ship;
 
 import java.awt.*;
 import java.util.HashSet;

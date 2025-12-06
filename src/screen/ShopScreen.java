@@ -4,10 +4,10 @@ import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
 import audio.SoundManager;
-import engine.Cooldown;
+import engine.core.Cooldown;
 import engine.DTO.ShopInfoDTO;
-import engine.GameState;
-import entity.ShopItem;
+import engine.core.GameState;
+import entity.item.ShopItem;
 
 
 /**

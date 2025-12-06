@@ -9,8 +9,8 @@ plugins {
 
 // 2. Specify the main class for the application
 application {
-    // Set the main entry point to engine.Core.java
-    mainClass = 'engine.Core'
+    // Set the main entry point to engine.core.Core.java
+    mainClass = 'engine.core.Core'
 }
 
 // 3. Set the project's Java version to 21 (LTS)

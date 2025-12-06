@@ -1,10 +1,8 @@
 package entity.pattern;
 
-import engine.Cooldown;
-import entity.BossBullet;
-import entity.HasBounds;
-
-import java.awt.*;
+import engine.core.Cooldown;
+import entity.bullet.BossBullet;
+import entity.base.HasBounds;
 
 public class ZigZagAngryPattern extends ZigZagPattern {
 
