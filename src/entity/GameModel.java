@@ -79,8 +79,8 @@ public class GameModel {
     /** Current score. */
     private int score;
     // === [ADD] Independent scores for two players ===
-    private int scoreP1 = 0;
-    private int scoreP2 = 0;
+    private int scoreP1;
+    private int scoreP2;
     /** Player lives left. */
     private int livesP1;
     private int livesP2;
@@ -154,6 +154,8 @@ public class GameModel {
         this.maxLives = maxLives;
         this.level = gameState.getLevel();
         this.score = gameState.getScore();
+		this.scoreP1 = gameState.getScoreP1();
+		this.scoreP2 = gameState.getScoreP2();
         this.coin = gameState.getCoin();
         this.livesP1 = gameState.getLivesRemaining();
         this.livesP2 = gameState.getLivesRemainingP2();
@@ -1285,8 +1287,8 @@ public class GameModel {
         if (this.coin > 2000) {
             AchievementManager.getInstance().unlockAchievement("Mr. Greedy");
         }
-        return new GameState(this.level, this.score, this.livesP1,this.livesP2,
-                this.bulletsShot, this.shipsDestroyed,this.coin);
+        return new GameState(this.level, this.score, this.scoreP1, this.scoreP2, this.livesP1, this.livesP2,
+                this.bulletsShot, this.shipsDestroyed, this.coin);
     }
     /**
      * Adds one life to the player.

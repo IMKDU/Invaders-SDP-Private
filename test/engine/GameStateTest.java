@@ -14,7 +14,7 @@ class GameStateTest {
     @BeforeEach
     void setUp() {
         // Starts each test with a default GameState having 100 coins.
-        gameState = new GameState(1, 0, 3, 3, 0, 0, 100);
+        gameState = new GameState(1, 0, 0, 0, 3, 3, 0, 0, 100);
     }
 
     @Test
