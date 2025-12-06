@@ -1,8 +1,12 @@
 package entity.skills;
 
-import engine.Cooldown;
+import engine.core.Cooldown;
 import entity.*;
 import entity.pattern.ISkill;
+import entity.ship.EnemyShip;
+import entity.ship.EnemyShipFormationModel;
+import entity.ship.EnemyShipSpecialFormation;
+import entity.ship.Ship;
 
 public class OriginSkill implements ISkill {
 

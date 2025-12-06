@@ -2,12 +2,10 @@ package entity.pattern;
 
 import java.util.*;
 import java.awt.*;
-import java.util.List;
 import java.util.logging.Logger;
-import entity.GameConstant;
-import entity.HasBounds;
-import entity.MidBoss;
-import entity.MidBossMob;
+
+import engine.core.Core;
+import entity.boss.MidBoss;
 
 public class SpawnMobPattern extends BossPattern {
 
@@ -67,7 +65,7 @@ public class SpawnMobPattern extends BossPattern {
         this.BOSS_WIDTH = boss.getWidth();
         this.BOSS_HEIGHT = boss.getHeight();
         this.BOSS_MAXHP = boss.getMaxHealPoint();
-        this.logger = engine.Core.getLogger();
+        this.logger = Core.getLogger();
         this.movementStrategy = new MidBossMobMovement(
                 this.BOSS_WIDTH,
                 this.BOSS_HEIGHT,

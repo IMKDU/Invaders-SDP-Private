@@ -1,5 +1,7 @@
 package entity;
 
+import entity.bullet.Bullet;
+import entity.bullet.BulletPool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,8 +1,7 @@
 package entity.pattern;
 
-import engine.Core;
 import entity.GameConstant;
-import entity.HasBounds;
+import entity.base.HasBounds;
 
 import java.awt.*;
 

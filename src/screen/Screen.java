@@ -4,10 +4,10 @@ import java.awt.Insets;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import engine.Cooldown;
-import engine.Core;
-import engine.DrawManager;
-import engine.InputManager;
+import engine.core.Cooldown;
+import engine.core.Core;
+import engine.view.DrawManager;
+import engine.core.InputManager;
 
 /**
  * Implements a generic screen.

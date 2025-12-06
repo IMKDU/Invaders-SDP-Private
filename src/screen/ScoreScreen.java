@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import engine.Cooldown;
-import engine.Core;
-import engine.GameState;
-import engine.Score;
-import entity.ShopItem;
+import engine.core.Cooldown;
+import engine.core.Core;
+import engine.core.GameState;
+import engine.view.Score;
+import entity.item.ShopItem;
 import entity.skills.OriginSkill;
 
 /**

@@ -2,7 +2,7 @@ package entity.pattern;
 
 import entity.Entity;
 import entity.GameConstant;
-import entity.HasBounds;
+import entity.base.HasBounds;
 
 import java.awt.*;
 

@@ -1,8 +1,8 @@
 package entity.pattern;
 
-import engine.Cooldown;
-import engine.Core;
-import entity.HasBounds;
+import engine.core.Cooldown;
+import engine.core.Core;
+import entity.base.HasBounds;
 
 import java.awt.Point;
 import java.util.Random;

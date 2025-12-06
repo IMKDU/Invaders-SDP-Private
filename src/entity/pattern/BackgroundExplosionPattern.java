@@ -1,8 +1,8 @@
 package entity.pattern;
 
 import audio.SoundManager;
-import engine.Cooldown;
-import entity.Explosion;
+import engine.core.Cooldown;
+import entity.item.Explosion;
 import entity.GameConstant;
 import java.awt.*;
 

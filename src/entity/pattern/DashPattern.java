@@ -1,10 +1,9 @@
 package entity.pattern;
 
-import audio.SoundManager;
-import engine.Core;
-//import engine.DrawManager;
+import engine.core.Core;
+//import engine.view.DrawManager;
 import entity.GameConstant;
-import entity.HasBounds;
+import entity.base.HasBounds;
 
 import java.awt.*;
 import java.util.logging.Logger;

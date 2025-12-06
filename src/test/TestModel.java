@@ -1,6 +1,10 @@
 package test;
 
 import entity.*;
+import entity.boss.OmegaBoss;
+import entity.bullet.Bullet;
+import entity.bullet.BulletPool;
+import entity.ship.Ship;
 
 import java.awt.*;
 import java.util.ArrayList;
