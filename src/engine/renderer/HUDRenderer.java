@@ -315,7 +315,7 @@ public final class HUDRenderer {
         drawPlayerSkillExplain(centerX, centerY, topLineY, bottomLineY, Color.RED, "P1:", "SHIFT(L)", new String[]{"CTRL(L)", "SPACE", "PRESS  O"}, new String[]{"laser","shoot","origin"}, new BufferedImage[]{spriteMap.get(DrawManager.SpriteType.ChargingLaserP1Icon), spriteMap.get(DrawManager.SpriteType.ShootP1Icon), spriteMap.get(DrawManager.SpriteType.OriginIcon)}, true);
     }
     public void drawExplainP2Skill(int centerX,int centerY,int topLineY,int bottomLineY) {
-        drawPlayerSkillExplain(centerX, centerY, topLineY, bottomLineY, Color.CYAN, "P2:", "\\ or |", new String[]{"SHIFT(R)", "ENTER", "PRESS  O"}, new String[]{"laser","shoot","origin"}, new BufferedImage[]{spriteMap.get(DrawManager.SpriteType.ChargingLaserP2Icon), spriteMap.get(DrawManager.SpriteType.ShootP2Icon), spriteMap.get(DrawManager.SpriteType.OriginIcon)}, false);
+        drawPlayerSkillExplain(centerX, centerY, topLineY, bottomLineY, Color.CYAN, "P2:", "SHIFT(R)", new String[]{"\\ or |", "ENTER", "PRESS  O"}, new String[]{"laser","shoot","origin"}, new BufferedImage[]{spriteMap.get(DrawManager.SpriteType.ChargingLaserP2Icon), spriteMap.get(DrawManager.SpriteType.ShootP2Icon), spriteMap.get(DrawManager.SpriteType.OriginIcon)}, false);
     }
 
 
