@@ -1,6 +1,6 @@
 package engine.DTO;
 
-import entity.Ship;
+import entity.ship.Ship;
 
 public final class HUDInfoDTO {
 

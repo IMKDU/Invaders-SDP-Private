@@ -1,11 +1,11 @@
 package entity.pattern;
 
-import engine.Cooldown;
-import engine.Core;
-import entity.Bullet;
+import engine.core.Cooldown;
+import engine.core.Core;
+import entity.bullet.Bullet;
 import entity.GameConstant;
-import entity.HasBounds;
-import entity.MidBoss;
+import entity.base.HasBounds;
+import entity.boss.MidBoss;
 
 import java.awt.*;
 import java.util.ArrayList;

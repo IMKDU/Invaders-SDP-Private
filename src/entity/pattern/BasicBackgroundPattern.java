@@ -1,7 +1,7 @@
 package entity.pattern;
 
-import engine.Cooldown;
-import entity.BossBullet;
+import engine.core.Cooldown;
+import entity.bullet.BossBullet;
 
 import java.awt.*;
 

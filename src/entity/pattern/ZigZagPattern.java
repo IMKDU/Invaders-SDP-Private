@@ -1,8 +1,8 @@
 package entity.pattern;
 
-import engine.Cooldown;
+import engine.core.Cooldown;
 import entity.GameConstant;
-import entity.HasBounds;
+import entity.base.HasBounds;
 
 public class ZigZagPattern extends PinnedBossPattern {
 

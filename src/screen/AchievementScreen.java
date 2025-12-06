@@ -3,8 +3,8 @@ package screen;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
-import engine.Achievement;
-import engine.AchievementManager;
+import entity.achievement.Achievement;
+import entity.achievement.AchievementManager;
 
 /**
  * Implements the achievement screen, which displays the player's achievements.

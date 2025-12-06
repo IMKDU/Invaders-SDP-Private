@@ -1,19 +1,32 @@
 package entity;
 
 import audio.SoundManager;
-import engine.*;
-import engine.level.Level;
+import engine.core.*;
+import entity.item.*;
+import entity.level.Level;
 
 import java.awt.*;
 import java.util.*;
 
+import entity.achievement.AchievementManager;
+import entity.base.BossEntity;
+import entity.base.HasBounds;
+import entity.base.LaserInfo;
+import entity.boss.*;
+import entity.bullet.*;
 import entity.pattern.ApocalypseAttackPattern;
 
 import java.util.List;
 import java.util.logging.Logger;
 
-import engine.level.ItemDrop;
+import entity.level.ItemDrop;
+import entity.pattern.BlackHole;
 import entity.pattern.ISkill;
+import entity.pattern.MidBossMob;
+import entity.ship.EnemyShip;
+import entity.ship.EnemyShipFormationModel;
+import entity.ship.EnemyShipSpecialFormation;
+import entity.ship.Ship;
 import entity.skills.OriginSkill;
 
 /**

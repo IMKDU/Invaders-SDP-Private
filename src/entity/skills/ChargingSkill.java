@@ -1,7 +1,7 @@
 package entity.skills;
 
 import audio.SoundManager;
-import entity.Ship;
+import entity.ship.Ship;
 import entity.pattern.ISkill;
 
 /**

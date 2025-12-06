@@ -1,12 +1,13 @@
 package screen;
 
-import engine.Cooldown;
+import engine.core.Cooldown;
 import engine.DTO.HUDInfoDTO;
-import engine.GameState;
-import engine.level.Level;
+import engine.core.GameState;
+import entity.level.Level;
+import engine.view.GameView;
 import entity.GameConstant;
 import entity.GameModel;
-import entity.Ship;
+import entity.ship.Ship;
 
 import java.awt.event.KeyEvent;
 

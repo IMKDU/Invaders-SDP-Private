@@ -1,7 +1,6 @@
 package entity.pattern;
 
 import entity.GameConstant;
-import entity.MidBossMob;
 
 import java.util.List;
 

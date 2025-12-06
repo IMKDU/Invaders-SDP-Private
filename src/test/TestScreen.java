@@ -1,8 +1,6 @@
 package test;
 
-import engine.Core;
 import engine.DTO.HUDInfoDTO;
-import entity.GameModel;
 import screen.Screen;
 
 public class TestScreen extends Screen {

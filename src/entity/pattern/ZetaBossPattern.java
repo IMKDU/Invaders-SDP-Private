@@ -1,8 +1,12 @@
 package entity.pattern;
 
-import engine.Cooldown;
-import engine.Core;
+import engine.core.Cooldown;
+import engine.core.Core;
 import entity.*;
+import entity.base.HasBounds;
+import entity.boss.MidBoss;
+import entity.bullet.Bullet;
+import entity.ship.Ship;
 
 import java.awt.*;
 import java.util.List;

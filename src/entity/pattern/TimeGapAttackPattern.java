@@ -1,15 +1,13 @@
 package entity.pattern;
 
-import engine.Cooldown;
-import entity.Bullet;
-import entity.HasBounds;
-import entity.LaserBeam;
-import entity.Ship;
+import engine.core.Cooldown;
+import entity.base.HasBounds;
+import entity.bullet.LaserBeam;
+import entity.ship.Ship;
 
 import java.util.HashSet;
 import java.util.List;
 import java.awt.*;
-import java.util.Set;
 
 public class TimeGapAttackPattern extends BossPattern {
 

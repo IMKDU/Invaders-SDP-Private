@@ -2,7 +2,9 @@ package entity;
 
 import java.awt.Color;
 
-import engine.DrawManager.SpriteType;
+import engine.view.DrawManager.SpriteType;
+import entity.base.Collidable;
+import entity.base.HasBounds;
 
 /**
  * Implements a generic game entity.
