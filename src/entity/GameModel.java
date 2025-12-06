@@ -37,6 +37,9 @@ public class GameModel {
     /** Time from finishing the level to screen change. */
     private static final int SCREEN_CHANGE_INTERVAL = 1500;
 
+    private static boolean origin_skill_activated = false;
+    private static boolean used_origin = false;
+
     /** Current level data (direct from Level system). */
     private Level currentLevel;
     /** Current difficulty level number. */
@@ -408,7 +411,7 @@ public class GameModel {
                 boolean isOmegaBossAlive = (this.omegaBoss != null && !this.omegaBoss.isDestroyed());
                 boolean isZetaBossAlive = (this.zetaBoss != null && !this.zetaBoss.isDestroyed());
                 boolean isGammaBossAlive = (this.gammaBoss != null && !this.gammaBoss.isDestroyed());
-                if (!GameConstant.getOrigin_skill_activated()) {
+                if (!getOrigin_skill_activated()) {
                     if (!isFinalBossAlive && !isOmegaBossAlive && !isZetaBossAlive && !isGammaBossAlive) {
                         if (!this.levelFinished) {
                             this.levelFinished = true;
@@ -1306,7 +1309,7 @@ public class GameModel {
         String bossName = this.currentLevel.getBossId();
 
         if (bossName == null || bossName.isEmpty()) {
-			if(GameConstant.getOrigin_skill_activated()) return;
+			if(getOrigin_skill_activated()) return;
             this.logger.info("No boss for this level. Proceeding to finish.");
             return;
         }
@@ -1521,6 +1524,18 @@ public class GameModel {
     }
     public List<Ship> getShips() {
         return ships;
+    }
+    public static boolean getOrigin_skill_activated() {
+        return origin_skill_activated;
+    }
+    public static boolean getUsed_origin() {
+        return used_origin;
+    }
+    public static void setOrigin_skill_activated(boolean value) {
+        origin_skill_activated = value;
+    }
+    public static void setUsed_origin(boolean value) {
+        used_origin = value;
     }
 
 //    public boolean isExplosionBoom() { return explosions.isBoom(); }

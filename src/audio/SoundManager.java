@@ -200,7 +200,6 @@ public class SoundManager {
 	/** Stop and close the given clip safely. */
 	private static void closeClipSafely(Clip c, boolean flushBeforeClose) {
 		if (c == null) return;
-		System.out.println("[Sound] closeClipSafely: " + c);
 		try { if (c.isRunning()) c.stop(); } catch (Exception ignored) {}
 		try { if (flushBeforeClose) c.flush(); } catch (Exception ignored) {}
 		try { c.close(); } catch (Exception ignored) {}

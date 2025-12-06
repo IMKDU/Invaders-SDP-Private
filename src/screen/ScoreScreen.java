@@ -9,6 +9,8 @@ import engine.Cooldown;
 import engine.Core;
 import engine.GameState;
 import engine.Score;
+import entity.ShopItem;
+import entity.skills.OriginSkill;
 
 /**
  * Implements the score screen.
@@ -103,6 +105,8 @@ public class ScoreScreen extends Screen {
 
 		draw();
 		if (this.inputDelay.checkFinished()) {
+            ShopItem.resetAllItems();
+            OriginSkill.resetUsed();
 			if (inputManager.isKeyDown(KeyEvent.VK_ESCAPE)) {
 				// Return to main menu.
 				this.returnCode = 1;

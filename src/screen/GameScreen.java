@@ -291,7 +291,8 @@ public class GameScreen extends Screen {
 				model.getAchievementText(),
 				model.getHealthPopupText(),
 				teleportCooldownP1,
-				teleportCooldownP2
+				teleportCooldownP2,
+                GameModel.getUsed_origin()
 		);
 	}
 
