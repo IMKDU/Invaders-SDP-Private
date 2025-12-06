@@ -148,7 +148,7 @@ public class ZetaBoss extends MidBoss {
     @Override
     public void takeDamage(int damage) {
         this.healPoint -= damage;
-        SoundManager.play("sfx/ZetaBoss_hitting.wav");
+        SoundManager.playPooled("sfx/ZetaBoss_hitting.wav");
         if(this.healPoint <= 0) {
             this.destroy();
         }

@@ -83,7 +83,8 @@ public final class SpriteAtlas {
             spriteMap.put(SpriteType.GammaBossDash2, new BufferedImage(50,70,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.GammaBossDashing1, new BufferedImage(50,70,BufferedImage.TYPE_INT_ARGB));
             spriteMap.put(SpriteType.GammaBossDashing2, new BufferedImage(50,70,BufferedImage.TYPE_INT_ARGB));
-
+            spriteMap.put(SpriteType.GuidedBullet1, new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB));
+            spriteMap.put(SpriteType.GuidedBullet2, new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB));
             fileManager.loadSprite(spriteMap);
             //symatric sprite
             spriteMap.put(SpriteType.OmegaBossDash3, mirrorSprite(spriteMap.get(SpriteType.OmegaBossDash1)));

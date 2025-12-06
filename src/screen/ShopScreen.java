@@ -202,6 +202,7 @@ public class ShopScreen extends Screen {
             if (selectedItem == TOTAL_ITEMS) {
                 // Exit option selected
                 this.isRunning = false;
+                SoundManager.stopAll();
             } else {
                 // Enter level selection mode
                 selectionMode = 1;

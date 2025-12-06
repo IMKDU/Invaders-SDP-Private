@@ -482,6 +482,7 @@ public class GameModel {
 		if (omegaBoss != null) bosses.add(omegaBoss);
 		if (zetaBoss != null) bosses.add(zetaBoss);
 		if (finalBoss != null) bosses.add(finalBoss);
+        if (gammaBoss != null) bosses.add(gammaBoss);
 
 		for (Bullet b : snapshot) {
 

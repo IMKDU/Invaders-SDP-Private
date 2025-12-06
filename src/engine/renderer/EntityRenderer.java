@@ -204,6 +204,13 @@ public final class EntityRenderer {
 			MidBossMob midBossMob = (MidBossMob) entity;
 			drawMidBossMob(midBossMob);
 		}
+        else if (entity instanceof GuidedBullet gb) {
+            drawGuidedRotated(gb);
+        }
+		else if (entity instanceof MidBossMob) {
+			MidBossMob midBossMob = (MidBossMob) entity;
+			drawMidBossMob(midBossMob);
+		}
 		else if (entity instanceof FinalBoss finalBoss){
 			drawFinalBoss(finalBoss);
 		}
@@ -822,7 +829,33 @@ public final class EntityRenderer {
         }
     }
 
+    private void drawGuidedRotated(GuidedBullet bullet) {
 
+        Graphics2D g2d = (Graphics2D) backBuffer.getGraphics();
+        BufferedImage img = spriteMap.get(bullet.getSpriteType());
+        if (img == null) return;
+
+        double scaleValue = scale * 2;
+
+        int drawW = (int) (img.getWidth() * scaleValue);
+        int drawH = (int) (img.getHeight() * scaleValue);
+
+        int cx = bullet.getPositionX() + bullet.getWidth() / 2;
+        int cy = bullet.getPositionY() + bullet.getHeight() / 2;
+
+        AffineTransform old = g2d.getTransform();
+
+        AffineTransform at = new AffineTransform();
+
+        at.translate(cx, cy);
+        at.rotate(bullet.getAngle());
+        at.translate(-drawW / 2.0, -drawH / 2.0);
+        at.scale(scaleValue, scaleValue);
+
+        g2d.drawImage(img, at, null);
+
+        g2d.setTransform(old);
+    }
 
 
 

@@ -47,7 +47,7 @@ public final class DrawManager {
 	/** Sprite types. */
     public static enum SpriteType {
         ShipP1,ShipP2,ShipP1Move,ShipP2Move,ShipP2Explosion1,ShipP2Explosion2, ShipP2Explosion3,Life, ShipP1Explosion1,ShipP1Explosion2,ShipP1Explosion3,
-        Bullet, EnemyBullet, EnemyShipA1, EnemyShipA2, Laser, Teleport, TeleportCool,BombExplosion,SubShipP1,SubShipP2,
+        Bullet, EnemyBullet, EnemyShipA1, EnemyShipA2, Laser, Teleport, TeleportCool,BombExplosion,SubShipP1,SubShipP2,GuidedBullet1,GuidedBullet2,
         EnemyShipB1, EnemyShipB2, EnemyShipC1, EnemyShipC2, EnemyShipSpecial, EnemyShipSpecialLeft, EnemySpecialExplosion,
         FinalBoss1, FinalBoss2, BasicBackGroundPatternBullet,FinalBossDeath,OmegaBoss1, OmegaBoss2,OmegaBossHitting,OmegaBossMoving1,OmegaBossMoving2,OmegaBossMoving3,OmegaBossMoving4,OmegaBossDeath, Explosion, SoundOn, SoundOff, Item_MultiShot,
         Item_SubShip, Item_Stop, Shield, Item_Bomb, Item_Coin, BombBullet,Bomb1,Bomb2, PinnedBossPatternBullet,
