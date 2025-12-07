@@ -858,19 +858,11 @@ public class GameModel {
 		if (ship.isInvincible()) return;
 
 		ship.destroy();
-
+        deathCnt++;
         if (ship.getPlayerId() == 1) {
-            int before = livesP1;
             livesP1 = Math.max(0, livesP1 - amount);
-            if (before > 0 && livesP1 == 0) {
-                deathCnt++;
-            }
         } else {
-            int before = livesP2;
             livesP2 = Math.max(0, livesP2 - amount);
-            if (before > 0 && livesP2 == 0) {
-                deathCnt++;
-            }
         }
 
 
