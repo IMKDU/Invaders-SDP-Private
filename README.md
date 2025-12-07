@@ -5,9 +5,9 @@
 
 ## Project Introduction
 
-**Course:** Software Development Practices (CES2024) - 25-2-23292
+**Course:** Software Development Practices (CSE2024) - 25-2-23292
 
-This course project focuses on creating a prototype based on the video game [Space Invaders](https://en.wikipedia.org/wiki/Space_Invaders). The aim is to apply and validate best practices in software engineering. The original code repository can be found at [RobertoIA/Invaders](https://github.com/RobertoIA/Invaders).
+This course project focuses on creating a prototype based on the video game [Space Invaders](https://en.wikipedia.org/wiki/Space_Invaders). The aim is to apply and validate best practices in software engineering. The original code repository can be found at [RobertoIA/Invaders](https://github.com/RobertoIA/Invaders). Additionally, the development was initiated based on the modified version of the project available at [PurpleBananass/Invaders-SDP-23292](https://github.com/PurpleBananass/Invaders-SDP-23292).
 
 ## 👥 Team Members
 
