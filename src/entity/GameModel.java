@@ -98,9 +98,11 @@ public class GameModel {
     private int livesP1;
     private int livesP2;
     /** Total bullets shot by the player. */
-    private int bulletsShot;
+    private int shootingCnt;
     /** Total ships destroyed by the player. */
-    private int shipsDestroyed;
+    private int kill;
+    private int hittingCnt;
+    private int deathCnt;
     /** Moment the game starts. */
     private long gameStartTime;
     /** Checks if the level is finished. */
@@ -177,8 +179,10 @@ public class GameModel {
             this.livesP1++;
             this.livesP2++;
         }
-        this.bulletsShot = gameState.getBulletsShot();
-        this.shipsDestroyed = gameState.getShipsDestroyed();
+        this.shootingCnt = gameState.getBulletsShot();
+        this.kill = gameState.getShipsKill();
+        this.hittingCnt = gameState.getHittingCnt();
+        this.deathCnt = gameState.getDeathCnt();
     }
 
     /**
@@ -298,7 +302,7 @@ public class GameModel {
 
         // Firing logic brought over from the original processPlayerInput
         if (ship.shoot(this.bullets)) {
-            this.bulletsShot++;
+            this.shootingCnt++;
             AchievementManager.getInstance().onShotFired();
 
             // Sub-ships fire together
@@ -784,13 +788,17 @@ public class GameModel {
         attemptItemDrop(enemy);
 
         String type = enemy.getEnemyType();
+
         if ("enemySpecial".equals(type)) {
             if (enemyShipSpecialFormation != null) {
                 enemyShipSpecialFormation.destroy(enemy);
+                this.kill++; //+1kill
             }
-        } else {
+        }
+        else {
             if (enemyShipFormationModel != null) {
                 enemyShipFormationModel.destroy(enemy);
+                this.kill++; //+1kill
             }
         }
     }
@@ -816,22 +824,23 @@ public class GameModel {
 	public void requestEnemyHitByPlayerBullet(Bullet bullet, EnemyShip enemy) {
 		if (!bullets.contains(bullet)) return;
 		if (enemy.isDestroyed()) return;
-
 		int pts = enemy.getPointValue();
 		addPointsFor(bullet, pts);
 		coin += pts / 10;
 		AchievementManager.getInstance().onEnemyDefeated();
-
+        this.hittingCnt++;
 		attemptItemDrop(enemy);
 
 		String type = enemy.getEnemyType();
 		if ("enemySpecial".equals(type)) {
 			if (enemyShipSpecialFormation != null) {
 				enemyShipSpecialFormation.destroy(enemy);
+                this.kill++; //+1kill
 			}
 		} else {
 			if (enemyShipFormationModel != null) {
 				enemyShipFormationModel.destroy(enemy);
+                this.kill++; //+1kill
 			}
 		}
 
@@ -849,12 +858,13 @@ public class GameModel {
 		if (ship.isInvincible()) return;
 
 		ship.destroy();
+        deathCnt++;
+        if (ship.getPlayerId() == 1) {
+            livesP1 = Math.max(0, livesP1 - amount);
+        } else {
+            livesP2 = Math.max(0, livesP2 - amount);
+        }
 
-		if (ship.getPlayerId() == 1) {
-			livesP1 = Math.max(0, livesP1 - amount);
-		} else {
-			livesP2 = Math.max(0, livesP2 - amount);
-		}
 
         if ((ship.getPlayerId() == 1 && livesP1 == 0) ||
                 (ship.getPlayerId() == 2 && livesP2 == 0)) {
@@ -892,14 +902,14 @@ public class GameModel {
 
 
 		boss.takeDamage(GameConstant.PLAYER_BULLET_DAMAGE);
-
+        this.hittingCnt++;
 		if (!bullet.penetration()) {
 			bullets.remove(bullet);
 		}
 
 		if (boss.getHealPoint() <= 0) {
 			boss.destroy();
-
+            this.kill++; //+1kill
 			int pts = boss.getPointValue();
 			addPointsFor(bullet, pts);
 			this.coin += pts / 10;
@@ -1167,17 +1177,18 @@ public class GameModel {
 		addPointsFor(source, pts);
 		this.coin += pts / GameConstant.POINTS_TO_COIN_CONVERSION;
 		AchievementManager.getInstance().onEnemyDefeated();
-
+        this.hittingCnt++;
 		attemptItemDrop(enemy);
-
 		String type = enemy.getEnemyType();
 		if ("enemySpecial".equals(type)) {
 			if (enemyShipSpecialFormation != null) {
 				enemyShipSpecialFormation.destroy(enemy);
+                this.kill++; //+1kill
 			}
 		} else {
 			if (enemyShipFormationModel != null) {
 				enemyShipFormationModel.destroy(enemy);
+                this.kill++; //+1kill
 			}
 		}
 	}
@@ -1186,9 +1197,10 @@ public class GameModel {
 		if (boss == null || boss.isDestroyed()) return;
 
 		boss.takeDamage(GameConstant.BOMB_DAMAGE_TO_BOSS);
-
+        this.hittingCnt++;
 		if (boss.getHealPoint() <= 0) {
 			boss.destroy();
+            this.kill++;
 			int pts = boss.getPointValue();
 			addPointsFor(source, pts);
 			this.coin += pts / 10;
@@ -1300,8 +1312,8 @@ public class GameModel {
         if (this.coin > 2000) {
             AchievementManager.getInstance().unlockAchievement("Mr. Greedy");
         }
-        return new GameState(this.level, this.score, this.scoreP1, this.scoreP2, this.livesP1, this.livesP2,
-                this.bulletsShot, this.shipsDestroyed, this.coin);
+        syncToGameState();
+        return this.gameState;
     }
     /**
      * Adds one life to the player.
@@ -1619,5 +1631,21 @@ public class GameModel {
         }
 
         return renderList;
+    }
+
+    public void syncToGameState() {
+        if (this.gameState == null) return;
+
+        this.gameState.setLevel(this.level);
+        this.gameState.setScore(this.score);
+        this.gameState.setScoreP1(this.scoreP1);
+        this.gameState.setScoreP2(this.scoreP2);
+        this.gameState.setLivesRemaining(this.livesP1);
+        this.gameState.setLivesRemainingP2(this.livesP2);
+        this.gameState.setBulletsShot(this.shootingCnt);
+        this.gameState.setShipsKill(this.kill);
+        this.gameState.setCoin(this.coin);
+        this.gameState.setHittingCnt(this.hittingCnt);
+        this.gameState.setDeathCnt(this.deathCnt);
     }
 }

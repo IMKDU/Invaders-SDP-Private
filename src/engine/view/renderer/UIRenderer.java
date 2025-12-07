@@ -106,7 +106,7 @@ public final class UIRenderer {
 
     /** Draws game results on the end screen.*/
     public void drawResults(final int screenWidth, final int screenHeight, final int score, final int livesRemaining,
-                            final int shipsDestroyed, final float accuracy, final boolean isNewRecord) {
+                            final int shipsDestroyed, final float accuracy, final boolean isNewRecord, final int death) {
 
         Graphics g = backBuffer.getGraphics();
         g.setFont(fontPack.getRegular());
@@ -116,6 +116,7 @@ public final class UIRenderer {
         String livesRemainingString = "Lives remaining: " + livesRemaining;
         String shipsDestroyedString = "Enemies destroyed: " + shipsDestroyed;
         String accuracyString = String.format("Accuracy: %.2f%%", accuracy * 100);
+        String deathCountString = "ships destroyed: " + death;
 
         int baseY = isNewRecord ? screenHeight / 4 : screenHeight / 2;
         int spacing = fontPack.getRegularMetrics().getHeight() * 2;
@@ -124,6 +125,7 @@ public final class UIRenderer {
         g.drawString(livesRemainingString, centerX(screenWidth, g, livesRemainingString), baseY + spacing);
         g.drawString(shipsDestroyedString, centerX(screenWidth, g, shipsDestroyedString), baseY + spacing * 2);
         g.drawString(accuracyString, centerX(screenWidth, g, accuracyString), baseY + spacing * 3);
+        g.drawString(deathCountString,centerX(screenWidth, g, deathCountString), baseY + spacing * 4);
     }
 
     /**

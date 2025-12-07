@@ -28,15 +28,16 @@ public class ScoreScreen extends Screen {
 	private static final int FIRST_CHAR = 65;
 	/** Code of last mayus character. */
 	private static final int LAST_CHAR = 90;
+    private final int deathCnt;
 
-	/** Current score. */
+    /** Current score. */
 	private int score;
 	/** Player lives left. */
 	private int livesRemaining;
 	/** Total bullets shot by the player. */
 	private int bulletsShot;
 	/** Total ships destroyed by the player. */
-	private int shipsDestroyed;
+	private int shipsKill;
 	/** List of past high scores. */
 	private List<Score> highScores;
 	/** Checks if current score is a new high score. */
@@ -47,6 +48,7 @@ public class ScoreScreen extends Screen {
 	private int nameCharSelected;
 	/** Time between changes in user selection. */
 	private Cooldown selectionCooldown;
+    private int hittingCnt;
 
 	/**
 	 * Constructor, establishes the properties of the screen.
@@ -67,7 +69,9 @@ public class ScoreScreen extends Screen {
 		this.score = gameState.getScore();
 		this.livesRemaining = gameState.getLivesRemaining();
 		this.bulletsShot = gameState.getBulletsShot();
-		this.shipsDestroyed = gameState.getShipsDestroyed();
+		this.shipsKill = gameState.getShipsKill();
+        this.hittingCnt = gameState.getHittingCnt();
+        this.deathCnt = gameState.getDeathCnt();
 		this.isNewRecord = false;
 		this.name = "AAA".toCharArray();
 		this.nameCharSelected = 0;
@@ -175,9 +179,9 @@ public class ScoreScreen extends Screen {
 
 		drawManager.getUIRenderer().drawGameOver(this.width,this.height, this.inputDelay.checkFinished(),
 				this.isNewRecord);
+        float accuracy = (bulletsShot == 0) ? 0 : (float) hittingCnt / bulletsShot;
 		drawManager.getUIRenderer().drawResults(this.width,this.height, this.score, this.livesRemaining,
-				this.shipsDestroyed, (float) this.shipsDestroyed
-						/ this.bulletsShot, this.isNewRecord);
+				this.shipsKill, accuracy, this.isNewRecord, this.deathCnt);
 
 		if (this.isNewRecord)
 			drawManager.getUIRenderer().drawNameInput(this.width,this.height, this.name, this.nameCharSelected);

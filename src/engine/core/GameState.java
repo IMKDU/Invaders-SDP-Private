@@ -20,12 +20,14 @@ public class GameState {
 	/** Bullets shot until now. */
 	private int bulletsShot;
 	/** Ships destroyed until now. */
-	private int shipsDestroyed;
+	private int shipsKill;
     /** Current coin. */
     private int coin;
+    private int hittingCnt;
+    private int deathCnt;
 
 
-	/**
+    /**
 	 * Constructor.
 	 * 
 	 * @param level
@@ -53,10 +55,55 @@ public class GameState {
 		this.livesRemaining = livesRemaining;
 		this.livesRemainingP2 = livesRemainingP2;
 		this.bulletsShot = bulletsShot;
-        this.shipsDestroyed = shipsDestroyed;
+        this.shipsKill = shipsDestroyed;
         this.coin = coin;
-		    }
-	/**
+    }
+
+    // --- setters for sync ---
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void setScoreP1(int scoreP1) {
+        this.scoreP1 = scoreP1;
+    }
+
+    public void setScoreP2(int scoreP2) {
+        this.scoreP2 = scoreP2;
+    }
+
+    public void setLivesRemaining(int livesRemaining) {
+        this.livesRemaining = livesRemaining;
+    }
+
+    public void setLivesRemainingP2(int livesRemainingP2) {
+        this.livesRemainingP2 = livesRemainingP2;
+    }
+
+    public void setBulletsShot(int bulletsShot) {
+        this.bulletsShot = bulletsShot;
+    }
+
+    public void setShipsKill(int shipsKill) {
+        this.shipsKill = shipsKill;
+    }
+
+    public void setCoin(int coin) {
+        this.coin = coin;
+    }
+    public void setHittingCnt(int hittingCnt) {
+        this.hittingCnt = hittingCnt;
+    }
+    public void setDeathCnt(int deathCnt){
+        this.deathCnt = deathCnt;
+    }
+
+    /**
 	 * @return the level
 	 */
 	public final int getLevel() {
@@ -99,11 +146,13 @@ public class GameState {
 	/**
 	 * @return the shipsDestroyed
 	 */
-	public final int getShipsDestroyed() {
-		return shipsDestroyed;
+	public final int getShipsKill() {
+		return shipsKill;
 	}
 
     public final int getCoin() { return coin; }
+
+    public int getHittingCnt() { return hittingCnt; }
 
 	public final boolean deductCoins(final int amount) {
 		if (amount < 0) {
@@ -127,4 +176,8 @@ public class GameState {
 			this.coin = amount;
 		}
 	}
+
+    public int getDeathCnt() {
+        return deathCnt;
+    }
 }
